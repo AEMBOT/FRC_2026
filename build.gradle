@@ -107,10 +107,10 @@ wpi.java.configureTestTasks(test)
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
 
-
-    // Spotless formatting (Automatically formats code, keeping consistent style)
-    project.compileJava.dependsOn(spotlessApply)
 }
+
+// Spotless formatting (Automatically formats code, keeping consistent style)
+project.compileJava.dependsOn(spotlessApply)
 spotless {
     java {
         target fileTree(".") {
