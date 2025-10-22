@@ -4,16 +4,23 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.TimedRobot;
+import static frc.robot.constants.GeneralConstants.*;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
  * the TimedRobot documentation. If you change the name of this class or the package after creating
  * this project, you must also update the Main.java file in the project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
@@ -37,11 +44,31 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
-    // commands, running already-scheduled commands, removing finished or interrupted commands,
-    // and running subsystem periodic() methods.  This must be called from the robot's periodic
-    // block in order for anything in the Command-based framework to work.
-    CommandScheduler.getInstance().run();
+
+    // Set up data receivers & replay source
+    switch (currentMode) {
+      case REAL:
+        // Running on a real robot, log to a USB stick ("/U/logs")
+        Logger.addDataReceiver(new WPILOGWriter("/U/logs"));
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+
+      case SIM:
+        // Running a physics simulator, log to NT
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+
+      case REPLAY:
+        // Replaying a log, set up replay source
+        setUseTiming(false); // Run as fast as possible
+        String logPath = LogFileUtil.findReplayLog();
+        Logger.setReplaySource(new WPILOGReader(logPath));
+        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        break;
+    }
+
+    // Start the AdvantageKit logger
+    Logger.start();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
