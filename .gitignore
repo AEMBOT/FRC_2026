@@ -185,3 +185,6 @@ compile_commands.json
 
 # Eclipse generated file for annotation processors
 .factorypath
+
+# Generated files only relevant for a specific build
+src/main/java/com/aembot/lib/constants/generated
