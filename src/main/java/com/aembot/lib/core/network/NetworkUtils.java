@@ -36,21 +36,15 @@ public final class NetworkUtils {
     public static final String getMACAddress() {
       // this method exists for error handling. For actual retrieval see _getMACAdress
       try {
-        String macAddress = null;
-
         Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
         while (networkInterfaces.hasMoreElements()) {
           NetworkInterface networkInterface = networkInterfaces.nextElement();
           if (networkInterface == null) continue;
 
-          // store value so it doesn't need to be recalculated if this is called again (I think
-          // that's how it works)
-          final String _macAddress =
-              NetworkUtils.MAC.formatMACAddress(networkInterface.getHardwareAddress());
-          macAddress = _macAddress;
+          return NetworkUtils.MAC.formatMACAddress(networkInterface.getHardwareAddress());
         }
 
-        return macAddress;
+        return null; // No MAC address could be retrieved
       } catch (SocketException e) {
         DataLogManager.log(
             String.format(
