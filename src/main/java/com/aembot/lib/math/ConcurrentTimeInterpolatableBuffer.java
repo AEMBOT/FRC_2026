@@ -173,9 +173,8 @@ public class ConcurrentTimeInterpolatableBuffer<T> {
   }
 
   /**
-   * Used in Pose Estimation to replay odometry inputs
-   * stored within this buffer
-   * 
+   * Used in Pose Estimation to replay odometry inputs stored within this buffer
+   *
    * @return The internal buffer used to store samples
    */
   public ConcurrentNavigableMap<Double, T> getInternalBuffer() {
