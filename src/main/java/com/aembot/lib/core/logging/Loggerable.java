@@ -1,5 +1,6 @@
 package com.aembot.lib.core.logging;
 
+import com.aembot.lib.constants.RuntimeConstants;
 import com.aembot.lib.constants.generated.BuildConstants;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -50,6 +51,7 @@ public interface Loggerable {
         break;
     }
 
-    // TODO Add robot metadata
+    Logger.recordMetadata("RobotName", RuntimeConstants.ROBOT_ID.getName());
+    Logger.recordMetadata("MACAddress", RuntimeConstants.ROBOT_ID.getMACAddress());
   }
 }
