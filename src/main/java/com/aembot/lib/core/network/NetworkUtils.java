@@ -41,7 +41,11 @@ public final class NetworkUtils {
           NetworkInterface networkInterface = networkInterfaces.nextElement();
           if (networkInterface == null) continue;
 
-          return NetworkUtils.MAC.formatMACAddress(networkInterface.getHardwareAddress());
+          byte[] macAddressBytes = networkInterface.getHardwareAddress();
+
+          if (macAddressBytes == null) continue;
+
+          return NetworkUtils.MAC.formatMACAddress(macAddressBytes);
         }
       } catch (SocketException e) {
         DataLogManager.log(
