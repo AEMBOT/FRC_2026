@@ -2,7 +2,6 @@ package com.aembot.frc2026.config;
 
 import com.aembot.lib.config.RobotID;
 import com.aembot.lib.core.network.NetworkUtils;
-
 import java.util.Map;
 
 public enum RobotIDYearly implements RobotID {
@@ -32,9 +31,8 @@ public enum RobotIDYearly implements RobotID {
     return macAddress;
   }
 
-  private static final Map<String, RobotID> ROBOT_TO_MAC = Map.of(
-        "blah:blah:blah:blah:blah:blah", RobotIDYearly.PRODUCTION
-    );
+  private static final Map<String, RobotID> ROBOT_TO_MAC =
+      Map.of("blah:blah:blah:blah:blah:blah", RobotIDYearly.PRODUCTION);
 
   private static final RobotID DEFAULT_ROBOT = PRODUCTION;
 
