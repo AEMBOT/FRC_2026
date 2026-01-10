@@ -1,12 +1,11 @@
 package com.aembot.lib.constants;
 
+import com.aembot.frc2026.constants.RobotRuntimeConstants;
+import com.aembot.lib.config.RobotID;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import java.util.Optional;
-
-import com.aembot.frc2026.constants.RobotRuntimeConstants;
-import com.aembot.lib.config.RobotID;
 
 /**
  * Year-agnostic (assuming FIRST doesn't do wierd things) constants determined at runtime. Should be
@@ -26,11 +25,12 @@ public class RuntimeConstants {
   }
 
   /** The runtime mode: real bot, simulated bot or replaying log file */
-  public static final RuntimeMode MODE =
-      RobotBase.isReal() ? RuntimeMode.REAL : RuntimeMode.SIM;
+  public static final RuntimeMode MODE = RobotBase.isReal() ? RuntimeMode.REAL : RuntimeMode.SIM;
 
-  // This is maybe wierd and cursed. The intent is to create a singular point for lib to access this season-specific field,
-  // to make porting between years a bit easier and less spaghettiful. TODO have other humans check this
+  // This is maybe wierd and cursed. The intent is to create a singular point for lib to access this
+  // season-specific field,
+  // to make porting between years a bit easier and less spaghettiful. TODO have other humans check
+  // this
   public static final RobotID ROBOT_ID = RobotRuntimeConstants.ROBOT_ID;
 
   /**
