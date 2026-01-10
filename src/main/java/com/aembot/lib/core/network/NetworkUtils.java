@@ -43,14 +43,13 @@ public final class NetworkUtils {
 
           return NetworkUtils.MAC.formatMACAddress(networkInterface.getHardwareAddress());
         }
-
-        return null; // No MAC address could be retrieved
       } catch (SocketException e) {
         DataLogManager.log(
             String.format(
                 "Exception when attempting to retrieve robot MAC address: %s", e.toString()));
-        return null;
       }
+
+      return null;
     }
   }
 }
