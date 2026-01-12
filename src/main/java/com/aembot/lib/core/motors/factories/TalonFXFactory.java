@@ -2,7 +2,7 @@ package com.aembot.lib.core.motors.factories;
 
 import com.aembot.lib.core.can.CANDeviceID;
 import com.aembot.lib.core.can.CANStatusLogger;
-import com.aembot.lib.phoenix6.CTREUtil;
+import com.aembot.lib.core.phoenix6.CTREUtil;
 import com.ctre.phoenix6.configs.AudioConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;

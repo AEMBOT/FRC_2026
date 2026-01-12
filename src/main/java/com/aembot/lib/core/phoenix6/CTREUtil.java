@@ -1,4 +1,4 @@
-package com.aembot.lib.phoenix6;
+package com.aembot.lib.core.phoenix6;
 
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.core.motors.io.MotorIOTalonFX;

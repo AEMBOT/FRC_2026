@@ -6,7 +6,7 @@ import com.aembot.lib.core.can.interfaces.CANable;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.factories.TalonFXFactory;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
-import com.aembot.lib.phoenix6.CTREUtil;
+import com.aembot.lib.core.phoenix6.CTREUtil;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
