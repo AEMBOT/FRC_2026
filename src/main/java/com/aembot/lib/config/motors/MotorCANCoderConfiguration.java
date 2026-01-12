@@ -1,6 +1,6 @@
 package com.aembot.lib.config.motors;
 
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.aembot.lib.config.encoders.AEMCANCoderConfiguration;
 
 /**
  * Configuration for a servo motor with a CANCoder
@@ -11,7 +11,7 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
  * @param <C> The type of the underlying configuration for the motor
  */
 public class MotorCANCoderConfiguration<C> extends MotorConfiguration<C> {
-  public CANcoderConfiguration canCoderConfiguration = new CANcoderConfiguration();
+  public AEMCANCoderConfiguration canCoderConfiguration = new AEMCANCoderConfiguration();
 
   /**
    * Gear ratio between the motor and the encoder; ratio of encoder rotations per motor rotation.
