@@ -7,12 +7,10 @@ public class SimulatedRobotStateYearly extends SimulatedRobotState {
     // TODO Add apriltags to vision sim
   }
 
-  private static SimulatedRobotStateYearly instance = null;
+  // Ppl on the interwebs say this is good & thread safe
+  private static final SimulatedRobotStateYearly INSTANCE = new SimulatedRobotStateYearly();
 
   public static SimulatedRobotStateYearly get() {
-    if (instance == null) {
-      instance = new SimulatedRobotStateYearly();
-    }
-    return instance;
+    return INSTANCE;
   }
 }
