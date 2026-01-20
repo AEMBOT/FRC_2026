@@ -42,11 +42,7 @@ public enum RobotIDYearly implements RobotID {
    */
   public static RobotID getIdentification() {
     String macAddress = NetworkUtils.MAC.getMACAddress();
-    if (macAddress == null) {
-      return DEFAULT_ROBOT.withMACAddress("NULL MAC ADDRESS");
-    }
-    RobotID id = ROBOT_TO_MAC.get(macAddress).withMACAddress(macAddress);
-    // Default to the main robot if MAC was unable to be retrieved
-    return (id != null) ? id : DEFAULT_ROBOT.withMACAddress(macAddress);
+
+    return ROBOT_TO_MAC.getOrDefault(macAddress, DEFAULT_ROBOT).withMACAddress(macAddress);
   }
 }
