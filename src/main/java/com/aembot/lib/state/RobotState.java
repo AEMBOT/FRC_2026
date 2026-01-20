@@ -4,8 +4,6 @@ import com.aembot.lib.constants.RobotStateConstants;
 import com.aembot.lib.core.logging.Loggable;
 import com.aembot.lib.math.ConcurrentTimeInterpolatableBuffer;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
@@ -93,27 +91,6 @@ public abstract class RobotState implements Loggable {
       Entry<Double, Pose2d> latest = buffer.getLatest();
       if (latest != null) {
         Logger.recordOutput(key, latest.getValue());
-      }
-    }
-
-    /**
-     * Logs the latest pose in the time interpolated pose
-     *
-     * @param key Where to log the result to
-     * @param buffer Buffer we are logging the data from
-     */
-    public static void logTimeInterpolatedPose3d(
-        String key, ConcurrentTimeInterpolatableBuffer<Pose2d> buffer) {
-      Entry<Double, Pose2d> latest = buffer.getLatest();
-      if (latest != null) {
-        Pose2d pose = latest.getValue();
-        Logger.recordOutput(
-            key,
-            new Pose3d(
-                pose.getX(),
-                pose.getY(),
-                0.0,
-                new Rotation3d(0.0, 0.0, pose.getRotation().getRadians())));
       }
     }
   }
@@ -226,7 +203,5 @@ public abstract class RobotState implements Loggable {
   public void updateLog(String standardPrefix, String inputPrefix) {
     RobotState.Odometry.logTimeInterpolatedPose(
         "SensorRobotState/RobotPose2d", odometryState.timeInterpolatableEstimatedRobotPose);
-    RobotState.Odometry.logTimeInterpolatedPose(
-        "SensorRobotState/RobotPose3d", odometryState.timeInterpolatableEstimatedRobotPose);
   }
 }
