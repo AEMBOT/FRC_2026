@@ -4,6 +4,7 @@ import com.aembot.lib.core.can.CANDeviceID;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.VoltageConfigs;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.math.Pair;
 
 public interface MotorIO {
@@ -14,7 +15,27 @@ public interface MotorIO {
 
   public enum FollowDirection {
     INVERT,
-    SAME
+    SAME;
+
+    public static FollowDirection fromCTREAlignment(MotorAlignmentValue value) {
+      switch (value) {
+        case Opposed:
+          return INVERT;
+        case Aligned:
+        default:
+          return SAME;
+      }
+    }
+
+    public MotorAlignmentValue toCTREAlignment() {
+      switch (this) {
+        case INVERT:
+          return MotorAlignmentValue.Opposed;
+        case SAME:
+        default:
+          return MotorAlignmentValue.Aligned;
+      }
+    }
   }
 
   /** Get the name given to this motor */

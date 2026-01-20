@@ -23,6 +23,7 @@ import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
@@ -60,10 +61,10 @@ public class MotorIOTalonFX implements MotorIO, CANable {
    * Velocity, Acceleration, and Jerk
    */
   private final DynamicMotionMagicVoltage dynamicMotionMagicPositionControl =
-      new DynamicMotionMagicVoltage(0.0, 0.0, 0.0, 0.0);
+      new DynamicMotionMagicVoltage(0, 0, 0);
 
   /** Controller used to mimic the output of another TalonFX */
-  private final Follower followerControl = new Follower(0, true);
+  private final Follower followerControl = new Follower(0, MotorAlignmentValue.Opposed);
 
   /** Controller to drive a motor to a desired stator current */
   private final TorqueCurrentFOC torqueCurrentFOCControl = new TorqueCurrentFOC(0.0);
@@ -381,8 +382,8 @@ public class MotorIOTalonFX implements MotorIO, CANable {
     this.getCANDevice().setMasterCANDevice(masterDevice);
     return talon.setControl(
             followerControl
-                .withMasterID(masterDevice.getDeviceID())
-                .withOpposeMasterDirection(direction == FollowDirection.INVERT))
+                .withLeaderID(masterDevice.getDeviceID())
+                .withMotorAlignment(direction.toCTREAlignment()))
         == StatusCode.OK;
   }
 
