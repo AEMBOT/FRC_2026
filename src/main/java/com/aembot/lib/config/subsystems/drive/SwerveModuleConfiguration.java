@@ -21,7 +21,7 @@ public abstract class SwerveModuleConfiguration<
     DC extends ParentConfiguration,
     SC extends ParentConfiguration,
     SE extends ParentConfiguration> {
-  protected final String moduleName;
+  public final String moduleName;
 
   protected double wheelRadiusM = 0;
 
