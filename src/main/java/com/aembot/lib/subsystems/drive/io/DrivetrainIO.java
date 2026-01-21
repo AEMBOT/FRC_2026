@@ -1,5 +1,6 @@
-package com.aembot.lib.subsystems.drive;
+package com.aembot.lib.subsystems.drive.io;
 
+import com.aembot.lib.subsystems.drive.DrivetrainInputs;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -32,11 +33,10 @@ public interface DrivetrainIO {
    *
    * @param request The operation to preform on the swerve drive
    */
-  void setControl(SwerveRequest request);
+  void setRequest(SwerveRequest request);
 
   /**
-   * Apply the SwerveRequest in the supplier to the swerve drive train until this command is
-   * cancelled
+   * Apply the supplied SwerveRequest to the swerve drive train until this command is cancelled
    *
    * @param requestSupplier The Supplier<SwerveRequest> used to control what request is being given
    *     to the drive train
