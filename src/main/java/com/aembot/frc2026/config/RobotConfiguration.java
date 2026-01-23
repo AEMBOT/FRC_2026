@@ -1,5 +1,6 @@
 package com.aembot.frc2026.config;
 
+import com.aembot.frc2026.config.robots.ProductionConfig;
 import com.pathplanner.lib.config.RobotConfig;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public abstract class RobotConfiguration {
     switch (identification) {
       case PRODUCTION:
       default:
-        return null; // FIXME
+        return new ProductionConfig();
     }
   }
 }
