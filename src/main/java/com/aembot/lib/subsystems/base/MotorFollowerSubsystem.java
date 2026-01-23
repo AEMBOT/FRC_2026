@@ -107,16 +107,16 @@ public class MotorFollowerSubsystem<
    */
   @Override
   public double getCurrentPosition() {
-    double positionSum = inputs.positionUnits;
+    double uninvertedPositionSum = inputs.positionUnits;
     for (int i = 0; i < followerMotorInputs.length; i++) {
       double followerPosition = followerMotorInputs[i].positionUnits;
       // If follower is inverted, negate its position to align with leader
       if (mainConfig.followerConfigurations.get(i).followDirection == FollowDirection.INVERT) {
         followerPosition = -followerPosition;
       }
-      positionSum += followerPosition;
+      uninvertedPositionSum += followerPosition;
     }
-    return positionSum / (mainConfig.followerConfigurations.size() + 1);
+    return uninvertedPositionSum / (mainConfig.followerConfigurations.size() + 1);
   }
 
   /**
