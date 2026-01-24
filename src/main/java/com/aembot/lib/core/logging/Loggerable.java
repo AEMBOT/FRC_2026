@@ -5,13 +5,16 @@ import static com.aembot.lib.constants.RuntimeConstants.*;
 import com.aembot.lib.constants.RuntimeConstants;
 import com.aembot.lib.constants.generated.BuildConstants;
 import edu.wpi.first.wpilibj.DriverStation;
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 /** Interface for a class that will set up the AKit {@link Logger} */
 public interface Loggerable {
-  public default void setupLogger() {
+  public default void setupLogger(LoggedRobot robot) {
     setupMetadata();
 
     switch (MODE) {
@@ -28,7 +31,14 @@ public interface Loggerable {
         Logger.addDataReceiver(new NT4Publisher());
         break;
       case REPLAY:
-        // TODO REPLAY
+        robot.setUseTiming(false);
+
+        String logPath = LogFileUtil.findReplayLog();
+        Logger.setReplaySource(new WPILOGReader(logPath));
+
+        // Save the outputs to a new log file with the suffix "_sim"
+        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        break;
     }
 
     Logger.start();

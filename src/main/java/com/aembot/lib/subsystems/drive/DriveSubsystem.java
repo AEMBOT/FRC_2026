@@ -112,7 +112,7 @@ public class DriveSubsystem extends AEMSubsystem {
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
-    Logger.processInputs(inputPrefix + "/Inputs", inputs);
+    Logger.processInputs(inputPrefix, inputs);
 
     Logger.recordOutput(
         standardPrefix + "/Odometry/SpeedMetersPerSecond",

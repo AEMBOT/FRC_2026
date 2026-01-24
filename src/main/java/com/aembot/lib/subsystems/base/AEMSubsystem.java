@@ -18,7 +18,8 @@ public abstract class AEMSubsystem extends SubsystemBase implements Loggable {
     this.subsystemName = name;
 
     this.logPrefixStandard = "Subsystems/" + this.subsystemName;
-    this.logPrefixInput = "RealOutputs/" + logPrefixStandard;
+
+    this.logPrefixInput = "Inputs/" + logPrefixStandard;
   }
 
   @Override

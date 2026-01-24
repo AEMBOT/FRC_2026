@@ -28,7 +28,7 @@ public class Robot extends LoggedRobot {
   public Robot() {
     // Instantiate our RobotContainer.  This will setup all our button bindings, put our
     // autonomous chooser on the dashboard, and set up logging
-    m_robotContainer = new RobotContainer();
+    m_robotContainer = new RobotContainer(this);
   }
 
   /**

@@ -2,12 +2,18 @@ package com.aembot.lib.subsystems.drive;
 
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 public class DrivetrainInputs extends SwerveDriveState implements LoggableInputs {
-  public SwerveDriveKinematics kinematics = null;
+  public SwerveDriveKinematics kinematics =
+      new SwerveDriveKinematics(
+          new Translation2d[] {
+            new Translation2d(), new Translation2d(), new Translation2d(), new Translation2d()
+          });
 
   public double gyroYawAngle = 0.0;
 
@@ -75,8 +81,8 @@ public class DrivetrainInputs extends SwerveDriveState implements LoggableInputs
     OdometryPeriod = table.get("OdometryPeriod", OdometryPeriod);
     Timestamp = table.get("Timestamp", Timestamp);
 
-    ModuleStates = table.get("ModuleStates", ModuleStates);
-    ModuleTargets = table.get("ModuleTargets", ModuleTargets);
+    ModuleStates = table.get("ModuleStates", new SwerveModuleState[4]);
+    ModuleTargets = table.get("ModuleTargets", new SwerveModuleState[4]);
 
     yawAngularVelocity = table.get("YawAngularVelocity", yawAngularVelocity);
     rollAngularVelocity = table.get("RollAngularVelocity", rollAngularVelocity);
