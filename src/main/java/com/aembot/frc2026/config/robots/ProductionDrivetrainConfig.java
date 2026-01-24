@@ -12,7 +12,9 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 
 public class ProductionDrivetrainConfig {
-  public static final String SUBSYSTEM_NAME = "DriveSubsystem";
+  public final class GeneralConstants {
+    public static final String SUBSYSTEM_NAME = "DriveSubsystem";
+  }
 
   /* ---- GYRO ---- */
   private final class GyroConstants {
@@ -29,7 +31,11 @@ public class ProductionDrivetrainConfig {
           .withGyroMountRotation(MOUNT_ROTATION)
           .withCANDevice(
               new CANDeviceID(
-                  ID, NAME, SUBSYSTEM_NAME, CANDeviceID.CANDeviceType.PIGEON2, canBusName));
+                  ID,
+                  NAME,
+                  GeneralConstants.SUBSYSTEM_NAME,
+                  CANDeviceID.CANDeviceType.PIGEON2,
+                  canBusName));
     }
   }
 
@@ -72,7 +78,7 @@ public class ProductionDrivetrainConfig {
         ProductionSwerveModuleConfigs moduleConfigs,
         Pigeon2GyroConfiguration gyroConfiguration) {
       return new DrivetrainConfiguration()
-          .withName(SUBSYSTEM_NAME)
+          .withName(GeneralConstants.SUBSYSTEM_NAME)
           .withMaxDriveSpeed(MAX_DRIVE_SPEED)
           .withMaxAngularRate(MAX_ANGULAR_RATE)
           .withChassisSpeedDeadband(
@@ -102,7 +108,7 @@ public class ProductionDrivetrainConfig {
     private static DrivetrainSimConfiguration makeSimulatedDrivetrainConfiguration(
         PhysicalConfiguration physicalConfiguration) {
       return new DrivetrainSimConfiguration(SIM_LOOP_PERIOD)
-          .withName(SUBSYSTEM_NAME)
+          .withName(GeneralConstants.SUBSYSTEM_NAME)
           .withPhysicalConfiguration(physicalConfiguration)
           .withDriveMotorsPerModule(ProductionSwerveModuleConfigs.DRIVE_MOTORS_PER_MODULE)
           .withSteerMotorsPerModule(ProductionSwerveModuleConfigs.STEER_MOTORS_PER_MODULE);
@@ -124,7 +130,8 @@ public class ProductionDrivetrainConfig {
     this.gyroConfiguration = GyroConstants.makeGyroConfiguration(drivetrainCANBusName);
 
     /* ---- MODULE CONFIGS ---- */
-    this.moduleConfigs = new ProductionSwerveModuleConfigs(SUBSYSTEM_NAME, drivetrainCANBusName);
+    this.moduleConfigs =
+        new ProductionSwerveModuleConfigs(GeneralConstants.SUBSYSTEM_NAME, drivetrainCANBusName);
 
     /* ---- DRIVETRAIN CONFIG ---- */
     this.drivetrainConfiguration =
