@@ -1,9 +1,9 @@
 package com.aembot.lib.subsystems.drive.io;
 
-import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
 import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
 import com.aembot.lib.core.can.CANStatusLogger;
+import com.aembot.lib.core.phoenix6.AEMSwerveDriveState;
 import com.aembot.lib.subsystems.drive.DrivetrainInputs;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -33,7 +33,7 @@ import org.littletonrobotics.junction.Logger;
 public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
     implements DrivetrainIO {
   /** Create a thread safe cached version of the telemetry that we can use to produce logs */
-  private AtomicReference<SwerveDriveState> swerveTelemetryCache = new AtomicReference<>();
+  private AtomicReference<AEMSwerveDriveState> swerveTelemetryCache = new AtomicReference<>();
 
   /**
    * Updates the odometry information from the drive train within our overall robot state as well as
@@ -41,17 +41,12 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
    */
   protected Consumer<SwerveDriveState> swerveTelemetryConsumer =
       state -> {
-        // Update the state via deep-copy
-        swerveTelemetryCache.set(state.clone());
+        AEMSwerveDriveState aemState = AEMSwerveDriveState.fromSwerveDriveState(state);
 
-        RobotStateYearly.get()
-            .addOdometryMeasurement(
-                // Synchronize the RoboRIO clock with the system time and return the rio time of the
-                // state
-                (Timer.getFPGATimestamp() - Utils.getCurrentTimeSeconds()) + state.Timestamp,
+        aemState.timestampRIOSynchronized =
+            (Timer.getFPGATimestamp() - Utils.getCurrentTimeSeconds()) + aemState.Timestamp;
 
-                // New pose of the swerve drive
-                state.Pose);
+        swerveTelemetryCache.set(aemState);
       };
 
   private Matrix<N3, N1> stateStdDevs = null;

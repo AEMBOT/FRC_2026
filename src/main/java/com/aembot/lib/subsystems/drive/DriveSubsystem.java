@@ -71,7 +71,7 @@ public class DriveSubsystem extends AEMSubsystem {
   /** Update {@link RobotStateYearly} with odometry info */
   private void updateRobotState() {
     // Use the timestamp logged with the data rather than the current timestamp.
-    double timestamp = inputs.Timestamp;
+    double timestamp = inputs.timestampRIOSynchronized;
 
     double rollRadsPerS = Units.degreesToRadians(inputs.rollAngularVelocity);
     double pitchRadsPerS = Units.degreesToRadians(inputs.pitchAngularVelocity);
@@ -92,6 +92,8 @@ public class DriveSubsystem extends AEMSubsystem {
 
     ChassisSpeeds desiredFieldRelative =
         ChassisSpeeds.fromRobotRelativeSpeeds(desiredRobotRelative, inputs.Pose.getRotation());
+
+    RobotStateYearly.get().addOdometryMeasurement(timestamp, inputs.Pose);
 
     RobotStateYearly.get()
         .addChassisMotionMeasurements(

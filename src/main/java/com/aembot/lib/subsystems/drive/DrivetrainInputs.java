@@ -1,6 +1,6 @@
 package com.aembot.lib.subsystems.drive;
 
-import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
+import com.aembot.lib.core.phoenix6.AEMSwerveDriveState;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -8,7 +8,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
-public class DrivetrainInputs extends SwerveDriveState implements LoggableInputs {
+public class DrivetrainInputs extends AEMSwerveDriveState implements LoggableInputs {
   public SwerveDriveKinematics kinematics =
       new SwerveDriveKinematics(
           new Translation2d[] {
@@ -36,7 +36,7 @@ public class DrivetrainInputs extends SwerveDriveState implements LoggableInputs
    *
    * @param stateIn The state we are loading from
    */
-  public void importSwerveDriveState(SwerveDriveState stateIn) {
+  public void importSwerveDriveState(AEMSwerveDriveState stateIn) {
     this.Pose = stateIn.Pose;
     this.SuccessfulDaqs = stateIn.SuccessfulDaqs;
     this.FailedDaqs = stateIn.FailedDaqs;
@@ -44,10 +44,13 @@ public class DrivetrainInputs extends SwerveDriveState implements LoggableInputs
     this.ModuleTargets = stateIn.ModuleTargets;
     this.Speeds = stateIn.Speeds;
     this.OdometryPeriod = stateIn.OdometryPeriod;
+    this.timestampRIOSynchronized = stateIn.timestampRIOSynchronized;
   }
 
   @Override
   public void toLog(LogTable table) {
+    table.put("UpdateTimestamp", timestampRIOSynchronized);
+
     table.put("SwerveDriveKinematics", kinematics);
 
     table.put("RobotYawAngle", gyroYawAngle);
@@ -73,6 +76,8 @@ public class DrivetrainInputs extends SwerveDriveState implements LoggableInputs
 
   @Override
   public void fromLog(LogTable table) {
+    timestampRIOSynchronized = table.get("UpdateTimestamp", timestampRIOSynchronized);
+
     kinematics = table.get("SwerveDriveKinematics", kinematics);
 
     gyroYawAngle = table.get("RobotYawAngle", gyroYawAngle);
