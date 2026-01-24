@@ -1,0 +1,41 @@
+package com.aembot.frc2026.config;
+
+import com.aembot.frc2026.config.robots.ProductionConfig;
+import com.pathplanner.lib.config.RobotConfig;
+import java.util.List;
+
+/**
+ * Abstract class defining how a robot should be configured. Contains method to get the {@link
+ * RobotConfig} implementation for a given {@link RobotIDYearly}
+ *
+ * @see RobotConfiguration#getRobotConstants(RobotIDYearly)
+ */
+public abstract class RobotConfiguration {
+  /**
+   * Get the name of the robot has a human readable string
+   *
+   * @return Robot name as a string
+   */
+  public abstract String getRobotName();
+
+  /**
+   * Gets the list of named CAN buses that are present on this bot
+   *
+   * @return Current list of CAN buses used on this robot
+   */
+  public abstract List<String> getCANBusNames();
+
+  /**
+   * retrieve the correct robot constants based on the given robot identification
+   *
+   * @param identification Robot identification representing what robot is currently in use
+   * @return The desired configuration that should be utilized with this robot
+   */
+  public static RobotConfiguration getRobotConstants(RobotIDYearly identification) {
+    switch (identification) {
+      case PRODUCTION:
+      default:
+        return new ProductionConfig();
+    }
+  }
+}
