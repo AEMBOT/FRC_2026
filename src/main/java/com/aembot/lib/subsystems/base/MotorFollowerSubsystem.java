@@ -3,6 +3,7 @@ package com.aembot.lib.subsystems.base;
 import com.aembot.lib.config.motors.MotorFollowersConfiguration;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
+import com.aembot.lib.core.motors.interfaces.MotorIO.FollowDirection;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -106,11 +107,16 @@ public class MotorFollowerSubsystem<
    */
   @Override
   public double getCurrentPosition() {
-    double averagePosition = inputs.positionUnits;
-    for (I followerInput : followerMotorInputs) {
-      averagePosition += followerInput.positionUnits;
+    double uninvertedPositionSum = inputs.positionUnits;
+    for (int i = 0; i < followerMotorInputs.length; i++) {
+      double followerPosition = followerMotorInputs[i].positionUnits;
+      // If follower is inverted, negate its position to align with leader
+      if (mainConfig.followerConfigurations.get(i).followDirection == FollowDirection.INVERT) {
+        followerPosition = -followerPosition;
+      }
+      uninvertedPositionSum += followerPosition;
     }
-    return averagePosition / (mainConfig.followerConfigurations.size() + 1);
+    return uninvertedPositionSum / (mainConfig.followerConfigurations.size() + 1);
   }
 
   /**
@@ -120,11 +126,16 @@ public class MotorFollowerSubsystem<
    */
   @Override
   public double getCurrentVelocity() {
-    double averageVelocity = inputs.velocityUnitsPerSecond;
-    for (I followerInput : followerMotorInputs) {
-      averageVelocity += followerInput.velocityUnitsPerSecond;
+    double uninvertedVelocitySum = inputs.velocityUnitsPerSecond;
+    for (int i = 0; i < followerMotorInputs.length; i++) {
+      double followerVelocity = followerMotorInputs[i].velocityUnitsPerSecond;
+      // If follower is inverted, negate its velocity to align with leader
+      if (mainConfig.followerConfigurations.get(i).followDirection == FollowDirection.INVERT) {
+        followerVelocity = -followerVelocity;
+      }
+      uninvertedVelocitySum += followerVelocity;
     }
-    return averageVelocity / (mainConfig.followerConfigurations.size() + 1);
+    return uninvertedVelocitySum / (mainConfig.followerConfigurations.size() + 1);
   }
 
   /**
