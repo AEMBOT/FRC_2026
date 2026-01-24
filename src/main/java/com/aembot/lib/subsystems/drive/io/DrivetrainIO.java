@@ -4,10 +4,6 @@ import com.aembot.lib.subsystems.drive.DrivetrainInputs;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import java.util.function.Supplier;
 
 public interface DrivetrainIO {
   public void updateInputs(DrivetrainInputs inputs);
@@ -36,18 +32,6 @@ public interface DrivetrainIO {
   void setRequest(SwerveRequest request);
 
   /**
-   * Apply the supplied SwerveRequest to the swerve drive train until this command is cancelled
-   *
-   * @param requestSupplier The Supplier<SwerveRequest> used to control what request is being given
-   *     to the drive train
-   * @param subsystemsRequired The subsystems required to drive this command (will be whatever the
-   *     drive subsystem is)
-   * @return The command to be run
-   */
-  Command continuousRequestCommand(
-      Supplier<SwerveRequest> requestSupplier, Subsystem... subsystemsRequired);
-
-  /**
    * Sets how much we trust the robots reported odometry. Stdevs increase as you trust the odometry
    * less
    *
@@ -56,11 +40,4 @@ public interface DrivetrainIO {
    * @param rotStd +/- θ standard deviation in radians
    */
   void setOdometryStdDevs(double xStd, double yStd, double rotStd);
-
-  /**
-   * Retrieve the swerve drive kinematics for this swerve drivetrain
-   *
-   * @return The SwerveDriveKinematics object for this swerve drive train
-   */
-  SwerveDriveKinematics getSwerveKinematics();
 }

@@ -9,7 +9,6 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -92,11 +91,6 @@ public class DrivetrainSimIO extends DrivetrainHardwareIO {
     simulationThread = new Notifier(drivetrainSim::update);
     simulationThread.setName("DrivetrainSimNotifier");
     simulationThread.startPeriodic(simConfig.simLoopPeriodS);
-  }
-
-  @Override
-  public SwerveDriveKinematics getSwerveKinematics() {
-    return new SwerveDriveKinematics(getModuleLocations());
   }
 
   /** Teleports the simulated robot to the given pose. */

@@ -17,21 +17,16 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 /** Hardware IO implementation of the drivetrain using the CTRE swerve API */
@@ -144,6 +139,7 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
         accelerationX,
         accelerationY);
 
+    inputs.kinematics = getKinematics();
     inputs.gyroYawAngle = inputs.Pose.getRotation().getDegrees();
     inputs.yawAngularVelocity = angularYawVelocity.getValueAsDouble();
     inputs.rollAngularVelocity = angularRollVelocity.getValueAsDouble();
@@ -182,19 +178,8 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
   }
 
   @Override
-  public SwerveDriveKinematics getSwerveKinematics() {
-    return getKinematics();
-  }
-
-  @Override
   public void setRequest(SwerveRequest request) {
     super.setControl(request);
-  }
-
-  @Override
-  public Command continuousRequestCommand(
-      Supplier<SwerveRequest> requestSupplier, Subsystem... subsystemsRequired) {
-    return Commands.run(() -> this.setControl(requestSupplier.get()), subsystemsRequired);
   }
 
   @Override

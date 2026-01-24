@@ -2,10 +2,13 @@ package com.aembot.lib.subsystems.drive;
 
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 public class DrivetrainInputs extends SwerveDriveState implements LoggableInputs {
+  public SwerveDriveKinematics kinematics = null;
+
   public double gyroYawAngle = 0.0;
 
   public double yawAngularVelocity = 0.0;
@@ -39,6 +42,8 @@ public class DrivetrainInputs extends SwerveDriveState implements LoggableInputs
 
   @Override
   public void toLog(LogTable table) {
+    table.put("SwerveDriveKinematics", kinematics);
+
     table.put("RobotYawAngle", gyroYawAngle);
     table.put("Pose", Pose);
     table.put("Speeds", Speeds);
@@ -62,6 +67,8 @@ public class DrivetrainInputs extends SwerveDriveState implements LoggableInputs
 
   @Override
   public void fromLog(LogTable table) {
+    kinematics = table.get("SwerveDriveKinematics", kinematics);
+
     gyroYawAngle = table.get("RobotYawAngle", gyroYawAngle);
     Pose = table.get("Pose", Pose);
     Speeds = table.get("Speeds", Speeds);
