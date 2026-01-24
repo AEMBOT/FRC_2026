@@ -16,6 +16,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -34,6 +35,12 @@ public class DriveSubsystem extends AEMSubsystem {
 
     this.config = configuration;
     this.io = drivetrain;
+  }
+
+  /** Call {@link DriveSubsystem#resetPose} and return self */
+  public DriveSubsystem withSetPose(Pose2d pose) {
+    this.resetPose(pose);
+    return this;
   }
 
   @Override
@@ -81,8 +88,7 @@ public class DriveSubsystem extends AEMSubsystem {
         new ChassisSpeeds(
             inputs.Speeds.vxMetersPerSecond, inputs.Speeds.vyMetersPerSecond, yawRadsPerS);
 
-    ChassisSpeeds desiredRobotRelative =
-        io.getSwerveKinematics().toChassisSpeeds(inputs.ModuleTargets);
+    ChassisSpeeds desiredRobotRelative = inputs.kinematics.toChassisSpeeds(inputs.ModuleTargets);
 
     ChassisSpeeds desiredFieldRelative =
         ChassisSpeeds.fromRobotRelativeSpeeds(desiredRobotRelative, inputs.Pose.getRotation());
@@ -132,7 +138,7 @@ public class DriveSubsystem extends AEMSubsystem {
    * @return The command applying the request
    */
   public Command applyRequest(Supplier<SwerveRequest> request) {
-    return io.continuousRequestCommand(request, this).withName("SwerveDriveRequest");
+    return Commands.run(() -> setRequest(request.get()), this).withName("SwerveDriveRequest");
   }
 
   /**

@@ -4,6 +4,9 @@
 
 package com.aembot.frc2026;
 
+import com.aembot.frc2026.state.RobotStateYearly;
+import com.aembot.frc2026.state.SimulatedRobotStateYearly;
+import com.aembot.lib.core.can.CANStatusLogger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -36,14 +39,26 @@ public class Robot extends LoggedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    CommandScheduler.getInstance().run();
 
-  /** This function is called once each time the robot enters Disabled mode. */
+    // Update the robot state
+    RobotStateYearly.get().updateLog();
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    SimulatedRobotStateYearly.get().updateState();
+    SimulatedRobotStateYearly.get().updateLog();
+  }
+
   @Override
   public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    CANStatusLogger.updateAllLogs();
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
@@ -88,8 +103,4 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is first started up. */
   @Override
   public void simulationInit() {}
-
-  /** This function is called periodically whilst in simulation. */
-  @Override
-  public void simulationPeriodic() {}
 }

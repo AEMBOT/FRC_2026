@@ -56,7 +56,7 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
 
   private Matrix<N3, N1> stateStdDevs = null;
 
-  private ArrayList<String> moduleNames;
+  private ArrayList<String> moduleNames = new ArrayList<>();
 
   /* ----- Pigeon 2 Status Signals ----- */
   private final StatusSignal<AngularVelocity> angularPitchVelocity;
@@ -100,7 +100,7 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
     accelerationY = getPigeon2().getAccelerationY();
 
     for (int i = 0; i < swerveModuleConfigurations.size(); i++) {
-      moduleNames.set(i, swerveModuleConfigurations.get(i).moduleName);
+      moduleNames.add(i, swerveModuleConfigurations.get(i).moduleName);
     }
 
     // Set yaw velocity to update at 250 hz; we care more about this value
