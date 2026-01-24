@@ -1,6 +1,11 @@
 package com.aembot.frc2026.config;
 
 import com.aembot.frc2026.config.robots.ProductionConfig;
+import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
+import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
+import com.aembot.lib.config.subsystems.drive.simulation.DrivetrainSimConfiguration;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.pathplanner.lib.config.RobotConfig;
 import java.util.List;
 
@@ -24,6 +29,30 @@ public abstract class RobotConfiguration {
    * @return Current list of CAN buses used on this robot
    */
   public abstract List<String> getCANBusNames();
+
+  /**
+   * Configuration that will be passed into the drivetrain configuration
+   *
+   * @return The current robot drivetrain configuration
+   */
+  public abstract DrivetrainConfiguration getDrivetrainConfiguration();
+
+  /**
+   * Retrieve the configuration for the swerve modules on the robot
+   *
+   * @return List of SwerveModuleConfigurations in FL, FR, BL, BR order
+   */
+  public abstract List<
+          SwerveModuleConfiguration<
+              TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>>
+      getSwerveConfigurations();
+
+  /**
+   * Get configuration details about the drive train sim for this robot
+   *
+   * @return DrivetrainSimConfiguration of the given robot
+   */
+  public abstract DrivetrainSimConfiguration getSimulatedDrivetrainConfiguration();
 
   /**
    * retrieve the correct robot constants based on the given robot identification
