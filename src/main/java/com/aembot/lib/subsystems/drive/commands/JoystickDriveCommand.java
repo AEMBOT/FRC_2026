@@ -224,7 +224,7 @@ public class JoystickDriveCommand extends Command {
   }
 
   private void driveWithSteer(double velocityX, double velocityY, double velocityTheta) {
-    driveWithSteerRequest.withVelocityX(velocityX).withVelocityY(velocityTheta);
+    driveWithSteerRequest.withVelocityX(velocityX).withVelocityY(velocityY);
 
     if (Math.abs(velocityTheta) > this.joystickSteerDeadband) {
       driveWithSteerRequest.withRotationalRate(velocityTheta);
