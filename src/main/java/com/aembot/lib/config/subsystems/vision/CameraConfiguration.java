@@ -51,6 +51,7 @@ public class CameraConfiguration {
     }
   }
 
+  /** The name of the camera. For Limelights, this should be the hostname / nickname of the camera */
   public final String cameraName;
 
   public final Type cameraType;
