@@ -73,7 +73,10 @@ public class VisionInputs implements LoggableInputs {
     tagHeightPixels = table.get("TagHeightPixels", tagHeightPixels);
     tagHeightAngle = table.get("TagHeightAngle", tagHeightAngle);
     tagDistanceMeters = table.get("TagDistanceMeters", tagDistanceMeters);
-    robotPoseEstimationLatencyUncompensated = table.get("RobotPoseEstimationLatencyUncompensated", robotPoseEstimationLatencyUncompensated);
-    robotPoseEstimationLatencyCompensated = table.get("RobotPoseEstimationLatencyCompensated", robotPoseEstimationLatencyCompensated);
+    robotPoseEstimationLatencyUncompensated =
+        table.get(
+            "RobotPoseEstimationLatencyUncompensated", robotPoseEstimationLatencyUncompensated);
+    robotPoseEstimationLatencyCompensated =
+        table.get("RobotPoseEstimationLatencyCompensated", robotPoseEstimationLatencyCompensated);
   }
 }
