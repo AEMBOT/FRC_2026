@@ -24,7 +24,7 @@ public class VisionInputs implements LoggableInputs {
    * The height of (<strong>not to</strong>) the currently detected tag as an angle.
    *
    * <p>In the below triangle, let 📷 be the camera, and the leg opposite to it be the tag. This is
-   * on the xz plane, so downwards is the floor.
+   * on the xz plane, so below this is the floor.
    *
    * <pre>
    * .
@@ -32,12 +32,18 @@ public class VisionInputs implements LoggableInputs {
    * 📷/_|
    * </pre>
    *
-   * tagHeightAngle is the angle at the camera in this triangle.
+   * {@code tagHeightAngle} is the angle at the camera in this triangle.
    */
   public Rotation2d tagHeightAngle;
 
   /** Distance from the camera to the tag in meters */
   public double tagDistanceMeters;
+
+  /**
+   * Ms between the end of the exposure of the middle row of the sensor to the data being published
+   * to network tables
+   */
+  public double latency;
 
   /**
    * The estimated pose of the robot based off the tag's data <strong>without</strong> compensation
