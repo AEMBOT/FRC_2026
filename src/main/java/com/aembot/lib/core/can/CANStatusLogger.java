@@ -1,9 +1,16 @@
 package com.aembot.lib.core.can;
 
+import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
 import com.aembot.lib.core.logging.Loggable;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.CANBus.CANBusStatus;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.swerve.SwerveDrivetrain;
+import com.ctre.phoenix6.swerve.SwerveModule;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,7 +94,37 @@ public class CANStatusLogger implements Loggable {
     devices.add(device);
   }
 
-  // TODO Add helper method for registering drivetrain devices
+  /**
+   * Register a CTRE swerve drivetrain with the logger, setting up and using the supply voltage
+   * status signals of each device to check connectivity.
+   */
+  public void registerSwerveDrivetrain(
+      SwerveDrivetrain<TalonFX, TalonFX, CANcoder> drivetrain,
+      List<
+              SwerveModuleConfiguration<
+                  TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>>
+          moduleConfigurations,
+      CANDeviceID gyroDevice) {
+    for (int i = 0; i < moduleConfigurations.size(); i++) {
+      SwerveModule<TalonFX, TalonFX, CANcoder> module = drivetrain.getModule(i);
+      SwerveModuleConfiguration<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+          moduleConfig = moduleConfigurations.get(i);
+
+      moduleConfig
+          .getDriveMotorID()
+          .setStatusSignal(module.getDriveMotor().getSupplyVoltage(), 100);
+      moduleConfig
+          .getSteerMotorID()
+          .setStatusSignal(module.getSteerMotor().getSupplyVoltage(), 100);
+      moduleConfig.getSteerEncoderID().setStatusSignal(module.getEncoder().getSupplyVoltage(), 100);
+      gyroDevice.setStatusSignal(drivetrain.getPigeon2().getSupplyVoltage(), 100);
+
+      devices.add(moduleConfig.getDriveMotorID());
+      devices.add(moduleConfig.getSteerMotorID());
+      devices.add(moduleConfig.getSteerEncoderID());
+      devices.add(gyroDevice);
+    }
+  }
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {

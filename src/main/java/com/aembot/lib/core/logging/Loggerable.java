@@ -1,33 +1,45 @@
 package com.aembot.lib.core.logging;
 
+import static com.aembot.lib.constants.RuntimeConstants.*;
+
 import com.aembot.lib.constants.RuntimeConstants;
 import com.aembot.lib.constants.generated.BuildConstants;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 /** Interface for a class that will set up the AKit {@link Logger} */
 public interface Loggerable {
-  public default void setupLogger() {
+  public default void setupLogger(LoggedRobot robot) {
     setupMetadata();
 
-    // On real log to logs file, and (if not on FMS) NetworkTables
-    if (RobotBase.isReal()) {
-      Logger.addDataReceiver(new WPILOGWriter("/U/logs"));
-      if (!DriverStation.isFMSAttached()) {
+    switch (MODE) {
+      case REAL:
+        // Log to logs file & (if not on FMS) NetworkTables
+        Logger.addDataReceiver(new WPILOGWriter("/U/logs"));
+        if (!DriverStation.isFMSAttached()) {
+          Logger.addDataReceiver(new NT4Publisher());
+        }
+        break;
+      case SIM:
+        // Log to both file & NetworkTables
+        Logger.addDataReceiver(new WPILOGWriter());
         Logger.addDataReceiver(new NT4Publisher());
-      }
-    }
+        break;
+      case REPLAY:
+        robot.setUseTiming(false);
 
-    // On sim log to both file & NetworkTables
-    else if (RobotBase.isSimulation()) {
-      Logger.addDataReceiver(new WPILOGWriter());
-      Logger.addDataReceiver(new NT4Publisher());
-    }
+        String logPath = LogFileUtil.findReplayLog();
+        Logger.setReplaySource(new WPILOGReader(logPath));
 
-    // TODO Replay
+        // Save the outputs to a new log file with the suffix "_sim"
+        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        break;
+    }
 
     Logger.start();
   }
