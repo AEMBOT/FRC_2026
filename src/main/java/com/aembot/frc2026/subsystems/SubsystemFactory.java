@@ -1,6 +1,7 @@
 package com.aembot.frc2026.subsystems;
 
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
+import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.drive.io.DrivetrainHardwareIO;
 import com.aembot.lib.subsystems.drive.io.DrivetrainIOReplay;
@@ -18,19 +19,22 @@ public class SubsystemFactory {
                 new DrivetrainSimIO(
                     RobotRuntimeConstants.ROBOT_CONFIG.getSimulatedDrivetrainConfiguration(),
                     RobotRuntimeConstants.ROBOT_CONFIG.getDrivetrainConfiguration(),
-                    RobotRuntimeConstants.ROBOT_CONFIG.getSwerveConfigurations()))
+                    RobotRuntimeConstants.ROBOT_CONFIG.getSwerveConfigurations()),
+                RobotStateYearly.get())
             .withSetPose(new Pose2d(2.5, 4, Rotation2d.fromDegrees(0)));
       case REPLAY:
         return new DriveSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getDrivetrainConfiguration(),
-            new DrivetrainIOReplay());
+            new DrivetrainIOReplay(),
+            RobotStateYearly.get());
       case REAL:
       default:
         return new DriveSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getDrivetrainConfiguration(),
             new DrivetrainHardwareIO(
                 RobotRuntimeConstants.ROBOT_CONFIG.getDrivetrainConfiguration(),
-                RobotRuntimeConstants.ROBOT_CONFIG.getSwerveConfigurations()));
+                RobotRuntimeConstants.ROBOT_CONFIG.getSwerveConfigurations()),
+            RobotStateYearly.get());
     }
   }
 }
