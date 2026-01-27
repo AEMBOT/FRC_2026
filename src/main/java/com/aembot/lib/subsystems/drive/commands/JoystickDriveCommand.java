@@ -187,7 +187,7 @@ public class JoystickDriveCommand extends Command {
     Double steerInput = this.steerVelocitySupplier.get();
     Rotation2d heading = this.headingSupplier.get();
 
-    boolean isRedAlliance = DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red;
+    boolean isBlueAlliance = DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Blue;
 
     double xVelocity = 0;
     double yVelocity = 0;
@@ -198,8 +198,8 @@ public class JoystickDriveCommand extends Command {
       xVelocity = this.xVelocitySupplier.getAsDouble() * this.maxDriveSpeed;
       yVelocity = this.yVelocitySupplier.getAsDouble() * this.maxDriveSpeed;
 
-      xVelocity = isRedAlliance ? -xVelocity : xVelocity;
-      yVelocity = isRedAlliance ? -yVelocity : yVelocity;
+      xVelocity = isBlueAlliance ? -xVelocity : xVelocity;
+      yVelocity = isBlueAlliance ? -yVelocity : yVelocity;
     }
 
     if (steerInput != null && Math.abs(steerInput) > this.joystickSteerDeadband) {

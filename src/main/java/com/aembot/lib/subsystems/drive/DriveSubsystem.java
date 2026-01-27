@@ -1,8 +1,8 @@
 package com.aembot.lib.subsystems.drive;
 
-import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
+import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.base.AEMSubsystem;
 import com.aembot.lib.subsystems.drive.io.DrivetrainIO;
 import com.aembot.lib.subsystems.drive.io.DrivetrainSimIO;
@@ -21,6 +21,8 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveSubsystem extends AEMSubsystem {
+  protected final RobotState robotStateInstance;
+
   protected DrivetrainIO io;
   protected DrivetrainInputs inputs = new DrivetrainInputs();
 
@@ -28,13 +30,17 @@ public class DriveSubsystem extends AEMSubsystem {
 
   private final SwerveVisualizer visualizer;
 
-  public DriveSubsystem(DrivetrainConfiguration configuration, DrivetrainIO drivetrain) {
+  public DriveSubsystem(
+      DrivetrainConfiguration configuration,
+      DrivetrainIO drivetrain,
+      RobotState robotStateInstance) {
     super(configuration.configurationName); // Logging prefix setup
 
     visualizer = new SwerveVisualizer(configuration.maxDriveSpeed);
 
     this.config = configuration;
     this.io = drivetrain;
+    this.robotStateInstance = robotStateInstance;
   }
 
   /** Call {@link DriveSubsystem#resetPose} and return self */
@@ -68,7 +74,7 @@ public class DriveSubsystem extends AEMSubsystem {
         (getCurrentCommand() == null) ? "Default" : getCurrentCommand().getName());
   }
 
-  /** Update {@link RobotStateYearly} with odometry info */
+  /** Update the robot state with odometry info */
   private void updateRobotState() {
     // Use the timestamp logged with the data rather than the current timestamp.
     double timestamp = inputs.timestampRIOSynchronized;
@@ -93,23 +99,22 @@ public class DriveSubsystem extends AEMSubsystem {
     ChassisSpeeds desiredFieldRelative =
         ChassisSpeeds.fromRobotRelativeSpeeds(desiredRobotRelative, inputs.Pose.getRotation());
 
-    RobotStateYearly.get().addOdometryMeasurement(timestamp, inputs.Pose);
+    robotStateInstance.addOdometryMeasurement(timestamp, inputs.Pose);
 
-    RobotStateYearly.get()
-        .addChassisMotionMeasurements(
-            timestamp,
-            rollRadsPerS,
-            pitchRadsPerS,
-            yawRadsPerS,
-            pitchRads,
-            rollRads,
-            inputs.accelX,
-            inputs.accelY,
-            actualRobotRelative,
-            inputs.Speeds,
-            desiredRobotRelative,
-            desiredFieldRelative,
-            gyroFusedFieldRelative);
+    robotStateInstance.addChassisMotionMeasurements(
+        timestamp,
+        rollRadsPerS,
+        pitchRadsPerS,
+        yawRadsPerS,
+        pitchRads,
+        rollRads,
+        inputs.accelX,
+        inputs.accelY,
+        actualRobotRelative,
+        inputs.Speeds,
+        desiredRobotRelative,
+        desiredFieldRelative,
+        gyroFusedFieldRelative);
   }
 
   @Override
