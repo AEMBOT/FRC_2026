@@ -21,7 +21,7 @@ public class ConcurrentInterpolatable2DMap<T> {
   private final ConcurrentNavigableMap<Double, ConcurrentNavigableMap<Double, T>> internalMap =
       new ConcurrentSkipListMap<>();
 
-  private ConcurrentInterpolatable2DMap(Interpolator<T> interpolatingFunc) {
+  public ConcurrentInterpolatable2DMap(Interpolator<T> interpolatingFunc) {
     this.interpolatingFunc = interpolatingFunc;
   }
 
