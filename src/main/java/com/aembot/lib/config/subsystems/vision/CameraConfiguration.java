@@ -2,6 +2,8 @@ package com.aembot.lib.config.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+
 import java.util.function.Supplier;
 
 public class CameraConfiguration {
@@ -84,7 +86,7 @@ public class CameraConfiguration {
    *
    * @see #withCameraOffset(Pose3d)
    */
-  public Pose3d cameraOffset;
+  public Transform3d cameraOffset;
 
   public Resolution cameraResolution;
 
@@ -108,14 +110,14 @@ public class CameraConfiguration {
   }
 
   /**
-   * Get the position of the camera relative to {@link #mechanismOrigin}. This is the preferred
+   * Get the position of the camera relative to the robot chassis' center on the floor. This is the preferred
    * method of getting the camera's position.
    *
    * @see #mechanismOrigin
    * @see #cameraOffset
    */
   public Pose3d getCameraPosition() {
-    return cameraOffset.relativeTo(mechanismOrigin.get());
+    return mechanismOrigin.get().transformBy(cameraOffset);
   }
 
   /**
@@ -140,7 +142,7 @@ public class CameraConfiguration {
    * Set the position of the camera relative to {@link #mechanismOrigin} (usually the center of the
    * robot chassis on the floor)
    */
-  public CameraConfiguration withCameraOffset(Pose3d offset) {
+  public CameraConfiguration withCameraOffset(Transform3d offset) {
     this.cameraOffset = offset;
     return this;
   }
