@@ -1,4 +1,4 @@
-package com.aembot.lib.subsystems.vision;
+package com.aembot.lib.subsystems.aprilvision;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -7,7 +7,7 @@ import org.dyn4j.geometry.Vector2;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
-public class VisionInputs implements LoggableInputs {
+public class AprilVisionInputs implements LoggableInputs {
   public boolean hasTag = false;
   public int tagID = -1;
 
