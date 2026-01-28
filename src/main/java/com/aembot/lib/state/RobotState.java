@@ -6,7 +6,6 @@ import com.aembot.lib.math.ConcurrentTimeInterpolatableBuffer;
 import com.aembot.lib.subsystems.aprilvision.util.AprilTagObservation;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -110,6 +109,7 @@ public abstract class RobotState implements Loggable {
 
   /**
    * Set the list of april tag observations
+   *
    * @param observations a list consisting of all the observations for this periodic loop
    */
   public void setApriltagObservations(List<AprilTagObservation> observations) {
@@ -122,6 +122,7 @@ public abstract class RobotState implements Loggable {
 
   /**
    * Get the current valid april tag observations
+   *
    * @return The list of valid april tag observations
    */
   public List<AprilTagObservation> getAprilTagObservations() {
