@@ -3,8 +3,12 @@ package com.aembot.lib.state;
 import com.aembot.lib.constants.RobotStateConstants;
 import com.aembot.lib.core.logging.Loggable;
 import com.aembot.lib.math.ConcurrentTimeInterpolatableBuffer;
+import com.aembot.lib.subsystems.aprilvision.util.AprilTagObservation;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
 import org.littletonrobotics.junction.Logger;
@@ -98,13 +102,31 @@ public abstract class RobotState implements Loggable {
   /* Normal class properties */
   protected final RobotState.Odometry odometryState = new RobotState.Odometry();
 
-  // TODO vision observations list
+  private final List<AprilTagObservation> aprilTagObservations = new ArrayList<>();
 
   public void addOdometryMeasurement(double timestamp, Pose2d pose) {
     odometryState.timeInterpolatableEstimatedRobotPose.addSample(timestamp, pose);
   }
 
-  // TODO Vision methods
+  /**
+   * Set the list of april tag observations
+   * @param observations a list consisting of all the observations for this periodic loop
+   */
+  public void setApriltagObservations(List<AprilTagObservation> observations) {
+    aprilTagObservations.clear();
+
+    for (AprilTagObservation observation : observations) {
+      aprilTagObservations.add(observation);
+    }
+  }
+
+  /**
+   * Get the current valid april tag observations
+   * @return The list of valid april tag observations
+   */
+  public List<AprilTagObservation> getAprilTagObservations() {
+    return aprilTagObservations;
+  }
 
   /**
    * Retrieve the latest robot field pose from the robot
