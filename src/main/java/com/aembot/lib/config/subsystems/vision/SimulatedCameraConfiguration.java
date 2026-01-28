@@ -45,6 +45,29 @@ public class SimulatedCameraConfiguration {
   }
 
   /**
+   * Configure the simulated camera to have a set framerate
+   *
+   * @param fps Camera frames per second
+   * @return this simulated camera configuration for chaining
+   */
+  public SimulatedCameraConfiguration withFramerate(double fps) {
+    simCameraProperties.setFPS(fps);
+    return this;
+  }
+
+  /**
+   * Configure the simulated camera to have noise in pixel amounts
+   *
+   * @param xPixelsNoise How much error in pixels should we add into the simulation along the x
+   * @param yPixelsNoise How much error in pixels should we add into the simulation along the y
+   * @return this simulated camera configuration for chaining
+   */
+  public SimulatedCameraConfiguration withCameraNoise(double xPixelNoise, double yPixelNoise) {
+    simCameraProperties.setCalibError(xPixelNoise, yPixelNoise);
+    return this;
+  }
+
+  /**
    * Sets the {@link CameraConfiguration#cameraDistanceScalar} of the camera's configuration while
    * running in sim. Note that this does not affect limelight's camera simulation; rather, it
    * affects the vision subsystem in the same way it would on the real robot.

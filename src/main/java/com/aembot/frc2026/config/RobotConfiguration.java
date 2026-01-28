@@ -4,6 +4,8 @@ import com.aembot.frc2026.config.robots.ProductionConfig;
 import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
 import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
 import com.aembot.lib.config.subsystems.drive.simulation.DrivetrainSimConfiguration;
+import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
+import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.pathplanner.lib.config.RobotConfig;
@@ -53,6 +55,20 @@ public abstract class RobotConfiguration {
    * @return DrivetrainSimConfiguration of the given robot
    */
   public abstract DrivetrainSimConfiguration getSimulatedDrivetrainConfiguration();
+
+  /**
+   * Get configuration details of all the cameras for this robot
+   *
+   * @return List of {@link CameraConfiguration}s of the given robot
+   */
+  public abstract List<CameraConfiguration> getCameraConfigurations();
+
+  /**
+   * Get configuration details of all the simulated cameras for this robot
+   *
+   * @return List of {@link SimulatedCameraConfiguration}s of the given robot
+   */
+  public abstract List<SimulatedCameraConfiguration> getSimulatedCameraConfigurations();
 
   /**
    * retrieve the correct robot constants based on the given robot identification

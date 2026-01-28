@@ -5,6 +5,8 @@ import com.aembot.lib.config.robot.PhysicalConfiguration;
 import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
 import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
 import com.aembot.lib.config.subsystems.drive.simulation.DrivetrainSimConfiguration;
+import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
+import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.util.Units;
@@ -29,6 +31,8 @@ public class ProductionConfig extends RobotConfiguration {
 
   private static final ProductionDrivetrainConfig DRIVETRAIN_CONFIG =
       new ProductionDrivetrainConfig(PHYSICAL_CONFIGURATION, DRIVETRAIN_BUS_NAME);
+
+  private static final ProductionCameraConfig CAMERA_CONFIG = new ProductionCameraConfig();
 
   @Override
   public String getRobotName() {
@@ -56,5 +60,15 @@ public class ProductionConfig extends RobotConfiguration {
   @Override
   public DrivetrainSimConfiguration getSimulatedDrivetrainConfiguration() {
     return DRIVETRAIN_CONFIG.simulatedDrivetrainConfiguration;
+  }
+
+  @Override
+  public List<CameraConfiguration> getCameraConfigurations() {
+    return CAMERA_CONFIG.cameraConfigurations;
+  }
+
+  @Override
+  public List<SimulatedCameraConfiguration> getSimulatedCameraConfigurations() {
+    return CAMERA_CONFIG.simConfigurations;
   }
 }
