@@ -24,6 +24,15 @@ public class Limelight4IOSim extends Limelight4IOHardware {
   private final PhotonCamera photonCamera;
   private final PhotonCameraSim photonCameraSim;
 
+  /**
+   * Constructor go brrr
+   *
+   * @param config Config for the simulated camera
+   * @param fieldConstants This season's field constants
+   * @param robotStateInstance This year's instance of {@link RobotState}
+   * @param registerVisionSimulationConsumer A consumer for registering the simulated photonvision
+   *     camera with the vision simulation system
+   */
   public Limelight4IOSim(
       SimulatedCameraConfiguration config,
       YearFieldConstantable fieldConstants,
