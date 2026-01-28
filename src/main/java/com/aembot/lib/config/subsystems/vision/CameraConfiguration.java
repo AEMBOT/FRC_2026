@@ -3,7 +3,6 @@ package com.aembot.lib.config.subsystems.vision;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-
 import java.util.function.Supplier;
 
 public class CameraConfiguration {
@@ -110,8 +109,8 @@ public class CameraConfiguration {
   }
 
   /**
-   * Get the position of the camera relative to the robot chassis' center on the floor. This is the preferred
-   * method of getting the camera's position.
+   * Get the position of the camera relative to the robot chassis' center on the floor. This is the
+   * preferred method of getting the camera's position.
    *
    * @see #mechanismOrigin
    * @see #cameraOffset
