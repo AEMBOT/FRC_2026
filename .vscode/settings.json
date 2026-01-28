@@ -56,5 +56,9 @@
     "edu.wpi.first.math.proto.*",
     "edu.wpi.first.math.**.proto.*",
     "edu.wpi.first.math.**.struct.*",
-  ]
+  ],
+  
+  // projectile-motion-map-calculator gives errors even when there are none
+  // TODO Find better solution to this
+  "C_Cpp.errorSquiggles": "disabled"
 }
