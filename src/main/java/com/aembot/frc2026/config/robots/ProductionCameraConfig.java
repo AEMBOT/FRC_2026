@@ -113,9 +113,5 @@ public class ProductionCameraConfig {
 
   /** List of configurations in FL, FR, BL, BR order */
   public final List<SimulatedCameraConfiguration> simConfigurations =
-      List.of(
-          simConfigFrontLeft,
-          simConfigFrontRight,
-          simConfigBackLeft,
-          simConfigBackRight);
+      List.of(simConfigFrontLeft, simConfigFrontRight, simConfigBackLeft, simConfigBackRight);
 }
