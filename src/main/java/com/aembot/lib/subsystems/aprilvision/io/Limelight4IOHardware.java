@@ -119,17 +119,17 @@ public class Limelight4IOHardware extends LimelightIO {
     inputs.robotPoseEstimationLatencyUncompensated = null;
     inputs.robotPoseEstimationLatencyCompensated = null;
     if (inputs.hasTag) {
-      Pose3d tagPose = fieldConstants.getAprilTagPose3d(inputs.tagID);
-
       inputs.tagHeightPixels = computeTagHeightInPixels(inputs.tagCornerPositions);
       inputs.tagHeightAngle = computeTagHeightInRotations(inputs.tagHeightPixels);
 
-      inputs.tagDistanceMeters =
-          computeDistanceToTagMeters(inputs.tagHeightAngle, tagPose.getZ())
-              * getConfiguration().cameraDistanceScalar;
-
       // If tag id valid
       if (inputs.tagID >= 1 && inputs.tagID <= fieldConstants.getNumTags()) {
+        Pose3d tagPose = fieldConstants.getAprilTagPose3d(inputs.tagID);
+        
+        inputs.tagDistanceMeters =
+            computeDistanceToTagMeters(inputs.tagHeightAngle, tagPose.getZ())
+                * getConfiguration().cameraDistanceScalar;
+
         Rotation2d robotRotation = robotStateInstance.getLatestFieldRobotPose().getRotation();
 
         Translation2d robotToTagTranslation =
