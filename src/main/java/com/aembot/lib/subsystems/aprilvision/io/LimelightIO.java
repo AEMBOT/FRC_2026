@@ -95,7 +95,7 @@ public abstract class LimelightIO implements AprilCameraIO {
       Rotation2d tagHeightRotations, double fieldTagHeight) {
     return computeDistanceToTagMetersStatic(
         tagHeightRotations,
-        (fieldTagHeight - FieldConstants.APRIL_TAG_HEIGHT_METERS)
+        (fieldTagHeight - FieldConstants.APRIL_TAG_HEIGHT_METERS / 2)
             - getConfiguration().getCameraPosition().getZ());
   }
 }
