@@ -1,7 +1,9 @@
 package com.aembot.lib.subsystems.aprilvision;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import java.util.List;
 import org.dyn4j.geometry.Vector2;
 import org.littletonrobotics.junction.LogTable;
@@ -10,6 +12,7 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
 public class AprilVisionInputs implements LoggableInputs {
   public boolean hasTag = false;
   public int tagID = -1;
+  public Pose3d tagPosition = new Pose3d(Double.NaN, Double.NaN, Double.NaN, new Rotation3d());
 
   /** Horizontal rotation from the camera's center to the detected tag's center */
   public Rotation2d horizontalAngleToTag;
@@ -62,6 +65,7 @@ public class AprilVisionInputs implements LoggableInputs {
   @Override
   public void toLog(LogTable table) {
     table.put("HasTag", hasTag);
+    table.put("tagPosition", tagPosition);
     table.put("HorizontalAngleToTag", horizontalAngleToTag);
     table.put("TagID", tagID);
     table.put("TagHeightPixels", tagHeightPixels);
@@ -74,6 +78,7 @@ public class AprilVisionInputs implements LoggableInputs {
   @Override
   public void fromLog(LogTable table) {
     hasTag = table.get("HasTag", hasTag);
+    tagPosition = table.get("tagPosition", tagPosition);
     horizontalAngleToTag = table.get("HorizontalAngleToTag", horizontalAngleToTag);
     tagID = table.get("TagID", tagID);
     tagHeightPixels = table.get("TagHeightPixels", tagHeightPixels);

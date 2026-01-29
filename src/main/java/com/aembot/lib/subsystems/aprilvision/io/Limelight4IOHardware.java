@@ -5,7 +5,6 @@ import com.aembot.lib.constants.fields.YearFieldConstantable;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionInputs;
 import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
@@ -124,10 +123,10 @@ public class Limelight4IOHardware extends LimelightIO {
 
       // If tag id valid
       if (inputs.tagID >= 1 && inputs.tagID <= fieldConstants.getNumTags()) {
-        Pose3d tagPose = fieldConstants.getAprilTagPose3d(inputs.tagID);
-        
+        inputs.tagPosition = fieldConstants.getAprilTagPose3d(inputs.tagID);
+
         inputs.tagDistanceMeters =
-            computeDistanceToTagMeters(inputs.tagHeightAngle, tagPose.getZ())
+            computeDistanceToTagMeters(inputs.tagHeightAngle, inputs.tagPosition.getZ())
                 * getConfiguration().cameraDistanceScalar;
 
         Rotation2d robotRotation = robotStateInstance.getLatestFieldRobotPose().getRotation();
@@ -137,7 +136,7 @@ public class Limelight4IOHardware extends LimelightIO {
 
         VisionPoseEstimation poseEstimation =
             computeRobotPose(
-                tagPose.toPose2d(),
+                inputs.tagPosition.toPose2d(),
                 robotRotation,
                 robotToTagTranslation,
                 robotStateInstance.getLatestFusedFieldRelativeChassisSpeed(),
