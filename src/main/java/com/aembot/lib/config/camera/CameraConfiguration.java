@@ -18,6 +18,10 @@ public class CameraConfiguration {
    * thought it is often pretty clear.
    */
   public enum Location {
+    FRONT("Front"),
+    LEFT("Left"),
+    RIGHT("Right"),
+    BACK("Back"),
     FRONT_RIGHT("FrontRight"),
     FRONT_LEFT("FrontLeft"),
     BACK_LEFT("BackLeft"),
