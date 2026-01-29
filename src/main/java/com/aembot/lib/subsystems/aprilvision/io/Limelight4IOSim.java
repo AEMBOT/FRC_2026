@@ -62,7 +62,7 @@ public class Limelight4IOSim extends Limelight4IOHardware {
 
       PhotonTrackedTarget target = result.getBestTarget();
 
-      validTagEntry.setBoolean(target != null);
+      validTagEntry.setInteger(target != null ? 1 : 0);
       if (target != null) {
         int tagID = target.getFiducialId();
         tagIDEntry.setInteger(tagID);

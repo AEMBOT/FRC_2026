@@ -13,6 +13,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import java.util.List;
 import org.dyn4j.geometry.Vector2;
+import org.littletonrobotics.junction.Logger;
 
 public class Limelight4IOHardware extends LimelightIO {
   /* ---- NETWORK TABLES ENTRIES ---- */
@@ -154,6 +155,7 @@ public class Limelight4IOHardware extends LimelightIO {
    */
   private void updateCornerPositions() {
     double[] cornerPositions = tagCornerPositionsEntry.getDoubleArray(new double[0]);
+    Logger.recordOutput(cameraConfiguration.cameraName + "corners", cornerPositions);
 
     if (cornerPositions.length == 8) {
       // 4 iterations bcuz we process 2 at a time

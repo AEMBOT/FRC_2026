@@ -1,6 +1,7 @@
 package com.aembot.frc2026.config.robots;
 
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
+import com.aembot.lib.config.subsystems.vision.CameraConfiguration.FOV;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration.Resolution;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration.Type;
 import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
@@ -28,14 +29,15 @@ public class ProductionCameraConfig {
                       Units.inchesToMeters(7.5)),
                   new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-15), 0.0)))
           .withCameraDistanceScalar(1, 1)
-          .withCameraResolution(Resolution.P1280x960);
+          .withCameraResolution(Resolution.P1280x960)
+          .withCameraFOV(FOV.LIMELIGHT4);
 
   public final SimulatedCameraConfiguration simConfigFrontLeft =
       new SimulatedCameraConfiguration(cameraConfigFrontLeft)
           .withFramerate(SIM_CAMERA_FPS)
           .withCameraNoise(0, 0)
           .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS)
-          .withCameraDistanceScalar(0.942, 0.071);
+          .withCameraDistanceScalar(1, 1);
 
   /* ---- FRONT RIGHT CAM ---- */
   public final CameraConfiguration cameraConfigFrontRight =
@@ -48,14 +50,15 @@ public class ProductionCameraConfig {
                       Units.inchesToMeters(7.5)),
                   new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-15), 0.0)))
           .withCameraDistanceScalar(1, 1)
-          .withCameraResolution(Resolution.P1280x960);
+          .withCameraResolution(Resolution.P1280x960)
+          .withCameraFOV(FOV.LIMELIGHT4);
 
   public final SimulatedCameraConfiguration simConfigFrontRight =
       new SimulatedCameraConfiguration(cameraConfigFrontRight)
           .withFramerate(SIM_CAMERA_FPS)
           .withCameraNoise(0, 0)
           .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS)
-          .withCameraDistanceScalar(0.950, 0.071);
+          .withCameraDistanceScalar(1, 1);
 
   /* ---- BACK LEFT CAM ---- */
   public final CameraConfiguration cameraConfigBackLeft =
@@ -71,18 +74,19 @@ public class ProductionCameraConfig {
                       Units.degreesToRadians(-11.75),
                       Units.degreesToRadians(180))))
           .withCameraDistanceScalar(1, 1)
-          .withCameraResolution(Resolution.P1280x960);
+          .withCameraResolution(Resolution.P1280x960)
+          .withCameraFOV(FOV.LIMELIGHT4);
 
   public final SimulatedCameraConfiguration simConfigBackLeft =
       new SimulatedCameraConfiguration(cameraConfigBackLeft)
           .withFramerate(SIM_CAMERA_FPS)
           .withCameraNoise(0, 0)
           .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS)
-          .withCameraDistanceScalar(0.905, 0.074);
+          .withCameraDistanceScalar(1, 1);
 
   /* ---- BACK RIGHT CAM ---- */
   public final CameraConfiguration cameraConfigBackRight =
-      new CameraConfiguration("FrontLeft", Type.LIMELIGHT)
+      new CameraConfiguration("BackRight", Type.LIMELIGHT)
           .withCameraOffset(
               new Transform3d(
                   new Translation3d(
@@ -94,14 +98,15 @@ public class ProductionCameraConfig {
                       Units.degreesToRadians(-11.75),
                       Units.degreesToRadians(-180))))
           .withCameraDistanceScalar(1, 1)
-          .withCameraResolution(Resolution.P1280x960);
+          .withCameraResolution(Resolution.P1280x960)
+          .withCameraFOV(FOV.LIMELIGHT4);
 
   public final SimulatedCameraConfiguration simConfigBackRight =
       new SimulatedCameraConfiguration(cameraConfigBackRight)
           .withFramerate(SIM_CAMERA_FPS)
           .withCameraNoise(0, 0)
           .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS)
-          .withCameraDistanceScalar(0.895, 0.074);
+          .withCameraDistanceScalar(1, 1);
 
   /** List of configurations in FL, FR, BL, BR order */
   public final List<CameraConfiguration> cameraConfigurations =

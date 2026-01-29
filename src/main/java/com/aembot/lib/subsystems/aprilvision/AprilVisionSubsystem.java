@@ -49,6 +49,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
 
     robotStateInstance.setApriltagObservations(aprilTagObservations);
 
+    updateLog();
     for (AprilTagObservation observation : robotStateInstance.getAprilTagObservations()) {
       Logger.recordOutput(
           logPrefixStandard + "/VisionEstimatedRobotPose", observation.estimatedPose());
