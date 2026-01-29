@@ -63,7 +63,7 @@ public abstract class LimelightIO implements AprilCameraIO {
    * @param tagHeightRotations The height of the apriltag from the perspective of the camera
    *     expressed as an angle
    * @param tagVertOffset The physical vertical offset between the center of the camera and the
-   *     bottom of the tag
+   *     center of the tag
    * @return The horizontal distance to the tag in meters. Returns {@link Double#POSITIVE_INFINITY}
    *     if the angle is effectively zero (parallel to the camera) to prevent division by zero.
    */
@@ -95,7 +95,7 @@ public abstract class LimelightIO implements AprilCameraIO {
       Rotation2d tagHeightRotations, double fieldTagHeight) {
     return computeDistanceToTagMetersStatic(
         tagHeightRotations,
-        (fieldTagHeight - FieldConstants.APRIL_TAG_HEIGHT_METERS / 2)
+        (fieldTagHeight)
             - getConfiguration().getCameraPosition().getZ());
   }
 }
