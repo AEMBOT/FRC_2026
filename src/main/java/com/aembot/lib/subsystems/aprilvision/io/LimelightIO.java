@@ -1,6 +1,5 @@
 package com.aembot.lib.subsystems.aprilvision.io;
 
-import com.aembot.lib.constants.FieldConstants;
 import com.aembot.lib.subsystems.aprilvision.interfaces.AprilCameraIO;
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.List;
@@ -94,8 +93,6 @@ public abstract class LimelightIO implements AprilCameraIO {
   protected double computeDistanceToTagMeters(
       Rotation2d tagHeightRotations, double fieldTagHeight) {
     return computeDistanceToTagMetersStatic(
-        tagHeightRotations,
-        (fieldTagHeight)
-            - getConfiguration().getCameraPosition().getZ());
+        tagHeightRotations, (fieldTagHeight) - getConfiguration().getCameraPosition().getZ());
   }
 }
