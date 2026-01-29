@@ -29,6 +29,7 @@ public class ProductionCameraConfig {
                       Units.inchesToMeters(7.5)),
                   new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-15), 0.0)))
           .withCameraDistanceScalar(1, 1)
+          .withXRotationScalar(1, -1)
           .withCameraResolution(Resolution.P1280x960)
           .withCameraFOV(FOV.LIMELIGHT4);
 
@@ -37,7 +38,7 @@ public class ProductionCameraConfig {
           .withFramerate(SIM_CAMERA_FPS)
           .withCameraNoise(0, 0)
           .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS)
-          .withCameraDistanceScalar(1, 1);
+          .withCameraDistanceScalar(1.1578897055, 0.819);
 
   /* ---- FRONT RIGHT CAM ---- */
   public final CameraConfiguration cameraConfigFrontRight =
@@ -50,6 +51,7 @@ public class ProductionCameraConfig {
                       Units.inchesToMeters(7.5)),
                   new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-15), 0.0)))
           .withCameraDistanceScalar(1, 1)
+          .withXRotationScalar(1, -1)
           .withCameraResolution(Resolution.P1280x960)
           .withCameraFOV(FOV.LIMELIGHT4);
 
@@ -74,6 +76,7 @@ public class ProductionCameraConfig {
                       Units.degreesToRadians(-11.75),
                       Units.degreesToRadians(180))))
           .withCameraDistanceScalar(1, 1)
+          .withXRotationScalar(1, -1)
           .withCameraResolution(Resolution.P1280x960)
           .withCameraFOV(FOV.LIMELIGHT4);
 
@@ -98,6 +101,7 @@ public class ProductionCameraConfig {
                       Units.degreesToRadians(-11.75),
                       Units.degreesToRadians(-180))))
           .withCameraDistanceScalar(1, 1)
+          .withXRotationScalar(1, -1)
           .withCameraResolution(Resolution.P1280x960)
           .withCameraFOV(FOV.LIMELIGHT4);
 
