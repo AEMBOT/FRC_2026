@@ -60,7 +60,7 @@ public class ProductionCameraConfig {
           .withFramerate(SIM_CAMERA_FPS)
           .withCameraNoise(0, 0)
           .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS)
-          .withCameraDistanceScalar(1.1578897055, 0.819);
+          .withCameraDistanceScalar(1.16, 1.3);
 
   /* ---- BACK LEFT CAM ---- */
   public final CameraConfiguration cameraConfigBackLeft =
@@ -85,7 +85,7 @@ public class ProductionCameraConfig {
           .withFramerate(SIM_CAMERA_FPS)
           .withCameraNoise(0, 0)
           .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS)
-          .withCameraDistanceScalar(1.1578897055, 0.819);
+          .withCameraDistanceScalar(1.16, 1.3);
 
   /* ---- BACK RIGHT CAM ---- */
   public final CameraConfiguration cameraConfigBackRight =
@@ -110,7 +110,7 @@ public class ProductionCameraConfig {
           .withFramerate(SIM_CAMERA_FPS)
           .withCameraNoise(0, 0)
           .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS)
-          .withCameraDistanceScalar(1.1578897055, 0.819);
+          .withCameraDistanceScalar(1.16, 1.3);
 
   /** List of configurations in FL, FR, BL, BR order */
   public final List<CameraConfiguration> cameraConfigurations =
