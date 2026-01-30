@@ -69,7 +69,9 @@ public abstract class LimelightIO implements AprilCameraIO {
    *     expressed as an angle
    * @param tagVertOffset The physical vertical offset between the center of the camera and the
    *     center of the tag
-   * @param cameraPitch The pitch of the camera. See {@link com.aembot.lib.config.subsystems.vision.CameraConfiguration#getCameraPitch() CameraConfiguration#getCameraPitch()}
+   * @param cameraPitch The pitch of the camera. See {@link
+   *     com.aembot.lib.config.subsystems.vision.CameraConfiguration#getCameraPitch()
+   *     CameraConfiguration#getCameraPitch()}
    * @return The horizontal distance to the tag in meters. Returns {@link Double#POSITIVE_INFINITY}
    *     if the angle is effectively zero (parallel to the camera) to prevent division by zero.
    */
