@@ -117,6 +117,7 @@ public class Limelight4IOHardware extends LimelightIO {
     inputs.tagDistanceMeters = -1;
     inputs.robotPoseEstimationLatencyUncompensated = null;
     inputs.robotPoseEstimationLatencyCompensated = null;
+    inputs.tagPosition = null;
     if (inputs.hasTag) {
       inputs.tagHeightPixels = computeTagHeightInPixels(inputs.tagCornerPositions);
       inputs.tagHeightAngle = computeTagHeightInRotations(inputs.tagHeightPixels);
