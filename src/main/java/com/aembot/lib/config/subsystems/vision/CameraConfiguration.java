@@ -1,6 +1,7 @@
 package com.aembot.lib.config.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import java.util.function.Supplier;
@@ -117,6 +118,16 @@ public class CameraConfiguration {
    */
   public Pose3d getCameraPosition() {
     return mechanismOrigin.get().transformBy(cameraOffset);
+  }
+
+  /** Get the pitch of the camera */
+  public Rotation2d getCameraPitch() {
+    Rotation3d yawAccountedPitch =
+        getCameraPosition()
+            .getRotation()
+            .rotateBy(new Rotation3d(0, 0, -getCameraPosition().getRotation().getZ()));
+
+    return Rotation2d.fromRadians(yawAccountedPitch.getY());
   }
 
   /**

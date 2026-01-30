@@ -1,7 +1,9 @@
 package com.aembot.lib.subsystems.aprilvision.io;
 
+import com.aembot.lib.constants.FieldConstants;
 import com.aembot.lib.subsystems.aprilvision.interfaces.AprilCameraIO;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import java.util.List;
 import org.dyn4j.geometry.Vector2;
 
@@ -66,15 +68,17 @@ public abstract class LimelightIO implements AprilCameraIO {
    * @return The horizontal distance to the tag in meters. Returns {@link Double#POSITIVE_INFINITY}
    *     if the angle is effectively zero (parallel to the camera) to prevent division by zero.
    */
-  public static double computeDistanceToTagMetersStatic(
-      Rotation2d tagHeightRotations, double tagVertOffset) {
-    double tanTheta = tagHeightRotations.getTan();
+  public double computeDistanceToTagMeters(
+      Rotation2d tagHeightRotations, double tagVertOffset, Rotation2d cameraPitch) {
+    double cameraToTag =
+        (1 / tagHeightRotations.div(2).getTan()) * (FieldConstants.APRIL_TAG_HEIGHT_METERS / 2);
 
-    if (Math.abs(tanTheta) < 1e-9) {
-      return Double.POSITIVE_INFINITY;
-    }
+    Rotation2d cameraToTagRotationWorldSpace =
+        Rotation2d.fromRadians(
+            Math.asin((FieldConstants.APRIL_TAG_HEIGHT_METERS / 2) / cameraToTag)
+                + Math.copySign(getConfiguration().getCameraPitch().getRadians(), tagVertOffset));
 
-    return Math.abs(tagVertOffset / tanTheta);
+    return new Translation2d(cameraToTag, cameraToTagRotationWorldSpace).getX();
   }
 
   /**
@@ -92,7 +96,9 @@ public abstract class LimelightIO implements AprilCameraIO {
    */
   protected double computeDistanceToTagMeters(
       Rotation2d tagHeightRotations, double fieldTagHeight) {
-    return computeDistanceToTagMetersStatic(
-        tagHeightRotations, (fieldTagHeight) - getConfiguration().getCameraPosition().getZ());
+    return computeDistanceToTagMeters(
+        tagHeightRotations,
+        (fieldTagHeight) - getConfiguration().getCameraPosition().getZ(),
+        getConfiguration().getCameraPitch());
   }
 }

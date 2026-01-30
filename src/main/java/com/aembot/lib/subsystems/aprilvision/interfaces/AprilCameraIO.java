@@ -56,7 +56,7 @@ public interface AprilCameraIO {
     Translation2d cameraToTagTranslation = new Translation2d(distanceToTagMeters, cameraAngleToTag);
 
     // Subtract camera mount position to get robot pose to tag
-    return cameraToTagTranslation.minus(
+    return cameraToTagTranslation.plus(
         getConfiguration().getCameraPosition().getTranslation().toTranslation2d());
   }
 
