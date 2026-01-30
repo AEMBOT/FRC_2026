@@ -6,6 +6,7 @@ import com.aembot.lib.subsystems.aprilvision.util.AprilTagObservation;
 import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
 import com.aembot.lib.subsystems.base.AEMSubsystem;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.geometry.Pose3d;
 import java.util.ArrayList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
@@ -33,6 +34,14 @@ public class AprilVisionSubsystem extends AEMSubsystem {
     for (Pair<AprilCameraIO, AprilVisionInputs> cameraWithInput : camerasWithInputs) {
       AprilCameraIO io = cameraWithInput.getFirst();
       AprilVisionInputs inputs = cameraWithInput.getSecond();
+
+      Logger.recordOutput(
+          logPrefixStandard + "/" + io.getConfiguration().cameraName + "/CameraPosition",
+          new Pose3d(robotStateInstance.getLatestFieldRobotPose())
+              // This is so jank. why is there no method to add two poses :sob:
+              // Convert the cam pos pose2d to a transform2d with #minus, because
+              // that returns a Transform2d for some unfathomable reason
+              .plus(io.getConfiguration().getCameraPosition().minus(Pose3d.kZero)));
 
       io.updateInputs(inputs);
 
