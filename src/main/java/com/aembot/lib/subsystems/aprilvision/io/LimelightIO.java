@@ -4,6 +4,7 @@ import com.aembot.lib.constants.FieldConstants;
 import com.aembot.lib.subsystems.aprilvision.interfaces.AprilCameraIO;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import java.util.ArrayList;
 import java.util.List;
 import org.dyn4j.geometry.Vector2;
 
@@ -17,20 +18,27 @@ public abstract class LimelightIO implements AprilCameraIO {
    * @return The height of the tag in pixels
    */
   protected static double computeTagHeightInPixels(List<Vector2> cornerPositions) {
-    /** The height of the lowest point of the tag */
-    double minY = Double.POSITIVE_INFINITY;
-    /** The height of the highest point of the tag */
-    double maxY = Double.NEGATIVE_INFINITY;
+    assert cornerPositions.size() == 4;
 
-    // Iterate thru the corner positions. minY will be the y value of whichever corner has the
-    // lowest y, and maxY whichever has the highest y.
-    for (Vector2 pos : cornerPositions) {
-      double y = pos.y;
-      if (y < minY) minY = y;
-      if (y > maxY) maxY = y;
+    // Shallow copy the list so we're not sorting the caller's list
+    List<Vector2> cornerPositionsSorted = new ArrayList<>();
+    for (Vector2 vector2 : cornerPositions) {
+      cornerPositionsSorted.add(vector2);
     }
 
-    return (maxY - minY);
+    // Sort corners from lowest to highest. I'm pretty sure cameras guarantee order but I think this
+    // is simpler & more robust
+    cornerPositionsSorted.sort(
+        (first, second) -> {
+          // Return the difference as an int. Calc difference, yoink sign, ceil it, and put sign
+          // back. Also convert back to int because Math.copySign returns double
+          return (int) Math.copySign(Math.ceil(Math.abs(first.y - second.y)), first.y - second.y);
+        });
+
+    double bottomY = (cornerPositions.get(0).y + cornerPositions.get(1).y) / 2;
+    double topY = (cornerPositions.get(2).y + cornerPositions.get(3).y) / 2;
+
+    return (topY - bottomY);
   }
 
   /**
