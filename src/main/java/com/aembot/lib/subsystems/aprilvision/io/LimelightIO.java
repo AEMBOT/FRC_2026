@@ -45,10 +45,6 @@ public abstract class LimelightIO implements AprilCameraIO {
    * Compute the rotational based height of a tag from its height in pixels
    *
    * @param tagHeightPixels The height of the tag in pixels
-   * @param cameraVerticalFOVDegrees The vertical FOV of the camera used to determine the pixel
-   *     height
-   * @param verticalResolutionPixels The vertical resolution of the camera used to determine the
-   *     pixel height
    * @return Rotation2D representing the height of the tag
    */
   protected Rotation2d computeTagHeightInRotations(double tagHeightPixels) {
@@ -73,6 +69,7 @@ public abstract class LimelightIO implements AprilCameraIO {
    *     expressed as an angle
    * @param tagVertOffset The physical vertical offset between the center of the camera and the
    *     center of the tag
+   * @param cameraPitch The pitch of the camera. See {@link com.aembot.lib.config.subsystems.vision.CameraConfiguration#getCameraPitch() CameraConfiguration#getCameraPitch()}
    * @return The horizontal distance to the tag in meters. Returns {@link Double#POSITIVE_INFINITY}
    *     if the angle is effectively zero (parallel to the camera) to prevent division by zero.
    */
