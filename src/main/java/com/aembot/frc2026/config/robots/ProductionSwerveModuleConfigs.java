@@ -45,7 +45,7 @@ public class ProductionSwerveModuleConfigs {
             // Drive Motor
             new CANDeviceID(
                 5,
-                "FrontRightSwerveDriveMotor",
+                "FrontLeftSwerveDriveMotor",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.TALON_FX,
                 driveCANBusName),
