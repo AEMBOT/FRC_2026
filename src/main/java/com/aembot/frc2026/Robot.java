@@ -4,16 +4,9 @@
 
 package com.aembot.frc2026;
 
-import static com.aembot.frc2026.constants.GeneralConstants.*;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.littletonrobotics.junction.wpilog.WPILOGReader;
-import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -30,33 +23,8 @@ public class Robot extends LoggedRobot {
    * initialization code.
    */
   public Robot() {
-    // Set up data receivers & replay source
-    switch (currentMode) {
-      case REAL:
-        // Running on a real robot, log to a USB stick ("/U/logs")
-        Logger.addDataReceiver(new WPILOGWriter("/U/logs"));
-        Logger.addDataReceiver(new NT4Publisher());
-        break;
-
-      case SIM:
-        // Running a physics simulator, log to NT
-        Logger.addDataReceiver(new NT4Publisher());
-        break;
-
-      case REPLAY:
-        // Replaying a log, set up replay source
-        setUseTiming(false); // Run as fast as possible
-        String logPath = LogFileUtil.findReplayLog();
-        Logger.setReplaySource(new WPILOGReader(logPath));
-        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
-        break;
-    }
-
-    // Start the AdvantageKit logger
-    Logger.start();
-
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
+    // Instantiate our RobotContainer.  This will setup all our button bindings, put our
+    // autonomous chooser on the dashboard, and set up logging
     m_robotContainer = new RobotContainer();
   }
 
