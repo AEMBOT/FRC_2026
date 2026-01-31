@@ -1,11 +1,13 @@
 package com.aembot.lib.subsystems.aprilvision.io;
 
+import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionInputs;
 import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -118,7 +120,7 @@ public class Limelight4IOHardware extends LimelightIO {
     inputs.robotPoseEstimationLatencyUncompensated = null;
     inputs.robotPoseEstimationLatencyCompensated = null;
     inputs.tagPosition = null;
-    if (inputs.hasTag) {
+    if (inputs.hasTag && inputs.tagID == 18) {
       inputs.tagHeightPixels = computeTagHeightInPixels(inputs.tagCornerPositions);
       inputs.tagHeightAngle = computeTagHeightInRotations(inputs.tagHeightPixels);
 
@@ -133,7 +135,7 @@ public class Limelight4IOHardware extends LimelightIO {
         Rotation2d robotRotation = robotStateInstance.getLatestFieldRobotPose().getRotation();
 
         Translation2d robotToTagTranslation =
-            computeRobotToTag(robotRotation, inputs.horizontalAngleToTag, inputs.tagDistanceMeters);
+            computeRobotToTag(inputs.horizontalAngleToTag, inputs.tagDistanceMeters);
 
         VisionPoseEstimation poseEstimation =
             computeRobotPose(
