@@ -6,9 +6,9 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import java.util.List;
-import org.dyn4j.geometry.Vector2;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
+import org.opencv.core.Point;
 
 public class AprilVisionInputs implements LoggableInputs {
   public boolean hasTag = false;
@@ -19,7 +19,7 @@ public class AprilVisionInputs implements LoggableInputs {
   public Rotation2d horizontalAngleToTag;
 
   /** Corner positions of the april tag */
-  public List<Vector2> tagCornerPositions;
+  public List<Point> tagCornerPositions;
 
   /** The height of (<strong>not to</strong>) the currently detected tag in pixels. */
   public double tagHeightPixels;

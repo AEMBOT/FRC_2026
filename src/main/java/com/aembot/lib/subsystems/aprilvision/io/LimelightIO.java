@@ -6,7 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import java.util.ArrayList;
 import java.util.List;
-import org.dyn4j.geometry.Vector2;
+import org.opencv.core.Point;
 
 /** Abstract class extending {@link AprilCameraIO} with methods specific to Limelights */
 public abstract class LimelightIO implements AprilCameraIO {
@@ -14,16 +14,18 @@ public abstract class LimelightIO implements AprilCameraIO {
    * Compute the height of the april tag in pixels based on the positions of the tag corners
    * utilizing contours to achieve these positions
    *
-   * @param cornerPositions The position of the tag on the screen
+   * @param cornerPositions The position of the tag corners on the screen in screen-space, this
+   *     method will account for distortion.
    * @return The height of the tag in pixels
    */
-  protected static double computeTagHeightInPixels(List<Vector2> cornerPositions) {
+  protected static double computeTagHeightInPixels(List<Point> cornerPositions) {
+    // TODO account for distortion
     assert cornerPositions.size() == 4;
 
     // Shallow copy the list so we're not sorting the caller's list
-    List<Vector2> cornerPositionsSorted = new ArrayList<>();
-    for (Vector2 vector2 : cornerPositions) {
-      cornerPositionsSorted.add(vector2);
+    List<Point> cornerPositionsSorted = new ArrayList<>();
+    for (Point point : cornerPositions) {
+      cornerPositionsSorted.add(point);
     }
 
     // Sort corners from lowest to highest. I'm pretty sure cameras guarantee order but I think this

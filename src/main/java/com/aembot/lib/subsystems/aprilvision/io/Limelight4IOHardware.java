@@ -12,8 +12,8 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import java.util.List;
-import org.dyn4j.geometry.Vector2;
 import org.littletonrobotics.junction.Logger;
+import org.opencv.core.Point;
 
 public class Limelight4IOHardware extends LimelightIO {
   /* ---- NETWORK TABLES ENTRIES ---- */
@@ -59,8 +59,8 @@ public class Limelight4IOHardware extends LimelightIO {
   protected final CameraConfiguration cameraConfiguration;
   protected final YearFieldConstantable fieldConstants;
 
-  protected final List<Vector2> tagCorners =
-      List.of(new Vector2(), new Vector2(), new Vector2(), new Vector2());
+  protected final List<Point> tagCorners =
+      List.of(new Point(), new Point(), new Point(), new Point());
 
   protected final RobotState robotStateInstance;
 
