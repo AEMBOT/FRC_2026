@@ -29,7 +29,7 @@ public interface AprilCameraIO {
   }
 
   /**
-   * Compute the field-centric translation from the robot to the tag
+   * Compute the robot-centric translation from the robot to the tag
    *
    * @param robotYaw The yaw of the robot at time of computation
    * @param cameraRotationToTarget The rotation from the camera to the tag
@@ -37,27 +37,15 @@ public interface AprilCameraIO {
    * @return Translation from the robot chassis' center to the tag
    */
   default Translation2d computeRobotToTag(
-      Rotation2d robotYaw, Rotation2d cameraRotationToTarget, double distanceToTagMeters) {
+      Rotation2d cameraRotationToTarget, double distanceToTagMeters) {
     // Scale the camera rotation by the camera rotation ratio scalar set in the configuration,
     // invert the system because limelight and wpilib rotations are inverted.
     Rotation2d scaledCameraRotationToTarget =
         Rotation2d.fromDegrees(
             -(cameraRotationToTarget.getDegrees() / getConfiguration().cameraXRotationScalar));
 
-    // Add rotation of camera to the robot position so that we can use the actual field-centric
-    // rotation of the camera in our computations
-    Rotation2d robotRotationWithLimelightYaw =
-        robotYaw.plus(getConfiguration().getCameraPosition().getRotation().toRotation2d());
-
-    // The angle from the camera to the tag as reported by the limelight
-    Rotation2d cameraAngleToTag = scaledCameraRotationToTarget.plus(robotRotationWithLimelightYaw);
-
-    // The translation from the camera to the tag as computed by our distance and angle
-    Translation2d cameraToTagTranslation = new Translation2d(distanceToTagMeters, cameraAngleToTag);
-
-    // Subtract camera mount position to get robot pose to tag
-    return cameraToTagTranslation.plus(
-        getConfiguration().getCameraPosition().getTranslation().toTranslation2d());
+    return new Translation2d(distanceToTagMeters, scaledCameraRotationToTarget)
+        .plus(getConfiguration().getCameraPosition().getTranslation().toTranslation2d());
   }
 
   default VisionPoseEstimation computeRobotPose(
@@ -66,7 +54,8 @@ public interface AprilCameraIO {
       Translation2d robotCenterToTag,
       ChassisSpeeds latestFieldChassisSpeeds,
       double latency) {
-    Translation2d latencyUncompensatedPosition = tagPose.getTranslation().minus(robotCenterToTag);
+    Translation2d latencyUncompensatedPosition =
+        tagPose.getTranslation().minus(robotCenterToTag.rotateBy(robotRotation));
 
     Translation2d latencyCompensatedPosition =
         new Translation2d(
