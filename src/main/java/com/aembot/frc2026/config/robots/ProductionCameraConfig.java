@@ -23,11 +23,9 @@ public class ProductionCameraConfig {
       new CameraConfiguration("FrontLeft", Type.LIMELIGHT)
           .withCameraOffset(
               new Transform3d(
-                  new Translation3d(
-                      Units.inchesToMeters(9),
-                      Units.inchesToMeters(8.25),
-                      Units.inchesToMeters(7.5)),
-                  new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-15), 0.0)))
+                  new Translation3d( // TODO for debugging. CHANGE BACK!!!
+                      Units.inchesToMeters(0), Units.inchesToMeters(0), Units.inchesToMeters(0)),
+                  new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(0), 0.0)))
           .withCameraDistanceScalar(1, 1)
           .withXRotationScalar(1, -1)
           .withCameraResolution(Resolution.P1280x960)
