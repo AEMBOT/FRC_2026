@@ -130,19 +130,19 @@ public class CameraConfiguration {
     }
   }
 
-  // Location of this camera
+  /** Location of this camera */
   public Location CameraLocation = Location.UNCONFIGURED;
 
-  // Type of this camera
+  /** Type of this camera */
   public Type CameraType = Type.UNCONFIGURED;
 
-  // Resolution of this camera
+  /** Resolution of this camera */
   public Resolution CameraResolution = Resolution._1280x960;
 
-  // FOV of this camera
+  /** FOV of this camera */
   public FOV CameraFov = FOV.LIMELIGHT4;
 
-  // Ratio between the reported distance to a tag and the actual distance.
+  /** Ratio between the reported distance to a tag and the actual distance. */
   public double CameraDistanceScalar = 1.0;
 
   /** Ratio between the limelights repoted angle and actual angle */

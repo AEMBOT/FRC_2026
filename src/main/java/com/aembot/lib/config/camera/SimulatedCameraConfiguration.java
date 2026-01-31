@@ -6,10 +6,10 @@ import org.photonvision.simulation.SimCameraProperties;
 /** Properties representing the configuration of a camera in sim */
 public class SimulatedCameraConfiguration {
 
-  // Properties of the simulated camera
+  /** Properties of the simulated camera */
   public final SimCameraProperties kSimCameraProperties = new SimCameraProperties();
 
-  // Camera configuration of the camera that is being simulated
+  /** Camera configuration of the camera that is being simulated */
   public final CameraConfiguration kCameraConfiguration;
 
   /**
