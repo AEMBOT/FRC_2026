@@ -1,5 +1,6 @@
 package com.aembot.lib.subsystems.aprilvision;
 
+import com.aembot.lib.subsystems.aprilvision.util.CameraCalibration;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -62,6 +63,12 @@ public class AprilVisionInputs implements LoggableInputs {
    */
   public Pose2d robotPoseEstimationLatencyCompensated;
 
+  /**
+   * The calibration of the camera. This is io-layer specific because the calibration is typically
+   * stored on a coprocessor
+   */
+  public CameraCalibration cameraCalibration;
+
   @Override
   public void toLog(LogTable table) {
     table.put("HasTag", hasTag);
@@ -73,6 +80,9 @@ public class AprilVisionInputs implements LoggableInputs {
     table.put("TagDistanceMeters", tagDistanceMeters);
     table.put("RobotPoseEstimationLatencyUncompensated", robotPoseEstimationLatencyUncompensated);
     table.put("RobotPoseEstimationLatencyCompensated", robotPoseEstimationLatencyCompensated);
+    table.put(
+        "CameraCalibration",
+        cameraCalibration != null ? cameraCalibration.serializeToString() : (String) null);
   }
 
   @Override
@@ -89,5 +99,8 @@ public class AprilVisionInputs implements LoggableInputs {
             "RobotPoseEstimationLatencyUncompensated", robotPoseEstimationLatencyUncompensated);
     robotPoseEstimationLatencyCompensated =
         table.get("RobotPoseEstimationLatencyCompensated", robotPoseEstimationLatencyCompensated);
+
+    cameraCalibration =
+        CameraCalibration.deserializeFromString(table.get("CameraCalibration", (String) null));
   }
 }
