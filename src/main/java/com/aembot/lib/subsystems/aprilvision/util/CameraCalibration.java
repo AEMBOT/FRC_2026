@@ -29,7 +29,7 @@ public record CameraCalibration(Matrix<N3, N3> cameraMatrix, Matrix<N8, N1> dist
     for (int r = 0; r < 3; r++) {
       for (int c = 0; c < 3; c++) {
         builder.append(cameraMatrix().get(r, c));
-        builder.append(",");
+        if (r != 2 && c != 2) builder.append(",");
       }
     }
 
@@ -37,6 +37,7 @@ public record CameraCalibration(Matrix<N3, N3> cameraMatrix, Matrix<N8, N1> dist
 
     for (int r = 0; r < 8; r++) {
       builder.append(distCoeffs().get(r, 0));
+      if (r != 7) builder.append(",");
     }
 
     return builder.toString();
