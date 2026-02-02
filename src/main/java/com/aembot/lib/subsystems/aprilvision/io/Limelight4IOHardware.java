@@ -21,8 +21,7 @@ public class Limelight4IOHardware extends LimelightIO {
   protected boolean validTag;
 
   /**
-   * double indicating horizontal offset in degrees from crosshair to target. "tx" on
-   * network table
+   * double indicating horizontal offset in degrees from crosshair to target. "tx" on network table
    */
   protected double xOffset;
 
@@ -32,21 +31,21 @@ public class Limelight4IOHardware extends LimelightIO {
   protected int tagID;
 
   /**
-   * double[] indicating corner coordinates in pixels [x0,y0,x1,y1......]. "tcornxy" on
-   * network table.
+   * double[] indicating corner coordinates in pixels [x0,y0,x1,y1......]. "tcornxy" on network
+   * table.
    */
   protected double[] tagCornerPositions;
 
   /**
-   * double indicating capture pipeline latency (ms). Time between the end of the exposure
-   * of the middle row of the sensor to the beginning of the tracking pipeline. Sum with {@link
+   * double indicating capture pipeline latency (ms). Time between the end of the exposure of the
+   * middle row of the sensor to the beginning of the tracking pipeline. Sum with {@link
    * #pipelineLatency} to get total latency. "cl" on network table.
    */
   protected double captureLatency;
 
   /**
-   * double indicating The pipeline's latency contribution (ms). Sum with {@link
-   * #captureLatency} to get total latency. "tl" on network table (for some reason).
+   * double indicating The pipeline's latency contribution (ms). Sum with {@link #captureLatency} to
+   * get total latency. "tl" on network table (for some reason).
    */
   protected double pipelineLatency;
 
