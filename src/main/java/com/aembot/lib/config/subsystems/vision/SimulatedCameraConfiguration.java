@@ -4,12 +4,16 @@ import com.aembot.lib.constants.RuntimeConstants;
 import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.simulation.SimCameraProperties;
 
 public class SimulatedCameraConfiguration {
   public final SimCameraProperties simCameraProperties = new SimCameraProperties();
 
   public final CameraConfiguration cameraConfiguration;
+
+  /** The photonvision pose estimation strategy to be used in sim. */
+  public PoseStrategy estimationStrategy = PoseStrategy.CONSTRAINED_SOLVEPNP;
 
   public SimulatedCameraConfiguration(CameraConfiguration cameraConfiguration) {
     this.cameraConfiguration = cameraConfiguration;
@@ -96,6 +100,16 @@ public class SimulatedCameraConfiguration {
       double avgLatencyMs, double latencyStdDevMs) {
     simCameraProperties.setAvgLatencyMs(avgLatencyMs);
     simCameraProperties.setLatencyStdDevMs(latencyStdDevMs);
+    return this;
+  }
+
+  /**
+   * Set the photonvions {@link PoseStrategy} to be used in sim.
+   *
+   * @return This {@link SimulatedCameraConfiguration} for chaining
+   */
+  public SimulatedCameraConfiguration withPoseEstimationStrategy(PoseStrategy strategy) {
+    this.estimationStrategy = strategy;
     return this;
   }
 

@@ -5,6 +5,7 @@ import com.aembot.lib.config.subsystems.vision.CameraConfiguration.FOV;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration.Resolution;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration.Type;
 import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -20,11 +21,19 @@ public class ProductionCameraConfig {
 
   /* ---- FRONT LEFT CAM ---- */
   public final CameraConfiguration cameraConfigFrontLeft =
-      new CameraConfiguration("FrontLeft", Type.LIMELIGHT)
+      new CameraConfiguration("Turret", Type.LIMELIGHT)
+          .withMechanismOrigin(
+              () -> // All super guesstimated placeholder
+              new Pose3d(
+                      new Translation3d(
+                          Units.inchesToMeters(-3),
+                          Units.inchesToMeters(0),
+                          Units.inchesToMeters(6)),
+                      new Rotation3d(0, 0, Units.degreesToRadians(15))))
           .withCameraOffset(
               new Transform3d(
-                  new Translation3d( // TODO for debugging. CHANGE BACK!!!
-                      Units.inchesToMeters(0), Units.inchesToMeters(0), Units.inchesToMeters(0)),
+                  new Translation3d(
+                      Units.inchesToMeters(3), Units.inchesToMeters(0), Units.inchesToMeters(3)),
                   new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(0), 0.0)))
           .withCameraDistanceScalar(1, 1)
           .withXRotationScalar(1, -1)

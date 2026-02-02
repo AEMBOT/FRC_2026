@@ -5,83 +5,107 @@ import com.aembot.lib.constants.fields.YearFieldConstantable;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionInputs;
 import com.aembot.lib.subsystems.aprilvision.util.CameraCalibration;
+import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers;
+import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers.PoseEstimate;
 import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Timer;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
 import org.opencv.core.Point;
 
 public class Limelight4IOHardware extends LimelightIO {
-  /* ---- NETWORK TABLES ENTRIES ---- */
+  // Set
+  /** double[] NT entry for the camera's robot-relative position */
+  // protected final NetworkTableEntry cameraOffsetSetEntry;
+
+  /** NT entry for the */
+  // protected final NetworkTableEntry robotOrientationSetEntry;
+
+  // get
   /** bool NT entry indicating whether we have a tag targetted. "tv" on network table */
-  protected final NetworkTableEntry validTagEntry;
+  // protected final NetworkTableEntry validTagEntry;
+
+  protected boolean validTag;
 
   /**
    * double NT entry indicating horizontal offset in degrees from crosshair to target. "tx" on
    * network table
    */
-  protected final NetworkTableEntry xOffsetEntry;
+  // protected final NetworkTableEntry xOffsetEntry;
+
+  protected double xOffset;
 
   /** int NT entry indicating id of the targeted apriltag. "tid" on network table */
-  protected final NetworkTableEntry tagIDEntry;
+  // protected final NetworkTableEntry tagIDEntry;
+
+  protected int tagID;
 
   /**
    * double[] NT entry indicating corner coordinates in pixels [x0,y0,x1,y1......]. "tcornxy" on
    * network table.
    */
-  protected final NetworkTableEntry tagCornerPositionsEntry;
+  // protected final NetworkTableEntry tagCornerPositionsEntry;
+
+  protected double[] tagCornerPositions;
 
   /**
    * int NT entry indicating number of frames to skip between processed frames to reduce temperature
    * rise. "throttle_set" on network table
    */
-  protected final NetworkTableEntry throttleSetEntry;
+  // protected final NetworkTableEntry throttleSetEntry;
 
   /**
    * double NT entry indicating capture pipeline latency (ms). Time between the end of the exposure
    * of the middle row of the sensor to the beginning of the tracking pipeline. Sum with {@link
    * #pipelineLatencyEntry} to get total latency. "cl" on network table.
    */
-  protected final NetworkTableEntry captureLatencyEntry;
+  // protected final NetworkTableEntry captureLatencyEntry;
+
+  protected double captureLatency;
 
   /**
    * double NT entry indicating The pipeline's latency contribution (ms). Sum with {@link
    * #captureLatencyEntry} to get total latency. "tl" on network table (for some reason).
    */
-  protected final NetworkTableEntry pipelineLatencyEntry;
+  // protected final NetworkTableEntry pipelineLatencyEntry;
 
-  /* ---- END NETWORK TABLES ENTRIES ---- */
+  protected double pipelineLatency;
+
+  protected Pose3d megatag2EstimatedRobotPose;
 
   protected final CameraConfiguration cameraConfiguration;
   protected final YearFieldConstantable fieldConstants;
+
+  /**
+   * The name of the camera as it appears on NetworkTables and as its hostname. Ex:
+   * "limelight-FrontLeft" will map to "limelight-FrontLeft" on NT4 & "limelight-frontleft.local"
+   * over mDNS
+   */
+  public final String cameraName;
 
   protected final List<Point> tagCorners =
       List.of(new Point(), new Point(), new Point(), new Point());
 
   protected final RobotState robotStateInstance;
 
+  /**
+   * The timestamp of the last megatag2 pose estimation. Two estimates will not be used from the
+   * same timestamp (or, more importantly, the same estimate from the same timestamp.)
+   */
+  private double lastMegatag2Timestamp = Double.NaN;
+
   public Limelight4IOHardware(
       CameraConfiguration config,
       YearFieldConstantable fieldConstants,
       RobotState robotStateInstance) {
     this.cameraConfiguration = config;
+    this.cameraName = "limelight-" + config.cameraName;
     this.fieldConstants = fieldConstants;
     this.robotStateInstance = robotStateInstance;
-
-    NetworkTable networkTable =
-        NetworkTableInstance.getDefault().getTable("limelight-" + cameraConfiguration.cameraName);
-
-    validTagEntry = networkTable.getEntry("tv");
-    xOffsetEntry = networkTable.getEntry("tx");
-    tagIDEntry = networkTable.getEntry("tid");
-    tagCornerPositionsEntry = networkTable.getEntry("tcornxy");
-    throttleSetEntry = networkTable.getEntry("throttle_set");
-    captureLatencyEntry = networkTable.getEntry("cl");
-    pipelineLatencyEntry = networkTable.getEntry("tl");
   }
 
   @Override
@@ -91,16 +115,25 @@ public class Limelight4IOHardware extends LimelightIO {
       inputs.cameraCalibration = getCalibration();
     }
 
-    inputs.latency = captureLatencyEntry.getDouble(0) + pipelineLatencyEntry.getDouble(0);
+    inputs.latency =
+        LimelightHelpers.getLatency_Capture(cameraName)
+            + LimelightHelpers.getLatency_Pipeline(cameraName);
 
-    inputs.hasTag = validTagEntry.getInteger(0) == 1;
-    inputs.tagID = (int) tagIDEntry.getInteger(-1);
-    inputs.horizontalAngleToTag = Rotation2d.fromDegrees(xOffsetEntry.getDouble(0));
+    inputs.hasTag = LimelightHelpers.getLatestResults(cameraName).valid;
+    inputs.tagID = (int) LimelightHelpers.getFiducialID(cameraName);
+    inputs.horizontalAngleToTag = Rotation2d.fromDegrees(LimelightHelpers.getTX(cameraName));
 
     updateCornerPositions();
     inputs.tagCornerPositions = this.tagCorners;
 
     estimatePoseAndPublish(inputs);
+
+    VisionPoseEstimation coprocessorPoseEstimation = getMegatag2Estimate();
+
+    inputs.coprocessorEstimationLatencyUncompensated =
+        coprocessorPoseEstimation.latencyUncompensatedPose();
+    inputs.coprocessorEstimationLatencyCompensated =
+        coprocessorPoseEstimation.latencyCompensatedPose();
   }
 
   /**
@@ -155,15 +188,35 @@ public class Limelight4IOHardware extends LimelightIO {
     }
   }
 
+  private VisionPoseEstimation getMegatag2Estimate() {
+    double robotYaw = robotStateInstance.getLatestFieldRobotPose().getRotation().getDegrees();
+    LimelightHelpers.SetRobotOrientation(cameraName, robotYaw, 0, 0, 0, 0, 0);
+
+    PoseEstimate estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
+    // Check that there actually is an estimate, and that we haven't processed it yet
+    if (estimate.tagCount > 0 && estimate.timestampSeconds != lastMegatag2Timestamp) {
+      Pose2d latencyUncompensatedPose = estimate.pose;
+      Pose2d latencyCompensatedPose =
+          compensateForEstimateLatency(
+              estimate.pose,
+              robotStateInstance.getLatestFusedFieldRelativeChassisSpeed(),
+              Timer.getFPGATimestamp() - (estimate.timestampSeconds - estimate.latency));
+
+      return new VisionPoseEstimation(latencyUncompensatedPose, latencyCompensatedPose);
+    } else {
+      return new VisionPoseEstimation(null, null);
+    }
+  }
+
   /**
    * Convert the Limelight-provided double[] of corner coordinates into a list of Vector2s
    * representing the corner positions in pixels
    */
   private void updateCornerPositions() {
-    double[] cornerPositions = tagCornerPositionsEntry.getDoubleArray(new double[0]);
+    double[] cornerPositions = LimelightHelpers.getCornerCoordinates(cameraName);
     Logger.recordOutput(cameraConfiguration.cameraName + "corners", cornerPositions);
 
-    if (cornerPositions.length == 8) {
+    if (cornerPositions.length >= 8) {
       // 4 iterations bcuz we process 2 at a time
       for (int i = 0; i < 4; i++) {
         tagCorners.get(i).x = cornerPositions[i * 2];
@@ -174,7 +227,7 @@ public class Limelight4IOHardware extends LimelightIO {
 
   protected CameraCalibration getCalibration() {
     // TODO stub
-    throw new UnsupportedOperationException("Not implemented.");
+    return null;
   }
 
   @Override

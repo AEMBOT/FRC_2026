@@ -64,6 +64,18 @@ public class AprilVisionInputs implements LoggableInputs {
   public Pose2d robotPoseEstimationLatencyCompensated;
 
   /**
+   * The estimated pose of the robot from the vision coprocessor. Ie. Limelight's MegaTag 2. Not
+   * latency compensated.
+   */
+  public Pose2d coprocessorEstimationLatencyUncompensated;
+
+  /**
+   * The estimated pose of the robot from the vision coprocessor. Ie. Limelight's MegaTag 2. Latency
+   * compensated.
+   */
+  public Pose2d coprocessorEstimationLatencyCompensated;
+
+  /**
    * The calibration of the camera. This is io-layer specific because the calibration is typically
    * stored on a coprocessor
    */
@@ -80,6 +92,9 @@ public class AprilVisionInputs implements LoggableInputs {
     table.put("TagDistanceMeters", tagDistanceMeters);
     table.put("RobotPoseEstimationLatencyUncompensated", robotPoseEstimationLatencyUncompensated);
     table.put("RobotPoseEstimationLatencyCompensated", robotPoseEstimationLatencyCompensated);
+    table.put(
+        "CoprocessorEstimationLatencyUncompensated", coprocessorEstimationLatencyUncompensated);
+    table.put("CoprocessorEstimationLatencyCompensated", coprocessorEstimationLatencyCompensated);
     table.put(
         "CameraCalibration",
         cameraCalibration != null ? cameraCalibration.serializeToString() : (String) null);
@@ -99,6 +114,12 @@ public class AprilVisionInputs implements LoggableInputs {
             "RobotPoseEstimationLatencyUncompensated", robotPoseEstimationLatencyUncompensated);
     robotPoseEstimationLatencyCompensated =
         table.get("RobotPoseEstimationLatencyCompensated", robotPoseEstimationLatencyCompensated);
+    coprocessorEstimationLatencyUncompensated =
+        table.get(
+            "CoprocessorEstimationLatencyUncompensated", coprocessorEstimationLatencyUncompensated);
+    coprocessorEstimationLatencyCompensated =
+        table.get(
+            "CoprocessorEstimationLatencyCompensated", coprocessorEstimationLatencyCompensated);
 
     cameraCalibration =
         CameraCalibration.deserializeFromString(table.get("CameraCalibration", (String) null));

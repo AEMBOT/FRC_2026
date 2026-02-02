@@ -2,14 +2,25 @@ package com.aembot.lib.subsystems.aprilvision.io;
 
 import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
+import com.aembot.lib.math.PositionUtil;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionInputs;
 import com.aembot.lib.subsystems.aprilvision.util.CameraCalibration;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -20,10 +31,56 @@ import org.photonvision.targeting.TargetCorner;
  * PhotonVision's sim to the Limelight's expected network table.
  */
 public class Limelight4IOSim extends Limelight4IOHardware {
+  /* ---- NETWORK TABLES ENTRIES ---- */
+  /** bool NT entry indicating whether we have a tag targetted. "tv" on network table */
+  protected final NetworkTableEntry validTagEntry;
+
+  /**
+   * double NT entry indicating horizontal offset in degrees from crosshair to target. "tx" on
+   * network table
+   */
+  protected final NetworkTableEntry xOffsetEntry;
+
+  /** int NT entry indicating id of the targeted apriltag. "tid" on network table */
+  protected final NetworkTableEntry tagIDEntry;
+
+  /**
+   * double[] NT entry indicating corner coordinates in pixels [x0,y0,x1,y1......]. "tcornxy" on
+   * network table.
+   */
+  protected final NetworkTableEntry tagCornerPositionsEntry;
+
+  /**
+   * int NT entry indicating number of frames to skip between processed frames to reduce temperature
+   * rise. "throttle_set" on network table
+   */
+  protected final NetworkTableEntry throttleSetEntry;
+
+  /**
+   * double NT entry indicating capture pipeline latency (ms). Time between the end of the exposure
+   * of the middle row of the sensor to the beginning of the tracking pipeline. Sum with {@link
+   * #pipelineLatencyEntry} to get total latency. "cl" on network table.
+   */
+  protected final NetworkTableEntry captureLatencyEntry;
+
+  /**
+   * double NT entry indicating The pipeline's latency contribution (ms). Sum with {@link
+   * #captureLatencyEntry} to get total latency. "tl" on network table (for some reason).
+   */
+  protected final NetworkTableEntry pipelineLatencyEntry;
+
+  protected final NetworkTableEntry robotOrientationEntry;
+
+  protected final NetworkTableEntry megatag2PoseEstimateEntry;
+
+  /* ---- END NETWORK TABLES ENTRIES ---- */
+
   private final SimulatedCameraConfiguration simConfig;
 
   private final PhotonCamera photonCamera;
   private final PhotonCameraSim photonCameraSim;
+
+  private final PhotonPoseEstimator photonPoseEstimator;
 
   /**
    * Constructor go brrr
@@ -45,11 +102,29 @@ public class Limelight4IOSim extends Limelight4IOHardware {
     this.photonCamera = new PhotonCamera(simConfig.cameraConfiguration.cameraName);
     this.photonCameraSim = new PhotonCameraSim(photonCamera, simConfig.simCameraProperties);
 
+    this.photonPoseEstimator =
+        new PhotonPoseEstimator(
+            fieldConstants.getFieldLayout(),
+            PoseStrategy.CONSTRAINED_SOLVEPNP,
+            PositionUtil.toTransform3d(config.cameraConfiguration.getCameraPosition()));
+
     registerVisionSimulationConsumer.accept(
         photonCameraSim,
         new Transform3d(
             cameraConfiguration.getCameraPosition().getTranslation(),
             cameraConfiguration.getCameraPosition().getRotation()));
+
+    NetworkTable networkTable = NetworkTableInstance.getDefault().getTable(cameraName);
+
+    validTagEntry = networkTable.getEntry("tv");
+    xOffsetEntry = networkTable.getEntry("tx");
+    tagIDEntry = networkTable.getEntry("tid");
+    tagCornerPositionsEntry = networkTable.getEntry("tcornxy");
+    throttleSetEntry = networkTable.getEntry("throttle_set");
+    captureLatencyEntry = networkTable.getEntry("cl");
+    pipelineLatencyEntry = networkTable.getEntry("tl");
+    robotOrientationEntry = networkTable.getEntry("robot_orientation_set");
+    megatag2PoseEstimateEntry = networkTable.getEntry("botpose_orb_wpiblue");
   }
 
   @Override
@@ -82,6 +157,62 @@ public class Limelight4IOSim extends Limelight4IOHardware {
         }
 
         tagCornerPositionsEntry.setDoubleArray(publishedArray);
+      }
+
+      /* --- "Coprocessor" pose estimation --- */
+      double[] orientationArr = robotOrientationEntry.getDoubleArray((double[]) null);
+
+      if (orientationArr != null) {
+        photonPoseEstimator.addHeadingData(
+            Timer.getFPGATimestamp(), Rotation2d.fromDegrees(orientationArr[0]));
+
+        Optional<EstimatedRobotPose> estimatedPoseOptional = photonPoseEstimator.update(result);
+
+        if (estimatedPoseOptional.isPresent()) {
+          EstimatedRobotPose data = estimatedPoseOptional.get();
+
+          Pose3d estimatedPose = data.estimatedPose;
+
+          double avgDistance = 0;
+          // Avg area of tags as % of img
+          double avgTagArea = 0;
+          for (PhotonTrackedTarget targetUsed : data.targetsUsed) {
+            avgDistance += targetUsed.bestCameraToTarget.getTranslation().getNorm();
+            // I'm _assuming_ area is square pixels? It's not documented (</3), so I'm not sure.
+            avgTagArea +=
+                targetUsed.area
+                    / (cameraConfiguration.cameraResolution.widthPixels
+                        * cameraConfiguration.cameraResolution.heightPixels);
+          }
+
+          avgDistance /= data.targetsUsed.size();
+          avgTagArea /= data.targetsUsed.size();
+
+          /*
+           * Array to be published to NT4. In format: Translation (X,Y,Z) in meters
+           * Rotation(Roll,Pitch,Yaw) in degrees, total latency (cl+tl), tag count, tag span, average
+           * tag distance from camera, average tag area (percentage of image)
+           */
+          megatag2PoseEstimateEntry.setDoubleArray(
+              new Double[] {
+                estimatedPose.getX(),
+                estimatedPose.getY(),
+                estimatedPose.getZ(),
+                Units.radiansToDegrees(estimatedPose.getRotation().getX()),
+                Units.radiansToDegrees(estimatedPose.getRotation().getY()),
+                Units.radiansToDegrees(estimatedPose.getRotation().getZ()),
+                captureLatencyEntry.getDouble(0),
+                (double) data.targetsUsed.size(),
+                0.0, // I'm not entirely sure what span is or how to get it, so... hopefully it's
+                // not
+                // important?
+                avgDistance,
+                avgTagArea
+              });
+        } else {
+          // LimelightHelpers will correctly read this as no data
+          megatag2PoseEstimateEntry.setDoubleArray(new Double[0]);
+        }
       }
     }
 
