@@ -119,7 +119,8 @@ public class Limelight4IOHardware extends LimelightIO {
         LimelightHelpers.getLatency_Capture(cameraName)
             + LimelightHelpers.getLatency_Pipeline(cameraName);
 
-    inputs.hasTag = LimelightHelpers.getLatestResults(cameraName).valid;
+    inputs.hasTag =
+        LimelightHelpers.getFiducialID(cameraName) != 0; // best method I could figure out
     inputs.tagID = (int) LimelightHelpers.getFiducialID(cameraName);
     inputs.horizontalAngleToTag = Rotation2d.fromDegrees(LimelightHelpers.getTX(cameraName));
 
@@ -157,7 +158,7 @@ public class Limelight4IOHardware extends LimelightIO {
     inputs.robotPoseEstimationLatencyUncompensated = null;
     inputs.robotPoseEstimationLatencyCompensated = null;
     inputs.tagPosition = null;
-    if (inputs.hasTag && inputs.tagID == 18) {
+    if (inputs.hasTag) {
       inputs.tagHeightPixels = computeTagHeightInPixels(inputs.tagCornerPositions);
       inputs.tagHeightAngle = computeTagHeightInRotations(inputs.tagHeightPixels);
 
