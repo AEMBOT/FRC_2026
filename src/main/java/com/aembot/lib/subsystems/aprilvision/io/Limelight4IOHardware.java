@@ -9,7 +9,6 @@ import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers;
 import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers.PoseEstimate;
 import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
@@ -18,25 +17,13 @@ import org.littletonrobotics.junction.Logger;
 import org.opencv.core.Point;
 
 public class Limelight4IOHardware extends LimelightIO {
-  // Set
-  /** double[] NT entry for the camera's robot-relative position */
-  // protected final NetworkTableEntry cameraOffsetSetEntry;
-
-  /** NT entry for the */
-  // protected final NetworkTableEntry robotOrientationSetEntry;
-
-  // get
-  /** bool NT entry indicating whether we have a tag targetted. "tv" on network table */
-  // protected final NetworkTableEntry validTagEntry;
-
+  /** bool indicating whether we have a tag targetted. "tv" on network table */
   protected boolean validTag;
 
   /**
-   * double NT entry indicating horizontal offset in degrees from crosshair to target. "tx" on
+   * double indicating horizontal offset in degrees from crosshair to target. "tx" on
    * network table
    */
-  // protected final NetworkTableEntry xOffsetEntry;
-
   protected double xOffset;
 
   /** int NT entry indicating id of the targeted apriltag. "tid" on network table */
@@ -45,37 +32,23 @@ public class Limelight4IOHardware extends LimelightIO {
   protected int tagID;
 
   /**
-   * double[] NT entry indicating corner coordinates in pixels [x0,y0,x1,y1......]. "tcornxy" on
+   * double[] indicating corner coordinates in pixels [x0,y0,x1,y1......]. "tcornxy" on
    * network table.
    */
-  // protected final NetworkTableEntry tagCornerPositionsEntry;
-
   protected double[] tagCornerPositions;
 
   /**
-   * int NT entry indicating number of frames to skip between processed frames to reduce temperature
-   * rise. "throttle_set" on network table
-   */
-  // protected final NetworkTableEntry throttleSetEntry;
-
-  /**
-   * double NT entry indicating capture pipeline latency (ms). Time between the end of the exposure
+   * double indicating capture pipeline latency (ms). Time between the end of the exposure
    * of the middle row of the sensor to the beginning of the tracking pipeline. Sum with {@link
-   * #pipelineLatencyEntry} to get total latency. "cl" on network table.
+   * #pipelineLatency} to get total latency. "cl" on network table.
    */
-  // protected final NetworkTableEntry captureLatencyEntry;
-
   protected double captureLatency;
 
   /**
-   * double NT entry indicating The pipeline's latency contribution (ms). Sum with {@link
-   * #captureLatencyEntry} to get total latency. "tl" on network table (for some reason).
+   * double indicating The pipeline's latency contribution (ms). Sum with {@link
+   * #captureLatency} to get total latency. "tl" on network table (for some reason).
    */
-  // protected final NetworkTableEntry pipelineLatencyEntry;
-
   protected double pipelineLatency;
-
-  protected Pose3d megatag2EstimatedRobotPose;
 
   protected final CameraConfiguration cameraConfiguration;
   protected final YearFieldConstantable fieldConstants;
