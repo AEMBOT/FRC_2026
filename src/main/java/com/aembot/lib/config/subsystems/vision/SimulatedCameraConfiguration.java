@@ -62,12 +62,12 @@ public class SimulatedCameraConfiguration {
   /**
    * Configure the simulated camera to have noise in pixel amounts
    *
-   * @param xPixelsNoise How much error in pixels should we add into the simulation along the x
-   * @param yPixelsNoise How much error in pixels should we add into the simulation along the y
+   * @param avgErrorPixels The avg error of the camera in pixels
+   * @param stddevErrorPixels The std deviations of the randomized error of the camera in pixels
    * @return this simulated camera configuration for chaining
    */
-  public SimulatedCameraConfiguration withCameraNoise(double xPixelNoise, double yPixelNoise) {
-    simCameraProperties.setCalibError(xPixelNoise, yPixelNoise);
+  public SimulatedCameraConfiguration withCalibrationError(double avgErrorPixels, double stddevErrorPixels) {
+    simCameraProperties.setCalibError(avgErrorPixels, stddevErrorPixels);
     return this;
   }
 
