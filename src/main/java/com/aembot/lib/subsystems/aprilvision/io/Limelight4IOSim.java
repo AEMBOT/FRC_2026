@@ -136,7 +136,7 @@ public class Limelight4IOSim extends Limelight4IOHardware {
       // Not sure if this is the best way to do latency
       captureLatencyEntry.setDouble(Timer.getFPGATimestamp() - result.getTimestampSeconds());
 
-      PhotonTrackedTarget target = result.getBestTarget();
+      PhotonTrackedTarget target = result.hasTargets() ? result.getBestTarget() : null;
 
       validTagEntry.setInteger(target != null ? 1 : 0);
       if (target != null) {
