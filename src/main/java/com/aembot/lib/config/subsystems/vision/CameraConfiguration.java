@@ -96,7 +96,7 @@ public class CameraConfiguration {
   public double cameraDistanceScalar = 1.0;
 
   /**
-   * Comment from 254: "When limelight tx was compared to robot rotation from the gyro, it was
+   * Comment from 2910: "When limelight tx was compared to robot rotation from the gyro, it was
    * observed that they did not scale at the same rate. Assuming the Pigeon2 scales correctly, this
    * means the limelight's angle scaling is incorrect. Because the difference scaled linearly, we
    * found out the ratio between the limelight angle and robot angle and applied it to the tx
