@@ -3,10 +3,13 @@ package com.aembot.lib.state;
 import com.aembot.lib.constants.RobotStateConstants;
 import com.aembot.lib.core.logging.Loggable;
 import com.aembot.lib.math.ConcurrentTimeInterpolatableBuffer;
+import com.aembot.lib.subsystems.vision.util.VisionPoseEstimate;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -95,8 +98,18 @@ public abstract class RobotState implements Loggable {
     }
   }
 
+  /** Tracks values relating to the robots vision */
+  class Vision {
+    public AtomicReference<Double> LastUsedMegaTagTimestamp = new AtomicReference<Double>(0.0);
+    public final ConcurrentTimeInterpolatableBuffer<Pose2d> TimeInterpolatablePose =
+        ConcurrentTimeInterpolatableBuffer.createBuffer(
+            RobotStateConstants.Kinematics.BUFFER_WINDOW_LENGTH);
+  }
+
   /* Normal class properties */
   protected final RobotState.Odometry odometryState = new RobotState.Odometry();
+
+  protected final RobotState.Vision visionState = new RobotState.Vision();
 
   // TODO vision observations list
 
@@ -117,6 +130,18 @@ public abstract class RobotState implements Loggable {
       return null;
     }
     return entry.getValue();
+  }
+
+  /**
+   * Sample the ododmetry pose buffer at the given time
+   *
+   * @param timestamp time to sample the buffer
+   * @return value sampled
+   */
+  public Optional<Pose2d> getFieldRobotPoseAtTime(double timestamp) {
+    Optional<Pose2d> poseEntry =
+        odometryState.timeInterpolatableEstimatedRobotPose.getSample(timestamp);
+    return poseEntry;
   }
 
   /**
@@ -196,6 +221,53 @@ public abstract class RobotState implements Loggable {
 
   public ChassisSpeeds getLatestFusedFieldRelativeChassisSpeed() {
     return odometryState.gyroFusedChassisSpeeds.get();
+  }
+
+  // --- Vision ---
+
+  /** Consumer to easily supply vision measurements to the drivetrain */
+  private Consumer<VisionPoseEstimate> drivetrainVisionEstimateConsumer = null;
+
+  /**
+   * Register the vision estimate consumer
+   *
+   * @param addVisionEstimateConsumer The consumer to supply estimates to
+   */
+  public void registerDriveTrainVisionEstimateConsumer(
+      Consumer<VisionPoseEstimate> addVisionEstimateConsumer) {
+    this.drivetrainVisionEstimateConsumer = addVisionEstimateConsumer;
+  }
+
+  /**
+   * Add a megatag pose estimate to vision measurements
+   *
+   * @param estimate the estimate to add
+   */
+  public void addMegatagEstimateMeasurement(VisionPoseEstimate estimate) {
+    visionState.TimeInterpolatablePose.addSample(
+        estimate.timestampSeconds, estimate.estimatedRobotPose);
+    visionState.LastUsedMegaTagTimestamp.set(estimate.timestampSeconds);
+    drivetrainVisionEstimateConsumer.accept(estimate);
+  }
+
+  /**
+   * @return The timestamp of the last megatag pose estimate
+   */
+  public double getLastUsedMegatagTimestamp() {
+    return visionState.LastUsedMegaTagTimestamp.get();
+  }
+
+  /**
+   * @return The most recent estimated pose of the robot
+   */
+  public Pose2d getLatestPoseEstimate() {
+    Entry<Double, Pose2d> latestPoseEntry = visionState.TimeInterpolatablePose.getLatest();
+
+    if (latestPoseEntry == null) {
+      return null;
+    }
+
+    return latestPoseEntry.getValue();
   }
 
   // --- Loggable Implementation ---
