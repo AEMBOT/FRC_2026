@@ -1,4 +1,4 @@
-package com.aembot.frc2026.subsystems;
+package com.aembot.frc2026.subsystems.vision;
 
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.lib.subsystems.base.AEMSubsystem;
