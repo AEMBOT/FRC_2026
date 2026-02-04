@@ -1,8 +1,6 @@
 package com.aembot.lib.config.camera;
 
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-
 import java.util.function.Supplier;
 
 /** Properties representing the configuration of a camera */
@@ -115,9 +113,10 @@ public class CameraConfiguration {
   }
 
   /**
-   * Give a supplier for the pose of the mechanism the camera is connected to 
-   * <p>This is helpful when
-   * the camera moves relative to the robot, for example if it is connected to a turret
+   * Give a supplier for the pose of the mechanism the camera is connected to
+   *
+   * <p>This is helpful when the camera moves relative to the robot, for example if it is connected
+   * to a turret
    *
    * @param mechanismPoseSupplier Supplier of the mechanism pose
    * @return reference to this object for chaining
@@ -129,13 +128,15 @@ public class CameraConfiguration {
 
   /**
    * Give a supplier for the angular velocity of the mechanism connected to this camera
-   * <p>This is helpful when
-   * the camera moves relative to the robot, for example if it is connected to a turret
-   * 
+   *
+   * <p>This is helpful when the camera moves relative to the robot, for example if it is connected
+   * to a turret
+   *
    * @param mechanismAngVelSupplier Supplier of the mechanism angular velocity
    * @return reference to this object for chaining
    */
-  public CameraConfiguration withMechanismAngularVelocitySupplier(Supplier<Double> mechanismAngVelSupplier) {
+  public CameraConfiguration withMechanismAngularVelocitySupplier(
+      Supplier<Double> mechanismAngVelSupplier) {
     this.MechanismAngVelSupplier = mechanismAngVelSupplier;
     return this;
   }
