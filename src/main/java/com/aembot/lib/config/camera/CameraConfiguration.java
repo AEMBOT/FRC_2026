@@ -1,77 +1,10 @@
 package com.aembot.lib.config.camera;
 
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import java.util.function.Supplier;
 
 /** Properties representing the configuration of a camera */
 public class CameraConfiguration {
-
-  /**
-   * Camera location enum that stores both a user described camera location as well as it's true
-   * pose3d.
-   *
-   * <p>Note: Rotation2d uses radians.
-   *
-   * <p>All relative directions (e.g. right and left) are from the perspective of looking from the
-   * rear of the robot to the front. Where the rear and front of the robot are must be agreed upon,
-   * thought it is often pretty clear.
-   */
-  public enum Location {
-    FRONT("Front"),
-    LEFT("Left"),
-    RIGHT("Right"),
-    BACK("Back"),
-    FRONT_RIGHT("FrontRight"),
-    FRONT_LEFT("FrontLeft"),
-    BACK_LEFT("BackLeft"),
-    BACK_RIGHT("BackRight"),
-    UNCONFIGURED("Unconfigured"),
-    ;
-
-    /** Human readable name for the camera location */
-    public final String LocationName;
-
-    /** Current post of the camera relative to robot center, i.e. (0, 0, 0) */
-    public Pose3d CameraPose;
-
-    /**
-     * Translation representing the position of the current camera as an offset from the center of
-     * the robot.
-     */
-    public Translation2d TranslationToRobotCenter;
-
-    /** Rotation 2d representing the mounting yaw rotation of the camera on the robot. */
-    public Rotation2d MountingYaw;
-
-    private Location(String name) {
-      this.LocationName = name;
-    }
-
-    /**
-     * Retrieve the name of the location as a string
-     *
-     * @return Stringified version of the camera location name
-     */
-    @Override
-    public String toString() {
-      return LocationName;
-    }
-
-    /**
-     * Update the current pose of a given camera location relative to the center of the robot.
-     *
-     * @param pose The new pose3d that we wish to have the camera located at.
-     * @return This enum, for chaining.
-     */
-    public Location withCameraPose(Pose3d pose) {
-      this.CameraPose = pose;
-
-      this.MountingYaw = Rotation2d.fromRadians(pose.getRotation().getZ());
-      this.TranslationToRobotCenter = pose.getTranslation().toTranslation2d();
-      return this;
-    }
-  }
 
   /** Enum for user described camera type */
   public enum Type {
@@ -130,8 +63,14 @@ public class CameraConfiguration {
     }
   }
 
-  /** Location of this camera */
-  public Location CameraLocation = Location.UNCONFIGURED;
+  /** Name of the this camera */
+  public String CameraName = "UNNAMED";
+
+  /** Pose of this camera relative to the mechanism it is on */
+  public Pose3d CameraPose = new Pose3d();
+
+  /** Supplier of the mechanism position, only applicable if camera moves relative to the robot */
+  public Supplier<Pose3d> MechanismPoseSupplier = () -> Pose3d.kZero;
 
   /** Type of this camera */
   public Type CameraType = Type.UNCONFIGURED;
@@ -153,18 +92,32 @@ public class CameraConfiguration {
    *
    * @param location Location of the camera on the robot
    */
-  public CameraConfiguration(Location location) {
-    this.CameraLocation = location;
+  public CameraConfiguration(String name) {
+    this.CameraName = name;
   }
 
   /**
-   * Update the pose of this camera relative to the center of the robot
+   * Update the pose of this camera relative to the mechanism it is connected to
+   *
+   * <p>For most cases this mechanism is just the center of the robot
    *
    * @param pose The pose of this camera.
    * @return reference to this object for chaining.
    */
   public CameraConfiguration withPose(Pose3d pose) {
-    this.CameraLocation.withCameraPose(pose);
+    this.CameraPose = pose;
+    return this;
+  }
+
+  /**
+   * Give a supplier for the pose of the mechanism the camera is connected to This is helpful when
+   * the camera moves relative to the robot, for example if it is connected to a turret
+   *
+   * @param mechanismPoseSupplier
+   * @return
+   */
+  public CameraConfiguration withMechanismPoseSupplier(Supplier<Pose3d> mechanismPoseSupplier) {
+    this.MechanismPoseSupplier = mechanismPoseSupplier;
     return this;
   }
 
@@ -232,6 +185,6 @@ public class CameraConfiguration {
 
   @Override
   public String toString() {
-    return CameraLocation.toString() + "_" + CameraType.toString();
+    return CameraName;
   }
 }
