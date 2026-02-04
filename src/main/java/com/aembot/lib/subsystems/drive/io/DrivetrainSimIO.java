@@ -37,9 +37,10 @@ public class DrivetrainSimIO extends DrivetrainHardwareIO {
   private Consumer<SwerveDriveState> simSwerveStateConsumer =
       state -> {
         if (drivetrainSim != null) {
-          state.Pose = drivetrainSim.mapleSimSwerveDrivetrain.getSimulatedDriveTrainPose();
+          SimulatedRobotStateYearly.get()
+              .updateSimulatedPosition(
+                  drivetrainSim.mapleSimSwerveDrivetrain.getSimulatedDriveTrainPose());
         }
-        SimulatedRobotStateYearly.get().updateSimulatedPosition(state.Pose);
         swerveTelemetryConsumer.accept(state);
       };
 
