@@ -1,6 +1,6 @@
 package com.aembot.lib.subsystems.vision;
 
-import com.aembot.lib.subsystems.vision.util.VisionStandardDevs;
+import com.aembot.lib.subsystems.vision.util.VisionStandardDeviations;
 import edu.wpi.first.math.geometry.Pose2d;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
@@ -11,7 +11,9 @@ public class VisionInputs implements LoggableInputs {
 
   public int primaryTagID = -1;
 
-  public VisionStandardDevs stdDevs;
+  public int numTags = 0;
+
+  public VisionStandardDeviations stdDevs;
 
   public Pose2d estimatedRobotPose;
 

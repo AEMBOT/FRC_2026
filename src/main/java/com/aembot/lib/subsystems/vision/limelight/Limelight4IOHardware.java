@@ -4,6 +4,7 @@ import com.aembot.lib.config.camera.CameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
 import com.aembot.lib.subsystems.vision.VisionInputs;
 import com.aembot.lib.subsystems.vision.util.LimelightHelpers;
+import com.aembot.lib.subsystems.vision.util.VisionStandardDeviations;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -64,6 +65,7 @@ public class Limelight4IOHardware implements LimelightIO {
 
     inputs.hasTag = hasTag();
     inputs.primaryTagID = getPrimaryTagID();
+    inputs.numTags = getNumTags();
     inputs.estimatedRobotPose = getEstimatedPose();
 
     updateMegatag2Info();
@@ -88,8 +90,17 @@ public class Limelight4IOHardware implements LimelightIO {
 
   @Override
   public Pose2d getEstimatedPose() {
-
     return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(kName).pose;
+  }
+
+  @Override
+  public int getNumTags() {
+    return LimelightHelpers.getTargetCount(kName);
+  }
+
+  @Override
+  public VisionStandardDeviations getStdDevs() {
+    return VisionStandardDeviations.fromDoubleArray(LimelightHelpers.getStandardDeviations(kName));
   }
 
   @Override

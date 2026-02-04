@@ -4,6 +4,7 @@ import com.aembot.lib.config.camera.CameraConfiguration;
 import com.aembot.lib.config.camera.SimulatedCameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
 import com.aembot.lib.subsystems.vision.VisionInputs;
+import com.aembot.lib.subsystems.vision.util.VisionStandardDeviations;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,6 +20,7 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Limelight4SimIO implements LimelightIO {
 
@@ -76,6 +78,7 @@ public class Limelight4SimIO implements LimelightIO {
 
     inputs.hasTag = hasTag();
     inputs.primaryTagID = getPrimaryTagID();
+    inputs.numTags = getNumTags();
     Pose2d estimatedPose = getEstimatedPose();
     if (estimatedPose != null) {
       inputs.estimatedRobotPose = estimatedPose;
@@ -98,6 +101,39 @@ public class Limelight4SimIO implements LimelightIO {
     } else {
       return null;
     }
+  }
+
+  @Override
+  public int getNumTags() {
+    return getLastResult().getTargets().size();
+  }
+
+  @Override
+  public VisionStandardDeviations getStdDevs() {
+    int tagCount = getNumTags();
+
+    if (tagCount == 0) {
+      return VisionStandardDeviations.ifSeesNoTags();
+    }
+
+    double avgTagArea = 0.0;
+    for (PhotonTrackedTarget target : getLastResult().getTargets()) {
+      avgTagArea += target.getArea();
+    }
+    avgTagArea /= tagCount;
+
+    double baseXYStdDev = 0.5;
+    double baseZStdDev = 0.8;
+
+    double tagCountFactor = 1.0 / Math.sqrt(tagCount);
+
+    double areaFactor = 1.0 / Math.sqrt(avgTagArea);
+
+    double xStdDev = baseXYStdDev * tagCountFactor * areaFactor;
+    double yStdDev = baseXYStdDev * tagCountFactor * areaFactor;
+    double zStdDev = baseZStdDev * tagCountFactor * areaFactor;
+
+    return new VisionStandardDeviations(xStdDev, yStdDev, zStdDev, 0, 0, 0);
   }
 
   public void setThrottle(int throttle) {

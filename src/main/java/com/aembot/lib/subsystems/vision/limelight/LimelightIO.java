@@ -1,6 +1,7 @@
 package com.aembot.lib.subsystems.vision.limelight;
 
 import com.aembot.lib.subsystems.vision.interfaces.CameraIO;
+import com.aembot.lib.subsystems.vision.util.VisionStandardDeviations;
 import edu.wpi.first.math.geometry.Pose2d;
 
 public interface LimelightIO extends CameraIO {
@@ -21,6 +22,16 @@ public interface LimelightIO extends CameraIO {
    * @return The pose calculate by the megatag 2 algorithm on the limelight
    */
   public Pose2d getEstimatedPose();
+
+  /**
+   * @return The number of tags currently visible
+   */
+  public int getNumTags();
+
+  /**
+   * @return The standard deviations of the estimated position
+   */
+  public VisionStandardDeviations getStdDevs();
 
   /**
    * Throttle the camera processor.
