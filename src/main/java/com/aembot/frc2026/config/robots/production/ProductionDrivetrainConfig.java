@@ -1,4 +1,4 @@
-package com.aembot.frc2026.config.robots;
+package com.aembot.frc2026.config.robots.production;
 
 import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.config.robot.PhysicalConfiguration;

@@ -1,4 +1,4 @@
-package com.aembot.frc2026.config.robots;
+package com.aembot.frc2026.config.robots.production;
 
 // TODO Need constants from 26 bot
 import com.aembot.frc2026.config.robots.swerve_tunings.NautilusSwerveConstants;
