@@ -1392,6 +1392,11 @@ public class LimelightHelpers {
     return getLimelightNTDoubleArray(limelightName, "targetpose_robotspace");
   }
 
+  // Not part of the original LimelightHelpers file provided
+  public static double[] getStandardDeviations(String limelightName) {
+    return getLimelightNTDoubleArray(limelightName, "stddevs");
+  }
+
   /**
    * Gets the average color under the crosshair region as a 3-element array.
    *
