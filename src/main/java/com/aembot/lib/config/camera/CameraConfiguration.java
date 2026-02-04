@@ -207,4 +207,16 @@ public class CameraConfiguration {
   public String toString() {
     return CameraName;
   }
+
+  /**
+   * create a new camera config for limelight4
+   *
+   * @param name name of the camera
+   * @return the new config
+   */
+  public static CameraConfiguration limelight4Config(String name) {
+    return new CameraConfiguration(name)
+        .withResolution(Resolution._1280x720)
+        .withFOV(FOV.LIMELIGHT4);
+  }
 }
