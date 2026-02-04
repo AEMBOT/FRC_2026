@@ -6,6 +6,7 @@ package com.aembot.frc2026;
 
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.subsystems.SubsystemFactory;
+import com.aembot.frc2026.subsystems.vision.VisionSubsystem;
 import com.aembot.lib.core.logging.Loggerable;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.drive.commands.JoystickDriveCommand;
@@ -36,6 +37,10 @@ public class RobotContainer implements Loggerable {
           driverController::getLeftY,
           driverController::getLeftX,
           driverController::getRightX);
+
+  /* ---- VISION ---- */
+  @SuppressWarnings("unused") // it gets used just by creating it
+  private final VisionSubsystem visionSubsystem = SubsystemFactory.createVisionSubsystem();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer(LoggedRobot robot) {

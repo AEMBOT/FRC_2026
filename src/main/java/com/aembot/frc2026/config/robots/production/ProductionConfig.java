@@ -1,7 +1,6 @@
 package com.aembot.frc2026.config.robots.production;
 
 import com.aembot.frc2026.config.RobotConfiguration;
-import com.aembot.frc2026.config.robots.ProductionDrivetrainConfig;
 import com.aembot.lib.config.camera.CameraConfiguration;
 import com.aembot.lib.config.camera.SimulatedCameraConfiguration;
 import com.aembot.lib.config.robot.PhysicalConfiguration;
