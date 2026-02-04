@@ -200,7 +200,7 @@ public abstract class RobotState implements Loggable {
 
     // --- Desired speeds
     odometryState.desiredRobotRelativeChassisSpeeds.set(desiredRobotRelativeChassisSpeeds);
-    odometryState.desiredRobotRelativeChassisSpeeds.set(desiredRobotRelativeChassisSpeeds);
+    odometryState.desiredFieldRelativeChassisSpeeds.set(desiredFieldRelativeChassisSpeeds);
   }
 
   public ChassisSpeeds getLatestMeasuredFieldRelativeChassisSpeeds() {

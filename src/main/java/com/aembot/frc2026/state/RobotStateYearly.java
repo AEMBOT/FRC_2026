@@ -3,12 +3,10 @@ package com.aembot.frc2026.state;
 import com.aembot.lib.state.RobotState;
 
 public class RobotStateYearly extends RobotState {
-  private static RobotStateYearly instance;
+  // Ppl on the interwebs say this is good & thread safe
+  private static final RobotStateYearly INSTANCE = new RobotStateYearly();
 
   public static RobotStateYearly get() {
-    if (instance == null) {
-      instance = new RobotStateYearly();
-    }
-    return instance;
+    return INSTANCE;
   }
 }
