@@ -20,12 +20,14 @@ public class VisionInputs implements LoggableInputs {
   @Override
   public void toLog(LogTable table) {
     table.put("HasTag", hasTag);
+    table.put("NumTags", numTags);
     table.put("estimatedRobotPose", estimatedRobotPose);
   }
 
   @Override
   public void fromLog(LogTable table) {
     hasTag = table.get("HasTag", hasTag);
+    numTags = table.get("NumTags", numTags);
     estimatedRobotPose = table.get("estimatedRobotPose", estimatedRobotPose);
   }
 }

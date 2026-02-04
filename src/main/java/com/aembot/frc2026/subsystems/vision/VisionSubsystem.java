@@ -62,6 +62,14 @@ public class VisionSubsystem extends AEMSubsystem {
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
+    for (Pair<LimelightIO, VisionInputs> limelightWithInput : limelightsWithInputsList) {
+      Logger.recordOutput(
+          inputPrefix
+              + limelightWithInput.getFirst().getConfiguration().CameraName
+              + "EstimatedPose",
+          limelightWithInput.getSecond().estimatedRobotPose);
+    }
+
     Logger.recordOutput(
         standardPrefix + "/EstimatedMegatagPose", RobotStateYearly.get().getLatestPoseEstimate());
   }
