@@ -1,7 +1,7 @@
 package com.aembot.lib.subsystems.vision.util;
 
-import com.aembot.lib.config.camera.CameraConfiguration.Location;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 
 public class AprilTagObservation {
 
@@ -9,7 +9,7 @@ public class AprilTagObservation {
   public final String cameraName;
 
   /** Location of the camera that made the observation */
-  public final Location cameraLocation;
+  public final Pose3d cameraPose;
 
   /** ID of the observed tag */
   public final int tagID;
@@ -26,10 +26,10 @@ public class AprilTagObservation {
    * @param estimatedRobotPose Robot pose estimated based off of position
    */
   public AprilTagObservation(
-      String cameraName, Location cameraLocation, int tagID, Pose2d estimatedRobotPose) {
+      String cameraName, Pose3d cameraPose, int tagID, Pose2d estimatedRobotPose) {
 
     this.cameraName = cameraName;
-    this.cameraLocation = cameraLocation;
+    this.cameraPose = cameraPose;
     this.tagID = tagID;
     this.estimatedRobotPose = estimatedRobotPose;
   }
