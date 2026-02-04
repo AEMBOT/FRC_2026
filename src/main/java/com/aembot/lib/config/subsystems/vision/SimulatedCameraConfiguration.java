@@ -66,7 +66,8 @@ public class SimulatedCameraConfiguration {
    * @param stddevErrorPixels The std deviations of the randomized error of the camera in pixels
    * @return this simulated camera configuration for chaining
    */
-  public SimulatedCameraConfiguration withCalibrationError(double avgErrorPixels, double stddevErrorPixels) {
+  public SimulatedCameraConfiguration withCalibrationError(
+      double avgErrorPixels, double stddevErrorPixels) {
     simCameraProperties.setCalibError(avgErrorPixels, stddevErrorPixels);
     return this;
   }

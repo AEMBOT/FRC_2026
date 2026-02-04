@@ -3,13 +3,14 @@ package com.aembot.lib.state;
 import com.aembot.lib.constants.RobotStateConstants;
 import com.aembot.lib.core.logging.Loggable;
 import com.aembot.lib.math.ConcurrentTimeInterpolatableBuffer;
-import com.aembot.lib.subsystems.aprilvision.util.AprilTagObservation;
+import com.aembot.lib.subsystems.aprilvision.util.AprilCameraOutput;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -101,7 +102,9 @@ public abstract class RobotState implements Loggable {
   /* Normal class properties */
   protected final RobotState.Odometry odometryState = new RobotState.Odometry();
 
-  private final List<AprilTagObservation> aprilTagObservations = new ArrayList<>();
+  private final List<AprilCameraOutput> aprilTagObservations = new ArrayList<>();
+
+  private List<Consumer<AprilCameraOutput>> aprilCameraOutputConsumers = new ArrayList<>();
 
   public void addOdometryMeasurement(double timestamp, Pose2d pose) {
     odometryState.timeInterpolatableEstimatedRobotPose.addSample(timestamp, pose);
@@ -112,12 +115,19 @@ public abstract class RobotState implements Loggable {
    *
    * @param observations a list consisting of all the observations for this periodic loop
    */
-  public void setApriltagObservations(List<AprilTagObservation> observations) {
+  public void setApriltagObservations(List<AprilCameraOutput> observations) {
     aprilTagObservations.clear();
 
-    for (AprilTagObservation observation : observations) {
+    for (AprilCameraOutput observation : observations) {
       aprilTagObservations.add(observation);
+      for (Consumer<AprilCameraOutput> consumer : aprilCameraOutputConsumers) {
+        consumer.accept(observation);
+      }
     }
+  }
+
+  public void registerAprilCameraOutputConsumer(Consumer<AprilCameraOutput> consumer) {
+    aprilCameraOutputConsumers.add(consumer);
   }
 
   /**
@@ -125,7 +135,7 @@ public abstract class RobotState implements Loggable {
    *
    * @return The list of valid april tag observations
    */
-  public List<AprilTagObservation> getAprilTagObservations() {
+  public List<AprilCameraOutput> getAprilTagObservations() {
     return aprilTagObservations;
   }
 

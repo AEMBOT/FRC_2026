@@ -2,7 +2,7 @@ package com.aembot.lib.subsystems.aprilvision;
 
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.aprilvision.interfaces.AprilCameraIO;
-import com.aembot.lib.subsystems.aprilvision.util.AprilTagObservation;
+import com.aembot.lib.subsystems.aprilvision.util.AprilCameraOutput;
 import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
 import com.aembot.lib.subsystems.base.AEMSubsystem;
 import edu.wpi.first.math.Pair;
@@ -29,7 +29,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
 
   @Override
   public void periodic() {
-    List<AprilTagObservation> aprilTagObservations = new ArrayList<>();
+    List<AprilCameraOutput> aprilTagObservations = new ArrayList<>();
 
     for (Pair<AprilCameraIO, AprilVisionInputs> cameraWithInput : camerasWithInputs) {
       AprilCameraIO io = cameraWithInput.getFirst();
@@ -45,21 +45,23 @@ public class AprilVisionSubsystem extends AEMSubsystem {
 
       io.updateInputs(inputs);
 
-      if (inputs.hasTag && inputs.robotPoseEstimationLatencyCompensated != null) {
+      if (inputs.coprocessorEstimationLatencyCompensated != null) {
         aprilTagObservations.add(
-            new AprilTagObservation(
+            new AprilCameraOutput(
                 io.getConfiguration().cameraName,
                 inputs.tagID,
                 new VisionPoseEstimation(
-                    inputs.robotPoseEstimationLatencyUncompensated,
-                    inputs.robotPoseEstimationLatencyCompensated)));
+                    inputs.coprocessorEstimationLatencyUncompensated,
+                    inputs.coprocessorEstimationLatencyCompensated,
+                    inputs.coprocessorEstimationStdDevs,
+                    inputs.coprocessorEstimationTimestamp)));
       }
     }
 
     robotStateInstance.setApriltagObservations(aprilTagObservations);
 
     updateLog();
-    for (AprilTagObservation observation : robotStateInstance.getAprilTagObservations()) {
+    for (AprilCameraOutput observation : robotStateInstance.getAprilTagObservations()) {
       Logger.recordOutput(
           logPrefixStandard + "/VisionEstimatedRobotPose", observation.estimatedPose());
     }

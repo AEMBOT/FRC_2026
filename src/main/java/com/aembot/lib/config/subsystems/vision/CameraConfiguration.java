@@ -104,6 +104,18 @@ public class CameraConfiguration {
    */
   public double cameraXRotationScalar = 1.0;
 
+  /**
+   * The translational standard deviations of the camera with 1 tag 1 meter away from the camera.
+   * This will be used as {@code baseline * (avgDistance^2 / numTags) * methodSpecificScalar}
+   */
+  public double baselineTranslationalStdDev = 0.02;
+
+  /**
+   * The rotational standard deviations of the camera with 1 tag 1 meter away from the camera This
+   * will be used as {@code baseline * (avgDistance^2 / numTags) * methodSpecificScalar}
+   */
+  public double baselineAngularStdDev = Double.MAX_VALUE;
+
   public CameraConfiguration(String name, Type type) {
     this.cameraName = name;
     this.cameraType = type;
@@ -193,8 +205,52 @@ public class CameraConfiguration {
     return this;
   }
 
+  /**
+   * Set the translational standard deviations of the camera with 1 tag 1 meter away from the
+   * camera. This will be used as {@code baseline * (avgDistance^2 / numTags) *
+   * methodSpecificScalar}
+   *
+   * @return this {@link CameraConfiguration} for chaining
+   */
+  public CameraConfiguration withBaselineTranslationalStdDev(double stdDevMeters) {
+    this.baselineTranslationalStdDev = stdDevMeters;
+    return this;
+  }
+
+  /**
+   * Set the angular standard deviations of the camera with 1 tag 1 meter away from the camera. This
+   * will be used as {@code baseline * (avgDistance^2 / numTags) * methodSpecificScalar}
+   *
+   * @return this {@link CameraConfiguration} for chaining
+   */
+  public CameraConfiguration withBaselineAngularStdDev(double stdDevRads) {
+    this.baselineAngularStdDev = stdDevRads;
+    return this;
+  }
+
+  /**
+   * Set the translational and angular standard deviations of the camera with 1 tag 1 meter away
+   * from the camera. This will be used as {@code baseline * (avgDistance^2 / numTags) *
+   * methodSpecificScalar}
+   *
+   * @return this {@link CameraConfiguration} for chaining
+   */
+  public CameraConfiguration withBaslineStdDev(
+      double baselineTranslationalStdDev, double baselineAngularStdDev) {
+    return this.withBaselineTranslationalStdDev(baselineTranslationalStdDev)
+        .withBaselineAngularStdDev(baselineAngularStdDev);
+  }
+
   @Override
   public String toString() {
     return cameraName + "_" + cameraType.typeName;
+  }
+
+  /* ---- FACTORY METHODS ---- */
+  public static CameraConfiguration makeLimelight4Config(String name) {
+    return new CameraConfiguration(name, Type.LIMELIGHT)
+        .withCameraResolution(Resolution.P1280x960)
+        .withCameraFOV(FOV.LIMELIGHT4)
+        .withBaslineStdDev(0.02, Double.MAX_VALUE); // Values yoinked from 2481
   }
 }

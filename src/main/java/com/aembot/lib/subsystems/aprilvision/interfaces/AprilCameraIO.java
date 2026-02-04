@@ -1,5 +1,6 @@
 package com.aembot.lib.subsystems.aprilvision.interfaces;
 
+import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionInputs;
 import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
@@ -7,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.Timer;
 
 public interface AprilCameraIO {
   public CameraConfiguration getConfiguration();
@@ -61,9 +63,20 @@ public interface AprilCameraIO {
         compensateForEstimateLatency(
             latencyUncompensatedPosition, latestFieldChassisSpeeds, latency);
 
+    // Yoinked from 2481
+    // Prolly wanna apply smth to make us trust this less than coproc est.
+    // Won't make this a todo tho bc this is on hold ~indefinitely~
+    double stdDevFactor = Math.pow(robotCenterToTag.getNorm(), 2);
+
+    double translationStddev = getConfiguration().baselineTranslationalStdDev * stdDevFactor;
+    Double angularStddev = getConfiguration().baselineAngularStdDev * stdDevFactor;
+
     return new VisionPoseEstimation(
         new Pose2d(latencyUncompensatedPosition, robotRotation),
-        new Pose2d(latencyCompensatedPosition, robotRotation));
+        new Pose2d(latencyCompensatedPosition, robotRotation),
+        new OdometryStandardDevs(translationStddev, translationStddev, angularStddev),
+        Timer.getFPGATimestamp()
+            - latency); // This assumes no latency on our part. May be decently problematic
   }
 
   default Translation2d compensateForEstimateLatency(

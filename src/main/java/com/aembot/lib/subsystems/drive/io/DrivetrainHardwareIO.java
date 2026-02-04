@@ -4,6 +4,7 @@ import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
 import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
 import com.aembot.lib.core.can.CANStatusLogger;
 import com.aembot.lib.core.phoenix6.AEMSwerveDriveState;
+import com.aembot.lib.subsystems.aprilvision.util.AprilCameraOutput;
 import com.aembot.lib.subsystems.drive.DrivetrainInputs;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -189,5 +190,15 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
     }
 
     this.setStateStdDevs(stateStdDevs);
+  }
+
+  @Override
+  public void addVisionEstimation(AprilCameraOutput cameraOutput) {
+    System.out.println("Vision go brrr");
+    System.out.println(Timer.getFPGATimestamp() - cameraOutput.estimatedPose().timestampSeconds());
+    addVisionMeasurement(
+        cameraOutput.estimatedPose().latencyCompensatedPose(),
+        Utils.fpgaToCurrentTime(cameraOutput.estimatedPose().timestampSeconds()),
+        cameraOutput.estimatedPose().stdDevs().toMatrix());
   }
 }

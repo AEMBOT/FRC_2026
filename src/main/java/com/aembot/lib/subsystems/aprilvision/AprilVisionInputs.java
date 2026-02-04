@@ -1,5 +1,6 @@
 package com.aembot.lib.subsystems.aprilvision;
 
+import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.subsystems.aprilvision.util.CameraCalibration;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -81,6 +82,12 @@ public class AprilVisionInputs implements LoggableInputs {
    */
   public CameraCalibration cameraCalibration;
 
+  public OdometryStandardDevs simpleEstimationStdDevs;
+  public OdometryStandardDevs coprocessorEstimationStdDevs;
+
+  public double simpleEstimationTimestamp;
+  public double coprocessorEstimationTimestamp;
+
   @Override
   public void toLog(LogTable table) {
     table.put("HasTag", hasTag);
@@ -98,6 +105,10 @@ public class AprilVisionInputs implements LoggableInputs {
     table.put(
         "CameraCalibration",
         cameraCalibration != null ? cameraCalibration.serializeToString() : (String) null);
+    table.put("SimpleEstimationStdDevs", simpleEstimationStdDevs);
+    table.put("CoprocessorEstimationStdDevs", coprocessorEstimationStdDevs);
+    table.put("SimpleEstimationTimestamp", simpleEstimationTimestamp);
+    table.put("CoprocessorEstimationTimestamp", coprocessorEstimationTimestamp);
   }
 
   @Override
@@ -120,6 +131,12 @@ public class AprilVisionInputs implements LoggableInputs {
     coprocessorEstimationLatencyCompensated =
         table.get(
             "CoprocessorEstimationLatencyCompensated", coprocessorEstimationLatencyCompensated);
+    simpleEstimationStdDevs = table.get("SimpleEstimationStdDevs", simpleEstimationStdDevs);
+    coprocessorEstimationStdDevs =
+        table.get("CoprocessorEstimationStdDevs", coprocessorEstimationStdDevs);
+    simpleEstimationTimestamp = table.get("SimpleEstimationTimestamp", simpleEstimationTimestamp);
+    coprocessorEstimationTimestamp =
+        table.get("CoprocessorEstimationTimestamp", coprocessorEstimationTimestamp);
 
     cameraCalibration =
         CameraCalibration.deserializeFromString(table.get("CameraCalibration", (String) null));

@@ -1,9 +1,6 @@
 package com.aembot.frc2026.config.robots;
 
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
-import com.aembot.lib.config.subsystems.vision.CameraConfiguration.FOV;
-import com.aembot.lib.config.subsystems.vision.CameraConfiguration.Resolution;
-import com.aembot.lib.config.subsystems.vision.CameraConfiguration.Type;
 import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -21,7 +18,7 @@ public class ProductionCameraConfig {
 
   /* ---- FRONT LEFT CAM ---- */
   public final CameraConfiguration cameraConfigFrontLeft =
-      new CameraConfiguration("Turret", Type.LIMELIGHT)
+      CameraConfiguration.makeLimelight4Config("Turret")
           .withMechanismOrigin(
               () -> // All super guesstimated placeholder
               new Pose3d(
@@ -36,20 +33,18 @@ public class ProductionCameraConfig {
                       Units.inchesToMeters(3), Units.inchesToMeters(0), Units.inchesToMeters(3)),
                   new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(0), 0.0)))
           .withCameraDistanceScalar(1, 1)
-          .withXRotationScalar(1, -1)
-          .withCameraResolution(Resolution.P1280x960)
-          .withCameraFOV(FOV.LIMELIGHT4);
+          .withXRotationScalar(1, -1);
 
   public final SimulatedCameraConfiguration simConfigFrontLeft =
       new SimulatedCameraConfiguration(cameraConfigFrontLeft)
           .withFramerate(SIM_CAMERA_FPS)
-          .withCameraNoise(0, 0)
+          .withCalibrationError(0, 0)
           .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS)
           .withCameraDistanceScalar(1.16, 1.3);
 
   /* ---- FRONT RIGHT CAM ---- */
   public final CameraConfiguration cameraConfigFrontRight =
-      new CameraConfiguration("FrontRight", Type.LIMELIGHT)
+      CameraConfiguration.makeLimelight4Config("FrontRight")
           .withCameraOffset(
               new Transform3d(
                   new Translation3d(
@@ -58,20 +53,18 @@ public class ProductionCameraConfig {
                       Units.inchesToMeters(7.5)),
                   new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-15), 0.0)))
           .withCameraDistanceScalar(1, 1)
-          .withXRotationScalar(1, -1)
-          .withCameraResolution(Resolution.P1280x960)
-          .withCameraFOV(FOV.LIMELIGHT4);
+          .withXRotationScalar(1, -1);
 
   public final SimulatedCameraConfiguration simConfigFrontRight =
       new SimulatedCameraConfiguration(cameraConfigFrontRight)
           .withFramerate(SIM_CAMERA_FPS)
-          .withCameraNoise(0, 0)
+          .withCalibrationError(0, 0)
           .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS)
           .withCameraDistanceScalar(1.16, 1.3);
 
   /* ---- BACK LEFT CAM ---- */
   public final CameraConfiguration cameraConfigBackLeft =
-      new CameraConfiguration("BackLeft", Type.LIMELIGHT)
+      CameraConfiguration.makeLimelight4Config("BackLeft")
           .withCameraOffset(
               new Transform3d(
                   new Translation3d(
@@ -83,20 +76,18 @@ public class ProductionCameraConfig {
                       Units.degreesToRadians(-11.75),
                       Units.degreesToRadians(180))))
           .withCameraDistanceScalar(1, 1)
-          .withXRotationScalar(1, -1)
-          .withCameraResolution(Resolution.P1280x960)
-          .withCameraFOV(FOV.LIMELIGHT4);
+          .withXRotationScalar(1, -1);
 
   public final SimulatedCameraConfiguration simConfigBackLeft =
       new SimulatedCameraConfiguration(cameraConfigBackLeft)
           .withFramerate(SIM_CAMERA_FPS)
-          .withCameraNoise(0, 0)
+          .withCalibrationError(0, 0)
           .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS)
           .withCameraDistanceScalar(1.16, 1.3);
 
   /* ---- BACK RIGHT CAM ---- */
   public final CameraConfiguration cameraConfigBackRight =
-      new CameraConfiguration("BackRight", Type.LIMELIGHT)
+      CameraConfiguration.makeLimelight4Config("BackRight")
           .withCameraOffset(
               new Transform3d(
                   new Translation3d(
@@ -108,14 +99,12 @@ public class ProductionCameraConfig {
                       Units.degreesToRadians(-11.75),
                       Units.degreesToRadians(-180))))
           .withCameraDistanceScalar(1, 1)
-          .withXRotationScalar(1, -1)
-          .withCameraResolution(Resolution.P1280x960)
-          .withCameraFOV(FOV.LIMELIGHT4);
+          .withXRotationScalar(1, -1);
 
   public final SimulatedCameraConfiguration simConfigBackRight =
       new SimulatedCameraConfiguration(cameraConfigBackRight)
           .withFramerate(SIM_CAMERA_FPS)
-          .withCameraNoise(0, 0)
+          .withCalibrationError(0, 0)
           .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS)
           .withCameraDistanceScalar(1.16, 1.3);
 

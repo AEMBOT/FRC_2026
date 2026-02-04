@@ -1,5 +1,6 @@
 package com.aembot.lib.subsystems.aprilvision.io;
 
+import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
 import com.aembot.lib.state.RobotState;
@@ -107,6 +108,8 @@ public class Limelight4IOHardware extends LimelightIO {
         coprocessorPoseEstimation.latencyUncompensatedPose();
     inputs.coprocessorEstimationLatencyCompensated =
         coprocessorPoseEstimation.latencyCompensatedPose();
+    inputs.coprocessorEstimationStdDevs = coprocessorPoseEstimation.stdDevs();
+    inputs.coprocessorEstimationTimestamp = coprocessorPoseEstimation.timestampSeconds();
   }
 
   /**
@@ -130,6 +133,7 @@ public class Limelight4IOHardware extends LimelightIO {
     inputs.robotPoseEstimationLatencyUncompensated = null;
     inputs.robotPoseEstimationLatencyCompensated = null;
     inputs.tagPosition = null;
+    inputs.simpleEstimationTimestamp = Double.NaN;
     if (inputs.hasTag) {
       inputs.tagHeightPixels = computeTagHeightInPixels(inputs.tagCornerPositions);
       inputs.tagHeightAngle = computeTagHeightInRotations(inputs.tagHeightPixels);
@@ -157,6 +161,8 @@ public class Limelight4IOHardware extends LimelightIO {
 
         inputs.robotPoseEstimationLatencyUncompensated = poseEstimation.latencyUncompensatedPose();
         inputs.robotPoseEstimationLatencyCompensated = poseEstimation.latencyCompensatedPose();
+        inputs.simpleEstimationStdDevs = poseEstimation.stdDevs();
+        inputs.simpleEstimationTimestamp = poseEstimation.timestampSeconds();
       }
     }
   }
@@ -175,9 +181,19 @@ public class Limelight4IOHardware extends LimelightIO {
               robotStateInstance.getLatestFusedFieldRelativeChassisSpeed(),
               Timer.getFPGATimestamp() - (estimate.timestampSeconds - estimate.latency));
 
-      return new VisionPoseEstimation(latencyUncompensatedPose, latencyCompensatedPose);
+      // Yoinked from 2481
+      double stdDevFactor = Math.pow(estimate.avgTagDist, 2) / estimate.tagCount;
+
+      double translationStddev = cameraConfiguration.baselineTranslationalStdDev * stdDevFactor;
+      Double angularStddev = cameraConfiguration.baselineAngularStdDev * stdDevFactor;
+
+      return new VisionPoseEstimation(
+          latencyUncompensatedPose,
+          latencyCompensatedPose,
+          new OdometryStandardDevs(translationStddev, translationStddev, angularStddev),
+          estimate.timestampSeconds);
     } else {
-      return new VisionPoseEstimation(null, null);
+      return new VisionPoseEstimation(null, null, null, Double.NaN);
     }
   }
 

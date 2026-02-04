@@ -1,7 +1,9 @@
 package com.aembot.lib.subsystems.aprilvision.util;
 
+import com.aembot.lib.config.odometry.OdometryStandardDevs;
+
 /**
- * Represents an observation of an april tag. Fields:
+ * Represents data output of an april-tag tracking camera for pose estimation. Fields:
  *
  * <ul>
  *   <li>{@code cameraName()}: {@link String} Name of the camera that observed the tag. Should be
@@ -10,6 +12,7 @@ package com.aembot.lib.subsystems.aprilvision.util;
  *   <li>{@code tagID()}: {@code int} ID of the observed tag
  *   <li>{@code estimatedPose()}: {@link VisionPoseEstimation} The robot pose estimated from the
  *       observation
+ *   <li>{@code stddevs()} {@link OdometryStandardDevs} The standard deviations of the pose
+ *       estimation
  */
-public record AprilTagObservation(
-    String cameraName, int tagID, VisionPoseEstimation estimatedPose) {}
+public record AprilCameraOutput(String cameraName, int tagID, VisionPoseEstimation estimatedPose) {}
