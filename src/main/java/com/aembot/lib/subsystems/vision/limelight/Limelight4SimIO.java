@@ -33,6 +33,8 @@ public class Limelight4SimIO implements LimelightIO {
 
   private final PhotonPoseEstimator poseEstimator;
 
+  private PhotonPipelineResult lastResult = new PhotonPipelineResult();
+
   public Limelight4SimIO(
       SimulatedCameraConfiguration config,
       YearFieldConstantable fieldConstants,
@@ -64,12 +66,13 @@ public class Limelight4SimIO implements LimelightIO {
     return mechanismPose.minus(cameraPoseInverse);
   }
 
-  private Optional<PhotonPipelineResult> getLastResult() {
+  private PhotonPipelineResult getLastResult() {
     List<PhotonPipelineResult> results = camera.getAllUnreadResults();
-    if (results.size() == 0) {
-      return Optional.empty();
+    if (results.size() != 0) {
+      lastResult = results.get(results.size() - 1);
     }
-    return Optional.of(results.get(results.size() - 1));
+
+    return lastResult;
   }
 
   @Override
@@ -89,29 +92,21 @@ public class Limelight4SimIO implements LimelightIO {
 
   @Override
   public boolean hasTag() {
-    Optional<PhotonPipelineResult> lastResult = getLastResult();
-    if (lastResult.isEmpty()) {
-      return false;
-    }
-    return lastResult.get().hasTargets();
+
+    return getLastResult().hasTargets();
   }
 
   @Override
   public int getPrimaryTagID() {
-    Optional<PhotonPipelineResult> lastResult = getLastResult();
-    if (lastResult.isEmpty()) {
+    if (getLastResult().getBestTarget() == null) {
       return -1;
     }
-    return lastResult.get().getBestTarget().fiducialId;
+    return getLastResult().getBestTarget().fiducialId;
   }
 
   @Override
   public Pose2d getEstimatedPose() {
-    Optional<PhotonPipelineResult> lastResult = getLastResult();
-    if (lastResult.isEmpty()) {
-      return null;
-    }
-    Optional<EstimatedRobotPose> estimatedPose = poseEstimator.update(lastResult.get());
+    Optional<EstimatedRobotPose> estimatedPose = poseEstimator.update(getLastResult());
 
     if (estimatedPose.isPresent()) {
       return estimatedPose.get().estimatedPose.toPose2d();
@@ -122,11 +117,7 @@ public class Limelight4SimIO implements LimelightIO {
 
   @Override
   public int getNumTags() {
-    Optional<PhotonPipelineResult> lastResult = getLastResult();
-    if (lastResult.isEmpty()) {
-      return 0;
-    }
-    return getLastResult().get().getTargets().size();
+    return getLastResult().getTargets().size();
   }
 
   @Override
@@ -138,7 +129,7 @@ public class Limelight4SimIO implements LimelightIO {
     }
 
     double avgTagArea = 0.0;
-    for (PhotonTrackedTarget target : getLastResult().get().getTargets()) {
+    for (PhotonTrackedTarget target : getLastResult().getTargets()) {
       avgTagArea += target.getArea();
     }
     avgTagArea /= tagCount;

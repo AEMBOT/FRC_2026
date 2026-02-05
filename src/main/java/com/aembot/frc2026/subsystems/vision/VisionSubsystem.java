@@ -55,10 +55,13 @@ public class VisionSubsystem extends AEMSubsystem {
               limelightPoseEstimates);
     }
 
-    if (fusedPose.isPresent() && fusedPose.get() != null) {
+    if (fusedPose.isPresent()) {
       RobotStateYearly.get().addMegatagEstimateMeasurement(fusedPose.get());
-      Logger.recordOutput("/EstimatedPose", fusedPose.get().getEstimatedPose());
+      Logger.recordOutput(
+          this.subsystemName + "/EstimatedPose", fusedPose.get().getEstimatedPose());
     }
+
+    Logger.recordOutput("TEST", 1);
 
     updateLog();
   }
