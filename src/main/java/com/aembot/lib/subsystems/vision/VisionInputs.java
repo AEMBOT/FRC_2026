@@ -13,9 +13,9 @@ public class VisionInputs implements LoggableInputs {
 
   public int numTags = 0;
 
-  public VisionStandardDeviations stdDevs;
+  public VisionStandardDeviations stdDevs = new VisionStandardDeviations(0, 0, 0, 0, 0, 0);
 
-  public Pose2d estimatedRobotPose;
+  public Pose2d estimatedRobotPose = Pose2d.kZero;
 
   @Override
   public void toLog(LogTable table) {

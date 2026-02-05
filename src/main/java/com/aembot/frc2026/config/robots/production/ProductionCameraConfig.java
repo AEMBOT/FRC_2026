@@ -86,7 +86,7 @@ public class ProductionCameraConfig {
           .withCalculatedDistanceScalar(1.16, 1.3);
 
   public final CameraConfiguration cameraConfigRight =
-      CameraConfiguration.limelight4Config("Left")
+      CameraConfiguration.limelight4Config("Right")
           .withPose(
               new Pose3d(
                   new Translation3d(

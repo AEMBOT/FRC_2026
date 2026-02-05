@@ -41,6 +41,8 @@ public class DriveSubsystem extends AEMSubsystem {
     this.config = configuration;
     this.io = drivetrain;
     this.robotStateInstance = robotStateInstance;
+
+    robotStateInstance.registerDriveTrainVisionEstimateConsumer((estimate) -> {});
   }
 
   /** Call {@link DriveSubsystem#resetPose} and return self */

@@ -64,37 +64,54 @@ public class Limelight4SimIO implements LimelightIO {
     return mechanismPose.minus(cameraPoseInverse);
   }
 
-  private PhotonPipelineResult getLastResult() {
+  private Optional<PhotonPipelineResult> getLastResult() {
     List<PhotonPipelineResult> results = camera.getAllUnreadResults();
-    return results.get(results.size() - 1);
+    if (results.size() == 0) {
+      return Optional.empty();
+    }
+    return Optional.of(results.get(results.size() - 1));
   }
 
+  @Override
   public CameraConfiguration getConfiguration() {
     return kSimCameraConfiguration.kCameraConfiguration;
   }
 
+  @Override
   public void updateInputs(VisionInputs inputs) {
     poseEstimator.addHeadingData(Timer.getFPGATimestamp(), kRobotRotationSupplier.get());
 
     inputs.hasTag = hasTag();
     inputs.primaryTagID = getPrimaryTagID();
     inputs.numTags = getNumTags();
-    Pose2d estimatedPose = getEstimatedPose();
-    if (estimatedPose != null) {
-      inputs.estimatedRobotPose = estimatedPose;
-    }
+    inputs.estimatedRobotPose = getEstimatedPose();
   }
 
+  @Override
   public boolean hasTag() {
-    return getLastResult().hasTargets();
+    Optional<PhotonPipelineResult> lastResult = getLastResult();
+    if (lastResult.isEmpty()) {
+      return false;
+    }
+    return lastResult.get().hasTargets();
   }
 
+  @Override
   public int getPrimaryTagID() {
-    return getLastResult().getBestTarget().fiducialId;
+    Optional<PhotonPipelineResult> lastResult = getLastResult();
+    if (lastResult.isEmpty()) {
+      return -1;
+    }
+    return lastResult.get().getBestTarget().fiducialId;
   }
 
+  @Override
   public Pose2d getEstimatedPose() {
-    Optional<EstimatedRobotPose> estimatedPose = poseEstimator.update(getLastResult());
+    Optional<PhotonPipelineResult> lastResult = getLastResult();
+    if (lastResult.isEmpty()) {
+      return null;
+    }
+    Optional<EstimatedRobotPose> estimatedPose = poseEstimator.update(lastResult.get());
 
     if (estimatedPose.isPresent()) {
       return estimatedPose.get().estimatedPose.toPose2d();
@@ -105,7 +122,11 @@ public class Limelight4SimIO implements LimelightIO {
 
   @Override
   public int getNumTags() {
-    return getLastResult().getTargets().size();
+    Optional<PhotonPipelineResult> lastResult = getLastResult();
+    if (lastResult.isEmpty()) {
+      return 0;
+    }
+    return getLastResult().get().getTargets().size();
   }
 
   @Override
@@ -117,7 +138,7 @@ public class Limelight4SimIO implements LimelightIO {
     }
 
     double avgTagArea = 0.0;
-    for (PhotonTrackedTarget target : getLastResult().getTargets()) {
+    for (PhotonTrackedTarget target : getLastResult().get().getTargets()) {
       avgTagArea += target.getArea();
     }
     avgTagArea /= tagCount;
