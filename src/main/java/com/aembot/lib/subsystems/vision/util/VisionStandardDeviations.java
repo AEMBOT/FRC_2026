@@ -92,6 +92,13 @@ public class VisionStandardDeviations {
   }
 
   /**
+   * @return Standard deviations as a double array
+   */
+  public double[] asDoubleArray() {
+    return new double[] {xStdDev, yStdDev, zStdDev, rollStdDev, pitchStdDev, yawStdDev};
+  }
+
+  /**
    * @return Standard deviations of the x position
    */
   public double getXStdDev() {

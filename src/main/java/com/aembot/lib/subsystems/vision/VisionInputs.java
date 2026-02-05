@@ -13,15 +13,19 @@ public class VisionInputs implements LoggableInputs {
 
   public int numTags = 0;
 
-  public VisionStandardDeviations stdDevs = new VisionStandardDeviations(0, 0, 0, 0, 0, 0);
+  public VisionStandardDeviations stdDevs = VisionStandardDeviations.ifSeesNoTags();
 
   public Pose2d estimatedRobotPose = Pose2d.kZero;
+
+  public double lastEstimateTimestamp = 0;
 
   @Override
   public void toLog(LogTable table) {
     table.put("HasTag", hasTag);
     table.put("NumTags", numTags);
     table.put("estimatedRobotPose", estimatedRobotPose);
+    table.put("StandardDeviations", stdDevs.asDoubleArray());
+    table.put("LastEstimateTimestamp", lastEstimateTimestamp);
   }
 
   @Override
@@ -29,5 +33,9 @@ public class VisionInputs implements LoggableInputs {
     hasTag = table.get("HasTag", hasTag);
     numTags = table.get("NumTags", numTags);
     estimatedRobotPose = table.get("estimatedRobotPose", estimatedRobotPose);
+    stdDevs =
+        VisionStandardDeviations.fromDoubleArray(
+            table.get("StandardDeviations", stdDevs.asDoubleArray()));
+    lastEstimateTimestamp = table.get("LastEstimateTimestamp", lastEstimateTimestamp);
   }
 }

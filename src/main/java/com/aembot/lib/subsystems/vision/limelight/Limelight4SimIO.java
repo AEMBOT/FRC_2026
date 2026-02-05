@@ -35,6 +35,8 @@ public class Limelight4SimIO implements LimelightIO {
 
   private PhotonPipelineResult lastResult = new PhotonPipelineResult();
 
+  private double lastPoseEstimateTimestamp = 0;
+
   public Limelight4SimIO(
       SimulatedCameraConfiguration config,
       YearFieldConstantable fieldConstants,
@@ -88,6 +90,8 @@ public class Limelight4SimIO implements LimelightIO {
     inputs.primaryTagID = getPrimaryTagID();
     inputs.numTags = getNumTags();
     inputs.estimatedRobotPose = getEstimatedPose();
+    inputs.stdDevs = getStdDevs();
+    inputs.lastEstimateTimestamp = lastResult.getTimestampSeconds();
   }
 
   @Override
@@ -109,6 +113,7 @@ public class Limelight4SimIO implements LimelightIO {
     Optional<EstimatedRobotPose> estimatedPose = poseEstimator.update(getLastResult());
 
     if (estimatedPose.isPresent()) {
+      lastPoseEstimateTimestamp = estimatedPose.get().timestampSeconds;
       return estimatedPose.get().estimatedPose.toPose2d();
     } else {
       return null;

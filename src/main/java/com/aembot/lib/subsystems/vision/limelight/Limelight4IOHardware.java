@@ -4,6 +4,7 @@ import com.aembot.lib.config.camera.CameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
 import com.aembot.lib.subsystems.vision.VisionInputs;
 import com.aembot.lib.subsystems.vision.util.LimelightHelpers;
+import com.aembot.lib.subsystems.vision.util.LimelightHelpers.PoseEstimate;
 import com.aembot.lib.subsystems.vision.util.VisionStandardDeviations;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,6 +19,8 @@ public class Limelight4IOHardware implements LimelightIO {
 
   protected final Supplier<Rotation2d> kRobotRotationSupplier;
   protected final Supplier<Double> kRobotYawVelocitySupplier;
+
+  private double lastPoseEstimateTimestamp = 0;
 
   public Limelight4IOHardware(
       CameraConfiguration config,
@@ -67,6 +70,8 @@ public class Limelight4IOHardware implements LimelightIO {
     inputs.primaryTagID = getPrimaryTagID();
     inputs.numTags = getNumTags();
     inputs.estimatedRobotPose = getEstimatedPose();
+    inputs.stdDevs = getStdDevs();
+    inputs.lastEstimateTimestamp = lastPoseEstimateTimestamp;
 
     updateMegatag2Info();
   }
@@ -90,7 +95,9 @@ public class Limelight4IOHardware implements LimelightIO {
 
   @Override
   public Pose2d getEstimatedPose() {
-    return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(kName).pose;
+    PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(kName);
+    lastPoseEstimateTimestamp = poseEstimate.timestampSeconds;
+    return poseEstimate.pose;
   }
 
   @Override

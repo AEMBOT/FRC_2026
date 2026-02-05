@@ -39,7 +39,7 @@ public class VisionSubsystem extends AEMSubsystem {
         VisionPoseEstimate poseEstimate =
             new VisionPoseEstimate(
                 inputs.estimatedRobotPose,
-                RobotStateYearly.get().getLastUsedMegatagTimestamp(),
+                inputs.lastEstimateTimestamp,
                 inputs.numTags,
                 inputs.stdDevs);
         limelightPoseEstimates.add(poseEstimate);
