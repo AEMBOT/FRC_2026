@@ -91,7 +91,7 @@ public class Limelight4SimIO implements LimelightIO {
     inputs.numTags = getNumTags();
     inputs.estimatedRobotPose = getEstimatedPose();
     inputs.stdDevs = getStdDevs();
-    inputs.lastEstimateTimestamp = lastResult.getTimestampSeconds();
+    inputs.lastEstimateTimestamp = lastPoseEstimateTimestamp;
   }
 
   @Override
