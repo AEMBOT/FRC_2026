@@ -1,5 +1,10 @@
 package com.aembot.lib.subsystems.vision.util;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+
 /** Helper class to store standard deviation values for robot pose */
 public class VisionStandardDeviations {
 
@@ -77,6 +82,13 @@ public class VisionStandardDeviations {
         Double.MAX_VALUE,
         Double.MAX_VALUE,
         Double.MAX_VALUE);
+  }
+
+  /**
+   * @return Standard deviations as a three value matrix
+   */
+  public Matrix<N3, N1> asMatrix() {
+    return VecBuilder.fill(xStdDev, yStdDev, yawStdDev);
   }
 
   /**

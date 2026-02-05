@@ -1,6 +1,7 @@
 package com.aembot.lib.subsystems.drive.io;
 
 import com.aembot.lib.subsystems.drive.DrivetrainInputs;
+import com.aembot.lib.subsystems.vision.util.VisionPoseEstimate;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -21,4 +22,7 @@ public class DrivetrainIOReplay implements DrivetrainIO {
 
   @Override
   public void setOdometryStdDevs(double xStd, double yStd, double rotStd) {}
+
+  @Override
+  public void addVisionEstimation(VisionPoseEstimate poseEstimate) {}
 }
