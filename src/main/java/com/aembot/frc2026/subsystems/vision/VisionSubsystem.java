@@ -33,11 +33,13 @@ public class VisionSubsystem extends AEMSubsystem {
     for (Pair<LimelightIO, VisionInputs> limelightWithInput : limelightsWithInputsList) {
       VisionInputs inputs = limelightWithInput.getSecond();
 
+      limelightWithInput.getFirst().updateInputs(inputs);
+
       if (inputs.hasTag) {
         VisionPoseEstimate poseEstimate =
             new VisionPoseEstimate(
                 inputs.estimatedRobotPose,
-                RobotStateYearly.get().getLastUsedMegatagTimestamp(),
+                inputs.lastEstimateTimestamp,
                 inputs.numTags,
                 inputs.stdDevs);
         limelightPoseEstimates.add(poseEstimate);
@@ -55,14 +57,22 @@ public class VisionSubsystem extends AEMSubsystem {
 
     if (fusedPose.isPresent()) {
       RobotStateYearly.get().addMegatagEstimateMeasurement(fusedPose.get());
+      Logger.recordOutput(
+          this.subsystemName + "/EstimatedPose", fusedPose.get().getEstimatedPose());
     }
+
+    Logger.recordOutput("TEST", 1);
 
     updateLog();
   }
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
-    Logger.recordOutput(
-        standardPrefix + "/EstimatedMegatagPose", RobotStateYearly.get().getLatestPoseEstimate());
+    for (Pair<LimelightIO, VisionInputs> limelightWithInput : limelightsWithInputsList) {
+      LimelightIO io = limelightWithInput.getFirst();
+      VisionInputs inputs = limelightWithInput.getSecond();
+
+      Logger.processInputs(inputPrefix + "/" + io.getConfiguration().toString(), inputs);
+    }
   }
 }

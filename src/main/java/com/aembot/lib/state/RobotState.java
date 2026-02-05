@@ -200,7 +200,7 @@ public abstract class RobotState implements Loggable {
 
     // --- Desired speeds
     odometryState.desiredRobotRelativeChassisSpeeds.set(desiredRobotRelativeChassisSpeeds);
-    odometryState.desiredRobotRelativeChassisSpeeds.set(desiredRobotRelativeChassisSpeeds);
+    odometryState.desiredFieldRelativeChassisSpeeds.set(desiredFieldRelativeChassisSpeeds);
   }
 
   public ChassisSpeeds getLatestMeasuredFieldRelativeChassisSpeeds() {
@@ -244,8 +244,10 @@ public abstract class RobotState implements Loggable {
    * @param estimate the estimate to add
    */
   public void addMegatagEstimateMeasurement(VisionPoseEstimate estimate) {
-    visionState.TimeInterpolatablePose.addSample(
-        estimate.timestampSeconds, estimate.estimatedRobotPose);
+    if (estimate.estimatedRobotPose != null) {
+      visionState.TimeInterpolatablePose.addSample(
+          estimate.timestampSeconds, estimate.estimatedRobotPose);
+    }
     visionState.LastUsedMegaTagTimestamp.set(estimate.timestampSeconds);
     drivetrainVisionEstimateConsumer.accept(estimate);
   }

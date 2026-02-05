@@ -4,6 +4,11 @@ import com.aembot.frc2026.config.RobotConfiguration;
 import com.aembot.lib.config.camera.CameraConfiguration;
 import com.aembot.lib.config.camera.SimulatedCameraConfiguration;
 import com.aembot.lib.config.robot.PhysicalConfiguration;
+import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
+import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
+import com.aembot.lib.config.subsystems.drive.simulation.DrivetrainSimConfiguration;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.util.Units;
 import java.util.List;
 
@@ -35,5 +40,34 @@ public class ProductionConfig extends RobotConfiguration {
   @Override
   public List<SimulatedCameraConfiguration> getSimulatedCameraConfigurations() {
     return CAMERA_CONFIG.simConfigurations;
+  }
+
+  private static final String DRIVETRAIN_BUS_NAME = "drivetrain";
+  private static final List<String> CAN_BUS_NAMES = List.of(DRIVETRAIN_BUS_NAME);
+
+  private static final ProductionDrivetrainConfig DRIVETRAIN_CONFIG =
+      new ProductionDrivetrainConfig(PHYSICAL_CONFIGURATION, DRIVETRAIN_BUS_NAME);
+
+  @Override
+  public List<String> getCANBusNames() {
+    return CAN_BUS_NAMES;
+  }
+
+  @Override
+  public DrivetrainConfiguration getDrivetrainConfiguration() {
+    return DRIVETRAIN_CONFIG.drivetrainConfiguration;
+  }
+
+  @Override
+  public List<
+          SwerveModuleConfiguration<
+              TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>>
+      getSwerveConfigurations() {
+    return DRIVETRAIN_CONFIG.moduleConfigs.configurations;
+  }
+
+  @Override
+  public DrivetrainSimConfiguration getSimulatedDrivetrainConfiguration() {
+    return DRIVETRAIN_CONFIG.simulatedDrivetrainConfiguration;
   }
 }

@@ -33,6 +33,10 @@ public class Limelight4SimIO implements LimelightIO {
 
   private final PhotonPoseEstimator poseEstimator;
 
+  private PhotonPipelineResult lastResult = new PhotonPipelineResult();
+
+  private double lastPoseEstimateTimestamp = 0;
+
   public Limelight4SimIO(
       SimulatedCameraConfiguration config,
       YearFieldConstantable fieldConstants,
@@ -66,37 +70,50 @@ public class Limelight4SimIO implements LimelightIO {
 
   private PhotonPipelineResult getLastResult() {
     List<PhotonPipelineResult> results = camera.getAllUnreadResults();
-    return results.get(results.size() - 1);
+    if (results.size() != 0) {
+      lastResult = results.get(results.size() - 1);
+    }
+
+    return lastResult;
   }
 
+  @Override
   public CameraConfiguration getConfiguration() {
     return kSimCameraConfiguration.kCameraConfiguration;
   }
 
+  @Override
   public void updateInputs(VisionInputs inputs) {
     poseEstimator.addHeadingData(Timer.getFPGATimestamp(), kRobotRotationSupplier.get());
 
     inputs.hasTag = hasTag();
     inputs.primaryTagID = getPrimaryTagID();
     inputs.numTags = getNumTags();
-    Pose2d estimatedPose = getEstimatedPose();
-    if (estimatedPose != null) {
-      inputs.estimatedRobotPose = estimatedPose;
-    }
+    inputs.estimatedRobotPose = getEstimatedPose();
+    inputs.stdDevs = getStdDevs();
+    inputs.lastEstimateTimestamp = lastResult.getTimestampSeconds();
   }
 
+  @Override
   public boolean hasTag() {
+
     return getLastResult().hasTargets();
   }
 
+  @Override
   public int getPrimaryTagID() {
+    if (getLastResult().getBestTarget() == null) {
+      return -1;
+    }
     return getLastResult().getBestTarget().fiducialId;
   }
 
+  @Override
   public Pose2d getEstimatedPose() {
     Optional<EstimatedRobotPose> estimatedPose = poseEstimator.update(getLastResult());
 
     if (estimatedPose.isPresent()) {
+      lastPoseEstimateTimestamp = estimatedPose.get().timestampSeconds;
       return estimatedPose.get().estimatedPose.toPose2d();
     } else {
       return null;

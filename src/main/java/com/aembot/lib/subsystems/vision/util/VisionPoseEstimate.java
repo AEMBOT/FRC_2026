@@ -79,6 +79,10 @@ public class VisionPoseEstimate {
 
     for (VisionPoseEstimate estimate : estimates) {
 
+      if (estimate.numTags == 0) {
+        continue;
+      }
+
       Optional<Pose2d> odometryAtEstimateTime = odometryPoseSupplier.apply(estimate.getTimestamp());
 
       if (odometryAtEstimateTime.isEmpty()) {
