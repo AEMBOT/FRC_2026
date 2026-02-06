@@ -36,7 +36,9 @@ public class Robot extends LoggedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    CommandScheduler.getInstance().run();
+  }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
