@@ -1,6 +1,8 @@
 package com.aembot.frc2026.config;
 
 import com.aembot.frc2026.config.robots.ProductionConfig;
+import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
+import com.aembot.lib.config.subsystems.hood.simulation.SimulatedHoodConfiguration;
 import com.pathplanner.lib.config.RobotConfig;
 import java.util.List;
 
@@ -17,6 +19,20 @@ public abstract class RobotConfiguration {
    * @return Robot name as a string
    */
   public abstract String getRobotName();
+
+  /**
+   * Get the configuration of the hood
+   *
+   * @return Hood configuration
+   */
+  public abstract TalonFXHoodConfiguration getHoodConfig();
+
+  /**
+   * Get the configuration of the simulated hood
+   *
+   * @return Simulated hood configuration
+   */
+  public abstract SimulatedHoodConfiguration getSimHoodConfig();
 
   /**
    * Gets the list of named CAN buses that are present on this bot

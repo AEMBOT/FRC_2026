@@ -2,6 +2,8 @@ package com.aembot.frc2026.config.robots;
 
 import com.aembot.frc2026.config.RobotConfiguration;
 import com.aembot.lib.config.robot.PhysicalConfiguration;
+import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
+import com.aembot.lib.config.subsystems.hood.simulation.SimulatedHoodConfiguration;
 import edu.wpi.first.math.util.Units;
 import java.util.List;
 
@@ -22,9 +24,21 @@ public class ProductionConfig extends RobotConfiguration {
           .withBumperWidthM(Units.inchesToMeters(35.625))
           .withWheelCoefficientOfFriction(1.2);
 
+  private static final ProductionHoodConfig HOOD_CONFIG = new ProductionHoodConfig();
+
   @Override
   public String getRobotName() {
     return ROBOT_NAME;
+  }
+
+  @Override
+  public TalonFXHoodConfiguration getHoodConfig() {
+    return HOOD_CONFIG.HOOD_CONFIG;
+  }
+
+  @Override
+  public SimulatedHoodConfiguration getSimHoodConfig() {
+    return HOOD_CONFIG.SIMULATED_HOOD_CONFIG;
   }
 
   @Override
