@@ -5,16 +5,13 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 public class TalonFXHoodConfiguration {
 
-    public final String kName;
+  public final String kName;
 
-    public final MotorConfiguration<TalonFXConfiguration> kMotorConfig;
+  public final MotorConfiguration<TalonFXConfiguration> kMotorConfig;
 
-    public TalonFXHoodConfiguration(
-        MotorConfiguration<TalonFXConfiguration> motorConfig,
-        String name
-    ) {
-        this.kMotorConfig = motorConfig;
-        this.kName = name;
-    }
-    
+  public TalonFXHoodConfiguration(
+      MotorConfiguration<TalonFXConfiguration> motorConfig, String name) {
+    this.kMotorConfig = motorConfig;
+    this.kName = name;
+  }
 }
