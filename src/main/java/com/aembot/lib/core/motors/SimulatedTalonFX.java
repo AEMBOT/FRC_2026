@@ -57,11 +57,10 @@ public class SimulatedTalonFX implements Loggable {
   }
 
   private void setupMotorSim() {
+    double gearRatio = 360 / config.kRealConfiguration.kUnitToRotorRotationRatio;
     var plant =
         LinearSystemId.createDCMotorSystem(
-            config.kSimMotorConstants,
-            config.kRealConfiguration.kMomentOfInertia,
-            1 / config.kRealConfiguration.kUnitToRotorRotationRatio);
+            config.kSimMotorConstants, config.kRealConfiguration.kMomentOfInertia, gearRatio);
     this.motorSim = new DCMotorSim(plant, config.kSimMotorConstants);
 
     double startAngle = Units.degreesToRotations(config.kStartingRotationDegrees);
@@ -102,7 +101,7 @@ public class SimulatedTalonFX implements Loggable {
     double clampedPosition = MathUtil.clamp(rawPosition, minAngleRad, maxAngleRad);
 
     if (rawPosition != clampedPosition) {
-      motorSim.setAngle(rawPosition);
+      motorSim.setAngle(clampedPosition);
       double currentVelocity = motorSim.getAngularVelocityRadPerSec();
       if ((rawPosition < minAngleRad && currentVelocity < 0)
           || (rawPosition > maxAngleRad && currentVelocity > 0)) {
@@ -119,6 +118,10 @@ public class SimulatedTalonFX implements Loggable {
 
     simState.setRawRotorPosition(inputs.RotorPosition);
     simState.setRotorVelocity(inputs.RotorVelocity);
+  }
+
+  public MotorIOTalonFXSim getMotor() {
+    return motorIO;
   }
 
   @Override

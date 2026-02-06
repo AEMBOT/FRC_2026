@@ -30,7 +30,7 @@ public class ProductionHoodConfig {
                           .withMotionMagicCruiseVelocity(
                               Units.degreesToRotations(CURISE_VELOCITY_DEG_PER_SEC) * GEAR_RATIO)
                           .withMotionMagicAcceleration(
-                              Units.degreesToRadians(ACCELERATION_DEG_PER_SEC) * GEAR_RATIO))
+                              Units.degreesToRotations(ACCELERATION_DEG_PER_SEC) * GEAR_RATIO))
                   .withSlot0(new Slot0Configs().withKP(1).withKI(0).withKD(0)))
           .withCANDevice(
               new CANDeviceID(

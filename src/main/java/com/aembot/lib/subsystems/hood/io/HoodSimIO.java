@@ -9,28 +9,23 @@ public class HoodSimIO implements HoodIO {
 
   private final SimulatedTalonFX simMotor;
 
-  public final MotorIOTalonFXSim motor;
-
   public final SimulatedHoodConfiguration config;
 
   public HoodSimIO(SimulatedHoodConfiguration config) {
     this.config = config;
-    motor = new MotorIOTalonFXSim(config.kMotorConfig);
     this.simMotor = new SimulatedTalonFX(config.kSimMotorConfig);
   }
 
   @Override
   public MotorIOTalonFXSim getMotor() {
-    return motor;
+    return simMotor.getMotor();
   }
 
   @Override
-  public void updateInputs(HoodInputs inputs) {
-    updateLog();
-  }
+  public void updateInputs(HoodInputs inputs) {}
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
-    simMotor.updateLog();
+    simMotor.updateLog(standardPrefix, inputPrefix);
   }
 }

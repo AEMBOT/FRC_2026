@@ -6,9 +6,7 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
 public class HoodInputs implements LoggableInputs {
 
   @Override
-  public void toLog(LogTable table) {
-    table.put("isLogging", true);
-  }
+  public void toLog(LogTable table) {}
 
   @Override
   public void fromLog(LogTable table) {}

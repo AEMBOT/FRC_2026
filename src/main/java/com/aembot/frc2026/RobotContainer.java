@@ -35,15 +35,9 @@ public class RobotContainer implements Loggerable {
   /** Use this method to define your controller button -> command mappings */
   private void configureBindings() {
 
-    hoodSubsystem.setDefaultCommand(hoodSubsystem.smartPositionSetpointCommand(() -> 30));
-
-    driverController
-        .axisGreaterThan(0, 0)
-        .whileTrue(hoodSubsystem.smartVelocitySetpointCommand(() -> 5));
-
-    driverController
-        .axisLessThan(0, 0)
-        .whileTrue(hoodSubsystem.smartVelocitySetpointCommand(() -> -5));
+    hoodSubsystem.setDefaultCommand(
+        hoodSubsystem.smartPositionSetpointCommand(
+            () -> (driverController.getRawAxis(0) * 45) + 45));
   }
 
   /**

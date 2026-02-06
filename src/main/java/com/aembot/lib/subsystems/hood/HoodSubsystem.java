@@ -12,29 +12,25 @@ import org.littletonrobotics.junction.Logger;
 public class HoodSubsystem
     extends MotorSubsystem<MotorInputs, MotorIO, MotorConfiguration<TalonFXConfiguration>> {
 
-  private final HoodInputs inputs;
-
   private final HoodIO io;
 
   private final TalonFXHoodConfiguration config;
 
-  public HoodSubsystem(HoodInputs inputs, TalonFXHoodConfiguration config, HoodIO io) {
+  public HoodSubsystem(TalonFXHoodConfiguration config, HoodIO io) {
     super(config.kName, new MotorInputs(), io.getMotor(), config.kMotorConfig);
-    this.inputs = inputs;
     this.io = io;
     this.config = config;
   }
 
   @Override
   public void periodic() {
-    io.updateInputs(inputs);
-    updateLog();
     super.periodic();
   }
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
     Logger.processInputs(inputPrefix, inputs);
+    io.updateLog(standardPrefix, inputPrefix);
     super.updateLog(standardPrefix, inputPrefix);
   }
 }
