@@ -4,9 +4,12 @@
 
 package com.aembot.frc2026;
 
+import com.aembot.frc2026.subsystems.SubsystemFactory;
 import com.aembot.lib.core.logging.Loggerable;
+import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**
@@ -16,6 +19,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer implements Loggerable {
+
+  private final HoodSubsystem hoodSubsystem = SubsystemFactory.createHoodSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -29,7 +34,14 @@ public class RobotContainer implements Loggerable {
   }
 
   /** Use this method to define your controller button -> command mappings */
-  private void configureBindings() {}
+  private void configureBindings() {
+
+    hoodSubsystem.setDefaultCommand(hoodSubsystem.smartPositionSetpointCommand(() -> 30));
+
+    driverController.axisGreaterThan(0, 0.5).whileTrue(hoodSubsystem.smartVelocitySetpointCommand(() -> 5));
+
+    driverController.y().whileTrue(hoodSubsystem.smartVelocitySetpointCommand(() -> -5));
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
