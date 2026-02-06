@@ -1,7 +1,6 @@
 package com.aembot.lib.config.wrappers;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.signals.GravityTypeValue;
 
 /**
  * Helper class to configure the gains for the drive and steer motors. Yoinked from 2910:
@@ -17,10 +16,5 @@ public class ConfigureSlot0Gains extends Slot0Configs {
     this.kS = kS;
     this.kG = kG;
     this.kA = kA;
-  }
-
-  public ConfigureSlot0Gains withGravityType(GravityTypeValue type) {
-    this.GravityType = type;
-    return this;
   }
 }
