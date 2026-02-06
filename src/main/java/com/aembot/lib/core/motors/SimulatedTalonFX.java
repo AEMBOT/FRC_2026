@@ -73,7 +73,6 @@ public class SimulatedTalonFX implements Loggable {
   }
 
   protected void updateSimState() {
-    System.out.println("simstate updated");
     TalonFXSimState simState = motorIO.getSimState();
 
     inputs.SupplyVoltage = simState.getSupplyCurrent();
