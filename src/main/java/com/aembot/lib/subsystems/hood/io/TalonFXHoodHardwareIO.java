@@ -9,6 +9,7 @@ public class TalonFXHoodHardwareIO implements HoodIO {
 
   private final MotorIOTalonFX motor;
 
+  @SuppressWarnings("unused") // Currently unused but that may change in the future
   private final TalonFXHoodConfiguration config;
 
   public TalonFXHoodHardwareIO(TalonFXHoodConfiguration config) {

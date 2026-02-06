@@ -14,6 +14,7 @@ public class HoodSubsystem
 
   private final HoodIO io;
 
+  @SuppressWarnings("unused") // Currently unused but that may change in the future
   private final TalonFXHoodConfiguration config;
 
   public HoodSubsystem(TalonFXHoodConfiguration config, HoodIO io) {
