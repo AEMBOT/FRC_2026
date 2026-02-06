@@ -26,7 +26,7 @@ public class MotorCANCoderConfiguration<C> extends MotorConfiguration<C> {
    * unitToCANCoderRotationRatio}, or {@code unitToRotationRatio} if not set
    */
   public double getEncoderRotationsToUnits(double rotorRotations) {
-    return getRotationsToUnits(rotorRotations / encoderToMotorGearRatio);
+    return getEncoderRotationsToUnits(rotorRotations / encoderToMotorGearRatio);
   }
 
   /**
@@ -34,6 +34,6 @@ public class MotorCANCoderConfiguration<C> extends MotorConfiguration<C> {
    * {@code unitToCANCoderRotationRatio}, or {@code unitToRotationRatio} if not set
    */
   public double getUnitsToEncoderRotations(double units) {
-    return getUnitsToRotations(units / encoderToMotorGearRatio);
+    return getUnitsToEncoderRotations(units / encoderToMotorGearRatio);
   }
 }

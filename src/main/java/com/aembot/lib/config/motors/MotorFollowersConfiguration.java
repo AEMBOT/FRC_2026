@@ -59,7 +59,7 @@ public class MotorFollowersConfiguration<C> extends MotorConfiguration<C> {
   public List<FollowerConfiguration<C>> followerConfigurations = List.of();
 
   public MotorFollowersConfiguration(C config) {
-    super.withConfig(config);
+    super.withMotorConfig(config);
   }
 
   public MotorFollowersConfiguration() {}
