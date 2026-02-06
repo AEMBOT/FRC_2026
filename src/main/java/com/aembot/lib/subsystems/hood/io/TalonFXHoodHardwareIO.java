@@ -22,7 +22,9 @@ public class TalonFXHoodHardwareIO implements HoodIO {
   }
 
   @Override
-  public void updateInputs(HoodInputs inputs) {}
+  public void updateInputs(HoodInputs inputs) {
+    updateLog();
+  }
 
   @Override
   public void updateLog(String standardPrefix, String inputs) {}
