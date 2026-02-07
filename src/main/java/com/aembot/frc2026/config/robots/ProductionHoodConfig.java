@@ -31,13 +31,13 @@ public class ProductionHoodConfig {
                               Units.degreesToRotations(CURISE_VELOCITY_DEG_PER_SEC) * GEAR_RATIO)
                           .withMotionMagicAcceleration(
                               Units.degreesToRotations(ACCELERATION_DEG_PER_SEC) * GEAR_RATIO))
-                  .withSlot0(new Slot0Configs().withKP(1).withKI(0).withKD(0)))
+                  .withSlot0(new Slot0Configs().withKP(1).withKI(0).withKD(0).withKV(0.1)))
           .withCANDevice(
               new CANDeviceID(
                   1, SUBSYSTEM_NAME + "Motor", SUBSYSTEM_NAME, CANDeviceID.CANDeviceType.TALON_FX))
           .withName(SUBSYSTEM_NAME + "Motor")
           .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / GEAR_RATIO))
-          .withMaxPositionUnits(0)
+          .withMaxPositionUnits(90)
           .withMinPositionUnits(0);
 
   public final SimulatedMotorConfiguration<TalonFXConfiguration> SIM_MOTOR_CONFIG =
