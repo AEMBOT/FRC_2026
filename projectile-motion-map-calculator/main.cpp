@@ -13,12 +13,12 @@ using namespace std;
 
 
 
-TrialPoint OptimizeTest(Vector3D initPos, array<Vector3D, 2> goalPositions) {
+TrialPoint OptimizeTest(Vector3D initPos, array<Vector3D, 2> goalPositions, optimizationType optimType) {
 
 	Vector3D p1 = goalPositions[0];
 	Vector3D p2 = goalPositions[1];
 
-	TrajectoryOptimizer optimizer = TrajectoryOptimizer(p1, p2, initPos, PASSING);
+	TrajectoryOptimizer optimizer = TrajectoryOptimizer(p1, p2, initPos, optimType);
 
 	optimizer.RunOptimizer();
 	
@@ -84,27 +84,27 @@ int main() {
 			Vector3D robotPos = {i, j, SHOOTER_HEIGHT};
 			TrialPoint point;
 
-			point = OptimizeTest(robotPos, GetTargetPositionsShoot(robotPos));
+			point = OptimizeTest(robotPos, GetTargetPositionsShoot(robotPos), SHOOTING);
 			if (point.error <= 0.5) {
 				hubFile << robotPos << ", " << point.initVel << endl;
 			}
 
-			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 0));
+			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 0), PASSING);
 			if (point.error <= 0.5) {
 				leftFile << robotPos << ", " << point.initVel << endl;
 			}
 
-			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 1));
+			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 1), PASSING);
 			if (point.error <= 0.5) {
 				midFile << robotPos << ", " << point.initVel << endl;
 			}
 
-			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 2));
+			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 2), PASSING);
 			if (point.error <= 0.5) {
 				rightFile << robotPos << ", " << point.initVel << endl;
 			}
 
-			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 3));
+			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 3), PASSING);
 			if (point.error <= 0.5) {
 				outpostFile << robotPos << ", " << point.initVel << endl;
 			}
