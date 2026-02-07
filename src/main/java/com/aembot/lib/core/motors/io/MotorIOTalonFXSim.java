@@ -13,6 +13,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import org.ironmaple.simulation.motorsims.SimulatedBattery;
@@ -100,11 +101,11 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
   }
 
   public void updateSimState() {
-    inputs.SupplyVoltage = simState.getSupplyCurrent();
+    inputs.SupplyVoltage = RobotController.getBatteryVoltage();
 
     inputs.SimVoltage = simState.getMotorVoltage();
 
-    motorSim.setInputVoltage(inputs.SimVoltage);
+    simState.setSupplyVoltage(inputs.SupplyVoltage);
 
     double timestamp = Timer.getFPGATimestamp();
     double dt = timestamp - lastUpdateTimestamp;
@@ -117,6 +118,7 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
       dt = 0.005;
     }
 
+    motorSim.setInputVoltage(inputs.SimVoltage);
     motorSim.update(dt);
 
     double rawPosition = motorSim.getAngularPositionRad();

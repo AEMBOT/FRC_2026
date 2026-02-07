@@ -36,7 +36,9 @@ public class ProductionHoodConfig {
               new CANDeviceID(
                   1, SUBSYSTEM_NAME + "Motor", SUBSYSTEM_NAME, CANDeviceID.CANDeviceType.TALON_FX))
           .withName(SUBSYSTEM_NAME + "Motor")
-          .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / GEAR_RATIO));
+          .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / GEAR_RATIO))
+          .withMaxPositionUnits(0)
+          .withMinPositionUnits(0);
 
   public final SimulatedMotorConfiguration<TalonFXConfiguration> SIM_MOTOR_CONFIG =
       new SimulatedMotorConfiguration<TalonFXConfiguration>()
