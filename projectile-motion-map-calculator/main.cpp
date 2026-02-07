@@ -29,11 +29,11 @@ TrialPoint OptimizeTest(Vector3D initPos, array<Vector3D, 2> goalPositions) {
 int main() {
 	auto start = chrono::high_resolution_clock::now();
 
-	ofstream hubFile("../src/main/deploy/initial-velocities/Shooting_Hub_Initival_Velocities.csv");
-	ofstream leftFile("../src/main/deploy/initial-velocities/Passing_Left_Initival_Velocities.csv");
-	ofstream midFile("../src/main/deploy/initial-velocities/Passing_Middle_Initival_Velocities.csv");
-	ofstream rightFile("../src/main/deploy/initial-velocities/Passing_Right_Initival_Velocities.csv");
-	ofstream outpostFile("../src/main/deploy/initial-velocities/Passing_Outpost_Initival_Velocities.csv");
+	ofstream hubFile("../src/main/deploy/initial-velocities/Shooting_Hub_Initial_Velocities.csv");
+	ofstream leftFile("../src/main/deploy/initial-velocities/Passing_Left_Initial_Velocities.csv");
+	ofstream midFile("../src/main/deploy/initial-velocities/Passing_Middle_Initial_Velocities.csv");
+	ofstream rightFile("../src/main/deploy/initial-velocities/Passing_Right_Initial_Velocities.csv");
+	ofstream outpostFile("../src/main/deploy/initial-velocities/Passing_Outpost_Initial_Velocities.csv");
 
 	if (!hubFile.is_open()) {
 		cout << "error opening hub file" << endl;
