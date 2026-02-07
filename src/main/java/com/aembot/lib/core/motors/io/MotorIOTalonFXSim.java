@@ -1,21 +1,46 @@
 package com.aembot.lib.core.motors.io;
 
-import com.aembot.lib.config.motors.MotorConfiguration;
+import com.aembot.lib.config.motors.factories.SimulatedMotorConfiguration;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import org.ironmaple.simulation.motorsims.SimulatedBattery;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
+import org.littletonrobotics.junction.Logger;
 
 /** IO implementation for a simulated TalonFX */
 public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorController {
+
+  class SimulatedTalonFXInputs {
+    double SupplyVoltage;
+    double SupplyCurrent;
+    double SimVoltage;
+    double SimPosDegrees;
+    double SimVelocityDegrees;
+    double RotorPosition;
+    double RotorVelocity;
+  }
+
   protected final TalonFXSimState simState;
+
+  protected SimulatedTalonFXInputs inputs = new SimulatedTalonFXInputs();
+
+  protected SimulatedMotorConfiguration<TalonFXConfiguration> config;
+
+  protected DCMotorSim motorSim;
+
+  protected double lastUpdateTimestamp = 0.0;
 
   /**
    * Create a new TalonFX Sim IO using a ServoMotorConfiguration.
@@ -23,13 +48,30 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
    * @param device CAN Device representing the Talon Fx
    * @param servoMotorConfig The servo motor configuration to create the new TalonFXIO with
    */
-  public MotorIOTalonFXSim(MotorConfiguration<TalonFXConfiguration> servoMotorConfig) {
-    super(servoMotorConfig);
+  public MotorIOTalonFXSim(SimulatedMotorConfiguration<TalonFXConfiguration> simulatedMotorConfig) {
+    super(simulatedMotorConfig.kRealConfiguration);
+
+    this.config = simulatedMotorConfig;
 
     simState = talon.getSimState();
     simState.Orientation =
         MotorIOTalonFXSim.computeSimMotorOrientation(
-            servoMotorConfig.getMotorConfig().MotorOutput.Inverted);
+            config.kRealConfiguration.getMotorConfig().MotorOutput.Inverted);
+
+    setupMotorSim();
+
+    lastUpdateTimestamp = Timer.getFPGATimestamp();
+  }
+
+  private void setupMotorSim() {
+    double gearRatio = 360 / config.kRealConfiguration.kUnitToRotorRotationRatio;
+    var plant =
+        LinearSystemId.createDCMotorSystem(
+            config.kSimMotorConstants, config.kRealConfiguration.kMomentOfInertia, gearRatio);
+    this.motorSim = new DCMotorSim(plant, config.kSimMotorConstants);
+
+    double startAngle = Units.degreesToRotations(config.kStartingRotationDegrees);
+    motorSim.setAngle(Units.rotationsToRadians(startAngle));
   }
 
   /**
@@ -55,6 +97,64 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
   public MotorIOTalonFXSim(TalonFX motor) {
     super(motor);
     simState = talon.getSimState();
+  }
+
+  public void updateSimState() {
+    inputs.SupplyVoltage = simState.getSupplyCurrent();
+
+    inputs.SimVoltage = simState.getMotorVoltage();
+
+    motorSim.setInputVoltage(inputs.SimVoltage);
+
+    double timestamp = Timer.getFPGATimestamp();
+    double dt = timestamp - lastUpdateTimestamp;
+    lastUpdateTimestamp = timestamp;
+
+    if (dt > 0.1) {
+      dt = 0.005;
+    }
+    if (dt <= 0) {
+      dt = 0.005;
+    }
+
+    motorSim.update(dt);
+
+    double rawPosition = motorSim.getAngularPositionRad();
+
+    double minAngleRad = Units.degreesToRadians(config.kRealConfiguration.kMinPositionUnits);
+    double maxAngleRad = Units.degreesToRadians(config.kRealConfiguration.kMaxPositionUnits);
+
+    double clampedPosition = MathUtil.clamp(rawPosition, minAngleRad, maxAngleRad);
+
+    if (rawPosition != clampedPosition) {
+      motorSim.setAngle(clampedPosition);
+      double currentVelocity = motorSim.getAngularVelocityRadPerSec();
+      if ((rawPosition < minAngleRad && currentVelocity < 0)
+          || (rawPosition > maxAngleRad && currentVelocity > 0)) {
+        motorSim.setAngularVelocity(0);
+      }
+    }
+
+    inputs.SimPosDegrees = Units.radiansToDegrees(rawPosition);
+    inputs.SimVelocityDegrees = Units.radiansToDegrees(motorSim.getAngularVelocityRadPerSec());
+
+    inputs.RotorPosition = config.kRealConfiguration.getUnitsToRotorRotations(inputs.SimPosDegrees);
+    inputs.RotorVelocity =
+        config.kRealConfiguration.getUnitsToRotorRotations(inputs.SimVelocityDegrees);
+
+    simState.setRawRotorPosition(inputs.RotorPosition);
+    simState.setRotorVelocity(inputs.RotorVelocity);
+  }
+
+  public void logSim(String standardPrefix, String inputPrefix) {
+    Logger.recordOutput(standardPrefix + "/Simulation/SupplyVoltage", inputs.SupplyVoltage);
+    Logger.recordOutput(standardPrefix + "/Simulation/SupplyCurrent", inputs.SupplyCurrent);
+    Logger.recordOutput(standardPrefix + "/Simulation/Voltage", inputs.SimVoltage);
+    Logger.recordOutput(standardPrefix + "/Simulation/PositionDegrees", inputs.SimPosDegrees);
+    Logger.recordOutput(
+        standardPrefix + "/Simulation/VelocityRadPerSec", inputs.SimVelocityDegrees);
+    Logger.recordOutput(standardPrefix + "/Simulation/RotorPosition", inputs.RotorPosition);
+    Logger.recordOutput(standardPrefix + "/Simulation/RotorVelocity", inputs.RotorVelocity);
   }
 
   public TalonFXSimState getSimState() {
