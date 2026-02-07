@@ -154,7 +154,7 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
     Logger.recordOutput(standardPrefix + "/Simulation/Voltage", inputs.SimVoltage);
     Logger.recordOutput(standardPrefix + "/Simulation/PositionDegrees", inputs.SimPosDegrees);
     Logger.recordOutput(
-        standardPrefix + "/Simulation/VelocityRadPerSec", inputs.SimVelocityDegrees);
+        standardPrefix + "/Simulation/VelocityDegreesPerSec", inputs.SimVelocityDegrees);
     Logger.recordOutput(standardPrefix + "/Simulation/RotorPosition", inputs.RotorPosition);
     Logger.recordOutput(standardPrefix + "/Simulation/RotorVelocity", inputs.RotorVelocity);
   }
