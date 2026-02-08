@@ -3,11 +3,11 @@ package com.aembot.frc2026.util;
 import com.aembot.lib.math.ConcurrentInterpolatable2DMap;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvToBeanBuilder;
-import edu.wpi.first.math.MathUtil;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.interpolation.Interpolator;
-import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -71,24 +71,35 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
   }
 
   /**
-   * Get the optimal velocity for a given point.
+   * Get the optimal velocity for a given pose and velocity
    *
-   * @param xPos x value of the point to sample
-   * @param yPos y value of the point to sample
+   * @param robotPose current pose of the robot, only uses x and y parts
+   * @param fieldRelativeChassisSpeeds speed of the robot relative to the field
    * @return value of the optimal velocity at the sampled point
    */
-  public Translation3d getVelocity(double xPos, double yPos) {
-    return getPoint(xPos, yPos).orElseThrow();
+  public Translation3d getFuelInitVelocity(Pose2d robotPose, ChassisSpeeds fieldRelativeChassisSpeeds) {
+    return getPoint(robotPose.getX(), robotPose.getY()).orElseThrow().minus(new Translation3d(fieldRelativeChassisSpeeds.vxMetersPerSecond, fieldRelativeChassisSpeeds.vyMetersPerSecond, 0));
   }
 
   /**
-   * Get a rotation representing the direction of the optimal velocity at a given point
+   * Get a rotation representing the direction of the optimal velocity of fuel at a given pose and velocity 
    * 
-   * @param xPos x value of the point to sample
-   * @param yPos y value of the point to sample
+   * @param robotPose current pose of the robot, only uses x and y parts
+   * @param fieldRelativeChassisSpeeds speed of the robot relative to the field
    * @return direction of the shooter at the sampled point
    */
-  public Rotation3d getVelocityDirection(double xPos, double yPos) {
-    return new Rotation3d(getPoint(xPos, yPos).orElseThrow().toVector());
+  public Rotation3d getFuelInitVelocityRotation3d(Pose2d robotPose, ChassisSpeeds fieldRelativeChassisSpeeds) {
+    return new Rotation3d(getFuelInitVelocity(robotPose, fieldRelativeChassisSpeeds).toVector());
+  }
+  
+  /**
+   * Get the magnitude of the the optimal velocity at a given pose and velocity 
+   * 
+   * @param robotPose current pose of the robot, only uses x and y parts
+   * @param fieldRelativeChassisSpeeds speed of the robot relative to the field
+   * @return exit speed of fuel at the sampled point
+   */
+  public double getFuelInitVelocityMagnitude(Pose2d robotPose, ChassisSpeeds fieldRelativeChassisSpeeds) {
+    return getFuelInitVelocity(robotPose, fieldRelativeChassisSpeeds).getDistance(Translation3d.kZero);
   }
 }
