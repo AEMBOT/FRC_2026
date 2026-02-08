@@ -2,6 +2,7 @@ package com.aembot.lib.core.motors.io;
 
 import com.aembot.lib.config.motors.factories.SimulatedMotorConfiguration;
 import com.aembot.lib.core.can.CANDeviceID;
+import com.aembot.lib.core.motors.visualization.SimulatedTalonFXVisualization;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -16,56 +17,12 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import org.ironmaple.simulation.motorsims.SimulatedBattery;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 /** IO implementation for a simulated TalonFX */
 public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorController {
-
-  class SimulatedTalonFXVisualisation {
-    private final LoggedMechanism2d mech2d;
-    private final LoggedMechanismRoot2d root;
-
-    private final LoggedMechanismLigament2d maxAngleLig;
-
-    private final LoggedMechanismLigament2d minAngleLig;
-
-    private final LoggedMechanismLigament2d curAngleLig;
-
-    public SimulatedTalonFXVisualisation(double maxAngle, double minAngle, double startingAngle) {
-      this.mech2d = new LoggedMechanism2d(2, 2);
-      this.mech2d.setBackgroundColor(new Color8Bit(Color.kBlack));
-      this.root = mech2d.getRoot("root", 1, 1);
-
-      this.maxAngleLig =
-          new LoggedMechanismLigament2d(
-              "MaxAngleLigament", 1, maxAngle, 2, new Color8Bit(Color.kGray));
-      this.minAngleLig =
-          new LoggedMechanismLigament2d(
-              "MinAngleLigament", 1, minAngle, 2, new Color8Bit(Color.kGray));
-      this.curAngleLig =
-          new LoggedMechanismLigament2d(
-              "CurAngleLigament", 1, startingAngle, 4, new Color8Bit(Color.kMediumAquamarine));
-
-      this.root.append(maxAngleLig);
-      this.root.append(minAngleLig);
-      this.root.append(curAngleLig);
-    }
-
-    public void updateAngle(double newAngle) {
-      this.curAngleLig.setAngle(newAngle);
-    }
-
-    public LoggedMechanism2d getMech2d() {
-      return mech2d;
-    }
-  }
 
   class SimulatedTalonFXInputs {
     double SupplyVoltage;
@@ -87,7 +44,7 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
 
   protected double lastUpdateTimestamp = 0.0;
 
-  protected SimulatedTalonFXVisualisation visualization;
+  protected SimulatedTalonFXVisualization visualization;
 
   /**
    * Create a new TalonFX Sim IO using a ServoMotorConfiguration.
@@ -121,7 +78,7 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
     motorSim.setAngle(Units.rotationsToRadians(startAngle));
 
     visualization =
-        new SimulatedTalonFXVisualisation(
+        new SimulatedTalonFXVisualization(
             config.kRealConfiguration.kMaxPositionUnits,
             config.kRealConfiguration.kMinPositionUnits,
             config.kStartingRotationDegrees);
