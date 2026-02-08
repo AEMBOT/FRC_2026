@@ -40,8 +40,8 @@ void ProjectileSim::SimulateStep() {
 	Vector3D k3_v = k3_s.velocity;
 	Vector3D k3_a = k3_s.getAcceleration();
 
-	State k4_s = {k3_p + k2_v * 0.5 * TIME_INTERVAL,
-				  k3_v + k3_a * 0.5 * TIME_INTERVAL}; 
+	State k4_s = {k3_p + k3_v * TIME_INTERVAL,
+				  k3_v + k3_a * TIME_INTERVAL}; 
 
 	Vector3D k4_p = k4_s.position;
 	Vector3D k4_v = k4_s.velocity;
