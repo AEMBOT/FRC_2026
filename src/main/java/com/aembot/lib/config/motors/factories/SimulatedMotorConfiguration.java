@@ -37,8 +37,7 @@ public class SimulatedMotorConfiguration<T> {
    * @param startingRotationDegrees Starting rotation of the motor
    * @return This Simulated MotorConfiguration for method chaining
    */
-  public final SimulatedMotorConfiguration<T> withStartingRotation(
-      double startingRotationUnits) {
+  public final SimulatedMotorConfiguration<T> withStartingRotation(double startingRotationUnits) {
     this.kStartingRotationUnits = startingRotationUnits;
     return this;
   }

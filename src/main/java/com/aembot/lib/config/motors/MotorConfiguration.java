@@ -28,7 +28,8 @@ public class MotorConfiguration<T> {
   // Conversion factor for converting between the desired output units and rotations of the motor
   public double kUnitToRotorRotationRatio = 1.0;
 
-  // Conversion factor for converting between the desired output units and one full rotation of the mechanism
+  // Conversion factor for converting between the desired output units and one full rotation of the
+  // mechanism
   // Defaults to the assumtion that units are degrees
   public double kUnitToMechanismRotationRatio = 360;
 
@@ -67,7 +68,7 @@ public class MotorConfiguration<T> {
   public double getUnitsToRotorRotations(double units) {
     return units / this.kUnitToRotorRotationRatio;
   }
-  
+
   /**
    * Convert the current units into mechanism rotations using the defined conversion ratio
    *
@@ -130,7 +131,7 @@ public class MotorConfiguration<T> {
     this.kUnitToRotorRotationRatio = ratio;
     return this;
   }
-  
+
   /**
    * Update the name unit to mechanism ratio used with this config
    *
