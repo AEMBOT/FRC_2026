@@ -28,8 +28,8 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
   class SimulatedTalonFXInputs {
     double SupplyVoltage;
     double SimVoltage;
-    double SimPosDegrees;
-    double SimVelocityDegrees;
+    double SimPosUnits;
+    double SimVelocityUnits;
     double RotorPosition;
     double RotorVelocity;
   }
@@ -75,20 +75,20 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
 
   /** Setup the motor simulation and visualization */
   private void setupMotorSim() {
-    double gearRatio = 360 / config.kRealConfiguration.kUnitToRotorRotationRatio;
+    double gearRatio = config.kRealConfiguration.kUnitToMechanismRotationRatio / config.kRealConfiguration.kUnitToRotorRotationRatio;
     var plant =
         LinearSystemId.createDCMotorSystem(
             config.kSimMotorConstants, config.kRealConfiguration.kMomentOfInertia, gearRatio);
     this.motorSim = new DCMotorSim(plant, config.kSimMotorConstants);
 
-    double startAngle = Units.degreesToRotations(config.kStartingRotationDegrees);
+    double startAngle = config.kStartingRotationUnits / config.kRealConfiguration.kUnitToMechanismRotationRatio;
     motorSim.setAngle(Units.rotationsToRadians(startAngle));
 
     visualization =
         new SimulatedTalonFXVisualization(
             config.kRealConfiguration.kMaxPositionUnits,
             config.kRealConfiguration.kMinPositionUnits,
-            config.kStartingRotationDegrees);
+            config.kStartingRotationUnits);
   }
 
   /**
@@ -148,8 +148,8 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
 
     double rawPosition = motorSim.getAngularPositionRad();
 
-    double minAngleRad = Units.degreesToRadians(config.kRealConfiguration.kMinPositionUnits);
-    double maxAngleRad = Units.degreesToRadians(config.kRealConfiguration.kMaxPositionUnits);
+    double minAngleRad = Units.rotationsToRadians(config.kRealConfiguration.getUnitsToMechanismRotations(config.kRealConfiguration.kMinPositionUnits));
+    double maxAngleRad = Units.rotationsToRadians(config.kRealConfiguration.getUnitsToMechanismRotations(config.kRealConfiguration.kMaxPositionUnits));
 
     double clampedPosition = MathUtil.clamp(rawPosition, minAngleRad, maxAngleRad);
 
@@ -162,25 +162,25 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
       }
     }
 
-    inputs.SimPosDegrees = Units.radiansToDegrees(motorSim.getAngularPositionRad());
-    inputs.SimVelocityDegrees = Units.radiansToDegrees(motorSim.getAngularVelocityRadPerSec());
+    inputs.SimPosUnits = config.kRealConfiguration.kUnitToMechanismRotationRatio * Units.radiansToRotations(motorSim.getAngularPositionRad());
+    inputs.SimVelocityUnits = config.kRealConfiguration.kUnitToMechanismRotationRatio * Units.radiansToRotations(motorSim.getAngularVelocityRadPerSec());
 
-    inputs.RotorPosition = config.kRealConfiguration.getUnitsToRotorRotations(inputs.SimPosDegrees);
+    inputs.RotorPosition = config.kRealConfiguration.getUnitsToRotorRotations(inputs.SimPosUnits);
     inputs.RotorVelocity =
-        config.kRealConfiguration.getUnitsToRotorRotations(inputs.SimVelocityDegrees);
+        config.kRealConfiguration.getUnitsToRotorRotations(inputs.SimVelocityUnits);
 
     simState.setRawRotorPosition(inputs.RotorPosition);
     simState.setRotorVelocity(inputs.RotorVelocity);
 
-    visualization.updateAngle(inputs.SimPosDegrees);
+    visualization.updateAngle(inputs.SimPosUnits);
   }
 
   public void logSim(String standardPrefix, String inputPrefix) {
     Logger.recordOutput(standardPrefix + "/Simulation/SupplyVoltage", inputs.SupplyVoltage);
     Logger.recordOutput(standardPrefix + "/Simulation/Voltage", inputs.SimVoltage);
-    Logger.recordOutput(standardPrefix + "/Simulation/PositionDegrees", inputs.SimPosDegrees);
+    Logger.recordOutput(standardPrefix + "/Simulation/PositionUnits", inputs.SimPosUnits);
     Logger.recordOutput(
-        standardPrefix + "/Simulation/VelocityDegreesPerSec", inputs.SimVelocityDegrees);
+        standardPrefix + "/Simulation/VelocityUnitsPerSec", inputs.SimVelocityUnits);
     Logger.recordOutput(standardPrefix + "/Simulation/RotorPosition", inputs.RotorPosition);
     Logger.recordOutput(standardPrefix + "/Simulation/RotorVelocity", inputs.RotorVelocity);
     Logger.recordOutput(standardPrefix + "/Simulation/Mechaism2d", visualization.getMech2d());

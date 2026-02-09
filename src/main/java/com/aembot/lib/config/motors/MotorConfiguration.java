@@ -28,6 +28,10 @@ public class MotorConfiguration<T> {
   // Conversion factor for converting between the desired output units and rotations of the motor
   public double kUnitToRotorRotationRatio = 1.0;
 
+  // Conversion factor for converting between the desired output units and one full rotation of the mechanism
+  // Defaults to the assumtion that units are degrees
+  public double kUnitToMechanismRotationRatio = 360;
+
   // In whatever units this configruation is using set the minimum position that this motor can
   // drive to
   public double kMinPositionUnits = Double.NEGATIVE_INFINITY;
@@ -62,6 +66,16 @@ public class MotorConfiguration<T> {
    */
   public double getUnitsToRotorRotations(double units) {
     return units / this.kUnitToRotorRotationRatio;
+  }
+  
+  /**
+   * Convert the current units into mechanism rotations using the defined conversion ratio
+   *
+   * @param units Units we want to convert to mechanism rotations
+   * @return The resulting rotor rotations
+   */
+  public double getUnitsToMechanismRotations(double units) {
+    return units / this.kUnitToMechanismRotationRatio;
   }
 
   /**
@@ -114,6 +128,17 @@ public class MotorConfiguration<T> {
    */
   public MotorConfiguration<T> withUnitToRotorRotationRatio(double ratio) {
     this.kUnitToRotorRotationRatio = ratio;
+    return this;
+  }
+  
+  /**
+   * Update the name unit to mechanism ratio used with this config
+   *
+   * @param ratio The ratio to set
+   * @return Reference to this motor configuration for chaining
+   */
+  public MotorConfiguration<T> withUnitToMechanismRotationRatio(double ratio) {
+    this.kUnitToMechanismRotationRatio = ratio;
     return this;
   }
 

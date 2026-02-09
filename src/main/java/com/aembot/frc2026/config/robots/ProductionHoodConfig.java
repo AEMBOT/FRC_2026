@@ -43,7 +43,7 @@ public class ProductionHoodConfig {
   public final SimulatedMotorConfiguration<TalonFXConfiguration> SIM_MOTOR_CONFIG =
       new SimulatedMotorConfiguration<TalonFXConfiguration>()
           .withRealConfiguration(MOTOR_CONFIG)
-          .withStartingRotations(45)
+          .withStartingRotation(45)
           .withSimMotorConstants(DCMotor.getKrakenX60(1));
 
   public final TalonFXHoodConfiguration HOOD_CONFIG =
