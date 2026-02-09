@@ -6,16 +6,31 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
+/** Helper class to create and view a simulated motor rotation */
 public class SimulatedTalonFXVisualization {
+
+  /* Internal mechanism 2d that is used to view the motor */
   private final LoggedMechanism2d mech2d;
+
+  /** Root of the internal mechanism 2d */
   private final LoggedMechanismRoot2d root;
 
+  /** Mechanism ligament at the maximum angle the motor can reach */
   private final LoggedMechanismLigament2d maxAngleLig;
 
+  /** Mechanism ligament at the minimum angle the motor can reach */
   private final LoggedMechanismLigament2d minAngleLig;
 
+  /** Mechanism ligament at the current angle of the motor */
   private final LoggedMechanismLigament2d curAngleLig;
 
+  /**
+   * Construct a new SimulatedTalonFX Visualization
+   *
+   * @param maxAngle Maximum angle of the mechanism in degrees
+   * @param minAngle Minumum angle of the mechanism in degrees
+   * @param startingAngle Angle to start the mechanism at in degrees
+   */
   public SimulatedTalonFXVisualization(double maxAngle, double minAngle, double startingAngle) {
     this.mech2d = new LoggedMechanism2d(2, 2);
     this.mech2d.setBackgroundColor(new Color8Bit(Color.kBlack));
@@ -36,10 +51,20 @@ public class SimulatedTalonFXVisualization {
     this.root.append(curAngleLig);
   }
 
+  /**
+   * Set the angle of the mechanism visualization
+   *
+   * @param newAngle The new angle of the mechanism in degrees
+   */
   public void updateAngle(double newAngle) {
     this.curAngleLig.setAngle(newAngle);
   }
 
+  /**
+   * Supply this to Logger.recordOutput in order to add visualization to advantage scope
+   *
+   * @return The internal mechanism 2d used in this visualization
+   */
   public LoggedMechanism2d getMech2d() {
     return mech2d;
   }

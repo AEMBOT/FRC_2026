@@ -5,14 +5,23 @@ import com.aembot.lib.core.motors.io.MotorIOTalonFXSim;
 import com.aembot.lib.subsystems.hood.HoodInputs;
 import edu.wpi.first.wpilibj.Notifier;
 
+/** Simulated Hood IO */
 public class HoodSimIO implements HoodIO {
 
+  /** Simulated motor IO */
   private final MotorIOTalonFXSim simMotor;
 
+  /** Configuration for this simulation */
   public final SimulatedHoodConfiguration config;
 
+  /** Notifier for this simulation */
   private final Notifier simNotifier;
 
+  /**
+   * Construct a new Simulated hood IO
+   *
+   * @param config Configuration for this simulation
+   */
   public HoodSimIO(SimulatedHoodConfiguration config) {
     this.config = config;
     this.simMotor = new MotorIOTalonFXSim(config.kSimMotorConfig);

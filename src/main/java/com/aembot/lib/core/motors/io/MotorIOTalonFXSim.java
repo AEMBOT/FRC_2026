@@ -24,9 +24,9 @@ import org.littletonrobotics.junction.Logger;
 /** IO implementation for a simulated TalonFX */
 public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorController {
 
+  /** Helper class for simulated talon fx data */
   class SimulatedTalonFXInputs {
     double SupplyVoltage;
-    double SupplyCurrent;
     double SimVoltage;
     double SimPosDegrees;
     double SimVelocityDegrees;
@@ -34,16 +34,22 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
     double RotorVelocity;
   }
 
+  /** Sim state of the talonfx */
   protected final TalonFXSimState simState;
 
+  /** Inputs to the simulated talonfx */
   protected SimulatedTalonFXInputs inputs = new SimulatedTalonFXInputs();
 
+  /** Sim configuration */
   protected SimulatedMotorConfiguration<TalonFXConfiguration> config;
 
+  /** Internal simulation of the motor */
   protected DCMotorSim motorSim;
 
+  /** Time of the last sim update, used to calculate delta time */
   protected double lastUpdateTimestamp = 0.0;
 
+  /** Visualization of the simulated motor */
   protected SimulatedTalonFXVisualization visualization;
 
   /**
@@ -67,6 +73,7 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
     lastUpdateTimestamp = Timer.getFPGATimestamp();
   }
 
+  /** Setup the motor simulation and visualization */
   private void setupMotorSim() {
     double gearRatio = 360 / config.kRealConfiguration.kUnitToRotorRotationRatio;
     var plant =
@@ -117,6 +124,7 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
     lastUpdateTimestamp = Timer.getFPGATimestamp();
   }
 
+  /** Update the state of the motor sim and inputs */
   public void updateSimState() {
     inputs.SupplyVoltage = RobotController.getBatteryVoltage();
 
@@ -169,7 +177,6 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
 
   public void logSim(String standardPrefix, String inputPrefix) {
     Logger.recordOutput(standardPrefix + "/Simulation/SupplyVoltage", inputs.SupplyVoltage);
-    Logger.recordOutput(standardPrefix + "/Simulation/SupplyCurrent", inputs.SupplyCurrent);
     Logger.recordOutput(standardPrefix + "/Simulation/Voltage", inputs.SimVoltage);
     Logger.recordOutput(standardPrefix + "/Simulation/PositionDegrees", inputs.SimPosDegrees);
     Logger.recordOutput(
