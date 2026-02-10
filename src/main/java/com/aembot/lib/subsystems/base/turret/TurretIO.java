@@ -5,13 +5,11 @@ import com.aembot.lib.core.motors.interfaces.MotorIO;
 
 public interface TurretIO extends Loggable {
 
-    public MotorIO getLeadMotor();
-    
-    public MotorIO[] getFollowerMotor();
+  public MotorIO getSingleMotor();
+
+  // public MotorIO[] getFollowerMotor();
 }
 
+// public class TurretIO {
 
-
-//public class TurretIO {
-    
-//}
+// }

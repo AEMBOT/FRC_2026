@@ -5,47 +5,43 @@
 
 package com.aembot.frc2026.subsystems.turret.io;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.aembot.lib.config.motors.MotorFollowersConfiguration;
-// import com.aembot.lib.core.motors.factories.TalonFXFactory;
+// specify type here and in sim make a new one. cancodersimio. cancoderhardwareio.
+
+import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOTalonFX;
 import com.aembot.lib.subsystems.base.turret.TurretIO;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+
+// import com.aembot.lib.core.motors.factories.TalonFXFactory;
 
 /** Hardware IO implementation for a turret */
-public class TurretHardwareIO implements TurretIO{
-    private final MotorIOTalonFX leadMotor;
-    private final MotorIOTalonFX[] followerMotors;
+public class TurretHardwareIO implements TurretIO {
+  private final MotorIOTalonFX singleMotor;
 
-    public TurretHardwareIO(
-       MotorFollowersConfiguration<TalonFXConfiguration> turretConfig
-    ){
-        // Setup our leader motor based on the configuration 
-        leadMotor = new MotorIOTalonFX(turretConfig);
-        //leadMotor = TalonFXFactory.createIO(turretConfig);
+  // private final MotorIOTalonFX[] followerMotors;
 
-        // Setup our follower motors based on the configuration
-        followerMotors = new MotorIOTalonFX[] {
-            new MotorIOTalonFX(turretConfig.followerConfigurations.get(0).config)
-        };
-    }
+  public TurretHardwareIO(MotorConfiguration<TalonFXConfiguration> turretConfig) {
+    singleMotor = new MotorIOTalonFX(turretConfig);
+    // leadMotor = TalonFXFactory.createIO(turretConfig);
 
-    @Override
-    public void updateLog(String standardPrefix, String inputPrefix) {}
+    // Setup our follower motors based on the configuration
+    // followerMotors = new MotorIOTalonFX[] {
+    //     new MotorIOTalonFX(turretConfig.followerConfigurations.get(0).config)
+    // };
+  }
 
-    @Override
-    public MotorIO getLeadMotor() {
-        return leadMotor;
-    }
+  @Override
+  public void updateLog(String standardPrefix, String inputPrefix) {}
 
-    @Override
-    public MotorIO[] getFollowerMotor() {
-        return followerMotors;
-    }
+  @Override
+  public MotorIO getSingleMotor() {
+    return singleMotor;
+  }
+
+  // @Override
+  // public MotorIO[] getFollowerMotor() {
+  //     return followerMotors;
+  // }
 
 }
-// package com.aembot.frc2026.subsystems.turret.io;
-
-// public class TurretHardwareIO {
-    
-// }

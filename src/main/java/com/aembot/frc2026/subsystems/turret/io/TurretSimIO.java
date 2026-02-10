@@ -11,11 +11,10 @@
 // import com.aembot.lib.core.motors.interfaces.MotorIO;
 // import com.aembot.lib.subsystems.turret.simulation.SimulatedElevator; // add this next
 
-
 // /** Elevator IO implementation for simulation */
 // public class TurretSimIO extends ElevatorHardwareIO {
 //     private final SimulatedElevator simElevator;
-    
+
 //     public TurretSimIO(
 //         MotorFollowersConfiguration<TalonFXConfiguration> elevatorConfig,
 //         SimulatedElevatorConfiguration simulatedElevatorConfig
@@ -44,5 +43,5 @@
 // package com.aembot.frc2026.subsystems.turret.io;
 
 // public class TurretSimIO {
-    
+
 // }
