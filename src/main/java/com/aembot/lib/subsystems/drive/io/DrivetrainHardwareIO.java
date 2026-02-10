@@ -194,8 +194,6 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
 
   @Override
   public void addVisionEstimation(AprilCameraOutput cameraOutput) {
-    System.out.println("Vision go brrr");
-    System.out.println(Timer.getFPGATimestamp() - cameraOutput.estimatedPose().timestampSeconds());
     addVisionMeasurement(
         cameraOutput.estimatedPose().latencyCompensatedPose(),
         Utils.fpgaToCurrentTime(cameraOutput.estimatedPose().timestampSeconds()),
