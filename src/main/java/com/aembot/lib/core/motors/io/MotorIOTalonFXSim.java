@@ -115,7 +115,7 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
   /**
    * Create a new TalonFX Sim IO using a raw motor, this should pretty much ONLY be used on the
    * drivetrain
-   * 
+   *
    * <p>Doesnt utilize the built in motor sim
    *
    * @param motor The motor itself, the TalonFXIO is just a commonality wrapper
