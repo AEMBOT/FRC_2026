@@ -98,7 +98,8 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
                     fieldRelativeChassisSpeeds.vxMetersPerSecond,
                     fieldRelativeChassisSpeeds.vyMetersPerSecond,
                     0));
-    Logger.recordOutput("AutoAim/" + fileName, velocity);
+    Logger.recordOutput(
+        "AutoAim/" + fileName, velocity.plus(new Translation3d(robotPose.getTranslation())));
     return velocity;
   }
 
