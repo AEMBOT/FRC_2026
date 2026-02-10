@@ -81,15 +81,24 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
             config.kSimMotorConstants, config.kRealConfiguration.kMomentOfInertia, gearRatio);
     this.motorSim = new DCMotorSim(plant, config.kSimMotorConstants);
 
-    double startAngle =
+    double startAngleRotations =
         config.kRealConfiguration.getUnitsToMechanismRotations(config.kStartingRotationUnits);
-    motorSim.setAngle(Units.rotationsToRadians(startAngle));
+
+    double minAngleRotations =
+        config.kRealConfiguration.getUnitsToMechanismRotations(
+            config.kRealConfiguration.kMinPositionUnits);
+
+    double maxAngleRotations =
+        config.kRealConfiguration.getUnitsToMechanismRotations(
+            config.kRealConfiguration.kMaxPositionUnits);
+
+    motorSim.setAngle(Units.rotationsToRadians(startAngleRotations));
 
     visualization =
         new SimulatedTalonFXVisualization(
-            config.kRealConfiguration.kMaxPositionUnits,
-            config.kRealConfiguration.kMinPositionUnits,
-            config.kStartingRotationUnits);
+            Units.rotationsToDegrees(maxAngleRotations),
+            Units.rotationsToDegrees(minAngleRotations),
+            Units.rotationsToDegrees(startAngleRotations));
   }
 
   /**
