@@ -11,12 +11,16 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import org.littletonrobotics.junction.Logger;
 
 /** Class that parses a csv file to an interpolatable 2D Map */
 public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translation3d> {
 
+  //
+  private final String fileName;
+
   // Internal class used for reading csv file
-  private class DataRow {
+  public static class DataRow {
 
     @CsvBindByName(column = "X Position")
     public double xPosition;
@@ -48,7 +52,12 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
 
     try (FileReader reader = new FileReader(filePath)) {
 
-      List<DataRow> data = new CsvToBeanBuilder<DataRow>(reader).build().parse();
+      List<DataRow> data =
+          new CsvToBeanBuilder<DataRow>(reader)
+              .withIgnoreLeadingWhiteSpace(true)
+              .withType(DataRow.class)
+              .build()
+              .parse();
 
       for (DataRow row : data) {
         addPoint(
@@ -60,6 +69,10 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
     } catch (IOException e) {
       e.printStackTrace();
     }
+
+    String[] directoryList = filePath.split("/");
+
+    this.fileName = directoryList[directoryList.length - 1];
   }
 
   // Override so that xpos and ypos are used as arguments instead of q1 and q2
@@ -77,13 +90,16 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
    */
   public Translation3d getFuelInitVelocity(
       Pose2d robotPose, ChassisSpeeds fieldRelativeChassisSpeeds) {
-    return getPoint(robotPose.getX(), robotPose.getY())
-        .orElseThrow()
-        .minus(
-            new Translation3d(
-                fieldRelativeChassisSpeeds.vxMetersPerSecond,
-                fieldRelativeChassisSpeeds.vyMetersPerSecond,
-                0));
+    Translation3d velocity =
+        getPoint(robotPose.getX(), robotPose.getY())
+            .orElse(Translation3d.kZero)
+            .minus(
+                new Translation3d(
+                    fieldRelativeChassisSpeeds.vxMetersPerSecond,
+                    fieldRelativeChassisSpeeds.vyMetersPerSecond,
+                    0));
+    Logger.recordOutput("AutoAim/" + fileName, velocity);
+    return velocity;
   }
 
   /**

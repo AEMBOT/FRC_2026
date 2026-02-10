@@ -4,6 +4,10 @@
 
 package com.aembot.frc2026;
 
+import com.aembot.frc2026.util.OptimalVelocityTable;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -25,6 +29,13 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+
+    OptimalVelocityTable optimTable =
+        new OptimalVelocityTable(
+            Filesystem.getDeployDirectory()
+                + "/initital-velocities/Shooting_Hub_Initial_Velocities.csv");
+
+    optimTable.getFuelInitVelocity(new Pose2d(), new ChassisSpeeds());
   }
 
   /** Use this method to define your controller button -> command mappings */
