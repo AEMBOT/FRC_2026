@@ -79,15 +79,23 @@ public class ConcurrentInterpolatable2DMap<T> {
       return Optional.empty();
     }
 
-    // possibly need to check if point is exactly on map (?)
-
     Entry<Double, T> q11 = internalMap.floorEntry(q1Key).getValue().floorEntry(q2Key);
     Entry<Double, T> q12 = internalMap.floorEntry(q1Key).getValue().ceilingEntry(q2Key);
     Entry<Double, T> q21 = internalMap.ceilingEntry(q1Key).getValue().floorEntry(q2Key);
     Entry<Double, T> q22 = internalMap.ceilingEntry(q1Key).getValue().ceilingEntry(q2Key);
 
-    Double q1InterpolationTime = (q1Key - q11.getKey()) / (q21.getKey() - q11.getKey());
-    Double q2InterpolationTime = (q2Key - q11.getKey()) / (q12.getKey() - q11.getKey());
+    Double q1KeyDistance = q21.getKey() - q11.getKey();
+    Double q2KeyDistance = q12.getKey() - q11.getKey();
+
+    if (q1KeyDistance == 0) {
+      q1KeyDistance = Double.MAX_VALUE;
+    }
+    if (q2KeyDistance == 0) {
+      q2KeyDistance = Double.MAX_VALUE;
+    }
+
+    Double q1InterpolationTime = (q1Key - q11.getKey()) / q1KeyDistance;
+    Double q2InterpolationTime = (q2Key - q11.getKey()) / q2KeyDistance;
 
     T floorInterpolatedQ1Value =
         interpolatingFunc.interpolate(q11.getValue(), q12.getValue(), q1InterpolationTime);
