@@ -75,16 +75,14 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
 
   /** Setup the motor simulation and visualization */
   private void setupMotorSim() {
-    double gearRatio =
-        config.kRealConfiguration.kUnitToMechanismRotationRatio
-            / config.kRealConfiguration.kUnitToRotorRotationRatio;
+    double gearRatio = config.kRealConfiguration.getGearRatio();
     var plant =
         LinearSystemId.createDCMotorSystem(
             config.kSimMotorConstants, config.kRealConfiguration.kMomentOfInertia, gearRatio);
     this.motorSim = new DCMotorSim(plant, config.kSimMotorConstants);
 
     double startAngle =
-        config.kStartingRotationUnits / config.kRealConfiguration.kUnitToMechanismRotationRatio;
+        config.kRealConfiguration.getUnitsToMechanismRotations(config.kStartingRotationUnits);
     motorSim.setAngle(Units.rotationsToRadians(startAngle));
 
     visualization =
@@ -172,11 +170,11 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
     }
 
     inputs.SimPosUnits =
-        config.kRealConfiguration.kUnitToMechanismRotationRatio
-            * Units.radiansToRotations(motorSim.getAngularPositionRad());
+        config.kRealConfiguration.getMechanismRotationsToUnits(
+            Units.radiansToRotations(motorSim.getAngularPositionRad()));
     inputs.SimVelocityUnits =
-        config.kRealConfiguration.kUnitToMechanismRotationRatio
-            * Units.radiansToRotations(motorSim.getAngularVelocityRadPerSec());
+        config.kRealConfiguration.getMechanismRotationsToUnits(
+            Units.radiansToRotations(motorSim.getAngularVelocityRadPerSec()));
 
     inputs.RotorPosition = config.kRealConfiguration.getUnitsToRotorRotations(inputs.SimPosUnits);
     inputs.RotorVelocity =

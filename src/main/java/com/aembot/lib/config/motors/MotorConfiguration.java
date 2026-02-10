@@ -80,6 +80,26 @@ public class MotorConfiguration<T> {
   }
 
   /**
+   * Convert mechanism rotations to the units using the defined converiosn ration
+   *
+   * @param mechRotations mechanism rotations we want to convert to units
+   * @return The resulting value
+   */
+  public double getMechanismRotationsToUnits(double mechRotations) {
+    return mechRotations * this.kUnitToMechanismRotationRatio;
+  }
+
+  /**
+   * Get the gear ratio calculated via the ratio of units to mechanism rotations and the ratio of
+   * units to rotor rotations
+   *
+   * @return gear ratio of this motor
+   */
+  public double getGearRatio() {
+    return this.kUnitToMechanismRotationRatio / this.kUnitToRotorRotationRatio;
+  }
+
+  /**
    * Get whatever the specified motor specific configuration was
    *
    * @return The motor configuration that this servo motor is using
