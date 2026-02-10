@@ -44,15 +44,15 @@ public class ProductionSwerveModuleConfigs {
 
             // Drive Motor
             new CANDeviceID(
-                5,
-                "FrontRightSwerveDriveMotor",
+                NautilusSwerveConstants.FrontLeft.DriveMotorId,
+                "FrontLeftSwerveDriveMotor",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.TALON_FX,
                 driveCANBusName),
 
             // Steer Motor
             new CANDeviceID(
-                8,
+                NautilusSwerveConstants.FrontLeft.SteerMotorId,
                 "FrontLeftSwerveSteerMotor",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.TALON_FX,
@@ -60,7 +60,7 @@ public class ProductionSwerveModuleConfigs {
 
             // Steer Encoder
             new CANDeviceID(
-                26,
+                NautilusSwerveConstants.FrontLeft.EncoderId,
                 "FrontLeftSwerveSteerEncoder",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.CANCODER,
@@ -73,7 +73,7 @@ public class ProductionSwerveModuleConfigs {
 
             // Drive Motor
             new CANDeviceID(
-                5,
+                NautilusSwerveConstants.FrontRight.DriveMotorId,
                 "FrontRightSwerveDriveMotor",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.TALON_FX,
@@ -81,7 +81,7 @@ public class ProductionSwerveModuleConfigs {
 
             // Steer Motor
             new CANDeviceID(
-                6,
+                NautilusSwerveConstants.FrontRight.SteerMotorId,
                 "FrontRightSwerveSteerMotor",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.TALON_FX,
@@ -89,7 +89,7 @@ public class ProductionSwerveModuleConfigs {
 
             // Steer Encoder
             new CANDeviceID(
-                24,
+                NautilusSwerveConstants.FrontRight.EncoderId,
                 "FrontRightSwerveSteerEncoder",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.CANCODER,
@@ -102,7 +102,7 @@ public class ProductionSwerveModuleConfigs {
 
             // Drive Motor
             new CANDeviceID(
-                3,
+                NautilusSwerveConstants.BackLeft.DriveMotorId,
                 "BackLeftSwerveDriveMotor",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.TALON_FX,
@@ -110,7 +110,7 @@ public class ProductionSwerveModuleConfigs {
 
             // Steer Motor
             new CANDeviceID(
-                4,
+                NautilusSwerveConstants.BackLeft.SteerMotorId,
                 "BackLeftSwerveSteerMotor",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.TALON_FX,
@@ -118,7 +118,7 @@ public class ProductionSwerveModuleConfigs {
 
             // Steer Encoder
             new CANDeviceID(
-                25,
+                NautilusSwerveConstants.BackLeft.EncoderId,
                 "BackLeftSwerveSteerEncoder",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.CANCODER,
@@ -131,7 +131,7 @@ public class ProductionSwerveModuleConfigs {
 
             // Drive Motor
             new CANDeviceID(
-                9,
+                NautilusSwerveConstants.BackRight.DriveMotorId,
                 "BackRightSwerveDriveMotor",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.TALON_FX,
@@ -139,7 +139,7 @@ public class ProductionSwerveModuleConfigs {
 
             // Steer Motor
             new CANDeviceID(
-                2,
+                NautilusSwerveConstants.BackRight.SteerMotorId,
                 "BackRightSwerveSteerMotor",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.TALON_FX,
@@ -147,7 +147,7 @@ public class ProductionSwerveModuleConfigs {
 
             // Steer Encoder
             new CANDeviceID(
-                23,
+                NautilusSwerveConstants.BackRight.EncoderId,
                 "BackRightSwerveSteerEncoder",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.CANCODER,
