@@ -25,7 +25,7 @@ public class CANDeviceID {
 
   private final String deviceName;
   private final int canID;
-  private final CANBus canBus;
+  private final CANBus bus;
   private final CANDeviceType deviceType;
   private final String subsystemName;
 
@@ -49,10 +49,32 @@ public class CANDeviceID {
    * @param busName The bus this device is on
    */
   public CANDeviceID(
-      int canID, String deviceName, String subsystemName, CANDeviceType deviceType, CANBus canBus) {
+      int canID, String deviceName, String subsystemName, CANDeviceType deviceType, CANBus bus) {
     this.deviceName = deviceName;
     this.canID = canID;
-    this.canBus = canBus;
+    this.bus = bus;
+    this.deviceType = deviceType;
+    this.subsystemName = subsystemName;
+  }
+
+  /**
+   * Create a new CAN Device
+   *
+   * @param canID ID of this device
+   * @param deviceName Name of this device
+   * @param subsystemName Name of the subsystem that this CAN device is a part of
+   * @param deviceType Type of CAN device that this object is
+   * @param busName The bus this device is on
+   */
+  public CANDeviceID(
+      int canID,
+      String deviceName,
+      String subsystemName,
+      CANDeviceType deviceType,
+      String busName) {
+    this.deviceName = deviceName;
+    this.canID = canID;
+    this.bus = new CANBus(busName);
     this.deviceType = deviceType;
     this.subsystemName = subsystemName;
   }
@@ -74,7 +96,11 @@ public class CANDeviceID {
   }
 
   public CANBus getBus() {
-    return canBus;
+    return bus;
+  }
+
+  public String getBusName() {
+    return bus.getName();
   }
 
   public CANDeviceType getDeviceType() {
@@ -135,7 +161,7 @@ public class CANDeviceID {
   }
 
   public boolean equals(CANDeviceID other) {
-    return other.canID == canID && other.canBus.equals(canBus) && other.deviceType == deviceType;
+    return other.canID == canID && other.bus.equals(bus) && other.deviceType == deviceType;
   }
 
   /**
@@ -156,6 +182,6 @@ public class CANDeviceID {
 
   @Override
   public String toString() {
-    return getDeviceName() + "_" + canBus.getName();
+    return getDeviceName() + "_" + bus.getName();
   }
 }
