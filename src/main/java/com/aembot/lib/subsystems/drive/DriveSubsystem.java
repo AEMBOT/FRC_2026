@@ -86,13 +86,14 @@ public class DriveSubsystem extends AEMSubsystem {
     double rollRads = Units.degreesToRadians(inputs.roll);
 
     /** Chassis speeds from drive encoders */
-    ChassisSpeeds actualRobotRelative =
-        ChassisSpeeds.fromFieldRelativeSpeeds(inputs.Speeds, inputs.Pose.getRotation());
+    ChassisSpeeds actualRobotRelative = inputs.Speeds;
 
     /** Chassis speeds from drivetrain encoders + gyro */
     ChassisSpeeds gyroFusedFieldRelative =
-        new ChassisSpeeds(
-            inputs.Speeds.vxMetersPerSecond, inputs.Speeds.vyMetersPerSecond, yawRadsPerS);
+        ChassisSpeeds.fromRobotRelativeSpeeds(
+            new ChassisSpeeds(
+                inputs.Speeds.vxMetersPerSecond, inputs.Speeds.vyMetersPerSecond, yawRadsPerS),
+            inputs.Pose.getRotation());
 
     ChassisSpeeds desiredRobotRelative = inputs.kinematics.toChassisSpeeds(inputs.ModuleTargets);
 
