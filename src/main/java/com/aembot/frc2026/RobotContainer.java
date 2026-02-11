@@ -39,7 +39,7 @@ public class RobotContainer implements Loggerable {
   public RobotContainer(LoggedRobot robot) {
     setupLogger(robot);
 
-    this.commandFactory = new CommandFactory(driveSubsystem);
+    this.commandFactory = new CommandFactory(driveSubsystem, hoodSubsystem);
     configureBindings();
   }
 
