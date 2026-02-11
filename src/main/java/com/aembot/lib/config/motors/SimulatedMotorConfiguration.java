@@ -1,6 +1,5 @@
-package com.aembot.lib.config.motors.factories;
+package com.aembot.lib.config.motors;
 
-import com.aembot.lib.config.motors.MotorConfiguration;
 import edu.wpi.first.math.system.plant.DCMotor;
 
 public class SimulatedMotorConfiguration<T> {
