@@ -1,6 +1,6 @@
 package com.aembot.lib.core.motors.io;
 
-import com.aembot.lib.config.motors.factories.SimulatedMotorConfiguration;
+import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.aembot.lib.core.motors.visualization.SimulatedTalonFXVisualization;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -25,7 +25,7 @@ import org.littletonrobotics.junction.Logger;
 public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorController {
 
   /** Helper class for simulated talon fx data */
-  class SimulatedTalonFXInputs {
+  class SimulatedTalonFXState {
     double SupplyVoltage;
     double SimVoltage;
     double SimPosUnits;
@@ -38,7 +38,7 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
   protected final TalonFXSimState simState;
 
   /** Inputs to the simulated talonfx */
-  protected SimulatedTalonFXInputs inputs = new SimulatedTalonFXInputs();
+  protected SimulatedTalonFXState inputs = new SimulatedTalonFXState();
 
   /** Sim configuration */
   protected SimulatedMotorConfiguration<TalonFXConfiguration> config;
