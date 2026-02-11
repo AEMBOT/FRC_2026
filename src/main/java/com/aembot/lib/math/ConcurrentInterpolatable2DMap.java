@@ -79,12 +79,34 @@ public class ConcurrentInterpolatable2DMap<T> {
       return Optional.empty();
     }
 
+    if (internalMap.floorEntry(q1Key) == null) {
+      return Optional.empty();
+    }
+
+    if (internalMap.ceilingEntry(q1Key) == null) {
+      return Optional.empty();
+    }
+
     Entry<Double, T> q11 = internalMap.floorEntry(q1Key).getValue().floorEntry(q2Key);
     Entry<Double, T> q12 = internalMap.floorEntry(q1Key).getValue().ceilingEntry(q2Key);
     Entry<Double, T> q21 = internalMap.ceilingEntry(q1Key).getValue().floorEntry(q2Key);
     Entry<Double, T> q22 = internalMap.ceilingEntry(q1Key).getValue().ceilingEntry(q2Key);
 
-    Double q1KeyDistance = q21.getKey() - q11.getKey();
+    if (q11 == null) {
+      return Optional.empty();
+    }
+    if (q12 == null) {
+      return Optional.empty();
+    }
+    if (q21 == null) {
+      return Optional.empty();
+    }
+    if (q22 == null) {
+      return Optional.empty();
+    }
+
+    Double q1KeyDistance =
+        internalMap.ceilingEntry(q1Key).getKey() - internalMap.floorEntry(q1Key).getKey();
     Double q2KeyDistance = q12.getKey() - q11.getKey();
 
     if (q1KeyDistance == 0) {
@@ -94,17 +116,17 @@ public class ConcurrentInterpolatable2DMap<T> {
       q2KeyDistance = Double.MAX_VALUE;
     }
 
-    Double q1InterpolationTime = (q1Key - q11.getKey()) / q1KeyDistance;
+    Double q1InterpolationTime = (q1Key - internalMap.floorEntry(q1Key).getKey()) / q1KeyDistance;
     Double q2InterpolationTime = (q2Key - q11.getKey()) / q2KeyDistance;
 
     T floorInterpolatedQ1Value =
-        interpolatingFunc.interpolate(q11.getValue(), q12.getValue(), q1InterpolationTime);
+        interpolatingFunc.interpolate(q11.getValue(), q12.getValue(), q2InterpolationTime);
     T ceilingInterpolatedQ1Value =
-        interpolatingFunc.interpolate(q21.getValue(), q22.getValue(), q1InterpolationTime);
+        interpolatingFunc.interpolate(q21.getValue(), q22.getValue(), q2InterpolationTime);
 
     return Optional.of(
         interpolatingFunc.interpolate(
-            floorInterpolatedQ1Value, ceilingInterpolatedQ1Value, q2InterpolationTime));
+            floorInterpolatedQ1Value, ceilingInterpolatedQ1Value, q1InterpolationTime));
   }
 
   /**
