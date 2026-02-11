@@ -12,6 +12,9 @@ class ProjectileSim {
 	private:
 		// Position and velocity of the simulated projectile
 		State projectileState;
+
+		// Whether or not to simulate drag
+		bool usesDrag;
 	
 	public:
 		/**
@@ -19,8 +22,9 @@ class ProjectileSim {
 		 *
 		 * @param initPos initial position of the projectile
 		 * @param initVel initial velocity of the projectile
+		 * @param useDrag whether or not to simulate drag
 		 */
-		ProjectileSim(Vector3D initPos, Vector3D initVel);
+		ProjectileSim(Vector3D initPos, Vector3D initVel, bool useDrag);
 		/**
 		 * Artifically set the position and/or velocity of the projectile 
 		 *

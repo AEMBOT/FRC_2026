@@ -13,12 +13,12 @@ using namespace std;
 
 
 
-TrialPoint OptimizeTest(Vector3D initPos, array<Vector3D, 2> goalPositions, optimizationType optimType) {
+TrialPoint OptimizeTest(Vector3D initPos, array<Vector3D, 2> goalPositions, optimizationType optimType, bool useDrag) {
 
 	Vector3D p1 = goalPositions[0];
 	Vector3D p2 = goalPositions[1];
 
-	TrajectoryOptimizer optimizer = TrajectoryOptimizer(p1, p2, initPos, optimType);
+	TrajectoryOptimizer optimizer = TrajectoryOptimizer(p1, p2, initPos, optimType, useDrag);
 
 	optimizer.RunOptimizer();
 	
@@ -29,44 +29,80 @@ TrialPoint OptimizeTest(Vector3D initPos, array<Vector3D, 2> goalPositions, opti
 int main() {
 	auto start = chrono::high_resolution_clock::now();
 
-	ofstream hubFile("../src/main/deploy/initial-velocities/Shooting_Hub_Initial_Velocities.csv");
-	ofstream leftFile("../src/main/deploy/initial-velocities/Passing_Left_Initial_Velocities.csv");
-	ofstream midFile("../src/main/deploy/initial-velocities/Passing_Middle_Initial_Velocities.csv");
-	ofstream rightFile("../src/main/deploy/initial-velocities/Passing_Right_Initial_Velocities.csv");
-	ofstream outpostFile("../src/main/deploy/initial-velocities/Passing_Outpost_Initial_Velocities.csv");
+	ofstream hubFileReal("../src/main/deploy/initial-velocities/real/Shooting_Hub_Initial_Velocities.csv");
+	ofstream leftFileReal("../src/main/deploy/initial-velocities/real/Passing_Left_Initial_Velocities.csv");
+	ofstream midFileReal("../src/main/deploy/initial-velocities/real/Passing_Middle_Initial_Velocities.csv");
+	ofstream rightFileReal("../src/main/deploy/initial-velocities/real/Passing_Right_Initial_Velocities.csv");
+	ofstream outpostFileReal("../src/main/deploy/initial-velocities/real/Passing_Outpost_Initial_Velocities.csv");
 
-	if (!hubFile.is_open()) {
-		cout << "error opening hub file" << endl;
+	ofstream hubFileSim("../src/main/deploy/initial-velocities/sim/Shooting_Hub_Initial_Velocities.csv");
+	ofstream leftFileSim("../src/main/deploy/initial-velocities/sim/Passing_Left_Initial_Velocities.csv");
+	ofstream midFileSim("../src/main/deploy/initial-velocities/sim/Passing_Middle_Initial_Velocities.csv");
+	ofstream rightFileSim("../src/main/deploy/initial-velocities/sim/Passing_Right_Initial_Velocities.csv");
+	ofstream outpostFileSim("../src/main/deploy/initial-velocities/sim/Passing_Outpost_Initial_Velocities.csv");
+
+	if (!hubFileReal.is_open()) {
+		cout << "error opening hub file (real)" << endl;
 		return 1;
 	}
 
-	if (!leftFile.is_open()) {
-		cout << "error opening left file" << endl;
+	if (!leftFileReal.is_open()) {
+		cout << "error opening left file (real)" << endl;
 		return 1;
 	}
 	
-	if (!midFile.is_open()) {
-		cout << "error opening mid file" << endl;
+	if (!midFileReal.is_open()) {
+		cout << "error opening mid file (real)" << endl;
 		return 1;
 	}
 
-	if (!rightFile.is_open()) {
-		cout << "error opening right file" << endl;
+	if (!rightFileReal.is_open()) {
+		cout << "error opening right file (real)" << endl;
 		return 1;
 	}
 
-	if (!outpostFile.is_open()) {
-		cout << "error opening outpost file" << endl;
+	if (!outpostFileReal.is_open()) {
+		cout << "error opening outpost file (real)" << endl;
+		return 1;
+	}
+	
+	if (!hubFileSim.is_open()) {
+		cout << "error opening hub file (sim)" << endl;
+		return 1;
+	}
+
+	if (!leftFileSim.is_open()) {
+		cout << "error opening left file (sim)" << endl;
+		return 1;
+	}
+	
+	if (!midFileSim.is_open()) {
+		cout << "error opening mid file (sim)" << endl;
+		return 1;
+	}
+
+	if (!rightFileSim.is_open()) {
+		cout << "error opening right file (sim)" << endl;
+		return 1;
+	}
+
+	if (!outpostFileSim.is_open()) {
+		cout << "error opening outpost file (sim)" << endl;
 		return 1;
 	}
 	
 	const char* header = "X Position, Y Position, Z Position, X Velocity, Y Velocity, Z Velocity";
 
-	hubFile << header << endl;
-	leftFile << header << endl;
-	midFile << header << endl;
-	rightFile << header << endl;
-	outpostFile << header << endl;
+	hubFileReal << header << endl;
+	leftFileReal << header << endl;
+	midFileReal << header << endl;
+	rightFileReal << header << endl;
+	outpostFileReal << header << endl;
+	hubFileSim << header << endl;
+	leftFileSim << header << endl;
+	midFileSim << header << endl;
+	rightFileSim << header << endl;
+	outpostFileSim << header << endl;
 
 	int totalIter = ceil((FIELD_SIZE.x / 0.25)) * ceil((FIELD_SIZE.y / 0.25));
 
@@ -84,30 +120,57 @@ int main() {
 			Vector3D robotPos = {i, j, SHOOTER_HEIGHT};
 			TrialPoint point;
 
-			point = OptimizeTest(robotPos, GetTargetPositionsShoot(robotPos), SHOOTING);
+			point = OptimizeTest(robotPos, GetTargetPositionsShoot(robotPos), SHOOTING, true);
 			if (point.error <= 0.5) {
-				hubFile << robotPos << ", " << point.initVel << endl;
+				hubFileReal << robotPos << ", " << point.initVel << endl;
 			}
 
-			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 0), PASSING);
+			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 0), PASSING, true);
 			if (point.error <= 0.5) {
-				leftFile << robotPos << ", " << point.initVel << endl;
+				leftFileReal << robotPos << ", " << point.initVel << endl;
 			}
 
-			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 1), PASSING);
+			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 1), PASSING, true);
 			if (point.error <= 0.5) {
-				midFile << robotPos << ", " << point.initVel << endl;
+				midFileReal << robotPos << ", " << point.initVel << endl;
 			}
 
-			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 2), PASSING);
+			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 2), PASSING, true);
 			if (point.error <= 0.5) {
-				rightFile << robotPos << ", " << point.initVel << endl;
+				rightFileReal << robotPos << ", " << point.initVel << endl;
 			}
 
-			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 3), PASSING);
+			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 3), PASSING, true);
 			if (point.error <= 0.5) {
-				outpostFile << robotPos << ", " << point.initVel << endl;
+				outpostFileReal << robotPos << ", " << point.initVel << endl;
 			}
+			
+			point = OptimizeTest(robotPos, GetTargetPositionsShoot(robotPos), SHOOTING, false);
+			if (point.error <= 0.5) {
+				hubFileSim << robotPos << ", " << point.initVel << endl;
+			}
+
+			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 0), PASSING, false);
+			if (point.error <= 0.5) {
+				leftFileSim << robotPos << ", " << point.initVel << endl;
+			}
+
+			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 1), PASSING, false);
+			if (point.error <= 0.5) {
+				midFileSim << robotPos << ", " << point.initVel << endl;
+			}
+
+			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 2), PASSING, false);
+			if (point.error <= 0.5) {
+				rightFileSim << robotPos << ", " << point.initVel << endl;
+			}
+
+			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 3), PASSING, false);
+			if (point.error <= 0.5) {
+				outpostFileSim << robotPos << ", " << point.initVel << endl;
+			}
+
+		
 		}
 	}
 
@@ -117,11 +180,16 @@ int main() {
 	cout.flush();
 
 
-	hubFile.close();
-	leftFile.close();
-	midFile.close();
-	rightFile.close();
-	outpostFile.close();
+	hubFileReal.close();
+	leftFileReal.close();
+	midFileReal.close();
+	rightFileReal.close();
+	outpostFileReal.close();
+	hubFileSim.close();
+	leftFileSim.close();
+	midFileSim.close();
+	rightFileSim.close();
+	outpostFileSim.close();
 
 	auto end = chrono::high_resolution_clock::now();
 

@@ -11,11 +11,12 @@
 
 using namespace std;
 
-TrajectoryOptimizer::TrajectoryOptimizer(Vector3D in_obsPos, Vector3D in_goalPos, Vector3D in_initPos, optimizationType in_optimType) {
+TrajectoryOptimizer::TrajectoryOptimizer(Vector3D in_obsPos, Vector3D in_goalPos, Vector3D in_initPos, optimizationType in_optimType, bool useDrag) {
 	obsPos = in_obsPos;
 	goalPos = in_goalPos;
 	initPos = in_initPos;
 	optimType = in_optimType;
+	usesDrag = useDrag;
 
 	minSearchSize = 0.0001;
 
@@ -35,7 +36,7 @@ TrialPoint TrajectoryOptimizer::objective(Vector3D initVel) {
 
 TrialPoint TrajectoryOptimizer::objectiveHub(Vector3D initVel) {
 
-	ProjectileSim sim = ProjectileSim(initPos, initVel);
+	ProjectileSim sim = ProjectileSim(initPos, initVel, usesDrag);
 
 	Vector3D lastPos = {0, 0, 0};
 
@@ -81,7 +82,7 @@ TrialPoint TrajectoryOptimizer::objectiveHub(Vector3D initVel) {
 
 TrialPoint TrajectoryOptimizer::objectivePass(Vector3D initVel) {
 
-	ProjectileSim sim = ProjectileSim(initPos, initVel);
+	ProjectileSim sim = ProjectileSim(initPos, initVel, usesDrag);
 
 	Vector3D lastPos = {0, 0, 0};
 

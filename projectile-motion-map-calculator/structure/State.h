@@ -15,11 +15,11 @@ static double mu = (AIR_DENSITY * DRAG_COEF * AREA) / (2 * MASS);
 struct State {
 	Vector3D position, velocity;
 
-	Vector3D getAcceleration() {
+	Vector3D getAcceleration(bool usingDrag) {
 		Vector3D accel = {
-			-mu	* velocity.x * velocity.mag(),
-			-mu * velocity.y * velocity.mag(),
-			-GRAVITY -mu * velocity.z * velocity.mag()
+			-(mu * usingDrag)	* velocity.x * velocity.mag(),
+			-(mu * usingDrag) * velocity.y * velocity.mag(),
+			-GRAVITY -(mu * usingDrag) * velocity.z * velocity.mag()
 		};
 
 		return accel;

@@ -43,6 +43,8 @@ class TrajectoryOptimizer {
 		TrialPoint bestPoint;
 		// The kind of optimization to use (shooting / passing)
 		optimizationType optimType;
+		// Whether or not to simulate drag
+		bool usesDrag;
 
 		/**
 		 * Recursive pattern search optimization function
@@ -106,8 +108,9 @@ class TrajectoryOptimizer {
 		 * @param in_goalPos the second target position to optimize for
 		 * @param in_initPos the initial position of the projectile
 		 * @param in_optimType kind of trajectory to optimize for (passing / shooting)
+		 * @param useDrag whether or not to use drag
 		 */
-		TrajectoryOptimizer(Vector3D in_obsPos, Vector3D in_goalPos, Vector3D in_initPos, optimizationType in_optimType);
+		TrajectoryOptimizer(Vector3D in_obsPos, Vector3D in_goalPos, Vector3D in_initPos, optimizationType in_optimType, bool useDrag);
 
 		~TrajectoryOptimizer();
 
