@@ -1,7 +1,7 @@
 package com.aembot.lib.core.motors.io;
 
 import com.aembot.lib.config.motors.MotorConfiguration;
-import com.aembot.lib.config.motors.factories.SimulatedMotorConfiguration;
+import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;

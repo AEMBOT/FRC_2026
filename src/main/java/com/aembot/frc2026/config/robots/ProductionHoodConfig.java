@@ -1,7 +1,7 @@
 package com.aembot.frc2026.config.robots;
 
 import com.aembot.lib.config.motors.MotorConfiguration;
-import com.aembot.lib.config.motors.factories.SimulatedMotorConfiguration;
+import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
 import com.aembot.lib.config.subsystems.hood.simulation.SimulatedHoodConfiguration;
 import com.aembot.lib.core.can.CANDeviceID;

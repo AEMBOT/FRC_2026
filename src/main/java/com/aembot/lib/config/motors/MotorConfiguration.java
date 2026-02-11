@@ -16,31 +16,45 @@ import com.aembot.lib.core.motors.interfaces.MotorIO.NeutralMode;
  */
 public class MotorConfiguration<T> {
 
-  /** The actual configuration being used internally by the motor*/
+  /** The actual configuration being used internally by the motor */
   public T kMotorConfig = null;
 
-  /** The name of the configuration in use*/
+  /** The name of the configuration in use */
   public String kConfigurationName = "UNNAMED";
 
-  /** The CAN device that is used by the device being configured*/
+  /** The CAN device that is used by the device being configured */
   public CANDeviceID kCANDevice = null;
 
-  /** Conversion factor for converting between the desired output units and rotations of the motor*/
+  /**
+   * Conversion factor for converting between the desired output units and rotations of the motor
+   */
   public double kUnitToRotorRotationRatio = 1.0;
 
-  /** Conversion factor for converting between the desired output units and one full rotation of the mechanism Defaults to the assumtion that units are degrees*/
+  /**
+   * Conversion factor for converting between the desired output units and one full rotation of the
+   * mechanism Defaults to the assumtion that units are degrees
+   */
   public double kUnitToMechanismRotationRatio = 360;
 
-  /** In whatever units this configruation is using set the minimum position that this motor can drive to*/
+  /**
+   * In whatever units this configruation is using set the minimum position that this motor can
+   * drive to
+   */
   public double kMinPositionUnits = Double.NEGATIVE_INFINITY;
 
-  /** In whatever units this configuration is using set the maximum position that this motor can drive to*/
+  /**
+   * In whatever units this configuration is using set the maximum position that this motor can
+   * drive to
+   */
   public double kMaxPositionUnits = Double.POSITIVE_INFINITY;
 
-  /** Moment of Inertia (KgMetersSquared) (how resistant a motor's rotor is to changs in its rotational speed)*/
+  /**
+   * Moment of Inertia (KgMetersSquared) (how resistant a motor's rotor is to changs in its
+   * rotational speed)
+   */
   public double kMomentOfInertia = 0.5;
 
-  /** The neutral mode of the motor*/
+  /** The neutral mode of the motor */
   public NeutralMode kNeutralMode = NeutralMode.BRAKE;
 
   /**

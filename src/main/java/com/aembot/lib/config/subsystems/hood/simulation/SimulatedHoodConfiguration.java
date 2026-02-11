@@ -1,6 +1,6 @@
 package com.aembot.lib.config.subsystems.hood.simulation;
 
-import com.aembot.lib.config.motors.factories.SimulatedMotorConfiguration;
+import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
