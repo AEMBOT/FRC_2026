@@ -40,9 +40,9 @@ public class RobotContainer implements Loggerable {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer(LoggedRobot robot) {
     setupLogger(robot);
-    configureBindings();
 
     this.commandFactory = new CommandFactory(driveSubsystem);
+    configureBindings();
   }
 
   /** Use this method to define your controller button -> command mappings */
