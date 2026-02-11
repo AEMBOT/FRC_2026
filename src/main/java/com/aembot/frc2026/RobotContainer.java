@@ -4,12 +4,11 @@
 
 package com.aembot.frc2026;
 
-import com.aembot.frc2026.constants.RobotRuntimeConstants;
+import com.aembot.frc2026.commands.CommandFactory;
 import com.aembot.frc2026.subsystems.SubsystemFactory;
 import com.aembot.lib.core.logging.Loggerable;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
-import com.aembot.lib.subsystems.drive.commands.JoystickDriveCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -30,13 +29,8 @@ public class RobotContainer implements Loggerable {
 
   /* ---- DRIVETRAIN ---- */
   private final DriveSubsystem driveSubsystem = SubsystemFactory.createDriveSubsystem();
-  private final JoystickDriveCommand driveDefaultCommand =
-      JoystickDriveCommand.createCommandWithSteer(
-          driveSubsystem,
-          RobotRuntimeConstants.ROBOT_CONFIG.getDrivetrainConfiguration(),
-          driverController::getLeftY,
-          driverController::getLeftX,
-          driverController::getRightX);
+
+  private final CommandFactory commandFactory;
 
   /* ---- VISION ---- */
   @SuppressWarnings("unused")
@@ -47,11 +41,13 @@ public class RobotContainer implements Loggerable {
   public RobotContainer(LoggedRobot robot) {
     setupLogger(robot);
     configureBindings();
+
+    this.commandFactory = new CommandFactory(driveSubsystem);
   }
 
   /** Use this method to define your controller button -> command mappings */
   private void configureBindings() {
-    driveSubsystem.setDefaultCommand(driveDefaultCommand);
+    driveSubsystem.setDefaultCommand(commandFactory.createDriveJoystickCmd(driverController));
   }
 
   /**
