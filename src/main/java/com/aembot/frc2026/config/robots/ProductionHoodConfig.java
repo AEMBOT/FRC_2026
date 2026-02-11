@@ -34,7 +34,7 @@ public class ProductionHoodConfig {
                   .withSlot0(new Slot0Configs().withKP(.1).withKV(.12)))
           .withCANDevice(
               new CANDeviceID(
-                  1, SUBSYSTEM_NAME + "Motor", SUBSYSTEM_NAME, CANDeviceID.CANDeviceType.TALON_FX))
+                  15, SUBSYSTEM_NAME + "Motor", SUBSYSTEM_NAME, CANDeviceID.CANDeviceType.TALON_FX))
           .withName(SUBSYSTEM_NAME + "Motor")
           .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / GEAR_RATIO))
           .withMaxPositionUnits(90)
