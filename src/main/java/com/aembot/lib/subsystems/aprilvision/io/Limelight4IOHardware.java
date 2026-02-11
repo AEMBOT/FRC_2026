@@ -5,51 +5,20 @@ import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionInputs;
-import com.aembot.lib.subsystems.aprilvision.util.CameraCalibration;
+import com.aembot.lib.subsystems.aprilvision.interfaces.AprilCameraIO;
 import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers;
 import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers.PoseEstimate;
 import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
 import org.opencv.core.Point;
 
-public class Limelight4IOHardware extends LimelightIO {
-  /** bool indicating whether we have a tag targetted. "tv" on network table */
-  protected boolean validTag;
-
-  /**
-   * double indicating horizontal offset in degrees from crosshair to target. "tx" on network table
-   */
-  protected double xOffset;
-
-  /** int NT entry indicating id of the targeted apriltag. "tid" on network table */
-  // protected final NetworkTableEntry tagIDEntry;
-
-  protected int tagID;
-
-  /**
-   * double[] indicating corner coordinates in pixels [x0,y0,x1,y1......]. "tcornxy" on network
-   * table.
-   */
-  protected double[] tagCornerPositions;
-
-  /**
-   * double indicating capture pipeline latency (ms). Time between the end of the exposure of the
-   * middle row of the sensor to the beginning of the tracking pipeline. Sum with {@link
-   * #pipelineLatency} to get total latency. "cl" on network table.
-   */
-  protected double captureLatency;
-
-  /**
-   * double indicating The pipeline's latency contribution (ms). Sum with {@link #captureLatency} to
-   * get total latency. "tl" on network table (for some reason).
-   */
-  protected double pipelineLatency;
-
+public class Limelight4IOHardware implements AprilCameraIO {
   protected final CameraConfiguration cameraConfiguration;
   protected final YearFieldConstantable fieldConstants;
 
@@ -83,11 +52,6 @@ public class Limelight4IOHardware extends LimelightIO {
 
   @Override
   public void updateInputs(AprilVisionInputs inputs) {
-    // Camera calib should only be updated once
-    if (inputs.cameraCalibration == null) {
-      inputs.cameraCalibration = getCalibration();
-    }
-
     inputs.latency =
         LimelightHelpers.getLatency_Capture(cameraName)
             + LimelightHelpers.getLatency_Pipeline(cameraName);
@@ -100,7 +64,11 @@ public class Limelight4IOHardware extends LimelightIO {
     updateCornerPositions();
     inputs.tagCornerPositions = this.tagCorners;
 
-    estimatePoseAndPublish(inputs);
+    if (inputs.hasTag && inputs.tagID >= 1 && inputs.tagID <= fieldConstants.getNumTags()) {
+      inputs.tagPosition = fieldConstants.getAprilTagPose3d(inputs.tagID);
+    } else {
+      inputs.tagPosition = new Pose3d(Double.NaN, Double.NaN, Double.NaN, new Rotation3d());
+    }
 
     VisionPoseEstimation coprocessorPoseEstimation = getMegatag2Estimate();
 
@@ -110,61 +78,6 @@ public class Limelight4IOHardware extends LimelightIO {
         coprocessorPoseEstimation.latencyCompensatedPose();
     inputs.coprocessorEstimationStdDevs = coprocessorPoseEstimation.stdDevs();
     inputs.coprocessorEstimationTimestamp = coprocessorPoseEstimation.timestampSeconds();
-  }
-
-  /**
-   * Using the given {@link AprilVisionInputs}, estimate the pose of the robot and publish data to
-   * the inputs. The published inputs are:
-   *
-   * <ul>
-   *   <li>{@link AprilVisionInputs#tagHeightPixels}
-   *   <li>{@link AprilVisionInputs#tagHeightAngle}
-   *   <li>{@link AprilVisionInputs#tagDistanceMeters}
-   *   <li>{@link AprilVisionInputs#robotPoseEstimationLatencyUncompensated}
-   *   <li>{@link AprilVisionInputs#robotPoseEstimationLatencyCompensated}
-   *
-   * @param inputs The {@link AprilVisionInputs} passed to {@link #updateInputs(AprilVisionInputs)}
-   */
-  private void estimatePoseAndPublish(AprilVisionInputs inputs) {
-    // Initially set inputs to defaults
-    inputs.tagHeightPixels = -1;
-    inputs.tagHeightAngle = Rotation2d.kZero;
-    inputs.tagDistanceMeters = -1;
-    inputs.robotPoseEstimationLatencyUncompensated = null;
-    inputs.robotPoseEstimationLatencyCompensated = null;
-    inputs.tagPosition = null;
-    inputs.simpleEstimationTimestamp = Double.NaN;
-    if (inputs.hasTag) {
-      inputs.tagHeightPixels = computeTagHeightInPixels(inputs.tagCornerPositions);
-      inputs.tagHeightAngle = computeTagHeightInRotations(inputs.tagHeightPixels);
-
-      // If tag id valid
-      if (inputs.tagID >= 1 && inputs.tagID <= fieldConstants.getNumTags()) {
-        inputs.tagPosition = fieldConstants.getAprilTagPose3d(inputs.tagID);
-
-        inputs.tagDistanceMeters =
-            computeDistanceToTagMeters(inputs.tagHeightAngle, inputs.tagPosition.getZ())
-                * getConfiguration().cameraDistanceScalar;
-
-        Rotation2d robotRotation = robotStateInstance.getLatestFieldRobotPose().getRotation();
-
-        Translation2d robotToTagTranslation =
-            computeRobotToTag(inputs.horizontalAngleToTag, inputs.tagDistanceMeters);
-
-        VisionPoseEstimation poseEstimation =
-            computeRobotPose(
-                inputs.tagPosition.toPose2d(),
-                robotRotation,
-                robotToTagTranslation,
-                robotStateInstance.getLatestFusedFieldRelativeChassisSpeed(),
-                inputs.latency);
-
-        inputs.robotPoseEstimationLatencyUncompensated = poseEstimation.latencyUncompensatedPose();
-        inputs.robotPoseEstimationLatencyCompensated = poseEstimation.latencyCompensatedPose();
-        inputs.simpleEstimationStdDevs = poseEstimation.stdDevs();
-        inputs.simpleEstimationTimestamp = poseEstimation.timestampSeconds();
-      }
-    }
   }
 
   private VisionPoseEstimation getMegatag2Estimate() {
@@ -212,11 +125,6 @@ public class Limelight4IOHardware extends LimelightIO {
         tagCorners.get(i).y = cornerPositions[i * 2 + 1];
       }
     }
-  }
-
-  protected CameraCalibration getCalibration() {
-    // TODO stub
-    return null;
   }
 
   @Override

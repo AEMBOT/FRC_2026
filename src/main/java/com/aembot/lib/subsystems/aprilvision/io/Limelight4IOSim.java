@@ -5,7 +5,6 @@ import com.aembot.lib.constants.fields.YearFieldConstantable;
 import com.aembot.lib.math.PositionUtil;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionInputs;
-import com.aembot.lib.subsystems.aprilvision.util.CameraCalibration;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -217,17 +216,5 @@ public class Limelight4IOSim extends Limelight4IOHardware {
     }
 
     super.updateInputs(inputs);
-  }
-
-  @Override
-  protected CameraCalibration getCalibration() {
-    try {
-      System.out.println("Calib info?");
-      return new CameraCalibration(
-          photonCamera.getCameraMatrix().get(), photonCamera.getDistCoeffs().get());
-    } catch (Exception e) {
-      System.out.println("Don't have calib info...");
-      return null;
-    }
   }
 }
