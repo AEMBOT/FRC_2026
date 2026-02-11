@@ -4,7 +4,7 @@
 
 package com.aembot.frc2026;
 
-import static com.aembot.frc2026.constants.GeneralConstants.*;
+import static com.aembot.frc2026.constants.RobotRuntimeConstants.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -31,7 +31,7 @@ public class Robot extends LoggedRobot {
    */
   public Robot() {
     // Set up data receivers & replay source
-    switch (currentMode) {
+    switch (CURRENT_RUNTIME_MODE) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
         Logger.addDataReceiver(new WPILOGWriter("/U/logs"));
@@ -68,7 +68,9 @@ public class Robot extends LoggedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    CommandScheduler.getInstance().run();
+  }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override

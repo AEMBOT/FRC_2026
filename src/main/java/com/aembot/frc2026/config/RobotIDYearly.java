@@ -5,7 +5,7 @@ import com.aembot.lib.core.network.NetworkUtils;
 import java.util.Map;
 
 public enum RobotIDYearly implements RobotID {
-  PRODUCTION("Production Bot"),
+  PRODUCTION("Placeholder"),
   ;
 
   private final String name;
