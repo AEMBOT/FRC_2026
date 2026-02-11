@@ -22,7 +22,7 @@ public class CANCoderFactory {
     device.setStatusSignal(encoder.getSupplyVoltage(), 100);
 
     // Automatically register the encoder with the CAN status logger upon creation
-    CANStatusLogger.get(device.getBus()).registerCANDevice(device);
+    CANStatusLogger.get(device.getBusName()).registerCANDevice(device);
     return encoder;
   }
 
