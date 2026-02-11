@@ -22,8 +22,6 @@ import org.littletonrobotics.junction.LoggedRobot;
  */
 public class RobotContainer implements Loggerable {
 
-  private final HoodSubsystem hoodSubsystem = SubsystemFactory.createHoodSubsystem();
-
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverController = new CommandXboxController(0);
 
@@ -32,6 +30,9 @@ public class RobotContainer implements Loggerable {
   /* ---- DRIVETRAIN ---- */
   private final DriveSubsystem driveSubsystem = SubsystemFactory.createDriveSubsystem();
 
+  /* ---- SHOOTER ---- */
+  private final HoodSubsystem hoodSubsystem = SubsystemFactory.createHoodSubsystem();
+
   private final CommandFactory commandFactory;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -39,12 +40,16 @@ public class RobotContainer implements Loggerable {
     setupLogger(robot);
     configureBindings();
 
-    this.commandFactory = new CommandFactory(driveSubsystem);
+    this.commandFactory = new CommandFactory(driveSubsystem, hoodSubsystem);
   }
 
   /** Use this method to define your controller button -> command mappings */
   private void configureBindings() {
     driveSubsystem.setDefaultCommand(commandFactory.createDriveJoystickCmd(driverController));
+    hoodSubsystem.setDefaultCommand(commandFactory.createHoodStopCommand());
+
+    driverController.a().whileTrue(commandFactory.createHoodUpCommand());
+    driverController.b().whileTrue(commandFactory.createHoodDownCommand());
   }
 
   /**
