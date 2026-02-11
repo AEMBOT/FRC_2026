@@ -63,7 +63,7 @@ public class MotorFollowerSubsystem<
     // Configure each follower to follow the leader according to their configuration
     for (int i = 0; i < config.followerConfigurations.size(); i++) {
       MotorIO motor = followerMotors[i];
-      motor.follow(mainConfig.canDevice, config.followerConfigurations.get(i).followDirection);
+      motor.follow(mainConfig.kCANDevice, config.followerConfigurations.get(i).followDirection);
     }
   }
 

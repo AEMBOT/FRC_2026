@@ -135,7 +135,7 @@ public class MotorIOTalonFX implements MotorIO, CANable {
    *     context of just the motor
    */
   public MotorIOTalonFX(MotorConfiguration<TalonFXConfiguration> config) {
-    this(TalonFXFactory.createRawWithConfig(config.canDevice, config.getMotorConfig()), config);
+    this(TalonFXFactory.createRawWithConfig(config.kCANDevice, config.getMotorConfig()), config);
   }
 
   /**
@@ -148,7 +148,7 @@ public class MotorIOTalonFX implements MotorIO, CANable {
   public MotorIOTalonFX(CANDeviceID device, TalonFXConfiguration motorConfiguration) {
     this(
         new MotorConfiguration<TalonFXConfiguration>()
-            .withConfig(motorConfiguration)
+            .withMotorConfig(motorConfiguration)
             .withCANDevice(device));
   }
 
@@ -178,7 +178,7 @@ public class MotorIOTalonFX implements MotorIO, CANable {
     if (this.config == null) {
       throw new NullPointerException(
           "Tried to use a method that requires a set MotorConfiguration config when config is null. "
-              + "If this method is needed, try a MotorIOTalonFX constructor that initializes config.");
+              + "If this method is needed, try a MotorIOTalonFX constructor that initializesconfig.");
     }
   }
 
@@ -190,7 +190,7 @@ public class MotorIOTalonFX implements MotorIO, CANable {
   @Override
   public CANDeviceID getCANDevice() {
     checkServoMotorConfig();
-    return this.config.canDevice;
+    return this.config.kCANDevice;
   }
 
   @Override
@@ -221,7 +221,7 @@ public class MotorIOTalonFX implements MotorIO, CANable {
    */
   private double getRotorRotationsToUnits(double rotorRotations) {
     checkServoMotorConfig();
-    return this.config.getRotationsToUnits(rotorRotations);
+    return this.config.getRotorRotationsToUnits(rotorRotations);
   }
 
   /**
@@ -232,7 +232,7 @@ public class MotorIOTalonFX implements MotorIO, CANable {
    */
   private double getUnitsToRotorRotations(double units) {
     checkServoMotorConfig();
-    return this.config.getUnitsToRotations(units);
+    return this.config.getUnitsToRotorRotations(units);
   }
 
   /**
@@ -244,7 +244,7 @@ public class MotorIOTalonFX implements MotorIO, CANable {
   private double clampPosition(double units) {
     checkServoMotorConfig();
     return getUnitsToRotorRotations(
-        MathUtil.clamp(units, this.config.minPositionUnits, this.config.maxPositionUnits));
+        MathUtil.clamp(units, this.config.kMinPositionUnits, this.config.kMaxPositionUnits));
   }
 
   /* ---- CONFIG ---- */
