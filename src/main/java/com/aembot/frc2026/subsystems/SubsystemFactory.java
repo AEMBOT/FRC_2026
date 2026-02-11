@@ -2,6 +2,7 @@ package com.aembot.frc2026.subsystems;
 
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
+import com.aembot.lib.subsystems.hood.io.HoodIOReplay;
 import com.aembot.lib.subsystems.hood.io.HoodSimIO;
 import com.aembot.lib.subsystems.hood.io.TalonFXHoodHardwareIO;
 
@@ -17,7 +18,8 @@ public class SubsystemFactory {
             new HoodSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getSimHoodConfig()));
 
       case REPLAY:
-
+        return new HoodSubsystem(
+            RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig(), new HoodIOReplay());
       case REAL:
 
       default:
