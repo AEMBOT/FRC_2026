@@ -4,12 +4,15 @@
 
 package com.aembot.frc2026;
 
+import com.aembot.frc2026.commands.CommandFactory;
 import com.aembot.frc2026.subsystems.SubsystemFactory;
 import com.aembot.lib.core.logging.Loggerable;
+import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import org.littletonrobotics.junction.LoggedRobot;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -26,19 +29,22 @@ public class RobotContainer implements Loggerable {
 
   private final CommandXboxController secondaryController = new CommandXboxController(1);
 
+  /* ---- DRIVETRAIN ---- */
+  private final DriveSubsystem driveSubsystem = SubsystemFactory.createDriveSubsystem();
+
+  private final CommandFactory commandFactory;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
-    setupLogger();
+  public RobotContainer(LoggedRobot robot) {
+    setupLogger(robot);
     configureBindings();
+
+    this.commandFactory = new CommandFactory(driveSubsystem);
   }
 
   /** Use this method to define your controller button -> command mappings */
   private void configureBindings() {
-
-    hoodSubsystem.setDefaultCommand(hoodSubsystem.smartVelocitySetpointCommand(() -> 0));
-
-    driverController.x().whileTrue(hoodSubsystem.smartVelocitySetpointCommand(() -> 30));
-    driverController.y().whileTrue(hoodSubsystem.smartVelocitySetpointCommand(() -> -30));
+    driveSubsystem.setDefaultCommand(commandFactory.createDriveJoystickCmd(driverController));
   }
 
   /**

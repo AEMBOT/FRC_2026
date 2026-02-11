@@ -61,7 +61,7 @@ public class MotorIOTalonFX implements MotorIO, CANable {
    * Velocity, Acceleration, and Jerk
    */
   private final DynamicMotionMagicVoltage dynamicMotionMagicPositionControl =
-      new DynamicMotionMagicVoltage(0.0, 0.0, 0.0);
+      new DynamicMotionMagicVoltage(0, 0, 0);
 
   /** Controller used to mimic the output of another TalonFX */
   private final Follower followerControl = new Follower(0, MotorAlignmentValue.Opposed);
@@ -383,10 +383,7 @@ public class MotorIOTalonFX implements MotorIO, CANable {
     return talon.setControl(
             followerControl
                 .withLeaderID(masterDevice.getDeviceID())
-                .withMotorAlignment(
-                    direction == FollowDirection.INVERT
-                        ? MotorAlignmentValue.Opposed
-                        : MotorAlignmentValue.Aligned))
+                .withMotorAlignment(direction.toCTREAlignment()))
         == StatusCode.OK;
   }
 

@@ -36,7 +36,7 @@ public class TalonFXFactory {
     device.setStatusSignal(talon.getSupplyVoltage(), 100);
 
     // Automatically register the Talon with the CAN status logger upon creation
-    CANStatusLogger.get(device.getBus().getName()).registerCANDevice(device);
+    CANStatusLogger.get(device.getBusName()).registerCANDevice(device);
     return talon;
   }
 
@@ -53,7 +53,7 @@ public class TalonFXFactory {
     device.setStatusSignal(talon.getSupplyVoltage(), 100);
 
     // Automatically register the Talon with the CAN status logger upon creation
-    CANStatusLogger.get(device.getBus().getName()).registerCANDevice(device);
+    CANStatusLogger.get(device.getBusName()).registerCANDevice(device);
     return talon;
   }
 
