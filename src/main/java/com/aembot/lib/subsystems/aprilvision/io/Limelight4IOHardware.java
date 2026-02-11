@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
@@ -81,6 +82,15 @@ public class Limelight4IOHardware implements AprilCameraIO {
   }
 
   private VisionPoseEstimation getMegatag2Estimate() {
+    LimelightHelpers.setCameraPose_RobotSpace(
+        cameraName,
+        cameraConfiguration.getCameraPosition().getX(),
+        cameraConfiguration.getCameraPosition().getY(),
+        cameraConfiguration.getCameraPosition().getZ(),
+        Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getX()),
+        Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getY()),
+        Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getZ()));
+
     double robotYaw = robotStateInstance.getLatestFieldRobotPose().getRotation().getDegrees();
     LimelightHelpers.SetRobotOrientation(cameraName, robotYaw, 0, 0, 0, 0, 0);
 

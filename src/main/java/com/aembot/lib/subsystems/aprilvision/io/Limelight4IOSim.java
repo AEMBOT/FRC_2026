@@ -128,6 +128,9 @@ public class Limelight4IOSim extends Limelight4IOHardware {
 
   @Override
   public void updateInputs(AprilVisionInputs inputs) {
+    this.photonPoseEstimator.setRobotToCameraTransform(
+        PositionUtil.toTransform3d(this.cameraConfiguration.getCameraPosition()));
+
     List<PhotonPipelineResult> results = photonCamera.getAllUnreadResults();
     if (results.size() > 0) {
       PhotonPipelineResult result = results.get(results.size() - 1);
