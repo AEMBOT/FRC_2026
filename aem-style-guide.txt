@@ -1,0 +1,14 @@
+Variable naming conventions
+
+    most variable names should be lower camel case
+    (ex. thisIsAVariableName)
+
+    constants that are set when a class is created should 
+    have a 'k' at the start, and otherwise be upper camel 
+    case
+    (ex. kThisIsAVariableName)
+
+    constants that are set when they are created and stay 
+    the same throughout the project should be all caps 
+    with underscores
+    (ex. THIS_IS_A_VARIABLE_NAME)
