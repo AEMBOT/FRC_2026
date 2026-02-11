@@ -53,7 +53,7 @@ public abstract class MotorCANCoderSubsystem<
   public MotorCANCoderSubsystem(
       MI motorInputs, M motor, EI canCoderInputs, E canCoder, C motorConfiguration) {
     super(
-        "Subsystems/" + motorConfiguration.configurationName + "/" + canCoder.getName(),
+        "Subsystems/" + motorConfiguration.kConfigurationName + "/" + canCoder.getName(),
         motorInputs,
         motor,
         motorConfiguration);

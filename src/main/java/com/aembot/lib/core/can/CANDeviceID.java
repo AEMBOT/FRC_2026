@@ -58,6 +58,18 @@ public class CANDeviceID {
   }
 
   /**
+   * Create a new CAN device with the default bus name "rio".
+   *
+   * @param canID ID of this CAN device
+   * @param deviceName Name of this CAN device
+   * @param subsystemName Name of the subsystem that this CAN device is a part of
+   * @param deviceType Type of CAN device that this object is
+   */
+  public CANDeviceID(int canID, String deviceName, String subsystemName, CANDeviceType deviceType) {
+    this(canID, deviceName, subsystemName, deviceType, new CANBus("rio"));
+  }
+
+  /**
    * Create a new CAN Device
    *
    * @param canID ID of this device
@@ -77,18 +89,6 @@ public class CANDeviceID {
     this.bus = new CANBus(busName);
     this.deviceType = deviceType;
     this.subsystemName = subsystemName;
-  }
-
-  /**
-   * Create a new CAN device with the default bus name "rio".
-   *
-   * @param canID ID of this CAN device
-   * @param deviceName Name of this CAN device
-   * @param subsystemName Name of the subsystem that this CAN device is a part of
-   * @param deviceType Type of CAN device that this object is
-   */
-  public CANDeviceID(int canID, String deviceName, String subsystemName, CANDeviceType deviceType) {
-    this(canID, deviceName, subsystemName, deviceType, "rio");
   }
 
   public int getDeviceID() {

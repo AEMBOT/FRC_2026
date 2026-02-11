@@ -1,6 +1,7 @@
 package com.aembot.lib.core.motors.io;
 
 import com.aembot.lib.config.motors.MotorConfiguration;
+import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -22,10 +23,10 @@ public class MotorIOTalonFXCANCoderSim extends MotorIOTalonFXSim {
    * @param cancoder CANcoder object itself that we are able to yoink the sim state from
    */
   public MotorIOTalonFXCANCoderSim(
-      MotorConfiguration<TalonFXConfiguration> servoMotorConfig,
+      SimulatedMotorConfiguration<TalonFXConfiguration> simulatedMotorConfig,
       CANDeviceID encoderDevice,
       CANcoder cancoder) {
-    super(servoMotorConfig);
+    super(simulatedMotorConfig);
 
     this.cancoderSimState = cancoder.getSimState();
   }
