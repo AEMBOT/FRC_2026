@@ -112,7 +112,7 @@ public class SimulatedFlywheel implements Loggable {
 
     // Input voltage into sim
     inputs.SimVoltage = simState.getMotorVoltage();
-    // flywheelSimulation.setInput(inputs.SimVoltage);
+    flywheelSimulation.setInput(inputs.SimVoltage);
 
     // Update flywheel by time
     double timestamp = Timer.getFPGATimestamp();
