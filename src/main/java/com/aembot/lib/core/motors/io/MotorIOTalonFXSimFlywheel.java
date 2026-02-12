@@ -60,6 +60,7 @@ public class MotorIOTalonFXSimFlywheel extends MotorIOTalonFXSim {
     inputs.SimPosUnits += inputs.SimVelocityUnits * dt / 60;
     inputs.RotorPosition += inputs.RotorVelocity * dt / 60;
 
+    simState.setRotorAcceleration(motorSim.getAngularAcceleration());
     simState.setRawRotorPosition(inputs.RotorPosition);
     simState.setRotorVelocity(inputs.RotorVelocity);
   }
