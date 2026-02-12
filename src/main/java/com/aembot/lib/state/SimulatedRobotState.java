@@ -62,9 +62,11 @@ public abstract class SimulatedRobotState implements Loggable {
     visionSimulation.update(positionState.getLatestFieldRobotPose());
   }
 
-  public void addCameraToVisionSimulation(
+  /** Add a camera to the vision simulation system and then return said {@link VisionSystemSim} */
+  public VisionSystemSim addCameraToVisionSimulation(
       PhotonCameraSim simulatedCamera, Transform3d robotToCameraTransform) {
     visionSimulation.addCamera(simulatedCamera, robotToCameraTransform);
+    return visionSimulation;
   }
 
   /**

@@ -20,8 +20,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import java.util.List;
-import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.VisionSystemSim;
 
 /** Subsystem factories intended to be called from RobotContainer */
 public class SubsystemFactory {
@@ -58,7 +59,7 @@ public class SubsystemFactory {
     List<SimulatedCameraConfiguration> simConfigs =
         RobotRuntimeConstants.ROBOT_CONFIG.getSimulatedCameraConfigurations();
 
-    BiConsumer<PhotonCameraSim, Transform3d> simCameraRegistrar =
+    BiFunction<PhotonCameraSim, Transform3d, VisionSystemSim> simCameraRegistrar =
         (cameraSim, cameraTransform) ->
             SimulatedRobotStateYearly.get().addCameraToVisionSimulation(cameraSim, cameraTransform);
 

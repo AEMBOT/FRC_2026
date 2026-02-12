@@ -15,12 +15,13 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.targeting.TargetCorner;
@@ -74,6 +75,8 @@ public class Limelight4IOSim extends Limelight4IOHardware {
 
   /* ---- END NETWORK TABLES ENTRIES ---- */
 
+  private final VisionSystemSim visionSystemSim;
+
   private final SimulatedCameraConfiguration simConfig;
 
   private final PhotonCamera photonCamera;
@@ -94,7 +97,7 @@ public class Limelight4IOSim extends Limelight4IOHardware {
       SimulatedCameraConfiguration config,
       YearFieldConstantable fieldConstants,
       RobotState robotStateInstance,
-      BiConsumer<PhotonCameraSim, Transform3d> registerVisionSimulationConsumer) {
+      BiFunction<PhotonCameraSim, Transform3d, VisionSystemSim> registerVisionSimulationConsumer) {
     super(config.cameraConfiguration, fieldConstants, robotStateInstance);
     this.simConfig = config;
 
@@ -107,11 +110,12 @@ public class Limelight4IOSim extends Limelight4IOHardware {
             PoseStrategy.CONSTRAINED_SOLVEPNP,
             PositionUtil.toTransform3d(config.cameraConfiguration.getCameraPosition()));
 
-    registerVisionSimulationConsumer.accept(
-        photonCameraSim,
-        new Transform3d(
-            cameraConfiguration.getCameraPosition().getTranslation(),
-            cameraConfiguration.getCameraPosition().getRotation()));
+    this.visionSystemSim =
+        registerVisionSimulationConsumer.apply(
+            photonCameraSim,
+            new Transform3d(
+                cameraConfiguration.getCameraPosition().getTranslation(),
+                cameraConfiguration.getCameraPosition().getRotation()));
 
     NetworkTable networkTable = NetworkTableInstance.getDefault().getTable(cameraName);
 
@@ -128,6 +132,8 @@ public class Limelight4IOSim extends Limelight4IOHardware {
 
   @Override
   public void updateInputs(AprilVisionInputs inputs) {
+    this.visionSystemSim.adjustCamera(
+        photonCameraSim, PositionUtil.toTransform3d(this.cameraConfiguration.getCameraPosition()));
     this.photonPoseEstimator.setRobotToCameraTransform(
         PositionUtil.toTransform3d(this.cameraConfiguration.getCameraPosition()));
 
