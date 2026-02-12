@@ -6,6 +6,7 @@ import com.aembot.lib.constants.fields.YearFieldConstantable;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionInputs;
 import com.aembot.lib.subsystems.aprilvision.interfaces.AprilCameraIO;
+import com.aembot.lib.subsystems.aprilvision.util.LimelightExtras;
 import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers;
 import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers.PoseEstimate;
 import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
@@ -104,16 +105,10 @@ public class Limelight4IOHardware implements AprilCameraIO {
               robotStateInstance.getLatestFusedFieldRelativeChassisSpeed(),
               Timer.getFPGATimestamp() - (estimate.timestampSeconds - estimate.latency));
 
-      // Yoinked from 2481
-      double stdDevFactor = Math.pow(estimate.avgTagDist, 2) / estimate.tagCount;
-
-      double translationStddev = cameraConfiguration.baselineTranslationalStdDev * stdDevFactor;
-      Double angularStddev = cameraConfiguration.baselineAngularStdDev * stdDevFactor;
-
       return new VisionPoseEstimation(
           latencyUncompensatedPose,
           latencyCompensatedPose,
-          new OdometryStandardDevs(translationStddev, translationStddev, angularStddev),
+          getStdDevs(estimate),
           estimate.timestampSeconds);
     } else {
       return new VisionPoseEstimation(null, null, null, Double.NaN);
@@ -135,6 +130,26 @@ public class Limelight4IOHardware implements AprilCameraIO {
         tagCorners.get(i).y = cornerPositions[i * 2 + 1];
       }
     }
+  }
+
+  /** Get standard deviations for the given pose estimate */
+  protected OdometryStandardDevs getStdDevs(PoseEstimate estimate) {
+    double[] doubleArray = LimelightExtras.getStandardDeviations(cameraName);
+
+    return adjustStdDevsWithOdomPose(
+        new OdometryStandardDevs(doubleArray[0], doubleArray[1], doubleArray[5]),
+        estimate.timestampSeconds,
+        estimate.pose);
+  }
+
+  protected OdometryStandardDevs adjustStdDevsWithOdomPose(
+      OdometryStandardDevs unadjustedStandardDevs,
+      double timestampSeconds,
+      Pose2d cameraEstimatedRobotPose) {
+    return adjustStdDevsWithOdomPose(
+        unadjustedStandardDevs,
+        robotStateInstance.getFieldRobotPoseForTimestamp(timestampSeconds),
+        cameraEstimatedRobotPose);
   }
 
   @Override

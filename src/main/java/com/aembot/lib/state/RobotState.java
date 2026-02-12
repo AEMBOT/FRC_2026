@@ -153,6 +153,18 @@ public abstract class RobotState implements Loggable {
   }
 
   /**
+   * Retrieve the robot field pose interpolated for the given timestamp
+   *
+   * @return Robot field pose
+   */
+  public Pose2d getFieldRobotPoseForTimestamp(double timestampSeconds) {
+    return odometryState
+        .timeInterpolatableEstimatedRobotPose
+        .getSample(timestampSeconds)
+        .orElse(null);
+  }
+
+  /**
    * Add the current motion measurements for the robot to the time buffer for logging
    *
    * @param timestamp The timestamp for which these measurements were logged

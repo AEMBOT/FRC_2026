@@ -41,6 +41,8 @@ public class AprilVisionInputs implements LoggableInputs {
 
   public OdometryStandardDevs coprocessorEstimationStdDevs;
 
+  public double coprocessorPoseEstimationAmbiguity;
+
   public double coprocessorEstimationTimestamp;
 
   @Override
@@ -53,6 +55,7 @@ public class AprilVisionInputs implements LoggableInputs {
         "CoprocessorEstimationLatencyUncompensated", coprocessorEstimationLatencyUncompensated);
     table.put("CoprocessorEstimationLatencyCompensated", coprocessorEstimationLatencyCompensated);
     table.put("CoprocessorEstimationStdDevs", coprocessorEstimationStdDevs);
+    table.put("CoprocessorPoseEstimationAmbiguity", coprocessorPoseEstimationAmbiguity);
     table.put("CoprocessorEstimationTimestamp", coprocessorEstimationTimestamp);
   }
 
@@ -70,6 +73,8 @@ public class AprilVisionInputs implements LoggableInputs {
             "CoprocessorEstimationLatencyCompensated", coprocessorEstimationLatencyCompensated);
     coprocessorEstimationStdDevs =
         table.get("CoprocessorEstimationStdDevs", coprocessorEstimationStdDevs);
+    coprocessorPoseEstimationAmbiguity =
+        table.get("CoprocessorPoseEstimationAmbiguity", coprocessorPoseEstimationAmbiguity);
     coprocessorEstimationTimestamp =
         table.get("CoprocessorEstimationTimestamp", coprocessorEstimationTimestamp);
   }

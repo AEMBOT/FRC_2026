@@ -1,10 +1,12 @@
 package com.aembot.lib.subsystems.aprilvision.io;
 
+import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
 import com.aembot.lib.math.PositionUtil;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionInputs;
+import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers.PoseEstimate;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -13,6 +15,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -73,6 +76,12 @@ public class Limelight4IOSim extends Limelight4IOHardware {
 
   protected final NetworkTableEntry megatag2PoseEstimateEntry;
 
+  /**
+   * double[] NT entry with all valid (unfiltered) fiducials in format [id, txnc, tync, ta,
+   * distToCamera, distToRobot, ambiguity, id2.....]
+   */
+  protected final NetworkTableEntry rawFiducialsEntry;
+
   /* ---- END NETWORK TABLES ENTRIES ---- */
 
   private final VisionSystemSim visionSystemSim;
@@ -128,6 +137,7 @@ public class Limelight4IOSim extends Limelight4IOHardware {
     pipelineLatencyEntry = networkTable.getEntry("tl");
     robotOrientationEntry = networkTable.getEntry("robot_orientation_set");
     megatag2PoseEstimateEntry = networkTable.getEntry("botpose_orb_wpiblue");
+    rawFiducialsEntry = networkTable.getEntry("rawfiducials");
   }
 
   @Override
@@ -167,63 +177,107 @@ public class Limelight4IOSim extends Limelight4IOHardware {
         tagCornerPositionsEntry.setDoubleArray(publishedArray);
       }
 
+      updateFiducials(result);
+
       /* --- "Coprocessor" pose estimation --- */
-      double[] orientationArr = robotOrientationEntry.getDoubleArray((double[]) null);
-
-      if (orientationArr != null) {
-        photonPoseEstimator.addHeadingData(
-            Timer.getFPGATimestamp(), Rotation2d.fromDegrees(orientationArr[0]));
-
-        Optional<EstimatedRobotPose> estimatedPoseOptional = photonPoseEstimator.update(result);
-
-        if (estimatedPoseOptional.isPresent()) {
-          EstimatedRobotPose data = estimatedPoseOptional.get();
-
-          Pose3d estimatedPose = data.estimatedPose;
-
-          double avgDistance = 0;
-          // Avg area of tags as % of img
-          double avgTagArea = 0;
-          for (PhotonTrackedTarget targetUsed : data.targetsUsed) {
-            avgDistance += targetUsed.bestCameraToTarget.getTranslation().getNorm();
-            // I'm _assuming_ area is square pixels? It's not documented (</3), so I'm not sure.
-            avgTagArea +=
-                targetUsed.area
-                    / (cameraConfiguration.cameraResolution.widthPixels
-                        * cameraConfiguration.cameraResolution.heightPixels);
-          }
-
-          avgDistance /= data.targetsUsed.size();
-          avgTagArea /= data.targetsUsed.size();
-
-          /*
-           * Array to be published to NT4. In format: Translation (X,Y,Z) in meters
-           * Rotation(Roll,Pitch,Yaw) in degrees, total latency (cl+tl), tag count, tag span, average
-           * tag distance from camera, average tag area (percentage of image)
-           */
-          megatag2PoseEstimateEntry.setDoubleArray(
-              new Double[] {
-                estimatedPose.getX(),
-                estimatedPose.getY(),
-                estimatedPose.getZ(),
-                Units.radiansToDegrees(estimatedPose.getRotation().getX()),
-                Units.radiansToDegrees(estimatedPose.getRotation().getY()),
-                Units.radiansToDegrees(estimatedPose.getRotation().getZ()),
-                captureLatencyEntry.getDouble(0),
-                (double) data.targetsUsed.size(),
-                0.0, // I'm not entirely sure what span is or how to get it, so... hopefully it's
-                // not
-                // important?
-                avgDistance,
-                avgTagArea
-              });
-        } else {
-          // LimelightHelpers will correctly read this as no data
-          megatag2PoseEstimateEntry.setDoubleArray(new Double[0]);
-        }
-      }
+      updateMegatag2(result);
     }
 
     super.updateInputs(inputs);
+  }
+
+  protected void updateMegatag2(PhotonPipelineResult result) {
+    /* --- "Coprocessor" pose estimation --- */
+    double[] orientationArr = robotOrientationEntry.getDoubleArray((double[]) null);
+
+    if (orientationArr != null) {
+      photonPoseEstimator.addHeadingData(
+          Timer.getFPGATimestamp(), Rotation2d.fromDegrees(orientationArr[0]));
+
+      Optional<EstimatedRobotPose> estimatedPoseOptional = photonPoseEstimator.update(result);
+
+      if (estimatedPoseOptional.isPresent()) {
+        EstimatedRobotPose data = estimatedPoseOptional.get();
+
+        Pose3d estimatedPose = data.estimatedPose;
+
+        double avgDistance = 0;
+        // Avg area of tags as % of img
+        double avgTagArea = 0;
+        for (PhotonTrackedTarget targetUsed : data.targetsUsed) {
+          avgDistance += targetUsed.bestCameraToTarget.getTranslation().getNorm();
+          avgTagArea += targetUsed.area / 100; // 0-100 -> 0-1
+        }
+
+        avgDistance /= data.targetsUsed.size();
+        avgTagArea /= data.targetsUsed.size();
+
+        /*
+         * Array to be published to NT4. In format: Translation (X,Y,Z) in meters
+         * Rotation(Roll,Pitch,Yaw) in degrees, total latency (cl+tl), tag count, tag span, average
+         * tag distance from camera, average tag area (percentage of image)
+         */
+        megatag2PoseEstimateEntry.setDoubleArray(
+            new Double[] {
+              estimatedPose.getX(),
+              estimatedPose.getY(),
+              estimatedPose.getZ(),
+              Units.radiansToDegrees(estimatedPose.getRotation().getX()),
+              Units.radiansToDegrees(estimatedPose.getRotation().getY()),
+              Units.radiansToDegrees(estimatedPose.getRotation().getZ()),
+              captureLatencyEntry.getDouble(0),
+              (double) data.targetsUsed.size(),
+              0.0, // I'm not entirely sure what span is or how to get it, so... hopefully it's
+              // not
+              // important?
+              avgDistance,
+              avgTagArea
+            });
+      } else {
+        // LimelightHelpers will correctly read this as no data
+        megatag2PoseEstimateEntry.setDoubleArray(new Double[0]);
+      }
+    }
+  }
+
+  public void updateFiducials(PhotonPipelineResult result) {
+    List<Double> rawFiducials = new ArrayList<>();
+
+    for (PhotonTrackedTarget target : result.targets) {
+      // id, tx deg, ty deg, tag area as percentage (0-1), distToCamera (m), distToRobot (m),
+      // ambiguity (0-1)
+      rawFiducials.add((double) target.fiducialId);
+      rawFiducials.add(-target.yaw); // Inverted between LL & Photon
+      rawFiducials.add(target.pitch);
+      rawFiducials.add(target.area / 100); // 0-100 -> 0-1
+      rawFiducials.add(target.bestCameraToTarget.getTranslation().getNorm());
+      rawFiducials.add(
+          target
+              .bestCameraToTarget
+              .inverse()
+              .plus(PositionUtil.toTransform3d(cameraConfiguration.getCameraPosition()))
+              .getTranslation()
+              .getNorm());
+      rawFiducials.add(
+          target
+              .poseAmbiguity); // TODO check this maps correctly to LL ambiguity vals (I suspect it
+      // won't TwT)
+    }
+
+    rawFiducialsEntry.setDoubleArray(rawFiducials.toArray(new Double[rawFiducials.size() / 7]));
+  }
+
+  @Override
+  public OdometryStandardDevs getStdDevs(PoseEstimate estimate) {
+    // Yoinked from 2481
+    double stdDevFactor = Math.pow(estimate.avgTagDist, 2) / estimate.tagCount;
+
+    double translationStddev = cameraConfiguration.baselineTranslationalStdDev * stdDevFactor;
+    Double angularStddev = cameraConfiguration.baselineAngularStdDev * stdDevFactor;
+
+    return adjustStdDevsWithOdomPose(
+        new OdometryStandardDevs(translationStddev, translationStddev, angularStddev),
+        estimate.timestampSeconds,
+        estimate.pose);
   }
 }

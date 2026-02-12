@@ -172,6 +172,9 @@ public class CameraConfiguration {
    * camera. This will be used as {@code baseline * (avgDistance^2 / numTags) *
    * methodSpecificScalar}
    *
+   * <p><strong>Note:</strong> some camera implementations (ie. Limelight hardware) might discard
+   * this value in favor of its own std dev calculation method (ie. Limelight-provided stddevs)
+   *
    * @return this {@link CameraConfiguration} for chaining
    */
   public CameraConfiguration withBaselineTranslationalStdDev(double stdDevMeters) {
@@ -183,6 +186,9 @@ public class CameraConfiguration {
    * Set the angular standard deviations of the camera with 1 tag 1 meter away from the camera. This
    * will be used as {@code baseline * (avgDistance^2 / numTags) * methodSpecificScalar}
    *
+   * <p><strong>Note:</strong> some camera implementations (ie. Limelight hardware) might discard
+   * this value in favor of its own std dev calculation method (ie. Limelight-provided stddevs)
+   *
    * @return this {@link CameraConfiguration} for chaining
    */
   public CameraConfiguration withBaselineAngularStdDev(double stdDevRads) {
@@ -193,7 +199,10 @@ public class CameraConfiguration {
   /**
    * Set the translational and angular standard deviations of the camera with 1 tag 1 meter away
    * from the camera. This will be used as {@code baseline * (avgDistance^2 / numTags) *
-   * methodSpecificScalar}
+   * methodSpecificScalar}.
+   *
+   * <p><strong>Note:</strong> some camera implementations (ie. Limelight hardware) might discard
+   * this value in favor of its own std dev calculation method (ie. Limelight-provided stddevs)
    *
    * @return this {@link CameraConfiguration} for chaining
    */
