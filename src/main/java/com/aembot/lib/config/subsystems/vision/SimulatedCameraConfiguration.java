@@ -1,7 +1,5 @@
 package com.aembot.lib.config.subsystems.vision;
 
-import com.aembot.lib.constants.RuntimeConstants;
-import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
@@ -69,23 +67,6 @@ public class SimulatedCameraConfiguration {
   public SimulatedCameraConfiguration withCalibrationError(
       double avgErrorPixels, double stddevErrorPixels) {
     simCameraProperties.setCalibError(avgErrorPixels, stddevErrorPixels);
-    return this;
-  }
-
-  /**
-   * Sets the {@link CameraConfiguration#cameraDistanceScalar} of the camera's configuration while
-   * running in sim. Note that this does not affect limelight's camera simulation; rather, it
-   * affects the vision subsystem in the same way it would on the real robot.
-   *
-   * @param actual Actual distance from the camera to an apriltag
-   * @param reported Distance reported by vision to an apriltag
-   * @return this {@link SimulatedCameraConfiguration} for chaining
-   * @see CameraConfiguration#withCameraDistanceScalar(double, double)
-   */
-  public SimulatedCameraConfiguration withCameraDistanceScalar(double actual, double reported) {
-    if (RuntimeConstants.MODE == RuntimeMode.SIM) {
-      cameraConfiguration.withCameraDistanceScalar(actual, reported);
-    }
     return this;
   }
 

@@ -31,16 +31,13 @@ public class ProductionCameraConfig {
               new Transform3d(
                   new Translation3d(
                       Units.inchesToMeters(3), Units.inchesToMeters(0), Units.inchesToMeters(3)),
-                  new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(0), 0.0)))
-          .withCameraDistanceScalar(1, 1)
-          .withXRotationScalar(1, -1);
+                  new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(0), 0.0)));
 
   public final SimulatedCameraConfiguration simConfigFrontLeft =
       new SimulatedCameraConfiguration(cameraConfigFrontLeft)
           .withFramerate(SIM_CAMERA_FPS)
           .withCalibrationError(0, 0)
-          .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS)
-          .withCameraDistanceScalar(1.16, 1.3);
+          .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS);
 
   /* ---- FRONT RIGHT CAM ---- */
   public final CameraConfiguration cameraConfigFrontRight =
@@ -51,16 +48,13 @@ public class ProductionCameraConfig {
                       Units.inchesToMeters(9),
                       Units.inchesToMeters(-8.25),
                       Units.inchesToMeters(7.5)),
-                  new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-15), 0.0)))
-          .withCameraDistanceScalar(1, 1)
-          .withXRotationScalar(1, -1);
+                  new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-15), 0.0)));
 
   public final SimulatedCameraConfiguration simConfigFrontRight =
       new SimulatedCameraConfiguration(cameraConfigFrontRight)
           .withFramerate(SIM_CAMERA_FPS)
           .withCalibrationError(0, 0)
-          .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS)
-          .withCameraDistanceScalar(1.16, 1.3);
+          .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS);
 
   /* ---- BACK LEFT CAM ---- */
   public final CameraConfiguration cameraConfigBackLeft =
@@ -74,16 +68,13 @@ public class ProductionCameraConfig {
                   new Rotation3d(
                       Units.degreesToRadians(180),
                       Units.degreesToRadians(-11.75),
-                      Units.degreesToRadians(180))))
-          .withCameraDistanceScalar(1, 1)
-          .withXRotationScalar(1, -1);
+                      Units.degreesToRadians(180))));
 
   public final SimulatedCameraConfiguration simConfigBackLeft =
       new SimulatedCameraConfiguration(cameraConfigBackLeft)
           .withFramerate(SIM_CAMERA_FPS)
           .withCalibrationError(0, 0)
-          .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS)
-          .withCameraDistanceScalar(1.16, 1.3);
+          .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS);
 
   /* ---- BACK RIGHT CAM ---- */
   public final CameraConfiguration cameraConfigBackRight =
@@ -97,16 +88,13 @@ public class ProductionCameraConfig {
                   new Rotation3d(
                       Units.degreesToRadians(180),
                       Units.degreesToRadians(-11.75),
-                      Units.degreesToRadians(-180))))
-          .withCameraDistanceScalar(1, 1)
-          .withXRotationScalar(1, -1);
+                      Units.degreesToRadians(-180))));
 
   public final SimulatedCameraConfiguration simConfigBackRight =
       new SimulatedCameraConfiguration(cameraConfigBackRight)
           .withFramerate(SIM_CAMERA_FPS)
           .withCalibrationError(0, 0)
-          .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS)
-          .withCameraDistanceScalar(1.16, 1.3);
+          .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS);
 
   /** List of configurations in FL, FR, BL, BR order */
   public final List<CameraConfiguration> cameraConfigurations =

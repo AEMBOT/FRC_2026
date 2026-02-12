@@ -92,18 +92,6 @@ public class CameraConfiguration {
 
   public FOV cameraFOV;
 
-  /** Ratio between the reported distance to a tag and the actual distance. Defaults to 1. */
-  public double cameraDistanceScalar = 1.0;
-
-  /**
-   * Comment from 2910: "When limelight tx was compared to robot rotation from the gyro, it was
-   * observed that they did not scale at the same rate. Assuming the Pigeon2 scales correctly, this
-   * means the limelight's angle scaling is incorrect. Because the difference scaled linearly, we
-   * found out the ratio between the limelight angle and robot angle and applied it to the tx
-   * angle."
-   */
-  public double cameraXRotationScalar = 1.0;
-
   /**
    * The translational standard deviations of the camera with 1 tag 1 meter away from the camera.
    * This will be used as {@code baseline * (avgDistance^2 / numTags) * methodSpecificScalar}
@@ -176,32 +164,6 @@ public class CameraConfiguration {
 
   public CameraConfiguration withCameraFOV(FOV fov) {
     this.cameraFOV = fov;
-    return this;
-  }
-
-  /**
-   * Set the ratio between actual distances and camera-reported distances. Used to account for
-   * distance irregularities in vision.
-   *
-   * @param actual Actual distance from the camera to an apriltag
-   * @param reported Distance reported by vision to an apriltag
-   * @return this {@link CameraConfiguration} for chaining
-   */
-  public CameraConfiguration withCameraDistanceScalar(double actual, double reported) {
-    this.cameraDistanceScalar = actual / reported;
-    return this;
-  }
-
-  /**
-   * Set the ratio between the gyro reported robot yaw (presumed to be actual) and vision-reported
-   * robot yaw. Used to account for rotation irregularities between camera & actual
-   *
-   * @param gyroRotation Rotation reported by the gyro for some angle
-   * @param cameraRotation Rotation reported by the camera pose estimation for the same angle
-   * @return this {@link CameraConfiguration} for chaining
-   */
-  public CameraConfiguration withXRotationScalar(double gyroRotation, double cameraRotation) {
-    this.cameraXRotationScalar = gyroRotation / cameraRotation;
     return this;
   }
 
