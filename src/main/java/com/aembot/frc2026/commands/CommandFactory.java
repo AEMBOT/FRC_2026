@@ -7,12 +7,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public final class CommandFactory {
+
   private final DriveSubsystem driveSubsystem;
   private final HoodSubsystem hoodSubsystem;
+
+  private final ShooterCommandFactory shooterCommandFactory;
 
   public CommandFactory(DriveSubsystem driveSubsystem, HoodSubsystem hoodSubsystem) {
     this.driveSubsystem = driveSubsystem;
     this.hoodSubsystem = hoodSubsystem;
+    this.shooterCommandFactory = new ShooterCommandFactory(hoodSubsystem);
   }
 
   public JoystickDriveCommand createDriveJoystickCmd(CommandXboxController driverController) {
@@ -29,5 +33,9 @@ public final class CommandFactory {
 
   public Command createHoodDownCommand() {
     return hoodSubsystem.smartVelocitySetpointCommand(() -> -30);
+  }
+
+  public Command createHoodTowardsHubCommand() {
+    return shooterCommandFactory.createHoodTowardsHubCommand();
   }
 }
