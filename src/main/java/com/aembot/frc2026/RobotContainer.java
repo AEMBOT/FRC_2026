@@ -9,6 +9,7 @@ import com.aembot.frc2026.subsystems.SubsystemFactory;
 import com.aembot.lib.core.logging.Loggerable;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
+import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -30,6 +31,9 @@ public class RobotContainer implements Loggerable {
   /* ---- DRIVETRAIN ---- */
   private final DriveSubsystem driveSubsystem = SubsystemFactory.createDriveSubsystem();
 
+  /* ---- SHOOTER ---- */
+  private final HoodSubsystem hoodSubsystem = SubsystemFactory.createHoodSubsystem();
+
   private final CommandFactory commandFactory;
 
   /* ---- VISION ---- */
@@ -41,13 +45,17 @@ public class RobotContainer implements Loggerable {
   public RobotContainer(LoggedRobot robot) {
     setupLogger(robot);
 
-    this.commandFactory = new CommandFactory(driveSubsystem);
+    this.commandFactory = new CommandFactory(driveSubsystem, hoodSubsystem);
     configureBindings();
   }
 
   /** Use this method to define your controller button -> command mappings */
   private void configureBindings() {
     driveSubsystem.setDefaultCommand(commandFactory.createDriveJoystickCmd(driverController));
+    hoodSubsystem.setDefaultCommand(commandFactory.createHoodStopCommand());
+
+    driverController.a().whileTrue(commandFactory.createHoodUpCommand());
+    driverController.b().whileTrue(commandFactory.createHoodDownCommand());
   }
 
   /**

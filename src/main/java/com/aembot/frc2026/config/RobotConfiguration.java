@@ -6,6 +6,8 @@ import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
 import com.aembot.lib.config.subsystems.drive.simulation.DrivetrainSimConfiguration;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
+import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
+import com.aembot.lib.config.subsystems.hood.simulation.SimulatedHoodConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.pathplanner.lib.config.RobotConfig;
@@ -48,6 +50,20 @@ public abstract class RobotConfiguration {
           SwerveModuleConfiguration<
               TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>>
       getSwerveConfigurations();
+
+  /**
+   * Get the configuration of the hood
+   *
+   * @return Hood configuration
+   */
+  public abstract TalonFXHoodConfiguration getHoodConfig();
+
+  /**
+   * Get the configuration of the simulated hood
+   *
+   * @return Simulated hood configuration
+   */
+  public abstract SimulatedHoodConfiguration getSimHoodConfig();
 
   /**
    * Get configuration details about the drive train sim for this robot

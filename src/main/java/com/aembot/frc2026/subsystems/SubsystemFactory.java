@@ -16,6 +16,10 @@ import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.drive.io.DrivetrainHardwareIO;
 import com.aembot.lib.subsystems.drive.io.DrivetrainIOReplay;
 import com.aembot.lib.subsystems.drive.io.DrivetrainSimIO;
+import com.aembot.lib.subsystems.hood.HoodSubsystem;
+import com.aembot.lib.subsystems.hood.io.HoodIOReplay;
+import com.aembot.lib.subsystems.hood.io.HoodSimIO;
+import com.aembot.lib.subsystems.hood.io.TalonFXHoodHardwareIO;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -52,6 +56,27 @@ public class SubsystemFactory {
             RobotStateYearly.get());
     }
   }
+
+  public static HoodSubsystem createHoodSubsystem() {
+
+    switch (RobotRuntimeConstants.MODE) {
+      case SIM:
+        return new HoodSubsystem(
+            RobotRuntimeConstants.ROBOT_CONFIG.getSimHoodConfig(),
+            new HoodSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getSimHoodConfig()));
+
+      case REPLAY:
+        return new HoodSubsystem(
+            RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig(), new HoodIOReplay());
+      case REAL:
+
+      default:
+        return new HoodSubsystem(
+            RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig(),
+            new TalonFXHoodHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig()));
+    }
+  }
+}
 
   public static AprilVisionSubsystem createAprilVisionSubsystem() {
     List<CameraConfiguration> configs =
