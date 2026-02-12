@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
@@ -115,9 +114,9 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
    */
   public Rotation3d getFuelInitVelocityRotation3d(
       Pose2d robotPose, ChassisSpeeds fieldRelativeChassisSpeeds) {
-        return new Rotation3d(
-            getFuelInitVelocity(robotPose, fieldRelativeChassisSpeeds).toVector(),
-            new Translation3d(1, 0, 0).toVector());
+    return new Rotation3d(
+        getFuelInitVelocity(robotPose, fieldRelativeChassisSpeeds).toVector(),
+        new Translation3d(1, 0, 0).toVector());
   }
 
   /**
