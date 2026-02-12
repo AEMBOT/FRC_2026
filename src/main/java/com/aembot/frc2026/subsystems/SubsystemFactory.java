@@ -76,7 +76,6 @@ public class SubsystemFactory {
             new TalonFXHoodHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig()));
     }
   }
-}
 
   public static AprilVisionSubsystem createAprilVisionSubsystem() {
     List<CameraConfiguration> configs =
