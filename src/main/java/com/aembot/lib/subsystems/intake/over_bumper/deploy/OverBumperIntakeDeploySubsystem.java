@@ -33,6 +33,8 @@ public class OverBumperIntakeDeploySubsystem
    *
    * @param config Configuration to use for this subsystem
    * @param io IO layer to use for this subsystem
+   * @param stateConsumer State consumer in order to update the state of this subsystem in
+   *     RobotState
    */
   public OverBumperIntakeDeploySubsystem(
       TalonFXOverBumperIntakeDeployConfiguration config,

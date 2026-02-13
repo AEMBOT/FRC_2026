@@ -20,12 +20,13 @@ public class OverBumperIntakeRunSubsystem
   /** IO layer to use for this subsystem */
   private final OverBumperIntakeRunIO io;
 
+  /** State of this subsystem */
   private final OverBumperIntakeRunState state;
 
   /** Configuration to use for this subsystem */
-  @SuppressWarnings("unused") // Currently unused but that may change in the future
   private final TalonFXOverBumperIntakeRunConfiguration config;
 
+  /** consumer in order to update values in robot state */
   private final Consumer<OverBumperIntakeRunState> stateConsumer;
 
   /**
@@ -33,6 +34,8 @@ public class OverBumperIntakeRunSubsystem
    *
    * @param config configuration to use for this subsystem
    * @param io IO layer to use for this subsystem
+   * @param stateConsumer State consumer in order to update the state of this subsystem in
+   *     RobotState
    */
   public OverBumperIntakeRunSubsystem(
       TalonFXOverBumperIntakeRunConfiguration config,
