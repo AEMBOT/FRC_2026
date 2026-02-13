@@ -57,7 +57,8 @@ public class RobotContainer implements Loggerable {
   private void configureBindings() {
     driveSubsystem.setDefaultCommand(commandFactory.createDriveJoystickCmd(driverController));
     hoodSubsystem.setDefaultCommand(commandFactory.createHoodStopCommand());
-    intakeRollerSubsystem.setDefaultCommand(commandFactory.intakeCommands.createStopIntakeCommand());
+    intakeRollerSubsystem.setDefaultCommand(
+        commandFactory.intakeCommands.createStopIntakeCommand());
 
     driverController.a().onTrue(commandFactory.intakeCommands.createUpCommand());
     driverController.b().onTrue(commandFactory.intakeCommands.createDownCommand());
