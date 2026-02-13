@@ -51,6 +51,10 @@ public class OverBumperIntakeRollerSubsystem
     return smartVelocitySetpointCommand(() -> config.kTargetSpeedUnitsPerMin);
   }
 
+  public Command stopRollerCommand() {
+    return smartVelocitySetpointCommand(() -> 0);
+  }
+
   private void updateState() {
 
     state.angularVelocityUnitsPerMin = getCurrentVelocity();

@@ -36,6 +36,6 @@ public final class IntakeCommands {
   }
 
   public Command createStopIntakeCommand() {
-    return roller.smartVelocitySetpointCommand(() -> 0);
+    return roller.stopRollerCommand();
   }
 }
