@@ -11,8 +11,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public final class CommandFactory {
   private final DriveSubsystem driveSubsystem;
   private final HoodSubsystem hoodSubsystem;
-  private final OverBumperIntakeDeploySubsystem intakeDeploySubsystem;
-  private final OverBumperIntakeRollerSubsystem intakeRollerSubsystem;
 
   public final IntakeCommands intakeCommands;
 
@@ -23,8 +21,6 @@ public final class CommandFactory {
       OverBumperIntakeRollerSubsystem intakeRollerSubsystem) {
     this.driveSubsystem = driveSubsystem;
     this.hoodSubsystem = hoodSubsystem;
-    this.intakeDeploySubsystem = intakeDeploySubsystem;
-    this.intakeRollerSubsystem = intakeRollerSubsystem;
 
     this.intakeCommands = new IntakeCommands(intakeDeploySubsystem, intakeRollerSubsystem);
   }
