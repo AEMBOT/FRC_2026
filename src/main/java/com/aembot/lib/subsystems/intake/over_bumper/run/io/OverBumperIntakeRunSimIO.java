@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.Notifier;
 /** simulated implementation for over the bumper intake game piece intaking io */
 public class OverBumperIntakeRunSimIO implements OverBumperIntakeRunIO {
 
-    /** Internal motor to use */
+  /** Internal motor to use */
   private final MotorIOTalonFXSimFlywheel simMotor;
 
   /** Configuration to use */
@@ -21,7 +21,7 @@ public class OverBumperIntakeRunSimIO implements OverBumperIntakeRunIO {
 
   /**
    * Create a new simulated IO layer for an over the bumper intake's gmae piece intaking system
-   * 
+   *
    * @param config The configuration to use for this io
    */
   public OverBumperIntakeRunSimIO(SimulatedOverBumperIntakeRunConfiguration config) {

@@ -9,11 +9,13 @@ import com.aembot.lib.subsystems.intake.over_bumper.run.io.OverBumperIntakeRunIO
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import org.littletonrobotics.junction.Logger;
 
-/** Extension of the motor subsystem to add over the bumper intake game piece intaking functionality */
+/**
+ * Extension of the motor subsystem to add over the bumper intake game piece intaking functionality
+ */
 public class OverBumperIntakeRunSubsystem
     extends MotorSubsystem<MotorInputs, MotorIO, MotorConfiguration<TalonFXConfiguration>> {
 
-    /** IO layer to use for this subsystem */
+  /** IO layer to use for this subsystem */
   private final OverBumperIntakeRunIO io;
 
   /** Configuration to use for this subsystem */
@@ -22,7 +24,7 @@ public class OverBumperIntakeRunSubsystem
 
   /**
    * Construct a new over the bumper intake game piece intaking subsystem
-   * 
+   *
    * @param config configuration to use for this subsystem
    * @param io IO layer to use for this subsystem
    */
