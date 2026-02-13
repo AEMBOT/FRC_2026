@@ -23,13 +23,13 @@ public class ProductionIntakeConfig {
 
   public final double DEPLOY_GEAR_RATIO = 18400 / 243;
 
-  public final double DEPLOY_CURISE_VELOCITY_DEG_PER_SEC = 90;
+  public final double DEPLOY_CRUISE_VELOCITY_DEG_PER_SEC = 90;
 
   public final double DEPLOY_ACCELERATION_DEG_PER_SEC = 180;
 
   public final double ROLLER_GEAR_RATIO = 18400 / 243;
 
-  public final double ROLLER_CURISE_VELOCITY_ROT_PER_MIN = 200;
+  public final double ROLLER_CRUISE_VELOCITY_ROT_PER_MIN = 200;
 
   public final double ROLLER_ACCELERATION_ROT_PER_MIN = 400;
 
@@ -40,7 +40,7 @@ public class ProductionIntakeConfig {
                   .withMotionMagic(
                       new MotionMagicConfigs()
                           .withMotionMagicCruiseVelocity(
-                              Units.degreesToRotations(DEPLOY_CURISE_VELOCITY_DEG_PER_SEC)
+                              Units.degreesToRotations(DEPLOY_CRUISE_VELOCITY_DEG_PER_SEC)
                                   * DEPLOY_GEAR_RATIO)
                           .withMotionMagicAcceleration(
                               Units.degreesToRotations(DEPLOY_ACCELERATION_DEG_PER_SEC)
@@ -65,7 +65,7 @@ public class ProductionIntakeConfig {
                   .withMotionMagic(
                       new MotionMagicConfigs()
                           .withMotionMagicCruiseVelocity(
-                              ROLLER_CURISE_VELOCITY_ROT_PER_MIN * 60 * ROLLER_GEAR_RATIO)
+                              ROLLER_CRUISE_VELOCITY_ROT_PER_MIN * 60 * ROLLER_GEAR_RATIO)
                           .withMotionMagicAcceleration(
                               ROLLER_ACCELERATION_ROT_PER_MIN * 60 * ROLLER_GEAR_RATIO))
                   // constants copies from hood config
@@ -103,5 +103,5 @@ public class ProductionIntakeConfig {
       new TalonFXOverBumperIntakeRollerConfiguration(SUBSYSTEM_NAME + "Roller")
           .withRealMotorConfiguration(ROLLER_MOTOR_CONFIG)
           .withSimMotorConfiguration(ROLLER_SIM_MOTOR_CONFIG)
-          .withTargetSpeed(ROLLER_CURISE_VELOCITY_ROT_PER_MIN);
+          .withTargetSpeed(ROLLER_CRUISE_VELOCITY_ROT_PER_MIN);
 }
