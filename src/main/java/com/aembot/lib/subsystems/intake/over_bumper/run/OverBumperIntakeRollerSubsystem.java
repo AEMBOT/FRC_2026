@@ -8,6 +8,7 @@ import com.aembot.lib.state.subsystems.intake.over_bumper.run.OverBumperIntakeRo
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.run.io.OverBumperIntakeRollerIO;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 
@@ -44,6 +45,10 @@ public class OverBumperIntakeRollerSubsystem
     this.config = config;
     this.state = new OverBumperIntakeRollerState();
     this.stateConsumer = stateConsumer;
+  }
+
+  public Command runRollerCommand() {
+    return smartVelocitySetpointCommand(() -> config.kTargetSpeedUnitsPerMin);
   }
 
   private void updateState() {

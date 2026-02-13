@@ -9,6 +9,8 @@ import com.aembot.frc2026.subsystems.SubsystemFactory;
 import com.aembot.lib.core.logging.Loggerable;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
+import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
+import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -33,13 +35,21 @@ public class RobotContainer implements Loggerable {
   /* ---- SHOOTER ---- */
   private final HoodSubsystem hoodSubsystem = SubsystemFactory.createHoodSubsystem();
 
+  /* ---- INTAKE ---- */
+  private final OverBumperIntakeDeploySubsystem intakeDeploySubsystem =
+      SubsystemFactory.createIntakeDeploySubsystem();
+  private final OverBumperIntakeRollerSubsystem intakeRollerSubsystem =
+      SubsystemFactory.createIntakeRollerSubsystem();
+
   private final CommandFactory commandFactory;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer(LoggedRobot robot) {
     setupLogger(robot);
 
-    this.commandFactory = new CommandFactory(driveSubsystem, hoodSubsystem);
+    this.commandFactory =
+        new CommandFactory(
+            driveSubsystem, hoodSubsystem, intakeDeploySubsystem, intakeRollerSubsystem);
     configureBindings();
   }
 
@@ -47,9 +57,12 @@ public class RobotContainer implements Loggerable {
   private void configureBindings() {
     driveSubsystem.setDefaultCommand(commandFactory.createDriveJoystickCmd(driverController));
     hoodSubsystem.setDefaultCommand(commandFactory.createHoodStopCommand());
+    intakeRollerSubsystem.setDefaultCommand(commandFactory.intakeCommands.stopIntakeCommand());
 
-    driverController.a().whileTrue(commandFactory.createHoodUpCommand());
-    driverController.b().whileTrue(commandFactory.createHoodDownCommand());
+    driverController.a().onTrue(commandFactory.intakeCommands.createUpCommand());
+    driverController.b().onTrue(commandFactory.intakeCommands.createDownCommand());
+
+    driverController.x().whileTrue(commandFactory.intakeCommands.runIntakeCommand());
   }
 
   /**

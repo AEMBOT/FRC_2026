@@ -9,9 +9,16 @@ public class TalonFXOverBumperIntakeRollerConfiguration {
 
   public final MotorConfiguration<TalonFXConfiguration> kMotorConfig;
 
+  public double kTargetSpeedUnitsPerMin;
+
   public TalonFXOverBumperIntakeRollerConfiguration(
       MotorConfiguration<TalonFXConfiguration> motorConfig, String name) {
     this.kMotorConfig = motorConfig;
     this.kName = name;
+  }
+
+  public TalonFXOverBumperIntakeRollerConfiguration withTargetSpeed(double targetSpeed) {
+    this.kTargetSpeedUnitsPerMin = targetSpeed;
+    return this;
   }
 }

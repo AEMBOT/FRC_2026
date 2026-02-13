@@ -28,7 +28,7 @@ public class OverBumperIntakeDeploySimIO implements OverBumperIntakeDeployIO {
     this.config = config;
     this.simMotor = new MotorIOTalonFXSim(config.kSimMotorConfig);
     this.simNotifier = new Notifier(() -> simMotor.updateSimState());
-    simNotifier.setName(config.kName + "Notifier");
+    simNotifier.setName(config.kRealConfig.kName + "Notifier");
     simNotifier.startPeriodic(0.005);
   }
 

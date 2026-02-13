@@ -75,6 +75,20 @@ public class OverBumperIntakeDeploySubsystem
             });
   }
 
+  /**
+   * @return A command that puts the motor to the up position
+   */
+  public Command putIntakeUpCommand() {
+    return smartPositionSetpointCommand(() -> config.kUpwardStopAngle);
+  }
+
+  /**
+   * @return A command that puts the motor to the up position
+   */
+  public Command putIntakeDownCommand() {
+    return smartPositionSetpointCommand(() -> config.kDownwardStopAngle);
+  }
+
   private void updateState() {
 
     state.deployPositionUnits = getCurrentPosition();

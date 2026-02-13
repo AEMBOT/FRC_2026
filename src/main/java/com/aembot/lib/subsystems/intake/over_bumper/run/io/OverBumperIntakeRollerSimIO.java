@@ -28,7 +28,7 @@ public class OverBumperIntakeRollerSimIO implements OverBumperIntakeRollerIO {
     this.config = config;
     this.simMotor = new MotorIOTalonFXSimFlywheel(config.kSimMotorConfig);
     this.simNotifier = new Notifier(() -> simMotor.updateSimState());
-    simNotifier.setName(config.kName + "Notifier");
+    simNotifier.setName(config.kRealConfig.kName + "Notifier");
     simNotifier.startPeriodic(0.005);
   }
 
