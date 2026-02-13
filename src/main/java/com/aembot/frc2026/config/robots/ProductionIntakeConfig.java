@@ -3,9 +3,7 @@ package com.aembot.frc2026.config.robots;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
-import com.aembot.lib.config.subsystems.intake.overBumper.deploy.simulation.SimulatedOverBumperIntakeDeployConfiguration;
 import com.aembot.lib.config.subsystems.intake.overBumper.run.TalonFXOverBumperIntakeRollerConfiguration;
-import com.aembot.lib.config.subsystems.intake.overBumper.run.simulation.SimulatedOverBumperIntakeRollerConfiguration;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -94,22 +92,16 @@ public class ProductionIntakeConfig {
           .withSimMotorConstants(DCMotor.getKrakenX60(1));
 
   public final TalonFXOverBumperIntakeDeployConfiguration DEPLOY_CONFIG =
-      new TalonFXOverBumperIntakeDeployConfiguration(DEPLOY_MOTOR_CONFIG, SUBSYSTEM_NAME + "Deploy")
+      new TalonFXOverBumperIntakeDeployConfiguration(SUBSYSTEM_NAME + "Deploy")
+          .withRealMotorConfiguration(DEPLOY_MOTOR_CONFIG)
+          .withSimulatedMotorConfiguration(DEPLOY_SIM_MOTOR_CONFIG)
           .withDownwardStopAngle(MIN_DEPLOY_ANGLE)
           .withUpwardStopAngle(MAX_DEPLOY_ANGLE)
           .withZeroingSpeed(ZEROING_SPEED);
 
-  public final SimulatedOverBumperIntakeDeployConfiguration SIMULATED_DEPLOY_CONFIG =
-      new SimulatedOverBumperIntakeDeployConfiguration(
-              DEPLOY_SIM_MOTOR_CONFIG, SUBSYSTEM_NAME + "Deploy")
-          .withRealConfig(DEPLOY_CONFIG);
-
   public final TalonFXOverBumperIntakeRollerConfiguration ROLLER_CONFIG =
-      new TalonFXOverBumperIntakeRollerConfiguration(ROLLER_MOTOR_CONFIG, SUBSYSTEM_NAME + "Roller")
+      new TalonFXOverBumperIntakeRollerConfiguration(SUBSYSTEM_NAME + "Roller")
+          .withRealMotorConfiguration(ROLLER_MOTOR_CONFIG)
+          .withSimMotorConfiguration(ROLLER_SIM_MOTOR_CONFIG)
           .withTargetSpeed(ROLLER_CURISE_VELOCITY_ROT_PER_MIN);
-
-  public final SimulatedOverBumperIntakeRollerConfiguration SIMULATED_ROLLER_CONFIG =
-      new SimulatedOverBumperIntakeRollerConfiguration(
-              ROLLER_SIM_MOTOR_CONFIG, SUBSYSTEM_NAME + "Roller")
-          .withRealConfig(ROLLER_CONFIG);
 }

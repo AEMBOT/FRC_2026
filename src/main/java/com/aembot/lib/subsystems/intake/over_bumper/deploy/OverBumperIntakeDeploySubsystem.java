@@ -40,7 +40,7 @@ public class OverBumperIntakeDeploySubsystem
       TalonFXOverBumperIntakeDeployConfiguration config,
       OverBumperIntakeDeployIO io,
       Consumer<OverBumperIntakeDeployState> stateConsumer) {
-    super(config.kName, new MotorInputs(), io.getMotor(), config.kMotorConfig);
+    super(config.kName, new MotorInputs(), io.getMotor(), config.kRealMotorConfig);
     this.io = io;
     this.config = config;
     this.state = new OverBumperIntakeDeployState();
@@ -57,7 +57,7 @@ public class OverBumperIntakeDeploySubsystem
         .finallyDo(
             () -> {
               setEncoderPosition(
-                  config.kMotorConfig.getUnitsToRotorRotations(config.kUpwardStopAngle));
+                  config.kRealMotorConfig.getUnitsToRotorRotations(config.kUpwardStopAngle));
             });
   }
 
@@ -71,7 +71,7 @@ public class OverBumperIntakeDeploySubsystem
         .finallyDo(
             () -> {
               setEncoderPosition(
-                  config.kMotorConfig.getUnitsToRotorRotations(config.kDownwardStopAngle));
+                  config.kRealMotorConfig.getUnitsToRotorRotations(config.kDownwardStopAngle));
             });
   }
 
@@ -95,7 +95,9 @@ public class OverBumperIntakeDeploySubsystem
 
     state.isDeployed =
         state.deployPositionUnits
-            < (config.kMotorConfig.kMaxPositionUnits + config.kMotorConfig.kMinPositionUnits) / 2;
+            < (config.kRealMotorConfig.kMaxPositionUnits
+                    + config.kRealMotorConfig.kMinPositionUnits)
+                / 2;
 
     stateConsumer.accept(state);
   }

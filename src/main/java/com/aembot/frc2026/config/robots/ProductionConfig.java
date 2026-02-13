@@ -8,9 +8,7 @@ import com.aembot.lib.config.subsystems.drive.simulation.DrivetrainSimConfigurat
 import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
 import com.aembot.lib.config.subsystems.hood.simulation.SimulatedHoodConfiguration;
 import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
-import com.aembot.lib.config.subsystems.intake.overBumper.deploy.simulation.SimulatedOverBumperIntakeDeployConfiguration;
 import com.aembot.lib.config.subsystems.intake.overBumper.run.TalonFXOverBumperIntakeRollerConfiguration;
-import com.aembot.lib.config.subsystems.intake.overBumper.run.simulation.SimulatedOverBumperIntakeRollerConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.util.Units;
@@ -59,18 +57,8 @@ public class ProductionConfig extends RobotConfiguration {
   }
 
   @Override
-  public SimulatedOverBumperIntakeDeployConfiguration getSimIntakeDeployConfig() {
-    return INTAKE_CONFIG.SIMULATED_DEPLOY_CONFIG;
-  }
-
-  @Override
   public TalonFXOverBumperIntakeRollerConfiguration getIntakeRollerConfig() {
     return INTAKE_CONFIG.ROLLER_CONFIG;
-  }
-
-  @Override
-  public SimulatedOverBumperIntakeRollerConfiguration getSimIntakeRollerConfig() {
-    return INTAKE_CONFIG.SIMULATED_ROLLER_CONFIG;
   }
 
   @Override

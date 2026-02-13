@@ -40,7 +40,7 @@ public class OverBumperIntakeRollerSubsystem
       TalonFXOverBumperIntakeRollerConfiguration config,
       OverBumperIntakeRollerIO io,
       Consumer<OverBumperIntakeRollerState> stateConsumer) {
-    super(config.kName, new MotorInputs(), io.getMotor(), config.kMotorConfig);
+    super(config.kName, new MotorInputs(), io.getMotor(), config.kRealMotorConfig);
     this.io = io;
     this.config = config;
     this.state = new OverBumperIntakeRollerState();
@@ -56,7 +56,7 @@ public class OverBumperIntakeRollerSubsystem
     state.angularVelocityUnitsPerMin = getCurrentVelocity();
 
     state.isActive =
-        state.angularVelocityUnitsPerMin > config.kMotorConfig.getMechanismRotationsToUnits(1);
+        state.angularVelocityUnitsPerMin > config.kRealMotorConfig.getMechanismRotationsToUnits(1);
 
     stateConsumer.accept(state);
   }

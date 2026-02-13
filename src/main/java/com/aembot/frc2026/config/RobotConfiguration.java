@@ -7,9 +7,7 @@ import com.aembot.lib.config.subsystems.drive.simulation.DrivetrainSimConfigurat
 import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
 import com.aembot.lib.config.subsystems.hood.simulation.SimulatedHoodConfiguration;
 import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
-import com.aembot.lib.config.subsystems.intake.overBumper.deploy.simulation.SimulatedOverBumperIntakeDeployConfiguration;
 import com.aembot.lib.config.subsystems.intake.overBumper.run.TalonFXOverBumperIntakeRollerConfiguration;
-import com.aembot.lib.config.subsystems.intake.overBumper.run.simulation.SimulatedOverBumperIntakeRollerConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.pathplanner.lib.config.RobotConfig;
@@ -75,25 +73,11 @@ public abstract class RobotConfiguration {
   public abstract TalonFXOverBumperIntakeDeployConfiguration getIntakeDeployConfig();
 
   /**
-   * Get the configuration of the simulated intake deployment subsystem
-   *
-   * @return simulated intake deployment configuration
-   */
-  public abstract SimulatedOverBumperIntakeDeployConfiguration getSimIntakeDeployConfig();
-
-  /**
    * Get the configuration of the intake roller subsystem
    *
    * @return intake roller configuration
    */
   public abstract TalonFXOverBumperIntakeRollerConfiguration getIntakeRollerConfig();
-
-  /**
-   * Get the configuration of the simulated intake roller subsystem
-   *
-   * @return simulated intake roller configuration
-   */
-  public abstract SimulatedOverBumperIntakeRollerConfiguration getSimIntakeRollerConfig();
 
   /**
    * Get configuration details about the drive train sim for this robot

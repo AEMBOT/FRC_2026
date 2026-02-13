@@ -22,7 +22,7 @@ public class TalonFXOverBumperIntakeRollerHardwareIO implements OverBumperIntake
    */
   public TalonFXOverBumperIntakeRollerHardwareIO(
       TalonFXOverBumperIntakeRollerConfiguration config) {
-    this.motor = new MotorIOTalonFX(config.kMotorConfig);
+    this.motor = new MotorIOTalonFX(config.kRealMotorConfig);
     this.config = config;
   }
 

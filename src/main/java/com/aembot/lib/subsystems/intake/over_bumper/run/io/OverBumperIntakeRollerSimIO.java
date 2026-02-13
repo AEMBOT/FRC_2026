@@ -1,6 +1,6 @@
 package com.aembot.lib.subsystems.intake.over_bumper.run.io;
 
-import com.aembot.lib.config.subsystems.intake.overBumper.run.simulation.SimulatedOverBumperIntakeRollerConfiguration;
+import com.aembot.lib.config.subsystems.intake.overBumper.run.TalonFXOverBumperIntakeRollerConfiguration;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOTalonFXSimFlywheel;
 import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerInputs;
@@ -14,7 +14,7 @@ public class OverBumperIntakeRollerSimIO implements OverBumperIntakeRollerIO {
 
   /** Configuration to use */
   @SuppressWarnings("unused") // Currently unused but that may change in the future
-  private final SimulatedOverBumperIntakeRollerConfiguration config;
+  private final TalonFXOverBumperIntakeRollerConfiguration config;
 
   /** Notifier to run the sim */
   private final Notifier simNotifier;
@@ -24,11 +24,11 @@ public class OverBumperIntakeRollerSimIO implements OverBumperIntakeRollerIO {
    *
    * @param config The configuration to use for this io
    */
-  public OverBumperIntakeRollerSimIO(SimulatedOverBumperIntakeRollerConfiguration config) {
+  public OverBumperIntakeRollerSimIO(TalonFXOverBumperIntakeRollerConfiguration config) {
     this.config = config;
     this.simMotor = new MotorIOTalonFXSimFlywheel(config.kSimMotorConfig);
     this.simNotifier = new Notifier(() -> simMotor.updateSimState());
-    simNotifier.setName(config.kRealConfig.kName + "Notifier");
+    simNotifier.setName(config.kName + "Notifier");
     simNotifier.startPeriodic(0.005);
   }
 
