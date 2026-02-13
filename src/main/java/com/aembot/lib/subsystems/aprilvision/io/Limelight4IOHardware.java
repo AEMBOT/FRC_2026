@@ -121,7 +121,6 @@ public class Limelight4IOHardware implements AprilCameraIO {
    */
   private void updateCornerPositions() {
     double[] cornerPositions = LimelightHelpers.getCornerCoordinates(cameraName);
-    Logger.recordOutput(cameraConfiguration.cameraName + "corners", cornerPositions);
 
     if (cornerPositions.length >= 8) {
       // 4 iterations bcuz we process 2 at a time
