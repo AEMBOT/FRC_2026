@@ -3,7 +3,7 @@ package com.aembot.lib.subsystems.intake.over_bumper.run;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
-public class OverBumperIntakeRunInputs implements LoggableInputs {
+public class OverBumperIntakeRollerInputs implements LoggableInputs {
 
   @Override
   public void toLog(LogTable table) {}

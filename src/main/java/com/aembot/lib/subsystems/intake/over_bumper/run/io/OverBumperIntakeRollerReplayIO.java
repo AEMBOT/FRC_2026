@@ -2,9 +2,9 @@ package com.aembot.lib.subsystems.intake.over_bumper.run.io;
 
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOReplay;
-import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRunInputs;
+import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerInputs;
 
-public class OverBumperIntakeRunReplayIO implements OverBumperIntakeRunIO {
+public class OverBumperIntakeRollerReplayIO implements OverBumperIntakeRollerIO {
 
   @Override
   public MotorIO getMotor() {
@@ -12,7 +12,7 @@ public class OverBumperIntakeRunReplayIO implements OverBumperIntakeRunIO {
   }
 
   @Override
-  public void updateInputs(OverBumperIntakeRunInputs inputs) {}
+  public void updateInputs(OverBumperIntakeRollerInputs inputs) {}
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {}

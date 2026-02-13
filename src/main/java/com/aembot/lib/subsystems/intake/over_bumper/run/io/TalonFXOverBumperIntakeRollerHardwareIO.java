@@ -1,26 +1,27 @@
 package com.aembot.lib.subsystems.intake.over_bumper.run.io;
 
-import com.aembot.lib.config.subsystems.intake.over_bumper.run.TalonFXOverBumperIntakeRunConfiguration;
+import com.aembot.lib.config.subsystems.intake.over_bumper.run.TalonFXOverBumperIntakeRollerConfiguration;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOTalonFX;
-import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRunInputs;
+import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerInputs;
 
-/** Real implementation for over the bumper intake game piece intaking io */
-public class TalonFXOverBumperIntakeRunHardwareIO implements OverBumperIntakeRunIO {
+/** Real implementation for over the bumper intake roller io */
+public class TalonFXOverBumperIntakeRollerHardwareIO implements OverBumperIntakeRollerIO {
 
   /** Motor IO to use */
   private final MotorIOTalonFX motor;
 
   /** Configuration to use for this io */
   @SuppressWarnings("unused") // Currently unused but that may change in the future
-  private final TalonFXOverBumperIntakeRunConfiguration config;
+  private final TalonFXOverBumperIntakeRollerConfiguration config;
 
   /**
    * Construct a new real over the bumper intake game piece intake system io
    *
    * @param config configuration to use for this io
    */
-  public TalonFXOverBumperIntakeRunHardwareIO(TalonFXOverBumperIntakeRunConfiguration config) {
+  public TalonFXOverBumperIntakeRollerHardwareIO(
+      TalonFXOverBumperIntakeRollerConfiguration config) {
     this.motor = new MotorIOTalonFX(config.kMotorConfig);
     this.config = config;
   }
@@ -31,7 +32,7 @@ public class TalonFXOverBumperIntakeRunHardwareIO implements OverBumperIntakeRun
   }
 
   @Override
-  public void updateInputs(OverBumperIntakeRunInputs inputs) {
+  public void updateInputs(OverBumperIntakeRollerInputs inputs) {
     updateLog();
   }
 

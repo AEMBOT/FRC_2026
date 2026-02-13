@@ -1,20 +1,20 @@
 package com.aembot.lib.subsystems.intake.over_bumper.run.io;
 
-import com.aembot.lib.config.subsystems.intake.over_bumper.run.simulation.SimulatedOverBumperIntakeRunConfiguration;
+import com.aembot.lib.config.subsystems.intake.over_bumper.run.simulation.SimulatedOverBumperIntakeRollerConfiguration;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOTalonFXSimFlywheel;
-import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRunInputs;
+import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerInputs;
 import edu.wpi.first.wpilibj.Notifier;
 
-/** simulated implementation for over the bumper intake game piece intaking io */
-public class OverBumperIntakeRunSimIO implements OverBumperIntakeRunIO {
+/** simulated implementation for over the bumper intake roller io */
+public class OverBumperIntakeRollerSimIO implements OverBumperIntakeRollerIO {
 
   /** Internal motor to use */
   private final MotorIOTalonFXSimFlywheel simMotor;
 
   /** Configuration to use */
   @SuppressWarnings("unused") // Currently unused but that may change in the future
-  private final SimulatedOverBumperIntakeRunConfiguration config;
+  private final SimulatedOverBumperIntakeRollerConfiguration config;
 
   /** Notifier to run the sim */
   private final Notifier simNotifier;
@@ -24,7 +24,7 @@ public class OverBumperIntakeRunSimIO implements OverBumperIntakeRunIO {
    *
    * @param config The configuration to use for this io
    */
-  public OverBumperIntakeRunSimIO(SimulatedOverBumperIntakeRunConfiguration config) {
+  public OverBumperIntakeRollerSimIO(SimulatedOverBumperIntakeRollerConfiguration config) {
     this.config = config;
     this.simMotor = new MotorIOTalonFXSimFlywheel(config.kSimMotorConfig);
     this.simNotifier = new Notifier(() -> simMotor.updateSimState());
@@ -38,7 +38,7 @@ public class OverBumperIntakeRunSimIO implements OverBumperIntakeRunIO {
   }
 
   @Override
-  public void updateInputs(OverBumperIntakeRunInputs inputs) {}
+  public void updateInputs(OverBumperIntakeRollerInputs inputs) {}
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {

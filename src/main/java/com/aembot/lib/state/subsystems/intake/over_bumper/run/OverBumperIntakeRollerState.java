@@ -3,7 +3,7 @@ package com.aembot.lib.state.subsystems.intake.over_bumper.run;
 import com.aembot.lib.core.logging.Loggable;
 import org.littletonrobotics.junction.Logger;
 
-public class OverBumperIntakeRunState implements Loggable {
+public class OverBumperIntakeRollerState implements Loggable {
 
   public double angularVelocityUnitsPerMin;
 
