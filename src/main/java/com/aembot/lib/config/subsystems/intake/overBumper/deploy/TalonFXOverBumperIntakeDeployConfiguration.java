@@ -1,4 +1,4 @@
-package com.aembot.lib.config.subsystems.intake.over_bumper.deploy;
+package com.aembot.lib.config.subsystems.intake.overBumper.deploy;
 
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;

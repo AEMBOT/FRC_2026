@@ -1,15 +1,15 @@
-package com.aembot.lib.config.subsystems.intake.over_bumper.run.simulation;
+package com.aembot.lib.config.subsystems.intake.overBumper.deploy.simulation;
 
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
-import com.aembot.lib.config.subsystems.intake.over_bumper.run.TalonFXOverBumperIntakeRollerConfiguration;
+import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
-public class SimulatedOverBumperIntakeRollerConfiguration
-    extends TalonFXOverBumperIntakeRollerConfiguration {
+public class SimulatedOverBumperIntakeDeployConfiguration
+    extends TalonFXOverBumperIntakeDeployConfiguration {
 
   public final SimulatedMotorConfiguration<TalonFXConfiguration> kSimMotorConfig;
 
-  public SimulatedOverBumperIntakeRollerConfiguration(
+  public SimulatedOverBumperIntakeDeployConfiguration(
       SimulatedMotorConfiguration<TalonFXConfiguration> simMotorConfig, String name) {
     super(simMotorConfig.kRealConfiguration, name);
     this.kSimMotorConfig = simMotorConfig;
