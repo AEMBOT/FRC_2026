@@ -7,6 +7,7 @@ import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.io.OverBumperIntakeDeployIO;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.wpilibj2.command.Command;
 import org.littletonrobotics.junction.Logger;
 
 /** Extension of the motor subsystem to add over the bumper intake deployment functionality */
@@ -17,7 +18,6 @@ public class OverBumperIntakeDeploySubsystem
   private final OverBumperIntakeDeployIO io;
 
   /** Configuration to use for this subsytem */
-  @SuppressWarnings("unused") // Currently unused but that may change in the future
   private final TalonFXOverBumperIntakeDeployConfiguration config;
 
   /**
@@ -31,6 +31,32 @@ public class OverBumperIntakeDeploySubsystem
     super(config.kName, new MotorInputs(), io.getMotor(), config.kMotorConfig);
     this.io = io;
     this.config = config;
+  }
+
+  /**
+   * @return A command that runs the motor upwards until it reaches a hard stop, then resets encoder position
+   */
+  public Command getZeroUpwardCommand() {
+    return smartVelocitySetpointCommand(() -> config.kZeroingSpeedDegPerSec)
+        .until(() -> (getCurrentVelocity() == 0))
+        .finallyDo(
+            () -> {
+              setEncoderPosition(
+                  config.kMotorConfig.getUnitsToRotorRotations(config.kUpwardStopAngle));
+            });
+  }
+  
+  /**
+   * @return A command that runs the motor downwards until it reaches a hard stop, then resets encoder position
+   */
+  public Command getZeroDownwardCommand() {
+    return smartVelocitySetpointCommand(() -> -config.kZeroingSpeedDegPerSec)
+        .until(() -> (getCurrentVelocity() == 0))
+        .finallyDo(
+            () -> {
+              setEncoderPosition(
+                  config.kMotorConfig.getUnitsToRotorRotations(config.kDownwardStopAngle));
+            });
   }
 
   @Override
