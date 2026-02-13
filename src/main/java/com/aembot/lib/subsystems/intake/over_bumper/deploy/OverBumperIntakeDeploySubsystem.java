@@ -83,7 +83,7 @@ public class OverBumperIntakeDeploySubsystem
   }
 
   /**
-   * @return A command that puts the motor to the up position
+   * @return A command that puts the motor to the down position
    */
   public Command putIntakeDownCommand() {
     return smartPositionSetpointCommand(() -> config.kDownwardStopAngle);
