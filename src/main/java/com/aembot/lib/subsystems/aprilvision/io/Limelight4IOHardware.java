@@ -57,8 +57,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
         LimelightHelpers.getLatency_Capture(cameraName)
             + LimelightHelpers.getLatency_Pipeline(cameraName);
 
-    inputs.hasTag =
-        LimelightHelpers.getFiducialID(cameraName) != 0; // best method I could figure out
+    inputs.hasTag = LimelightHelpers.getTV(cameraName);
     inputs.tagID = (int) LimelightHelpers.getFiducialID(cameraName);
     inputs.horizontalAngleToTag = Rotation2d.fromDegrees(LimelightHelpers.getTX(cameraName));
 
