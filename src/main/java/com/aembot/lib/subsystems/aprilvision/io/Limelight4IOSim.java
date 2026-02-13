@@ -99,14 +99,14 @@ public class Limelight4IOSim extends Limelight4IOHardware {
    * @param config Config for the simulated camera
    * @param fieldConstants This season's field constants
    * @param robotStateInstance This year's instance of {@link RobotState}
-   * @param registerVisionSimulationConsumer A consumer for registering the simulated photonvision
-   *     camera with the vision simulation system
+   * @param visionSimulationRegistrar A function for registering the simulated photonvision camera
+   *     with the vision simulation system, returning said vision simulation system
    */
   public Limelight4IOSim(
       SimulatedCameraConfiguration config,
       YearFieldConstantable fieldConstants,
       RobotState robotStateInstance,
-      BiFunction<PhotonCameraSim, Transform3d, VisionSystemSim> registerVisionSimulationConsumer) {
+      BiFunction<PhotonCameraSim, Transform3d, VisionSystemSim> visionSimulationRegistrar) {
     super(config.cameraConfiguration, fieldConstants, robotStateInstance);
     this.simConfig = config;
 
@@ -120,7 +120,7 @@ public class Limelight4IOSim extends Limelight4IOHardware {
             PositionUtil.toTransform3d(config.cameraConfiguration.getCameraPosition()));
 
     this.visionSystemSim =
-        registerVisionSimulationConsumer.apply(
+        visionSimulationRegistrar.apply(
             photonCameraSim, PositionUtil.toTransform3d(cameraConfiguration.getCameraPosition()));
 
     NetworkTable networkTable = NetworkTableInstance.getDefault().getTable(cameraName);
