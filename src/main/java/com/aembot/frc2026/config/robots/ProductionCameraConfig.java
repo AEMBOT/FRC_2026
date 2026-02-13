@@ -16,95 +16,99 @@ public class ProductionCameraConfig {
 
   private static final double SIM_CAMERA_LATENCY_STDDEV_MS = 1;
 
-  /* ---- FRONT LEFT CAM ---- */
-  public final CameraConfiguration cameraConfigFrontLeft =
+  /* ---- TURRET CAM ---- */
+  public final CameraConfiguration cameraConfigTurret =
       CameraConfiguration.makeLimelight4Config("Turret")
           .withMechanismOrigin(
-              () -> // All super guesstimated placeholder
-              new Pose3d(
+              () ->
+                  new Pose3d(
                       new Translation3d(
-                          Units.inchesToMeters(-3),
+                          Units.inchesToMeters(-5.3125),
                           Units.inchesToMeters(0),
-                          Units.inchesToMeters(6)),
-                      new Rotation3d(0, 0, Units.degreesToRadians(15))))
+                          Units.inchesToMeters(0)),
+                      new Rotation3d(
+                          0,
+                          0,
+                          Units.degreesToRadians(
+                              0)))) // TODO grab actual turret rot from robot state
           .withCameraOffset(
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(3), Units.inchesToMeters(0), Units.inchesToMeters(3)),
-                  new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(0), 0.0)));
+                      Units.inchesToMeters(6.0625),
+                      Units.inchesToMeters(0),
+                      Units.inchesToMeters(18.75)),
+                  new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-27), 0.0)));
 
-  public final SimulatedCameraConfiguration simConfigFrontLeft =
-      new SimulatedCameraConfiguration(cameraConfigFrontLeft)
+  public final SimulatedCameraConfiguration simConfigTurret =
+      new SimulatedCameraConfiguration(cameraConfigTurret)
           .withFramerate(SIM_CAMERA_FPS)
           .withCalibrationError(0, 0)
           .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS);
 
-  /* ---- FRONT RIGHT CAM ---- */
-  public final CameraConfiguration cameraConfigFrontRight =
-      CameraConfiguration.makeLimelight4Config("FrontRight")
+  /* ---- RIGHT CAM ---- */
+  public final CameraConfiguration cameraConfigRight =
+      CameraConfiguration.makeLimelight4Config("Right")
           .withCameraOffset(
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(9),
-                      Units.inchesToMeters(-8.25),
-                      Units.inchesToMeters(7.5)),
-                  new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-15), 0.0)));
-
-  public final SimulatedCameraConfiguration simConfigFrontRight =
-      new SimulatedCameraConfiguration(cameraConfigFrontRight)
-          .withFramerate(SIM_CAMERA_FPS)
-          .withCalibrationError(0, 0)
-          .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS);
-
-  /* ---- BACK LEFT CAM ---- */
-  public final CameraConfiguration cameraConfigBackLeft =
-      CameraConfiguration.makeLimelight4Config("BackLeft")
-          .withCameraOffset(
-              new Transform3d(
-                  new Translation3d(
-                      Units.inchesToMeters(-12),
-                      Units.inchesToMeters(7.5),
-                      Units.inchesToMeters(10.5)),
+                      Units.inchesToMeters(-3),
+                      Units.inchesToMeters(-13.5),
+                      Units.inchesToMeters(15.132)),
                   new Rotation3d(
                       Units.degreesToRadians(180),
-                      Units.degreesToRadians(-11.75),
-                      Units.degreesToRadians(180))));
+                      Units.degreesToRadians(-27),
+                      Units.degreesToRadians(-90))));
 
-  public final SimulatedCameraConfiguration simConfigBackLeft =
-      new SimulatedCameraConfiguration(cameraConfigBackLeft)
+  public final SimulatedCameraConfiguration simConfigRight =
+      new SimulatedCameraConfiguration(cameraConfigRight)
           .withFramerate(SIM_CAMERA_FPS)
           .withCalibrationError(0, 0)
           .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS);
 
-  /* ---- BACK RIGHT CAM ---- */
-  public final CameraConfiguration cameraConfigBackRight =
-      CameraConfiguration.makeLimelight4Config("BackRight")
+  /* ---- LEFT CAM ---- */
+  public final CameraConfiguration cameraConfigLeft =
+      CameraConfiguration.makeLimelight4Config("Left")
           .withCameraOffset(
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(-12),
-                      Units.inchesToMeters(-7.5),
-                      Units.inchesToMeters(10.5)),
+                      Units.inchesToMeters(-3),
+                      Units.inchesToMeters(13.5),
+                      Units.inchesToMeters(15.132)),
                   new Rotation3d(
                       Units.degreesToRadians(180),
-                      Units.degreesToRadians(-11.75),
+                      Units.degreesToRadians(-27),
+                      Units.degreesToRadians(90))));
+  public final SimulatedCameraConfiguration simConfigLeft =
+      new SimulatedCameraConfiguration(cameraConfigLeft)
+          .withFramerate(SIM_CAMERA_FPS)
+          .withCalibrationError(0, 0)
+          .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS);
+
+  /* ---- BACK CAM ---- */
+  public final CameraConfiguration cameraConfigBack =
+      CameraConfiguration.makeLimelight4Config("Back")
+          .withCameraOffset(
+              new Transform3d(
+                  new Translation3d(
+                      Units.inchesToMeters(-13),
+                      Units.inchesToMeters(0),
+                      Units.inchesToMeters(12.2)),
+                  new Rotation3d(
+                      Units.degreesToRadians(180),
+                      Units.degreesToRadians(-27),
                       Units.degreesToRadians(-180))));
 
-  public final SimulatedCameraConfiguration simConfigBackRight =
-      new SimulatedCameraConfiguration(cameraConfigBackRight)
+  public final SimulatedCameraConfiguration simConfigBack =
+      new SimulatedCameraConfiguration(cameraConfigBack)
           .withFramerate(SIM_CAMERA_FPS)
           .withCalibrationError(0, 0)
           .withCameraLatency(SIM_CAMERA_LATENCY_MS, SIM_CAMERA_LATENCY_STDDEV_MS);
 
   /** List of configurations in FL, FR, BL, BR order */
   public final List<CameraConfiguration> cameraConfigurations =
-      List.of(
-          cameraConfigFrontLeft,
-          cameraConfigFrontRight,
-          cameraConfigBackLeft,
-          cameraConfigBackRight);
+      List.of(cameraConfigTurret, cameraConfigRight, cameraConfigLeft, cameraConfigBack);
 
   /** List of configurations in FL, FR, BL, BR order */
   public final List<SimulatedCameraConfiguration> simConfigurations =
-      List.of(simConfigFrontLeft, simConfigFrontRight, simConfigBackLeft, simConfigBackRight);
+      List.of(simConfigTurret, simConfigRight, simConfigLeft, simConfigBack);
 }
