@@ -19,7 +19,7 @@ public class OverBumperIntakeDeploySubsystem
   /** IO layer to use for this subsystem */
   private final OverBumperIntakeDeployIO io;
 
-  /** Configuration to use for this subsytem */
+  /** Configuration to use for this subsystem */
   private final TalonFXOverBumperIntakeDeployConfiguration config;
 
   /** State of this subsystem */
