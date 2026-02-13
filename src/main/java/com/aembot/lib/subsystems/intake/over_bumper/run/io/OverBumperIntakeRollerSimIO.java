@@ -1,6 +1,6 @@
 package com.aembot.lib.subsystems.intake.over_bumper.run.io;
 
-import com.aembot.lib.config.subsystems.intake.over_bumper.run.simulation.SimulatedOverBumperIntakeRollerConfiguration;
+import com.aembot.lib.config.subsystems.intake.overBumper.run.simulation.SimulatedOverBumperIntakeRollerConfiguration;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOTalonFXSimFlywheel;
 import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerInputs;

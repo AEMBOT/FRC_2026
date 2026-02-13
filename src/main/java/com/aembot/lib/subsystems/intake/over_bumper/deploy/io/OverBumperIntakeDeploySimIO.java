@@ -1,6 +1,6 @@
 package com.aembot.lib.subsystems.intake.over_bumper.deploy.io;
 
-import com.aembot.lib.config.subsystems.intake.over_bumper.deploy.simulation.SimulatedOverBumperIntakeDeployConfiguration;
+import com.aembot.lib.config.subsystems.intake.overBumper.deploy.simulation.SimulatedOverBumperIntakeDeployConfiguration;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOTalonFXSim;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeployInputs;
