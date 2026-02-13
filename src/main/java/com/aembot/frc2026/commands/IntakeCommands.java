@@ -31,11 +31,11 @@ public final class IntakeCommands {
     return deploy.getZeroDownwardCommand();
   }
 
-  public Command runIntakeCommand() {
+  public Command createRunIntakeCommand() {
     return roller.runRollerCommand();
   }
 
-  public Command stopIntakeCommand() {
+  public Command createStopIntakeCommand() {
     return roller.smartVelocitySetpointCommand(() -> 0);
   }
 }
