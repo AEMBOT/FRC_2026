@@ -189,6 +189,7 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
     inputs.RotorVelocity =
         config.kRealConfiguration.getUnitsToRotorRotations(inputs.SimVelocityUnits);
 
+    simState.setRotorAcceleration(motorSim.getAngularAcceleration());
     simState.setRawRotorPosition(inputs.RotorPosition);
     simState.setRotorVelocity(inputs.RotorVelocity);
 
