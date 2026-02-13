@@ -1,7 +1,7 @@
 package com.aembot.frc2026.subsystems;
 
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
-import com.aembot.frc2026.constants.field.Field2025;
+import com.aembot.frc2026.constants.field.Field2026;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.state.SimulatedRobotStateYearly;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
@@ -87,7 +87,7 @@ public class SubsystemFactory {
         (cameraSim, cameraTransform) ->
             SimulatedRobotStateYearly.get().addCameraToVisionSimulation(cameraSim, cameraTransform);
 
-    YearFieldConstantable fieldConstants = new Field2025();
+    YearFieldConstantable fieldConstants = new Field2026();
 
     AprilCameraIO[] cameraIOs = new AprilCameraIO[configs.size()];
 
