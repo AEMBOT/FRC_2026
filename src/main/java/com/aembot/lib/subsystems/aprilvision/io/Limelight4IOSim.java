@@ -121,10 +121,7 @@ public class Limelight4IOSim extends Limelight4IOHardware {
 
     this.visionSystemSim =
         registerVisionSimulationConsumer.apply(
-            photonCameraSim,
-            new Transform3d(
-                cameraConfiguration.getCameraPosition().getTranslation(),
-                cameraConfiguration.getCameraPosition().getRotation()));
+            photonCameraSim, PositionUtil.toTransform3d(cameraConfiguration.getCameraPosition()));
 
     NetworkTable networkTable = NetworkTableInstance.getDefault().getTable(cameraName);
 
