@@ -32,9 +32,7 @@ public class TalonFXOverBumperIntakeRollerHardwareIO implements OverBumperIntake
   }
 
   @Override
-  public void updateInputs(OverBumperIntakeRollerInputs inputs) {
-    updateLog();
-  }
+  public void updateInputs(OverBumperIntakeRollerInputs inputs) {}
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {}
