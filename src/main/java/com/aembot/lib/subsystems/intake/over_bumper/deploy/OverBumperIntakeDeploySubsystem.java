@@ -8,6 +8,8 @@ import com.aembot.lib.state.subsystems.intake.over_bumper.deploy.OverBumperIntak
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.io.OverBumperIntakeDeployIO;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import java.util.function.Consumer;
@@ -56,7 +58,7 @@ public class OverBumperIntakeDeploySubsystem
     return new InstantCommand(() -> setEncoderPosition(config.kRealMotorConfig.kMinPositionUnits))
         .andThen(
             smartVelocitySetpointCommand(() -> config.kZeroingSpeedDegPerSec)
-                .until(() -> (getCurrentVelocity() == 0))
+                .until(() -> (MathUtil.isNear(0, getCurrentVelocity(), 0.1)))
                 .finallyDo(
                     () -> {
                       setEncoderPosition(
@@ -73,7 +75,7 @@ public class OverBumperIntakeDeploySubsystem
     return new InstantCommand(() -> setEncoderPosition(config.kRealMotorConfig.kMaxPositionUnits))
         .andThen(
             smartVelocitySetpointCommand(() -> -config.kZeroingSpeedDegPerSec)
-                .until(() -> (getCurrentVelocity() == 0))
+                .until(() -> (MathUtil.isNear(0, getCurrentVelocity(), 0.1)))
                 .finallyDo(
                     () -> {
                       setEncoderPosition(
