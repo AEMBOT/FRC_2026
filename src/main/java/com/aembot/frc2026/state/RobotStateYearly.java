@@ -1,5 +1,7 @@
 package com.aembot.frc2026.state;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.state.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeployState;
 import com.aembot.lib.state.subsystems.intake.over_bumper.run.OverBumperIntakeRollerState;
@@ -8,23 +10,23 @@ public class RobotStateYearly extends RobotState {
   // Ppl on the interwebs say this is good & thread safe
   private static final RobotStateYearly INSTANCE = new RobotStateYearly();
 
-  protected OverBumperIntakeDeployState intakeDeployState = new OverBumperIntakeDeployState();
-  protected OverBumperIntakeRollerState intakeRollerState = new OverBumperIntakeRollerState();
+  protected AtomicReference<OverBumperIntakeDeployState> intakeDeployState = new AtomicReference<OverBumperIntakeDeployState>();
+  protected AtomicReference<OverBumperIntakeRollerState> intakeRollerState = new AtomicReference<OverBumperIntakeRollerState>();
 
   public void updateIntakeDeployState(OverBumperIntakeDeployState state) {
-    intakeDeployState = state;
+    intakeDeployState = new AtomicReference<OverBumperIntakeDeployState>(state);
   }
 
   public OverBumperIntakeDeployState getIntakeDeployState() {
-    return intakeDeployState;
+    return intakeDeployState.get();
   }
 
   public void updateIntakeRollerState(OverBumperIntakeRollerState state) {
-    intakeRollerState = state;
+    intakeRollerState = new AtomicReference<OverBumperIntakeRollerState>(state);
   }
 
   public OverBumperIntakeRollerState getIntakeRollerState() {
-    return intakeRollerState;
+    return intakeRollerState.get();
   }
 
   public static RobotStateYearly get() {
