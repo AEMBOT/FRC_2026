@@ -1,5 +1,6 @@
 package com.aembot.lib.subsystems.drive.io;
 
+import com.aembot.lib.subsystems.aprilvision.util.AprilCameraOutput;
 import com.aembot.lib.subsystems.drive.DrivetrainInputs;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -40,4 +41,6 @@ public interface DrivetrainIO {
    * @param rotStd +/- θ standard deviation in radians
    */
   void setOdometryStdDevs(double xStd, double yStd, double rotStd);
+
+  void addVisionEstimation(AprilCameraOutput cameraOutput);
 }
