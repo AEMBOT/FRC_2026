@@ -21,7 +21,7 @@ public class ProductionIntakeConfig {
 
   public final double MIN_DEPLOY_ANGLE = 0;
 
-  public final double ZEROING_SPEED = 45;
+  public final double ZEROING_SPEED_DEG_PER_SEC = 45;
 
   public final String SUBSYSTEM_NAME = "IntakeSubsystem";
 
@@ -99,7 +99,7 @@ public class ProductionIntakeConfig {
       new TalonFXOverBumperIntakeDeployConfiguration(SUBSYSTEM_NAME + "Deploy")
           .withRealMotorConfiguration(DEPLOY_MOTOR_CONFIG)
           .withSimulatedMotorConfiguration(DEPLOY_SIM_MOTOR_CONFIG)
-          .withZeroingSpeed(ZEROING_SPEED);
+          .withZeroingSpeed(ZEROING_SPEED_DEG_PER_SEC);
 
   public final TalonFXOverBumperIntakeRollerConfiguration ROLLER_CONFIG =
       new TalonFXOverBumperIntakeRollerConfiguration(SUBSYSTEM_NAME + "Roller")
