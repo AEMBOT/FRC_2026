@@ -78,7 +78,7 @@ public class SubsystemFactory {
             RobotRuntimeConstants.ROBOT_CONFIG.getIntakeDeployConfig(),
             new OverBumperIntakeDeploySimIO(
                 RobotRuntimeConstants.ROBOT_CONFIG.getIntakeDeployConfig()),
-            (state) -> SimulatedRobotStateYearly.get().updateIntakeDeployState(state));
+            (state) -> RobotStateYearly.get().updateIntakeDeployState(state));
       case REPLAY:
         return new OverBumperIntakeDeploySubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getIntakeDeployConfig(),
@@ -102,7 +102,7 @@ public class SubsystemFactory {
             RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig(),
             new OverBumperIntakeRollerSimIO(
                 RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig()),
-            (state) -> SimulatedRobotStateYearly.get().updateIntakeRollerState(state));
+            (state) -> RobotStateYearly.get().updateIntakeRollerState(state));
       case REPLAY:
         return new OverBumperIntakeRollerSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig(),
