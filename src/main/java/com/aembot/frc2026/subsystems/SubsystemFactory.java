@@ -2,7 +2,6 @@ package com.aembot.frc2026.subsystems;
 
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.state.RobotStateYearly;
-import com.aembot.frc2026.state.SimulatedRobotStateYearly;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.drive.io.DrivetrainHardwareIO;
 import com.aembot.lib.subsystems.drive.io.DrivetrainIOReplay;

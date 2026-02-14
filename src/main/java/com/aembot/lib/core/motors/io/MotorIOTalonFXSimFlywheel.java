@@ -1,6 +1,7 @@
 package com.aembot.lib.core.motors.io;
 
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
+import com.aembot.lib.core.motors.visualization.SimulatedTalonFXVisualization;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
@@ -16,16 +17,21 @@ public class MotorIOTalonFXSimFlywheel extends MotorIOTalonFXSim {
   public MotorIOTalonFXSimFlywheel(
       SimulatedMotorConfiguration<TalonFXConfiguration> simulatedMotorConfig) {
     super(simulatedMotorConfig);
-
-    setupMotorSim();
   }
 
-  private void setupMotorSim() {
+  @Override
+  protected void setupMotorSim() {
     double gearRatio = config.kRealConfiguration.getGearRatio();
     var plant =
         LinearSystemId.createFlywheelSystem(
             config.kSimMotorConstants, config.kRealConfiguration.kMomentOfInertia, gearRatio);
     this.motorSim = new FlywheelSim(plant, config.kSimMotorConstants);
+
+    visualization =
+        new SimulatedTalonFXVisualization(
+            Units.rotationsToDegrees(Double.MAX_VALUE),
+            Units.rotationsToDegrees(Double.MAX_VALUE),
+            Units.rotationsToDegrees(0.0));
   }
 
   @Override
@@ -63,5 +69,7 @@ public class MotorIOTalonFXSimFlywheel extends MotorIOTalonFXSim {
     simState.setRotorAcceleration(motorSim.getAngularAcceleration());
     simState.setRawRotorPosition(inputs.RotorPosition);
     simState.setRotorVelocity(inputs.RotorVelocity);
+
+    visualization.updateAngle(inputs.SimPosUnits);
   }
 }

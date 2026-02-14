@@ -1,17 +1,18 @@
 package com.aembot.frc2026.state;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.state.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeployState;
 import com.aembot.lib.state.subsystems.intake.over_bumper.run.OverBumperIntakeRollerState;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class RobotStateYearly extends RobotState {
   // Ppl on the interwebs say this is good & thread safe
   private static final RobotStateYearly INSTANCE = new RobotStateYearly();
 
-  public AtomicReference<OverBumperIntakeDeployState> intakeDeployState = new AtomicReference<OverBumperIntakeDeployState>();
-  public AtomicReference<OverBumperIntakeRollerState> intakeRollerState = new AtomicReference<OverBumperIntakeRollerState>();
+  public AtomicReference<OverBumperIntakeDeployState> intakeDeployState =
+      new AtomicReference<OverBumperIntakeDeployState>();
+  public AtomicReference<OverBumperIntakeRollerState> intakeRollerState =
+      new AtomicReference<OverBumperIntakeRollerState>();
 
   public void updateIntakeDeployState(OverBumperIntakeDeployState state) {
     intakeDeployState = new AtomicReference<OverBumperIntakeDeployState>(state);

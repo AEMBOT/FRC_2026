@@ -74,7 +74,7 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
   }
 
   /** Setup the motor simulation and visualization */
-  private void setupMotorSim() {
+  protected void setupMotorSim() {
     double gearRatio = config.kRealConfiguration.getGearRatio();
     var plant =
         LinearSystemId.createDCMotorSystem(
