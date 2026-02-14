@@ -7,6 +7,7 @@ package com.aembot.frc2026;
 import com.aembot.frc2026.commands.CommandFactory;
 import com.aembot.frc2026.subsystems.SubsystemFactory;
 import com.aembot.lib.core.logging.Loggerable;
+import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -34,6 +35,11 @@ public class RobotContainer implements Loggerable {
   private final HoodSubsystem hoodSubsystem = SubsystemFactory.createHoodSubsystem();
 
   private final CommandFactory commandFactory;
+
+  /* ---- VISION ---- */
+  @SuppressWarnings("unused")
+  private final AprilVisionSubsystem visionSubsystem =
+      SubsystemFactory.createAprilVisionSubsystem();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer(LoggedRobot robot) {
