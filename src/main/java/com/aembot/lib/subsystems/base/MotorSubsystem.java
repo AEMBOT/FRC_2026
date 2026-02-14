@@ -78,7 +78,7 @@ public abstract class MotorSubsystem<
    * @param motorConfiguration The ServoMotorConfiguration that is in use with this system
    */
   public MotorSubsystem(I motorInputs, M motor, C motorConfiguration) {
-    this(motorConfiguration.configurationName, motorInputs, motor, motorConfiguration);
+    this(motorConfiguration.kConfigurationName, motorInputs, motor, motorConfiguration);
   }
 
   @Override
