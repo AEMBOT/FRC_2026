@@ -21,13 +21,13 @@ public class ProductionIntakeConfig {
 
   public final String SUBSYSTEM_NAME = "IntakeSubsystem";
 
-  public final double DEPLOY_GEAR_RATIO = 18400 / 243;
+  public final double DEPLOY_GEAR_RATIO = 18400.0 / 243.0;
 
   public final double DEPLOY_CRUISE_VELOCITY_DEG_PER_SEC = 90;
 
   public final double DEPLOY_ACCELERATION_DEG_PER_SEC = 180;
 
-  public final double ROLLER_GEAR_RATIO = 18400 / 243;
+  public final double ROLLER_GEAR_RATIO = 1;
 
   public final double ROLLER_CRUISE_VELOCITY_ROT_PER_MIN = 200;
 
