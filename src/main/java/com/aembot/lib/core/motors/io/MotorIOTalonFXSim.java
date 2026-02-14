@@ -146,6 +146,7 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
     double dt = timestamp - lastUpdateTimestamp;
     lastUpdateTimestamp = timestamp;
 
+    // TODO find place to store these values
     if (dt > 0.1) {
       dt = 0.005;
     }
