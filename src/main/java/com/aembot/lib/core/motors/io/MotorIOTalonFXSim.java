@@ -30,8 +30,10 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
     double SimVoltage;
     double SimPosUnits;
     double SimVelocityUnits;
+    double SimAccelerationUnits;
     double RotorPosition;
     double RotorVelocity;
+    double RotorAcceleration;
   }
 
   /** Sim state of the talonfx */
@@ -185,12 +187,18 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
     inputs.SimVelocityUnits =
         config.kRealConfiguration.getMechanismRotationsToUnits(
             Units.radiansToRotations(motorSim.getAngularVelocityRadPerSec()));
+    inputs.SimAccelerationUnits =
+      config.kRealConfiguration.getMechanismRotationsToUnits(
+        Units.radiansToRotations(motorSim.getAngularAccelerationRadPerSecSq())
+      );
 
     inputs.RotorPosition = config.kRealConfiguration.getUnitsToRotorRotations(inputs.SimPosUnits);
     inputs.RotorVelocity =
         config.kRealConfiguration.getUnitsToRotorRotations(inputs.SimVelocityUnits);
+    inputs.RotorAcceleration =
+    config.kRealConfiguration.getUnitsToRotorRotations(inputs.SimAccelerationUnits);
 
-    simState.setRotorAcceleration(motorSim.getAngularAcceleration());
+    simState.setRotorAcceleration(inputs.RotorAcceleration);
     simState.setRawRotorPosition(inputs.RotorPosition);
     simState.setRotorVelocity(inputs.RotorVelocity);
 
