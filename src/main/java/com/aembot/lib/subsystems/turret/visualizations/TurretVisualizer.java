@@ -1,4 +1,4 @@
-package com.aembot.lib.subsystems.base.turret.visualizations;
+package com.aembot.lib.subsystems.turret.visualizations;
 
 import com.aembot.lib.core.logging.Loggable;
 import edu.wpi.first.wpilibj.util.Color;

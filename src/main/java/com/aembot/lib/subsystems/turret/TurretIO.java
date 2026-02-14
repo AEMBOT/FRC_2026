@@ -1,4 +1,4 @@
-package com.aembot.lib.subsystems.base.turret;
+package com.aembot.lib.subsystems.turret;
 
 import com.aembot.lib.core.logging.Loggable;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
