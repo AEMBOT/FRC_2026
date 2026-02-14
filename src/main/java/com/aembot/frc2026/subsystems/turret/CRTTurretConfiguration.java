@@ -2,6 +2,7 @@ package com.aembot.frc2026.subsystems.turret;
 
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import edu.wpi.first.math.MathUtil;
 
 // takes motorSubsystem, motorConfig, adds two cancoders. will be used by TurretSubsystem.
 // set some consants or something
@@ -75,18 +76,20 @@ public class CRTTurretConfiguration<C> {
   public double solve(double rawEncoderAinput, double rawEncoderBinput) {
 
     int i = 0;
-    int EncoderApos = (int) Math.round(kEncoderAteeth * rawEncoderAinput);
-    int EncoderBpos = (int) Math.round(kEncoderBteeth * rawEncoderBinput);
+    double EncoderApos = (kEncoderAteeth * rawEncoderAinput);
+    double EncoderBpos = (kEncoderBteeth * rawEncoderBinput);
     boolean solved = false;
     double RealEncoderVal = 0;
 
     while (!solved) {
-      if ((EncoderBpos + kEncoderBteeth * i) % kEncoderAteeth
-          == EncoderApos) { // For this to be most efficient, Encoder B should be the bigger one
-        RealEncoderVal = EncoderBpos;
-        RealEncoderVal = RealEncoderVal + kEncoderBteeth * i;
-        RealEncoderVal =
-            RealEncoderVal + (rawEncoderAinput % (1. / kEncoderAteeth)) * kEncoderAteeth;
+      // if ((EncoderBpos + kEncoderBteeth * i) % kEncoderAteeth == EncoderApos) { // For this to be
+      // most efficient, Encoder B should be the bigger one
+      if (MathUtil.isNear(EncoderApos, (EncoderBpos + kEncoderBteeth * i) % kEncoderAteeth, 0.1)) {
+        // RealEncoderVal = EncoderBpos;
+        // RealEncoderVal = RealEncoderVal + kEncoderBteeth * i;
+        // RealEncoderVal =
+        //     RealEncoderVal + (rawEncoderAinput % (1. / kEncoderAteeth)) * kEncoderAteeth;
+        RealEncoderVal = EncoderBpos + kEncoderBteeth * i;
         solved = true;
 
       } else {
@@ -96,11 +99,11 @@ public class CRTTurretConfiguration<C> {
         return -1; // means something is wrong. TODO add actual try catch except or whatever here
       }
     }
-    System.out.println(kEncoderAteeth);
-    System.out.println(kEncoderBteeth);
-    System.out.println(rawEncoderAinput);
-    System.out.println(rawEncoderBinput);
-    System.out.println(RealEncoderVal);
+    // System.out.println(kEncoderAteeth);
+    // System.out.println(kEncoderBteeth);
+    // System.out.println(rawEncoderAinput);
+    // System.out.println(rawEncoderBinput);
+    // System.out.println(RealEncoderVal);
 
     return RealEncoderVal;
   }
