@@ -65,9 +65,9 @@ public class ProductionIntakeConfig {
                   .withMotionMagic(
                       new MotionMagicConfigs()
                           .withMotionMagicCruiseVelocity(
-                              ROLLER_CRUISE_VELOCITY_ROT_PER_MIN * 60 * ROLLER_GEAR_RATIO)
+                              (ROLLER_CRUISE_VELOCITY_ROT_PER_MIN / 60) * ROLLER_GEAR_RATIO)
                           .withMotionMagicAcceleration(
-                              ROLLER_ACCELERATION_ROT_PER_MIN * 60 * ROLLER_GEAR_RATIO))
+                              (ROLLER_ACCELERATION_ROT_PER_MIN / 60) * ROLLER_GEAR_RATIO))
                   // constants copies from hood config
                   .withSlot0(new Slot0Configs().withKP(.1).withKV(.12)))
           .withCANDevice(
@@ -95,8 +95,6 @@ public class ProductionIntakeConfig {
       new TalonFXOverBumperIntakeDeployConfiguration(SUBSYSTEM_NAME + "Deploy")
           .withRealMotorConfiguration(DEPLOY_MOTOR_CONFIG)
           .withSimulatedMotorConfiguration(DEPLOY_SIM_MOTOR_CONFIG)
-          .withDownwardStopAngle(MIN_DEPLOY_ANGLE)
-          .withUpwardStopAngle(MAX_DEPLOY_ANGLE)
           .withZeroingSpeed(ZEROING_SPEED);
 
   public final TalonFXOverBumperIntakeRollerConfiguration ROLLER_CONFIG =

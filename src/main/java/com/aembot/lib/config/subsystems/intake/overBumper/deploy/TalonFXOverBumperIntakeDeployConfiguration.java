@@ -14,12 +14,6 @@ public class TalonFXOverBumperIntakeDeployConfiguration {
   /** Motor configuration for simulated subsystem */
   public SimulatedMotorConfiguration<TalonFXConfiguration> kSimMotorConfig;
 
-  /** The angle at which the deploy motor stops based on the upwards hard stop */
-  public double kUpwardStopAngle;
-
-  /** The angle at which the deploy motor stops based on the sownwards hard stop */
-  public double kDownwardStopAngle;
-
   /** Speed at which to run the motor while zeroing, in degrees per second */
   public double kZeroingSpeedDegPerSec;
 
@@ -36,26 +30,6 @@ public class TalonFXOverBumperIntakeDeployConfiguration {
   public TalonFXOverBumperIntakeDeployConfiguration withRealMotorConfiguration(
       MotorConfiguration<TalonFXConfiguration> realMotorConfig) {
     this.kRealMotorConfig = realMotorConfig;
-    return this;
-  }
-
-  /**
-   * @param upwardStopAngle The angle at which the deploy motor stops based on the upwards hard stop
-   * @return A reference to this object for chaining
-   */
-  public TalonFXOverBumperIntakeDeployConfiguration withUpwardStopAngle(double upwardStopAngle) {
-    this.kUpwardStopAngle = upwardStopAngle;
-    return this;
-  }
-
-  /**
-   * @param upwardStopAngle The angle at which the deploy motor stops based on the downwards hard
-   *     stop
-   * @return A reference to this object for chaining
-   */
-  public TalonFXOverBumperIntakeDeployConfiguration withDownwardStopAngle(
-      double downwardStopAngle) {
-    this.kDownwardStopAngle = downwardStopAngle;
     return this;
   }
 

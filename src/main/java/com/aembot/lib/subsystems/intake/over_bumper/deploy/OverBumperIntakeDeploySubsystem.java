@@ -9,6 +9,7 @@ import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.io.OverBumperIntakeDeployIO;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 
@@ -52,13 +53,16 @@ public class OverBumperIntakeDeploySubsystem
    *     position
    */
   public Command getZeroUpwardCommand() {
-    return smartVelocitySetpointCommand(() -> config.kZeroingSpeedDegPerSec)
-        .until(() -> (getCurrentVelocity() == 0))
-        .finallyDo(
-            () -> {
-              setEncoderPosition(
-                  config.kRealMotorConfig.getUnitsToRotorRotations(config.kUpwardStopAngle));
-            });
+    return new InstantCommand(() -> setEncoderPosition(config.kRealMotorConfig.kMinPositionUnits))
+        .andThen(
+            smartVelocitySetpointCommand(() -> config.kZeroingSpeedDegPerSec)
+                .until(() -> (getCurrentVelocity() == 0))
+                .finallyDo(
+                    () -> {
+                      setEncoderPosition(
+                          config.kRealMotorConfig.getUnitsToRotorRotations(
+                              config.kRealMotorConfig.kMaxPositionUnits));
+                    }));
   }
 
   /**
@@ -66,27 +70,30 @@ public class OverBumperIntakeDeploySubsystem
    *     encoder position
    */
   public Command getZeroDownwardCommand() {
-    return smartVelocitySetpointCommand(() -> -config.kZeroingSpeedDegPerSec)
-        .until(() -> (getCurrentVelocity() == 0))
-        .finallyDo(
-            () -> {
-              setEncoderPosition(
-                  config.kRealMotorConfig.getUnitsToRotorRotations(config.kDownwardStopAngle));
-            });
+    return new InstantCommand(() -> setEncoderPosition(config.kRealMotorConfig.kMaxPositionUnits))
+        .andThen(
+            smartVelocitySetpointCommand(() -> -config.kZeroingSpeedDegPerSec)
+                .until(() -> (getCurrentVelocity() == 0))
+                .finallyDo(
+                    () -> {
+                      setEncoderPosition(
+                          config.kRealMotorConfig.getUnitsToRotorRotations(
+                              config.kRealMotorConfig.kMinPositionUnits));
+                    }));
   }
 
   /**
    * @return A command that puts the motor to the up position
    */
   public Command putIntakeUpCommand() {
-    return smartPositionSetpointCommand(() -> config.kUpwardStopAngle);
+    return smartPositionSetpointCommand(() -> config.kRealMotorConfig.kMaxPositionUnits);
   }
 
   /**
    * @return A command that puts the motor to the down position
    */
   public Command putIntakeDownCommand() {
-    return smartPositionSetpointCommand(() -> config.kDownwardStopAngle);
+    return smartPositionSetpointCommand(() -> config.kRealMotorConfig.kMinPositionUnits);
   }
 
   private void updateState() {
