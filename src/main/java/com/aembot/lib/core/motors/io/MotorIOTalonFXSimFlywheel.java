@@ -9,7 +9,10 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 
-/** Extends MotorIOTalonFXSim to use FlywheelSim instead of basic DCMotorSim, should be used for mechanisms that prioritize velocity control over positional control*/
+/**
+ * Extends MotorIOTalonFXSim to use FlywheelSim instead of basic DCMotorSim, should be used for
+ * mechanisms that prioritize velocity control over positional control
+ */
 public class MotorIOTalonFXSimFlywheel extends MotorIOTalonFXSim {
 
   protected FlywheelSim motorSim;
