@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.Timer;
 import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.VisionSystemSim;
 
 /**
  * Robot state class that retains all information that is used to determine the robots current state
@@ -51,18 +52,21 @@ public abstract class SimulatedRobotState implements Loggable {
 
   protected final SimulatedRobotState.PositionState positionState = new PositionState();
 
+  protected final VisionSystemSim visionSimulation = new VisionSystemSim("vision-sim");
+
   /**
    * Update the simulated robot state. This is used to tick any simulated robot state functions that
    * need to run during simulationPeriodic
    */
   public void updateState() {
-    // TODO Tick vision
+    visionSimulation.update(positionState.getLatestFieldRobotPose());
   }
 
-  public void addCameraToVisionSimulation(
+  /** Add a camera to the vision simulation system and then return said {@link VisionSystemSim} */
+  public VisionSystemSim addCameraToVisionSimulation(
       PhotonCameraSim simulatedCamera, Transform3d robotToCameraTransform) {
-    // TODO addCameraToVisionSimulation
-    throw new UnsupportedOperationException("Not yet implemented");
+    visionSimulation.addCamera(simulatedCamera, robotToCameraTransform);
+    return visionSimulation;
   }
 
   /**

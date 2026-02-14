@@ -9,6 +9,8 @@ import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
 import com.aembot.lib.config.subsystems.hood.simulation.SimulatedHoodConfiguration;
 import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
 import com.aembot.lib.config.subsystems.intake.overBumper.run.TalonFXOverBumperIntakeRollerConfiguration;
+import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
+import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.util.Units;
@@ -35,6 +37,8 @@ public class ProductionConfig extends RobotConfiguration {
       new ProductionDrivetrainConfig(PHYSICAL_CONFIGURATION, DRIVETRAIN_BUS_NAME);
   private static final ProductionHoodConfig HOOD_CONFIG = new ProductionHoodConfig();
   private static final ProductionIntakeConfig INTAKE_CONFIG = new ProductionIntakeConfig();
+
+  private static final ProductionCameraConfig CAMERA_CONFIG = new ProductionCameraConfig();
 
   @Override
   public String getRobotName() {
@@ -82,5 +86,15 @@ public class ProductionConfig extends RobotConfiguration {
   @Override
   public DrivetrainSimConfiguration getSimulatedDrivetrainConfiguration() {
     return DRIVETRAIN_CONFIG.simulatedDrivetrainConfiguration;
+  }
+
+  @Override
+  public List<CameraConfiguration> getCameraConfigurations() {
+    return CAMERA_CONFIG.cameraConfigurations;
+  }
+
+  @Override
+  public List<SimulatedCameraConfiguration> getSimulatedCameraConfigurations() {
+    return CAMERA_CONFIG.simConfigurations;
   }
 }
