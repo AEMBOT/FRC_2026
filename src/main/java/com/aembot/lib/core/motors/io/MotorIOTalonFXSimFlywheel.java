@@ -63,13 +63,12 @@ public class MotorIOTalonFXSimFlywheel extends MotorIOTalonFXSim {
             Units.radiansPerSecondToRotationsPerMinute(motorSim.getAngularVelocityRadPerSec()));
     inputs.RotorVelocity =
         config.kRealConfiguration.getUnitsToMechanismRotations(inputs.SimVelocityUnits);
-        
+
     inputs.SimAccelerationUnits =
-      config.kRealConfiguration.getMechanismRotationsToUnits(
-        Units.radiansToRotations(motorSim.getAngularAccelerationRadPerSecSq())
-      );
-    inputs.RotorAcceleration = config.kRealConfiguration.getUnitsToRotorRotations(inputs.SimAccelerationUnits);
-    
+        config.kRealConfiguration.getMechanismRotationsToUnits(
+            Units.radiansToRotations(motorSim.getAngularAccelerationRadPerSecSq()));
+    inputs.RotorAcceleration =
+        config.kRealConfiguration.getUnitsToRotorRotations(inputs.SimAccelerationUnits);
 
     inputs.SimPosUnits += (inputs.SimVelocityUnits / 60) * dt;
     inputs.RotorPosition += (inputs.RotorVelocity / 60) * dt;
