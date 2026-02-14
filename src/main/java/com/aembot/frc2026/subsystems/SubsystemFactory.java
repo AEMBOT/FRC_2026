@@ -131,6 +131,8 @@ public class SubsystemFactory {
                 RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig()),
             (state) -> RobotStateYearly.get().updateIntakeRollerState(state));
     }
+  }
+
   public static AprilVisionSubsystem createAprilVisionSubsystem() {
     List<CameraConfiguration> configs =
         RobotRuntimeConstants.ROBOT_CONFIG.getCameraConfigurations();
