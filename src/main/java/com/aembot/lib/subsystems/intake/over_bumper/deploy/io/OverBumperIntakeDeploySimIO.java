@@ -6,7 +6,7 @@ import com.aembot.lib.core.motors.io.MotorIOTalonFXSim;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeployInputs;
 import edu.wpi.first.wpilibj.Notifier;
 
-/** Simulated over the bumper intake deployement IO */
+/** Simulated over the bumper intake deployment IO */
 public class OverBumperIntakeDeploySimIO implements OverBumperIntakeDeployIO {
 
   /** Simulated Motor IO */
