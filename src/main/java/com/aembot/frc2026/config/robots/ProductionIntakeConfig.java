@@ -13,6 +13,10 @@ import edu.wpi.first.math.util.Units;
 
 public class ProductionIntakeConfig {
 
+    public final int DEPLOY_CAN_ID = 16;
+
+    public final int ROLLER_CAN_ID = 17;
+
   public final double MAX_DEPLOY_ANGLE = 90;
 
   public final double MIN_DEPLOY_ANGLE = 0;
@@ -49,7 +53,7 @@ public class ProductionIntakeConfig {
                   .withSlot0(new Slot0Configs().withKP(.1).withKV(.12)))
           .withCANDevice(
               new CANDeviceID(
-                  16,
+                  DEPLOY_CAN_ID,
                   SUBSYSTEM_NAME + "DeployMotor",
                   SUBSYSTEM_NAME + "Deploy",
                   CANDeviceID.CANDeviceType.TALON_FX))
@@ -72,7 +76,7 @@ public class ProductionIntakeConfig {
                   .withSlot0(new Slot0Configs().withKP(.1).withKV(.12)))
           .withCANDevice(
               new CANDeviceID(
-                  17,
+                  ROLLER_CAN_ID,
                   SUBSYSTEM_NAME + "RollerMotor",
                   SUBSYSTEM_NAME + "Roller",
                   CANDeviceID.CANDeviceType.TALON_FX))
