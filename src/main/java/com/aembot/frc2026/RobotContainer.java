@@ -13,6 +13,8 @@ import com.aembot.lib.core.logging.Loggerable;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
+import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
+import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -47,6 +49,12 @@ public class RobotContainer implements Loggerable {
   /* ---- SHOOTER ---- */
   private final HoodSubsystem hoodSubsystem = SubsystemFactory.createHoodSubsystem();
 
+  /* ---- INTAKE ---- */
+  private final OverBumperIntakeDeploySubsystem intakeDeploySubsystem =
+      SubsystemFactory.createIntakeDeploySubsystem();
+  private final OverBumperIntakeRollerSubsystem intakeRollerSubsystem =
+      SubsystemFactory.createIntakeRollerSubsystem();
+
   private final CommandFactory commandFactory;
 
   /* ---- VISION ---- */
@@ -58,7 +66,9 @@ public class RobotContainer implements Loggerable {
   public RobotContainer(LoggedRobot robot) {
     setupLogger(robot);
 
-    this.commandFactory = new CommandFactory(driveSubsystem, hoodSubsystem);
+    this.commandFactory =
+        new CommandFactory(
+            driveSubsystem, hoodSubsystem, intakeDeploySubsystem, intakeRollerSubsystem);
     configureBindings();
   }
 
@@ -66,16 +76,20 @@ public class RobotContainer implements Loggerable {
   private void configureBindings() {
     driveSubsystem.setDefaultCommand(commandFactory.createDriveJoystickCmd(driverController));
     hoodSubsystem.setDefaultCommand(commandFactory.createHoodStopCommand());
+    intakeRollerSubsystem.setDefaultCommand(
+        commandFactory.intakeCommands.createStopIntakeCommand());
 
     spindexerSubsystem.setDefaultCommand(spindexerSubsystem.stopSpindexerCommand());
     indexerSelectorSubsystem.setDefaultCommand(indexerSelectorSubsystem.stopSelectorCommand());
     indexerKickerSubsystem.setDefaultCommand(indexerKickerSubsystem.stopKickerCommand());
 
-    driverController.a().whileTrue(commandFactory.createHoodUpCommand());
-    driverController.b().whileTrue(commandFactory.createHoodDownCommand());
+    driverController.a().onTrue(commandFactory.intakeCommands.createUpCommand());
+    driverController.b().onTrue(commandFactory.intakeCommands.createDownCommand());
+
+    driverController.x().whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
 
     driverController
-        .x()
+        .y()
         .whileTrue(
             new ParallelCommandGroup(
                 spindexerSubsystem.runSpindexerCommand(),
