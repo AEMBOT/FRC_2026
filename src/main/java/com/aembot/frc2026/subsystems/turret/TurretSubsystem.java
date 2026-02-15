@@ -1,32 +1,27 @@
 package com.aembot.frc2026.subsystems.turret;
 
-// need to switch everythign from motorfollower to motorsubsystem
-
+import com.aembot.frc2026.config.subsystems.TalonFXTurretConfiguration;
+import com.aembot.frc2026.subsystems.turret.io.TurretIO;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
-import com.aembot.lib.subsystems.base.turret.TurretIO;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import edu.wpi.first.wpilibj2.command.Command;
+import org.littletonrobotics.junction.Logger;
 
 public class TurretSubsystem
-    extends MotorSubsystem< // will extend CRTturretconfiguration?
-        MotorInputs,
-        MotorIO,
-        MotorConfiguration<
-            TalonFXConfiguration> // replaced by crtturretconfiguration? probably not?
-    > {
-  public final TurretIO turret;
+    extends MotorSubsystem<MotorInputs, MotorIO, MotorConfiguration<TalonFXConfiguration>> {
+  public final TurretIO io;
 
-  public TurretSubsystem(MotorConfiguration<TalonFXConfiguration> config, TurretIO turret) {
+  public TurretSubsystem(TalonFXTurretConfiguration config, TurretIO io) {
 
-    super(new MotorInputs(), turret.getSingleMotor(), config);
+    super(config.kName, new MotorInputs(), io.getMotor(), config.kRealMotorConfig);
 
-    this.turret = turret;
+    this.io = io;
 
-    zeroEncoderPosition();
-    setDefaultCommand(gotoPositionCommand());
+    setEncoderPosition(
+        config.getMechanismRotationsFromEncoders(
+            io.getCANcoderA().getRawAngle(), io.getCANcoderB().getRawAngle()));
   }
 
   @Override
@@ -34,14 +29,10 @@ public class TurretSubsystem
     super.periodic();
   }
 
-  public Command gotoPositionCommand() { // not sure if this is the right thing to do here
-    return smartPositionSetpointCommand(this::getPositionSetpointUnits)
-        .withName("gotoPosition")
-        .ignoringDisable(false);
-  }
-
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
-    turret.updateLog(standardPrefix, inputPrefix);
+    Logger.processInputs(inputPrefix, inputs);
+    io.updateLog(standardPrefix, inputPrefix);
+    super.updateLog(standardPrefix, inputPrefix);
   }
 }

@@ -1,14 +1,13 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.aembot.frc2026.subsystems.turret.CRTTurretConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.aembot.frc2026.config.subsystems.TalonFXTurretConfiguration;
 import org.junit.jupiter.api.Test;
 
 public class CRTTest {
-  public CRTTurretConfiguration<TalonFXConfiguration> testconfig =
-      new CRTTurretConfiguration<TalonFXConfiguration>()
-          .withEncoderAteeth(13)
-          .withEncoderBteeth(17);
+  public TalonFXTurretConfiguration testconfig =
+      new TalonFXTurretConfiguration("TestConfig")
+          .withCANcoderAGearTeeth(13)
+          .withCANcoderBGearTeeth(17);
 
   @Test
   void DoesItWork() {
@@ -19,7 +18,7 @@ public class CRTTest {
       double inputB = (i % 17.0) / 17.0;
       try {
         System.currentTimeMillis();
-        assertEquals(i, testconfig.solve(inputA, inputB), 0.01);
+        assertEquals(i, testconfig.getMechanismRotationsFromEncoders(inputA, inputB), 0.01);
       } catch (AssertionError e) {
         System.out.println(e.getMessage());
       }

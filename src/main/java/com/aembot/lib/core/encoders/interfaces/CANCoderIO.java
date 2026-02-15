@@ -21,4 +21,9 @@ public interface CANCoderIO {
    * @return true on success false on failure
    */
   public boolean setUpdateFrequency(double hz);
+
+  /**
+   * @return The raw angle between 0 and 1 of the encoder
+   */
+  public double getRawAngle();
 }
