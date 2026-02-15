@@ -23,7 +23,7 @@ public class IndexerKickerSubsystem
   private final IndexerKickerConfiguration kConfig;
 
   public IndexerKickerSubsystem(IndexerKickerConfiguration config, IndexerKickerMechanismIO io) {
-    super(new MotorInputs(), io.getMotor(), config.kMotorConfig);
+    super(config.kName, new MotorInputs(), io.getMotor(), config.kMotorConfig);
     this.kMechanismIO = io;
     this.kConfig = config;
     this.kMechanismInputs = new IndexerKickerMechanismInputs();

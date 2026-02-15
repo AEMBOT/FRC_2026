@@ -24,7 +24,7 @@ public class SpindexerSubsystem
   private final SpindexerConfiguration kConfig;
 
   public SpindexerSubsystem(SpindexerConfiguration config, SpindexerMechanismIO io) {
-    super(new MotorInputs(), io.getMotor(), config.kMotorConfig);
+    super(config.kName, new MotorInputs(), io.getMotor(), config.kMotorConfig);
     this.kMechanismIO = io;
     this.kMechanismInputs = new SpindexerMechanismInputs();
     this.kConfig = config;

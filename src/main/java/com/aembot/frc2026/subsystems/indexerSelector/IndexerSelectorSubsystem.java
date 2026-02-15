@@ -31,7 +31,7 @@ public class IndexerSelectorSubsystem
       IndexerSelectorConfiguration config,
       IndexerSelectorMechanismIO mechanismIO,
       TimeOfFlightIO timeOfFlightIO) {
-    super(new MotorInputs(), mechanismIO.getMotor(), config.kMotorConfig);
+    super(config.kName, new MotorInputs(), mechanismIO.getMotor(), config.kMotorConfig);
     this.kMechanismIO = mechanismIO;
     this.kMechanismInputs = new IndexerSelectorMechanismInputs();
     this.kTimeOfFlightSensor =
