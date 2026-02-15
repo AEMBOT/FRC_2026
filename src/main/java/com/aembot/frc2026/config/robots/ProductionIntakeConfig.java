@@ -17,9 +17,9 @@ public class ProductionIntakeConfig {
 
   public final int ROLLER_CAN_ID = 17;
 
-  public final double MAX_DEPLOY_ANGLE = 90;
+  public final double UP_DEPLOY_ANGLE = 90;
 
-  public final double MIN_DEPLOY_ANGLE = 0;
+  public final double DOWN_DEPLOY_ANGLE = 0;
 
   public final double ZEROING_SPEED_DEG_PER_SEC = 45;
 
@@ -59,8 +59,8 @@ public class ProductionIntakeConfig {
                   CANDeviceID.CANDeviceType.TALON_FX))
           .withName(SUBSYSTEM_NAME + "DeployMotor")
           .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / DEPLOY_GEAR_RATIO))
-          .withMaxPositionUnits(MAX_DEPLOY_ANGLE)
-          .withMinPositionUnits(MIN_DEPLOY_ANGLE);
+          .withMaxPositionUnits(UP_DEPLOY_ANGLE)
+          .withMinPositionUnits(DOWN_DEPLOY_ANGLE);
 
   public final MotorConfiguration<TalonFXConfiguration> ROLLER_MOTOR_CONFIG =
       new MotorConfiguration<TalonFXConfiguration>()
