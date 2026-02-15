@@ -6,6 +6,8 @@ import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
 import com.aembot.lib.config.subsystems.drive.simulation.DrivetrainSimConfiguration;
 import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
 import com.aembot.lib.config.subsystems.hood.simulation.SimulatedHoodConfiguration;
+import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
+import com.aembot.lib.config.subsystems.intake.overBumper.run.TalonFXOverBumperIntakeRollerConfiguration;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -64,6 +66,20 @@ public abstract class RobotConfiguration {
    * @return Simulated hood configuration
    */
   public abstract SimulatedHoodConfiguration getSimHoodConfig();
+
+  /**
+   * Get the configuration of the intake deployment subsystem
+   *
+   * @return intake deployment configuration
+   */
+  public abstract TalonFXOverBumperIntakeDeployConfiguration getIntakeDeployConfig();
+
+  /**
+   * Get the configuration of the intake roller subsystem
+   *
+   * @return intake roller configuration
+   */
+  public abstract TalonFXOverBumperIntakeRollerConfiguration getIntakeRollerConfig();
 
   /**
    * Get configuration details about the drive train sim for this robot
