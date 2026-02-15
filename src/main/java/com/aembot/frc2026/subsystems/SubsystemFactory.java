@@ -4,9 +4,23 @@ import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.constants.field.Field2026;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.state.SimulatedRobotStateYearly;
+import com.aembot.frc2026.subsystems.indexerKicker.IndexerKickerSubsystem;
+import com.aembot.frc2026.subsystems.indexerKicker.io.IndexerKickerMechanismIOReal;
+import com.aembot.frc2026.subsystems.indexerKicker.io.IndexerKickerMechanismIOReplay;
+import com.aembot.frc2026.subsystems.indexerKicker.io.IndexerKickerMechanismIOSim;
+import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorSubsystem;
+import com.aembot.frc2026.subsystems.indexerSelector.io.IndexerSelectorMechanismIOReal;
+import com.aembot.frc2026.subsystems.indexerSelector.io.IndexerSelectorMechanismIOReplay;
+import com.aembot.frc2026.subsystems.indexerSelector.io.IndexerSelectorMechanismIOSim;
+import com.aembot.frc2026.subsystems.spindexer.SpindexerSubsystem;
+import com.aembot.frc2026.subsystems.spindexer.io.SpindexerMechanismIOReal;
+import com.aembot.frc2026.subsystems.spindexer.io.SpindexerMechanismIOReplay;
+import com.aembot.frc2026.subsystems.spindexer.io.SpindexerMechanismIOSim;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
+import com.aembot.lib.core.sensors.timeOfFlight.io.TimeOfFlightIOReplay;
+import com.aembot.lib.core.sensors.timeOfFlight.io.TimeOfFlightSimIOCanRange;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
 import com.aembot.lib.subsystems.aprilvision.interfaces.AprilCameraIO;
 import com.aembot.lib.subsystems.aprilvision.io.AprilCameraReplayIO;
@@ -74,6 +88,61 @@ public class SubsystemFactory {
         return new HoodSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig(),
             new TalonFXHoodHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig()));
+    }
+  }
+
+  public static SpindexerSubsystem createSpindexerSubsystem() {
+    var spindexerConfig = RobotRuntimeConstants.ROBOT_CONFIG.getSpindexerConfiguration();
+
+    switch (RobotRuntimeConstants.MODE) {
+      case SIM:
+        return new SpindexerSubsystem(
+            spindexerConfig, new SpindexerMechanismIOSim(spindexerConfig));
+      case REPLAY:
+        return new SpindexerSubsystem(spindexerConfig, new SpindexerMechanismIOReplay());
+      case REAL:
+      default:
+        return new SpindexerSubsystem(
+            spindexerConfig, new SpindexerMechanismIOReal(spindexerConfig));
+    }
+  }
+
+  public static IndexerSelectorSubsystem createIndexerSelectorSubsystem() {
+    var selectorConfig = RobotRuntimeConstants.ROBOT_CONFIG.getIndexerSelectorConfiguration();
+
+    switch (RobotRuntimeConstants.MODE) {
+      case SIM:
+        return new IndexerSelectorSubsystem(
+            selectorConfig,
+            new IndexerSelectorMechanismIOSim(selectorConfig),
+            new TimeOfFlightSimIOCanRange(selectorConfig.kTimeOfFlightConfig));
+      case REPLAY:
+        return new IndexerSelectorSubsystem(
+            selectorConfig,
+            new IndexerSelectorMechanismIOReplay(),
+            new TimeOfFlightIOReplay(selectorConfig.kTimeOfFlightConfig));
+      case REAL:
+      default:
+        return new IndexerSelectorSubsystem(
+            selectorConfig,
+            new IndexerSelectorMechanismIOReal(selectorConfig),
+            new TimeOfFlightSimIOCanRange(selectorConfig.kTimeOfFlightConfig));
+    }
+  }
+
+  public static IndexerKickerSubsystem createIndexerKickerSubsystem() {
+    var kickerConfig = RobotRuntimeConstants.ROBOT_CONFIG.getIndexerKickerConfiguration();
+
+    switch (RobotRuntimeConstants.MODE) {
+      case SIM:
+        return new IndexerKickerSubsystem(
+            kickerConfig, new IndexerKickerMechanismIOSim(kickerConfig));
+      case REPLAY:
+        return new IndexerKickerSubsystem(kickerConfig, new IndexerKickerMechanismIOReplay());
+      case REAL:
+      default:
+        return new IndexerKickerSubsystem(
+            kickerConfig, new IndexerKickerMechanismIOReal(kickerConfig));
     }
   }
 

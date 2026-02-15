@@ -1,0 +1,98 @@
+package com.aembot.frc2026.config.subsystems.indexerSelector;
+
+import com.aembot.lib.config.motors.MotorConfiguration;
+import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
+import com.aembot.lib.config.sensors.timeOfFlight.TimeOfFlightConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Config for the selector subsystem, which moves game pieces from the spindexer to the kicker
+ *
+ * <p>Required calls:
+ *
+ * <ul>
+ *   <li>{@link #withMotorConfig(MotorConfiguration)}
+ *   <li>{@link #withTimeOfFlightConfig(TimeOfFlightConfiguration)}
+ *   <li>{@link #withTargetSpeedRPM(double)}
+ *   <li>{@link #validate()} (last)
+ * </ul>
+ */
+public class IndexerSelectorConfiguration {
+  public final String kName;
+
+  public MotorConfiguration<TalonFXConfiguration> kMotorConfig;
+  public SimulatedMotorConfiguration<TalonFXConfiguration> kSimMotorConfig;
+  public TimeOfFlightConfiguration kTimeOfFlightConfig;
+
+  public Double kTargetSpeedRPM;
+
+  public IndexerSelectorConfiguration(String name) {
+    this.kName = name;
+  }
+
+  /**
+   * Set the config for the selector's motor
+   *
+   * @return This {@link IndexerSelectorConfiguration} for chaining
+   */
+  public IndexerSelectorConfiguration withMotorConfig(
+      MotorConfiguration<TalonFXConfiguration> config) {
+    this.kMotorConfig = config;
+    return this;
+  }
+
+  /**
+   * Set the sim config for the spindexer's motor
+   *
+   * @return This {@link IndexerSelectorConfiguration} for chaining
+   */
+  public IndexerSelectorConfiguration withSimMotorConfig(
+      SimulatedMotorConfiguration<TalonFXConfiguration> config) {
+    this.kSimMotorConfig = config;
+    return this;
+  }
+
+  /**
+   * Set the config for the selector's time of flight sensor
+   *
+   * @return This {@link IndexerSelectorConfiguration} for chaining
+   */
+  public IndexerSelectorConfiguration withTimeOfFlightConfig(TimeOfFlightConfiguration config) {
+    this.kTimeOfFlightConfig = config;
+    return this;
+  }
+
+  /**
+   * Set the target RPM of the selector while running
+   *
+   * @param targetSpeedRPM target RPM of the selector while running
+   * @return this {@link IndexerSelectorConfiguration} for chaining
+   */
+  public IndexerSelectorConfiguration withTargetSpeedRPM(double targetSpeedRPM) {
+    this.kTargetSpeedRPM = targetSpeedRPM;
+    return this;
+  }
+
+  /**
+   * Check that all values required for a selector subsystem are set on this config. If they are
+   * not, throw a {@link VerifyError}. Intended to be called at the end of an initialization chain.
+   *
+   * @return this {@link IndexerSelectorConfiguration} for chaining
+   */
+  public IndexerSelectorConfiguration validate() {
+    List<String> missing = new ArrayList<>();
+    if (this.kTargetSpeedRPM == null) missing.add("kTargetSpeed");
+    if (this.kMotorConfig == null) missing.add("kMotorConfig");
+    if (this.kSimMotorConfig == null) missing.add("kSimMotorConfig");
+    if (this.kTimeOfFlightConfig == null) missing.add("kTimeOfFlightConfig");
+
+    if (missing.size() != 0) {
+      throw new VerifyError(
+          "Config for " + kName + " does not have a set " + String.join(",", missing));
+    }
+
+    return this;
+  }
+}

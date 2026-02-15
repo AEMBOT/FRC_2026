@@ -6,12 +6,16 @@ package com.aembot.frc2026;
 
 import com.aembot.frc2026.commands.CommandFactory;
 import com.aembot.frc2026.subsystems.SubsystemFactory;
+import com.aembot.frc2026.subsystems.indexerKicker.IndexerKickerSubsystem;
+import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorSubsystem;
+import com.aembot.frc2026.subsystems.spindexer.SpindexerSubsystem;
 import com.aembot.lib.core.logging.Loggerable;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.littletonrobotics.junction.LoggedRobot;
 
@@ -30,6 +34,15 @@ public class RobotContainer implements Loggerable {
 
   /* ---- DRIVETRAIN ---- */
   private final DriveSubsystem driveSubsystem = SubsystemFactory.createDriveSubsystem();
+
+  /* ---- INDEXER ---- */
+  private final SpindexerSubsystem spindexerSubsystem = SubsystemFactory.createSpindexerSubsystem();
+
+  private final IndexerSelectorSubsystem indexerSelectorSubsystem =
+      SubsystemFactory.createIndexerSelectorSubsystem();
+
+  private final IndexerKickerSubsystem indexerKickerSubsystem =
+      SubsystemFactory.createIndexerKickerSubsystem();
 
   /* ---- SHOOTER ---- */
   private final HoodSubsystem hoodSubsystem = SubsystemFactory.createHoodSubsystem();
@@ -54,8 +67,20 @@ public class RobotContainer implements Loggerable {
     driveSubsystem.setDefaultCommand(commandFactory.createDriveJoystickCmd(driverController));
     hoodSubsystem.setDefaultCommand(commandFactory.createHoodStopCommand());
 
+    spindexerSubsystem.setDefaultCommand(spindexerSubsystem.stopSpindexerCommand());
+    indexerSelectorSubsystem.setDefaultCommand(indexerSelectorSubsystem.stopSelectorCommand());
+    indexerKickerSubsystem.setDefaultCommand(indexerKickerSubsystem.stopKickerCommand());
+
     driverController.a().whileTrue(commandFactory.createHoodUpCommand());
     driverController.b().whileTrue(commandFactory.createHoodDownCommand());
+
+    driverController
+        .x()
+        .whileTrue(
+            new ParallelCommandGroup(
+                spindexerSubsystem.runSpindexerCommand(),
+                indexerSelectorSubsystem.runSelectorCommand(),
+                indexerKickerSubsystem.runKickerCommand()));
   }
 
   /**

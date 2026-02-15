@@ -1,4 +1,4 @@
-package com.aembot.frc2026.config.subsystems.spindexer;
+package com.aembot.frc2026.config.subsystems.indexerKicker;
 
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Config for the spindexer subsystem, which moves game pieces from the intake to the selector
+ * Config for the kicker subsystem, which moves game pieces from the selector to the shooter
  *
  * <p>Required calls:
  *
@@ -18,7 +18,7 @@ import java.util.List;
  *   <li>{@link #validate()} (last)
  * </ul>
  */
-public class SpindexerConfiguration {
+public class IndexerKickerConfiguration {
   public final String kName;
 
   public MotorConfiguration<TalonFXConfiguration> kMotorConfig;
@@ -26,16 +26,17 @@ public class SpindexerConfiguration {
 
   public Double kTargetSpeedRPM;
 
-  public SpindexerConfiguration(String name) {
+  public IndexerKickerConfiguration(String name) {
     this.kName = name;
   }
 
   /**
    * Set the config for the spindexer's motor
    *
-   * @return This {@link SpindexerConfiguration} for chaining
+   * @return This {@link IndexerKickerConfiguration} for chaining
    */
-  public SpindexerConfiguration withMotorConfig(MotorConfiguration<TalonFXConfiguration> config) {
+  public IndexerKickerConfiguration withMotorConfig(
+      MotorConfiguration<TalonFXConfiguration> config) {
     this.kMotorConfig = config;
     return this;
   }
@@ -43,36 +44,36 @@ public class SpindexerConfiguration {
   /**
    * Set the sim config for the spindexer's motor
    *
-   * @return This {@link SpindexerConfiguration} for chaining
+   * @return This {@link IndexerKickerConfiguration} for chaining
    */
-  public SpindexerConfiguration withSimMotorConfig(
+  public IndexerKickerConfiguration withSimMotorConfig(
       SimulatedMotorConfiguration<TalonFXConfiguration> config) {
     this.kSimMotorConfig = config;
     return this;
   }
 
   /**
-   * Set the target RPM of the spindexer while running
+   * Set the target RPM of the kicker while running
    *
-   * @param targetSpeedRPM target RPM of the spindexer while running
-   * @return this {@link SpindexerConfiguration} for chaining
+   * @param targetSpeedRPM target RPM of the kicker while running
+   * @return this {@link IndexerKickerConfiguration} for chaining
    */
-  public SpindexerConfiguration withTargetSpeedRPM(double targetSpeedRPM) {
+  public IndexerKickerConfiguration withTargetSpeedRPM(double targetSpeedRPM) {
     this.kTargetSpeedRPM = targetSpeedRPM;
     return this;
   }
 
   /**
-   * Check that all values required for a spindexer subsystem are set on this config. If they are
-   * not, throw a {@link VerifyError}. Intended to be called at the end of an initialization chain.
+   * Check that all values required for a kicker subsystem are set on this config. If they are not,
+   * throw a {@link VerifyError}. Intended to be called at the end of an initialization chain.
    *
-   * @return this {@link SpindexerConfiguration} for chaining
+   * @return this {@link IndexerKickerConfiguration} for chaining
    */
-  public SpindexerConfiguration validate() {
+  public IndexerKickerConfiguration validate() {
     List<String> missing = new ArrayList<>();
-    if (this.kTargetSpeedRPM == null) missing.add("kTargetSpeed");
     if (this.kMotorConfig == null) missing.add("kMotorConfig");
     if (this.kSimMotorConfig == null) missing.add("kSimMotorConfig");
+    if (this.kTargetSpeedRPM == null) missing.add("kTargetSpeed");
 
     if (missing.size() != 0) {
       throw new VerifyError(

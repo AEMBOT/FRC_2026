@@ -5,6 +5,12 @@ import com.aembot.lib.core.can.CANDeviceID;
 /**
  * Config for a time-of-flight sensor such as a CANRange.
  *
+ * <p>Required calls:
+ *
+ * <ul>
+ *   <li>{@link #validate()} (last)
+ * </ul>
+ *
  * @see {@link com.aembot.lib.core.sensors.timeOfFlight.interfaces.TimeOfFlightIO}
  */
 public class TimeOfFlightConfiguration {

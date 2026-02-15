@@ -1,6 +1,9 @@
 package com.aembot.frc2026.config.robots;
 
 import com.aembot.frc2026.config.RobotConfiguration;
+import com.aembot.frc2026.config.subsystems.indexerKicker.IndexerKickerConfiguration;
+import com.aembot.frc2026.config.subsystems.indexerSelector.IndexerSelectorConfiguration;
+import com.aembot.frc2026.config.subsystems.spindexer.SpindexerConfiguration;
 import com.aembot.lib.config.robot.PhysicalConfiguration;
 import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
 import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
@@ -20,7 +23,8 @@ public class ProductionConfig extends RobotConfiguration {
   private static final String ROBOT_NAME = "Timothy";
 
   private static final String DRIVETRAIN_BUS_NAME = "drivetrain";
-  private static final List<String> CAN_BUS_NAMES = List.of(DRIVETRAIN_BUS_NAME);
+  private static final String PRIMARY_BUS_NAME = "rio"; // TODO
+  private static final List<String> CAN_BUS_NAMES = List.of(DRIVETRAIN_BUS_NAME, PRIMARY_BUS_NAME);
 
   private static final PhysicalConfiguration PHYSICAL_CONFIGURATION =
       new PhysicalConfiguration()
@@ -34,6 +38,8 @@ public class ProductionConfig extends RobotConfiguration {
   private static final ProductionDrivetrainConfig DRIVETRAIN_CONFIG =
       new ProductionDrivetrainConfig(PHYSICAL_CONFIGURATION, DRIVETRAIN_BUS_NAME);
   private static final ProductionHoodConfig HOOD_CONFIG = new ProductionHoodConfig();
+  private static final ProductionIndexerConfig INDEXER_CONFIG =
+      new ProductionIndexerConfig(PRIMARY_BUS_NAME);
 
   private static final ProductionCameraConfig CAMERA_CONFIG = new ProductionCameraConfig();
 
@@ -83,5 +89,20 @@ public class ProductionConfig extends RobotConfiguration {
   @Override
   public List<SimulatedCameraConfiguration> getSimulatedCameraConfigurations() {
     return CAMERA_CONFIG.simConfigurations;
+  }
+
+  @Override
+  public SpindexerConfiguration getSpindexerConfiguration() {
+    return INDEXER_CONFIG.spindexerConfiguration;
+  }
+
+  @Override
+  public IndexerSelectorConfiguration getIndexerSelectorConfiguration() {
+    return INDEXER_CONFIG.selectorConfiguration;
+  }
+
+  @Override
+  public IndexerKickerConfiguration getIndexerKickerConfiguration() {
+    return INDEXER_CONFIG.kickerConfiguration;
   }
 }
