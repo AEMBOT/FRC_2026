@@ -27,7 +27,7 @@ public class CANCoderSimIO implements CANCoderIO, CANable {
 
   protected double lastUpdateTimestamp = 0.0;
 
-  protected SimulatedCANCoderState inputs;
+  protected SimulatedCANCoderState inputs = new SimulatedCANCoderState();
 
   public CANCoderSimIO(AEMCANCoderConfiguration config) {
     this.config = config;

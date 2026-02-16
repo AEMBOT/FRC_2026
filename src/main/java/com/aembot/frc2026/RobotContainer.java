@@ -6,6 +6,7 @@ package com.aembot.frc2026;
 
 import com.aembot.frc2026.commands.CommandFactory;
 import com.aembot.frc2026.subsystems.SubsystemFactory;
+import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.lib.core.logging.Loggerable;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
@@ -42,6 +43,9 @@ public class RobotContainer implements Loggerable {
   private final OverBumperIntakeRollerSubsystem intakeRollerSubsystem =
       SubsystemFactory.createIntakeRollerSubsystem();
 
+  /* ---- TURRET ---- */
+  private final TurretSubsystem turretSubsystem = SubsystemFactory.createTurretSubsystem();
+
   private final CommandFactory commandFactory;
 
   /* ---- VISION ---- */
@@ -55,7 +59,11 @@ public class RobotContainer implements Loggerable {
 
     this.commandFactory =
         new CommandFactory(
-            driveSubsystem, hoodSubsystem, intakeDeploySubsystem, intakeRollerSubsystem);
+            driveSubsystem,
+            hoodSubsystem,
+            intakeDeploySubsystem,
+            intakeRollerSubsystem,
+            turretSubsystem);
     configureBindings();
   }
 
@@ -63,13 +71,9 @@ public class RobotContainer implements Loggerable {
   private void configureBindings() {
     driveSubsystem.setDefaultCommand(commandFactory.createDriveJoystickCmd(driverController));
     hoodSubsystem.setDefaultCommand(commandFactory.createHoodStopCommand());
+    turretSubsystem.setDefaultCommand(commandFactory.createTurretStopCommand());
     intakeRollerSubsystem.setDefaultCommand(
         commandFactory.intakeCommands.createStopIntakeCommand());
-
-    driverController.a().onTrue(commandFactory.intakeCommands.createUpCommand());
-    driverController.b().onTrue(commandFactory.intakeCommands.createDownCommand());
-
-    driverController.x().whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
   }
 
   /**
