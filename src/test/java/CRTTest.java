@@ -8,7 +8,7 @@ public class CRTTest {
   public TalonFXTurretConfiguration testconfig = new ProductionTurretConfig().TURRET_CONFIG;
 
   @Test
-  void DoesItWork() {
+  void DualEncoderTurretAngleCalculation() {
     // double result = testconfig.solve(0.230769231, 0.176470588);
 
     for (double i = 0.; i < 750; i += 0.5) {
