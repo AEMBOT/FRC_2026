@@ -1,5 +1,6 @@
 package com.aembot.frc2026.commands;
 
+import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -36,5 +37,20 @@ public final class ShooterCommands {
 
   public Command createTurretDownCommand() {
     return turret.smartVelocitySetpointCommand(() -> -30);
+  }
+
+  private double getTurretForwardFromRobotPose() {
+    double targetRotation =
+        RobotStateYearly.get().getLatestFieldRobotPose().getRotation().getDegrees() + 180;
+
+    if (targetRotation < 0) {
+      targetRotation += 360;
+    }
+
+    return targetRotation;
+  }
+
+  public Command createTurretAbsoluteForwardCommand() {
+    return turret.smartPositionSetpointCommand(() -> getTurretForwardFromRobotPose());
   }
 }
