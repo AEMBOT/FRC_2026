@@ -4,7 +4,7 @@ import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.frc2026.subsystems.flywheel.io.FlywheelHardwareIO;
 import com.aembot.frc2026.subsystems.flywheel.io.FlywheelSimIO;
-import com.aembot.lib.config.motors.MotorFollowersConfiguration;
+import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.subsystems.flywheel.simulation.SimulatedFlywheelConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
@@ -12,7 +12,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 public class SubsystemFactory {
   public static FlywheelSubsystem createFlywheelSubsystem() {
     FlywheelSubsystem flywheelSubsystem = null;
-    MotorFollowersConfiguration<TalonFXConfiguration> flywheelMotorsConfig =
+    MotorConfiguration<TalonFXConfiguration> flywheelMotorsConfig =
         RobotRuntimeConstants.CURRENT_ROBOT_CONFIGS.getFlywheelConfiguration();
     SimulatedFlywheelConfiguration flywheelSimConfig =
         RobotRuntimeConstants.CURRENT_ROBOT_CONFIGS.getSimulatedFlywheelConfiguration();

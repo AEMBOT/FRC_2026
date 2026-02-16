@@ -1,6 +1,6 @@
 package com.aembot.frc2026.subsystems.flywheel.io;
 
-import com.aembot.lib.config.motors.MotorFollowersConfiguration;
+import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.subsystems.flywheel.simulation.SimulatedFlywheelConfiguration;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.subsystems.flywheel.simulation.SimulatedFlywheel;
@@ -11,7 +11,7 @@ public class FlywheelSimIO extends FlywheelHardwareIO {
   private final SimulatedFlywheel simFlywheel;
 
   public FlywheelSimIO(
-      MotorFollowersConfiguration<TalonFXConfiguration> flywheelConfig,
+      MotorConfiguration<TalonFXConfiguration> flywheelConfig,
       SimulatedFlywheelConfiguration simulatedFlywheelConfig) {
     super(flywheelConfig);
     simFlywheel = new SimulatedFlywheel(flywheelConfig, simulatedFlywheelConfig);
@@ -27,8 +27,8 @@ public class FlywheelSimIO extends FlywheelHardwareIO {
     return simFlywheel.getLeadTalon();
   }
 
-  @Override
-  public MotorIO[] getFollowerMotors() {
-    return simFlywheel.getFollowerTalons();
-  }
+  // @Override
+  // public MotorIO[] getFollowerMotors() {
+  //   return simFlywheel.getFollowerTalons();
+  // }
 }

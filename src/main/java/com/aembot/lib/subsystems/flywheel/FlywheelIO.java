@@ -7,5 +7,5 @@ public interface FlywheelIO extends Loggable {
 
   public MotorIO getLeadMotor();
 
-  public MotorIO[] getFollowerMotors();
+  // public MotorIO[] getFollowerMotors();
 }

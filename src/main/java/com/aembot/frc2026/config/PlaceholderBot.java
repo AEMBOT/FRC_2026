@@ -1,7 +1,7 @@
 package com.aembot.frc2026.config;
 
 import com.aembot.frc2026.constants.RobotConfig;
-import com.aembot.lib.config.motors.MotorFollowersConfiguration;
+import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.subsystems.flywheel.simulation.SimulatedFlywheelConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
@@ -24,7 +24,7 @@ public class PlaceholderBot extends RobotConfig {
   }
 
   @Override
-  public MotorFollowersConfiguration<TalonFXConfiguration> getFlywheelConfiguration() {
+  public MotorConfiguration<TalonFXConfiguration> getFlywheelConfiguration() {
     return FLYWHEEL_CONFIGURATION.FLYWHEEL_SUBSYSTEM_CONFIGURATION;
   }
 }

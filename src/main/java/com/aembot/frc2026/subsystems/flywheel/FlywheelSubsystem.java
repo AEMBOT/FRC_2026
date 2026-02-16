@@ -1,30 +1,27 @@
 package com.aembot.frc2026.subsystems.flywheel;
 
-import com.aembot.lib.config.motors.MotorFollowersConfiguration;
+import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
-import com.aembot.lib.subsystems.base.MotorFollowerSubsystem;
+import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.aembot.lib.subsystems.flywheel.FlywheelIO;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.ControlRequest;
-import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
-
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class FlywheelSubsystem
-    extends MotorFollowerSubsystem<
-        MotorInputs, MotorIO, MotorFollowersConfiguration<TalonFXConfiguration>> {
+    extends MotorSubsystem<MotorInputs, MotorIO, MotorConfiguration<TalonFXConfiguration>> {
   private final FlywheelIO flywheel;
 
-  public FlywheelSubsystem(
-      MotorFollowersConfiguration<TalonFXConfiguration> config, FlywheelIO flywheel) {
+  public FlywheelSubsystem(MotorConfiguration<TalonFXConfiguration> config, FlywheelIO flywheel) {
+    super(new MotorInputs(), flywheel.getLeadMotor(), config);
+    // super(
+    //     new MotorInputs(),
+    //     flywheel.getLeadMotor(),
 
-    super(
-        new MotorInputs(),
-        flywheel.getLeadMotor(),
-        generateFollowerInputs(flywheel.getFollowerMotors()),
-        flywheel.getFollowerMotors(),
-        config);
+    //     //generateFollowerInputs(flywheel.getFollowerMotors()),
+    //     //flywheel.getFollowerMotors(),
+    //     config);
+    // MotorSubsystem(new MotorInputs(), flywheel.getLeadMotor(), config);
 
     this.flywheel = flywheel;
 
@@ -44,6 +41,6 @@ public class FlywheelSubsystem
   }
 
   public Command DefaultSpin() {
-    return smartVelocitySetpointCommand(() -> 40).withName("DefaultSpin").ignoringDisable(true);
+    return smartVelocitySetpointCommand(() -> 20).withName("DefaultSpin").ignoringDisable(true);
   }
 }

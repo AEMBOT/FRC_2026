@@ -1,9 +1,8 @@
 package com.aembot.lib.subsystems.flywheel.simulation;
 
-import com.aembot.lib.config.motors.MotorFollowersConfiguration;
+import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.subsystems.flywheel.simulation.SimulatedFlywheelConfiguration;
 import com.aembot.lib.core.logging.Loggable;
-import com.aembot.lib.core.motors.interfaces.MotorIO.FollowDirection;
 import com.aembot.lib.core.motors.io.MotorIOTalonFX;
 import com.aembot.lib.core.motors.io.MotorIOTalonFXSim;
 import com.aembot.lib.subsystems.flywheel.visualization.FlywheelVisualizer;
@@ -35,11 +34,11 @@ public class SimulatedFlywheel implements Loggable {
   protected SimulatedFlywheelInputs inputs = new SimulatedFlywheelInputs();
 
   // Set up motor instances and configurations
-  protected MotorFollowersConfiguration<TalonFXConfiguration> config;
+  protected MotorConfiguration<TalonFXConfiguration> config;
   protected SimulatedFlywheelConfiguration flywheelSimulationConfiguration;
 
   protected MotorIOTalonFXSim leadTalonSimulation;
-  protected MotorIOTalonFXSim[] followerTalonSimulations;
+  // protected MotorIOTalonFXSim[] followerTalonSimulations;
 
   // The simulated flywheel
   protected FlywheelSim flywheelSimulation;
@@ -49,8 +48,7 @@ public class SimulatedFlywheel implements Loggable {
   protected double lastUpdateTimestamp = 0.0;
 
   public SimulatedFlywheel(
-      MotorFollowersConfiguration<TalonFXConfiguration> config,
-      SimulatedFlywheelConfiguration simConfig) {
+      MotorConfiguration<TalonFXConfiguration> config, SimulatedFlywheelConfiguration simConfig) {
     this.config = config;
     this.flywheelSimulationConfiguration = simConfig;
 
@@ -58,20 +56,18 @@ public class SimulatedFlywheel implements Loggable {
     this.flywheelSimulation =
         new FlywheelSim(
             LinearSystemId.createFlywheelSystem(
-                DCMotor.getKrakenX60Foc(config.followerConfigurations.size() + 1),
-                simConfig.JKgMetersSquared,
-                1 / simConfig.gearing),
-            DCMotor.getKrakenX60Foc(config.followerConfigurations.size() + 1));
+                DCMotor.getKrakenX60Foc(1), simConfig.JKgMetersSquared, 1 / simConfig.gearing),
+            DCMotor.getKrakenX60Foc(1));
 
     // Leader talon setup
     leadTalonSimulation = new MotorIOTalonFXSim(config);
 
     // Create new simulated talons for each follower talon
-    followerTalonSimulations = new MotorIOTalonFXSim[config.followerConfigurations.size()];
-    for (int i = 0; i < config.followerConfigurations.size(); i++) {
-      followerTalonSimulations[i] =
-          new MotorIOTalonFXSim(config.followerConfigurations.get(i).config);
-    }
+    // followerTalonSimulations = new MotorIOTalonFXSim[config.followerConfigurations.size()];
+    // for (int i = 0; i < config.followerConfigurations.size(); i++) {
+    //   followerTalonSimulations[i] =
+    //       new MotorIOTalonFXSim(config.followerConfigurations.get(i).config);
+    // }
 
     // Set up the way sim updates for proper behaviour
     simNotifier =
@@ -139,40 +135,40 @@ public class SimulatedFlywheel implements Loggable {
     simState.setRawRotorPosition(inputs.RotorPositionRot);
 
     // Update the follower talon sim states
-    for (int i = 0; i < followerTalonSimulations.length; ++i) {
-      if (this.config.followerConfigurations.get(i).followDirection == FollowDirection.SAME) {
-        followerTalonSimulations[i]
-            .getSimState()
-            .setRawRotorPosition(inputs.RotorPositionRot * 1.0);
-        followerTalonSimulations[i]
-            .getSimState()
-            .setRotorVelocity(inputs.RotorVelocityRotPerSec * 1.0);
-        followerTalonSimulations[i]
-            .getSimState()
-            .setRotorAcceleration(inputs.RotorAccelerationRotPerSecSq * 1.0);
-      } else {
-        followerTalonSimulations[i]
-            .getSimState()
-            .setRawRotorPosition(inputs.RotorPositionRot * -1.0);
-        followerTalonSimulations[i]
-            .getSimState()
-            .setRotorVelocity(inputs.RotorVelocityRotPerSec * -1.0);
-        followerTalonSimulations[i]
-            .getSimState()
-            .setRotorAcceleration(inputs.RotorAccelerationRotPerSecSq * -1.0);
-      }
-    }
+    // for (int i = 0; i < followerTalonSimulations.length; ++i) {
+    //   if (this.config.followerConfigurations.get(i).followDirection == FollowDirection.SAME) {
+    //     followerTalonSimulations[i]
+    //         .getSimState()
+    //         .setRawRotorPosition(inputs.RotorPositionRot * 1.0);
+    //     followerTalonSimulations[i]
+    //         .getSimState()
+    //         .setRotorVelocity(inputs.RotorVelocityRotPerSec * 1.0);
+    //     followerTalonSimulations[i]
+    //         .getSimState()
+    //         .setRotorAcceleration(inputs.RotorAccelerationRotPerSecSq * 1.0);
+    //   } else {
+    //     followerTalonSimulations[i]
+    //         .getSimState()
+    //         .setRawRotorPosition(inputs.RotorPositionRot * -1.0);
+    //     followerTalonSimulations[i]
+    //         .getSimState()
+    //         .setRotorVelocity(inputs.RotorVelocityRotPerSec * -1.0);
+    //     followerTalonSimulations[i]
+    //         .getSimState()
+    //         .setRotorAcceleration(inputs.RotorAccelerationRotPerSecSq * -1.0);
+    //   }
+    // }
   }
 
   public MotorIOTalonFX getLeadTalon() {
     return leadTalonSimulation;
   }
 
-  public MotorIOTalonFX[] getFollowerTalons() {
-    return followerTalonSimulations;
-  }
+  // public MotorIOTalonFX[] getFollowerTalons() {
+  //   return followerTalonSimulations;
+  // }
 
-  public void setVoltage(double voltage) {
-    flywheelSimulation.setInput(voltage);
-  }
+  // public void setVoltage(double voltage) {
+  //   flywheelSimulation.setInput(voltage);
+  // }
 }
