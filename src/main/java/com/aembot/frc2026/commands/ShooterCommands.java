@@ -2,7 +2,6 @@ package com.aembot.frc2026.commands;
 
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
-
 import edu.wpi.first.wpilibj2.command.Command;
 
 public final class ShooterCommands {
