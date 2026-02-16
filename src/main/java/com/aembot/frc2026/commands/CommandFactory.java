@@ -15,19 +15,20 @@ public final class CommandFactory {
 
   private final ShooterCommandFactory shooterCommandFactory;
 
-  private final ShooterCommandFactory shooterCommandFactory;
-
   public final IntakeCommands intakeCommands;
 
   public CommandFactory(
       DriveSubsystem driveSubsystem,
       HoodSubsystem hoodSubsystem,
       OverBumperIntakeDeploySubsystem intakeDeploySubsystem,
-      OverBumperIntakeRollerSubsystem intakeRollerSubsystem) {
+      OverBumperIntakeRollerSubsystem intakeRollerSubsystem
+      ) {
     this.driveSubsystem = driveSubsystem;
     this.hoodSubsystem = hoodSubsystem;
 
     this.intakeCommands = new IntakeCommands(intakeDeploySubsystem, intakeRollerSubsystem);
+
+    this.shooterCommandFactory = new ShooterCommandFactory(hoodSubsystem);
   }
 
   public JoystickDriveCommand createDriveJoystickCmd(CommandXboxController driverController) {

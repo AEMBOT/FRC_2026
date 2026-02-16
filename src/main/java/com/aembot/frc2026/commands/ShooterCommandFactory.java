@@ -109,10 +109,10 @@ public final class ShooterCommandFactory {
             new RebuiltFuelOnFly(
                     robotPose.getTranslation(),
                     new Translation2d(),
-                    ChassisSpeeds.fromFieldRelativeSpeeds(
+                    ChassisSpeeds.fromRobotRelativeSpeeds(
                         RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds(),
                         robotPose.getRotation()),
-                    getRelativeYaw(),
+                    getRelativeYaw(), // TODO: replace with turret angle
                     Meters.of(0.5), // TODO:find spot to replace magic number
                     MetersPerSecond.of(getShootingSpeed()), // TODO: replace with flywheel speed
                     Degrees.of(hood.getCurrentPosition()))

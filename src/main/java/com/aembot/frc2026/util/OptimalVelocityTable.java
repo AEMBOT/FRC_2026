@@ -125,7 +125,7 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
     double yaw = Math.atan2(velocity.getY(), velocity.getX());
 
     double pitch =
-        Math.PI / 2 - Math.acos(velocity.getZ() / velocity.getDistance(Translation3d.kZero));
+        (Math.PI / 2) - Math.acos(velocity.getZ() / velocity.getDistance(Translation3d.kZero));
 
     return new Rotation3d(0, pitch, yaw);
   }
