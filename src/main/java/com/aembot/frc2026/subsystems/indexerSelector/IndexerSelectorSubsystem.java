@@ -53,7 +53,7 @@ public class IndexerSelectorSubsystem
    *     termination. Note that this does not set target velocity to 0 upon termination.
    */
   public Command runSelectorCommand() {
-    return this.smartVelocitySetpointCommand(() -> kConfig.kTargetSpeedRPM);
+    return this.smartVelocitySetpointCommand(() -> kConfig.kTargetSpeedRPM / 60);
   }
 
   /**

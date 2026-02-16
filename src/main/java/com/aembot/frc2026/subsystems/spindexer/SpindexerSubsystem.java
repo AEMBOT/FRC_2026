@@ -43,7 +43,7 @@ public class SpindexerSubsystem
    *     termination. Note that this does not set target velocity to 0 upon termination.
    */
   public Command runSpindexerCommand() {
-    return this.smartVelocitySetpointCommand(() -> kConfig.kTargetSpeedRPM)
+    return this.smartVelocitySetpointCommand(() -> kConfig.kTargetSpeedRPM / 60)
         .withName("SpindexerRunning");
   }
 

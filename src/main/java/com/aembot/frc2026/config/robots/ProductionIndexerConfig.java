@@ -42,8 +42,10 @@ public final class ProductionIndexerConfig {
                   new TalonFXConfiguration()
                       .withMotionMagic(
                           new MotionMagicConfigs()
+                              .withMotionMagicCruiseVelocity((TARGET_SPEED_RPM / 60) * GEAR_RATIO)
                               .withMotionMagicAcceleration((ACCELERATION_RPM / 60) * GEAR_RATIO))
                       .withSlot0(MOTOR_GAINS))
+              .withMomentOfInertia(0.01)
               .withCANDevice(
                   new CANDeviceID(
                       MOTOR_CAN_ID,
@@ -52,7 +54,8 @@ public final class ProductionIndexerConfig {
                       CANDeviceID.CANDeviceType.TALON_FX,
                       busName))
               .withName(SUBSYSTEM_NAME + "Motor")
-              .withUnitToRotorRotationRatio(GEAR_RATIO);
+              .withUnitToMechanismRotationRatio(1) // Use RPM
+              .withUnitToRotorRotationRatio(1 / GEAR_RATIO);
 
       SimulatedMotorConfiguration<TalonFXConfiguration> simMotorConfig =
           new SimulatedMotorConfiguration<TalonFXConfiguration>()
@@ -95,6 +98,7 @@ public final class ProductionIndexerConfig {
                           new MotionMagicConfigs()
                               .withMotionMagicAcceleration((ACCELERATION_RPM / 60) * GEAR_RATIO))
                       .withSlot0(MOTOR_GAINS))
+              .withMomentOfInertia(0.01)
               .withCANDevice(
                   new CANDeviceID(
                       MOTOR_CAN_ID,
@@ -103,6 +107,7 @@ public final class ProductionIndexerConfig {
                       CANDeviceID.CANDeviceType.TALON_FX,
                       busName))
               .withName(SUBSYSTEM_NAME + "Motor")
+              .withUnitToMechanismRotationRatio(1) // Use RPM
               .withUnitToRotorRotationRatio(GEAR_RATIO);
 
       SimulatedMotorConfiguration<TalonFXConfiguration> simMotorConfig =
@@ -164,6 +169,7 @@ public final class ProductionIndexerConfig {
                           new MotionMagicConfigs()
                               .withMotionMagicAcceleration((ACCELERATION_RPM / 60) * GEAR_RATIO))
                       .withSlot0(MOTOR_GAINS))
+              .withMomentOfInertia(0.01)
               .withCANDevice(
                   new CANDeviceID(
                       MOTOR_CAN_ID,
@@ -172,6 +178,7 @@ public final class ProductionIndexerConfig {
                       CANDeviceID.CANDeviceType.TALON_FX,
                       busName))
               .withName(SUBSYSTEM_NAME + "Motor")
+              .withUnitToMechanismRotationRatio(1) // Use RPM
               .withUnitToRotorRotationRatio(GEAR_RATIO);
 
       SimulatedMotorConfiguration<TalonFXConfiguration> simMotorConfig =

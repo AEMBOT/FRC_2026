@@ -42,7 +42,7 @@ public class IndexerKickerSubsystem
    *     termination. Note that this does not set target velocity to 0 upon termination.
    */
   public Command runKickerCommand() {
-    return this.smartVelocitySetpointCommand(() -> kConfig.kTargetSpeedRPM);
+    return this.smartVelocitySetpointCommand(() -> kConfig.kTargetSpeedRPM / 60);
   }
 
   /**
@@ -53,7 +53,7 @@ public class IndexerKickerSubsystem
    *     termination. Note that this does not set target velocity to 0 upon termination.
    */
   public Command resistKickerCommand() {
-    return this.smartVelocitySetpointCommand(() -> kConfig.kResistSpeedRPM);
+    return this.smartVelocitySetpointCommand(() -> kConfig.kResistSpeedRPM / 60);
   }
 
   /**
