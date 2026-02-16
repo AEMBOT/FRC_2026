@@ -30,8 +30,10 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
     double SimVoltage;
     double SimPosUnits;
     double SimVelocityUnits;
+    double SimAccelerationUnits;
     double RotorPosition;
     double RotorVelocity;
+    double RotorAcceleration;
   }
 
   /** Sim state of the talonfx */
@@ -74,7 +76,7 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
   }
 
   /** Setup the motor simulation and visualization */
-  private void setupMotorSim() {
+  protected void setupMotorSim() {
     double gearRatio = config.kRealConfiguration.getGearRatio();
     var plant =
         LinearSystemId.createDCMotorSystem(
@@ -146,6 +148,7 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
     double dt = timestamp - lastUpdateTimestamp;
     lastUpdateTimestamp = timestamp;
 
+    // TODO find place to store these values
     if (dt > 0.1) {
       dt = 0.005;
     }
@@ -184,12 +187,17 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
     inputs.SimVelocityUnits =
         config.kRealConfiguration.getMechanismRotationsToUnits(
             Units.radiansToRotations(motorSim.getAngularVelocityRadPerSec()));
+    inputs.SimAccelerationUnits =
+        config.kRealConfiguration.getMechanismRotationsToUnits(
+            Units.radiansToRotations(motorSim.getAngularAccelerationRadPerSecSq()));
 
     inputs.RotorPosition = config.kRealConfiguration.getUnitsToRotorRotations(inputs.SimPosUnits);
     inputs.RotorVelocity =
         config.kRealConfiguration.getUnitsToRotorRotations(inputs.SimVelocityUnits);
+    inputs.RotorAcceleration =
+        config.kRealConfiguration.getUnitsToRotorRotations(inputs.SimAccelerationUnits);
 
-    simState.setRotorAcceleration(motorSim.getAngularAcceleration());
+    simState.setRotorAcceleration(inputs.RotorAcceleration);
     simState.setRawRotorPosition(inputs.RotorPosition);
     simState.setRotorVelocity(inputs.RotorVelocity);
 
