@@ -145,6 +145,13 @@ public final class ProductionIndexerConfig {
     /** Target speed of the spindexer roller in RPM */
     static final double TARGET_SPEED_RPM = 200.0; // Copied from intake config
 
+    /**
+     * Speed of the kicker to resist movement of game pieces into the shooter in RPM.
+     *
+     * @see IndexerKickerConfiguration#kResistSpeedRPM
+     */
+    static final double RESIST_SPEED_RPM = -20.0;
+
     /** Target acceleration of the spindexer roller in RPM^2. */
     static final double ACCELERATION_RPM = 400.0; // Copied from intake config
 
@@ -177,6 +184,7 @@ public final class ProductionIndexerConfig {
           .withMotorConfig(motorConfig)
           .withSimMotorConfig(simMotorConfig)
           .withTargetSpeedRPM(TARGET_SPEED_RPM)
+          .withResistSpeedRPM(RESIST_SPEED_RPM)
           .validate();
     }
   }

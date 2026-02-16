@@ -1,5 +1,8 @@
 package com.aembot.frc2026.commands;
 
+import com.aembot.frc2026.subsystems.indexerKicker.IndexerKickerSubsystem;
+import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorSubsystem;
+import com.aembot.frc2026.subsystems.spindexer.SpindexerSubsystem;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.drive.commands.JoystickDriveCommand;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
@@ -13,16 +16,22 @@ public final class CommandFactory {
   private final HoodSubsystem hoodSubsystem;
 
   public final IntakeCommands intakeCommands;
+  public final IndexerCommands indexerCommands;
 
   public CommandFactory(
       DriveSubsystem driveSubsystem,
       HoodSubsystem hoodSubsystem,
       OverBumperIntakeDeploySubsystem intakeDeploySubsystem,
-      OverBumperIntakeRollerSubsystem intakeRollerSubsystem) {
+      OverBumperIntakeRollerSubsystem intakeRollerSubsystem,
+      SpindexerSubsystem spindexerSubsystem,
+      IndexerSelectorSubsystem indexerSelectorSubsystem,
+      IndexerKickerSubsystem indexerKickerSubsystem) {
     this.driveSubsystem = driveSubsystem;
     this.hoodSubsystem = hoodSubsystem;
 
     this.intakeCommands = new IntakeCommands(intakeDeploySubsystem, intakeRollerSubsystem);
+    this.indexerCommands =
+        new IndexerCommands(spindexerSubsystem, indexerSelectorSubsystem, indexerKickerSubsystem);
   }
 
   public JoystickDriveCommand createDriveJoystickCmd(CommandXboxController driverController) {

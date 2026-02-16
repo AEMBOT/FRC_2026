@@ -15,6 +15,7 @@ import java.util.List;
  *   <li>{@link #withMotorConfig(MotorConfiguration)}
  *   <li>{@link #withSimMotorConfig(SimulatedMotorConfiguration)}
  *   <li>{@link #withTargetSpeedRPM(double)}
+ *   <li>{@link #withResistSpeedRPM(double)}
  *   <li>{@link #validate()} (last)
  * </ul>
  */
@@ -25,6 +26,9 @@ public class IndexerKickerConfiguration {
   public SimulatedMotorConfiguration<TalonFXConfiguration> kSimMotorConfig;
 
   public Double kTargetSpeedRPM;
+
+  /** Speed to run the kicker at to prevent game pieces from being pushed into the shooter. */
+  public Double kResistSpeedRPM;
 
   public IndexerKickerConfiguration(String name) {
     this.kName = name;
@@ -64,6 +68,17 @@ public class IndexerKickerConfiguration {
   }
 
   /**
+   * Set the speed to run the kicker at to prevent game pieces from being pushed into the shooter
+   *
+   * @param resistSpeedRPM target RPM of the kicker while resisting
+   * @return this {@link IndexerKickerConfiguration} for chaining
+   */
+  public IndexerKickerConfiguration withResistSpeedRPM(double resistSpeedRPM) {
+    this.kResistSpeedRPM = resistSpeedRPM;
+    return this;
+  }
+
+  /**
    * Check that all values required for a kicker subsystem are set on this config. If they are not,
    * throw a {@link VerifyError}. Intended to be called at the end of an initialization chain.
    *
@@ -74,6 +89,7 @@ public class IndexerKickerConfiguration {
     if (this.kMotorConfig == null) missing.add("kMotorConfig");
     if (this.kSimMotorConfig == null) missing.add("kSimMotorConfig");
     if (this.kTargetSpeedRPM == null) missing.add("kTargetSpeed");
+    if (this.kResistSpeedRPM == null) missing.add("kResistSpeedRPM");
 
     if (missing.size() != 0) {
       throw new VerifyError(

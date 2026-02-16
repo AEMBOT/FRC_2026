@@ -46,6 +46,17 @@ public class IndexerKickerSubsystem
   }
 
   /**
+   * Command to run the kicker in reverse, preventing balls from being pushed into the shooter
+   *
+   * @return Command that will set the target velocity of the kicker to the velocity defined in
+   *     {@link #kConfig}'s {@link IndexerKickerConfiguration#kResistSpeedRPM}. Runs until
+   *     termination. Note that this does not set target velocity to 0 upon termination.
+   */
+  public Command resistKickerCommand() {
+    return this.smartVelocitySetpointCommand(() -> kConfig.kResistSpeedRPM);
+  }
+
+  /**
    * @return Command that will set the target velocity of the kicker to 0. Runs until termination.
    */
   public Command stopKickerCommand() {

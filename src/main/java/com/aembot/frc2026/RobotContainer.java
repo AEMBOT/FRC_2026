@@ -17,7 +17,6 @@ import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeplo
 import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.littletonrobotics.junction.LoggedRobot;
 
@@ -32,6 +31,7 @@ public class RobotContainer implements Loggerable {
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverController = new CommandXboxController(0);
 
+  @SuppressWarnings("unused")
   private final CommandXboxController secondaryController = new CommandXboxController(1);
 
   /* ---- DRIVETRAIN ---- */
@@ -68,7 +68,13 @@ public class RobotContainer implements Loggerable {
 
     this.commandFactory =
         new CommandFactory(
-            driveSubsystem, hoodSubsystem, intakeDeploySubsystem, intakeRollerSubsystem);
+            driveSubsystem,
+            hoodSubsystem,
+            intakeDeploySubsystem,
+            intakeRollerSubsystem,
+            spindexerSubsystem,
+            indexerSelectorSubsystem,
+            indexerKickerSubsystem);
     configureBindings();
   }
 
@@ -79,22 +85,14 @@ public class RobotContainer implements Loggerable {
     intakeRollerSubsystem.setDefaultCommand(
         commandFactory.intakeCommands.createStopIntakeCommand());
 
-    spindexerSubsystem.setDefaultCommand(spindexerSubsystem.stopSpindexerCommand());
-    indexerSelectorSubsystem.setDefaultCommand(indexerSelectorSubsystem.stopSelectorCommand());
-    indexerKickerSubsystem.setDefaultCommand(indexerKickerSubsystem.stopKickerCommand());
+    commandFactory.indexerCommands.defaultToStop();
 
     driverController.a().onTrue(commandFactory.intakeCommands.createUpCommand());
     driverController.b().onTrue(commandFactory.intakeCommands.createDownCommand());
 
     driverController.x().whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
 
-    driverController
-        .y()
-        .whileTrue(
-            new ParallelCommandGroup(
-                spindexerSubsystem.runSpindexerCommand(),
-                indexerSelectorSubsystem.runSelectorCommand(),
-                indexerKickerSubsystem.runKickerCommand()));
+    driverController.y().whileTrue(commandFactory.indexerCommands.createRunIndexerCommand());
   }
 
   /**
