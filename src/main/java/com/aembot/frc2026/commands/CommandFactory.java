@@ -38,4 +38,8 @@ public final class CommandFactory {
   public Command createHoodTowardsHubCommand() {
     return shooterCommandFactory.createHoodTowardsHubCommand();
   }
+
+  public Command createShootFuelCommand() {
+    return shooterCommandFactory.createShootFuelCommand();
+  }
 }

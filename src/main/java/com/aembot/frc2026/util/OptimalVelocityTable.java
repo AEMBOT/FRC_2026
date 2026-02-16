@@ -4,6 +4,7 @@ import com.aembot.lib.math.ConcurrentInterpolatable2DMap;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvToBeanBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -90,16 +91,21 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
    */
   public Translation3d getFuelInitVelocity(
       Pose2d robotPose, ChassisSpeeds fieldRelativeChassisSpeeds) {
+
+    ChassisSpeeds absoluteChassisSpeeds =
+        ChassisSpeeds.fromRobotRelativeSpeeds(fieldRelativeChassisSpeeds, robotPose.getRotation());
+
     Translation3d velocity =
         getPoint(robotPose.getX(), robotPose.getY())
             .orElse(Translation3d.kZero)
             .minus(
                 new Translation3d(
-                    fieldRelativeChassisSpeeds.vxMetersPerSecond,
-                    fieldRelativeChassisSpeeds.vyMetersPerSecond,
+                    absoluteChassisSpeeds.vxMetersPerSecond,
+                    absoluteChassisSpeeds.vyMetersPerSecond,
                     0));
     Logger.recordOutput(
-        "AutoAim/" + fileName, velocity.plus(new Translation3d(robotPose.getTranslation())));
+        "AutoAim/" + fileName,
+        new Pose3d(velocity.plus(new Translation3d(robotPose.getTranslation())), Rotation3d.kZero));
     return velocity;
   }
 
@@ -113,9 +119,15 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
    */
   public Rotation3d getFuelInitVelocityRotation3d(
       Pose2d robotPose, ChassisSpeeds fieldRelativeChassisSpeeds) {
-    return new Rotation3d(
-        getFuelInitVelocity(robotPose, fieldRelativeChassisSpeeds).toVector(),
-        new Translation3d(1, 0, 0).toVector());
+
+    Translation3d velocity = getFuelInitVelocity(robotPose, fieldRelativeChassisSpeeds);
+
+    double yaw = Math.atan2(velocity.getY(), velocity.getX());
+
+    double pitch =
+        Math.PI / 2 - Math.acos(velocity.getZ() / velocity.getDistance(Translation3d.kZero));
+
+    return new Rotation3d(0, pitch, yaw);
   }
 
   /**
