@@ -27,7 +27,7 @@ public class ProductionTurretConfig {
 
   public final int CANCODER_A_ID = 19;
 
-  public final int CANCODER_B_ID = 19;
+  public final int CANCODER_B_ID = 20;
 
   public final AEMCANCoderConfiguration CANCODER_A_CONFIG =
       new AEMCANCoderConfiguration()
