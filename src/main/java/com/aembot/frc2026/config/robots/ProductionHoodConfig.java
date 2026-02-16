@@ -31,7 +31,7 @@ public class ProductionHoodConfig {
                               Units.degreesToRotations(CRUISE_VELOCITY_DEG_PER_SEC) * GEAR_RATIO)
                           .withMotionMagicAcceleration(
                               Units.degreesToRotations(ACCELERATION_DEG_PER_SEC) * GEAR_RATIO))
-                  .withSlot0(new Slot0Configs().withKP(.1).withKV(.12)))
+                  .withSlot0(new Slot0Configs().withKP(.1).withKV(0)))
           .withCANDevice(
               new CANDeviceID(
                   15, SUBSYSTEM_NAME + "Motor", SUBSYSTEM_NAME, CANDeviceID.CANDeviceType.TALON_FX))

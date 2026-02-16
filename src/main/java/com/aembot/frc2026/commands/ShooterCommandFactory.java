@@ -13,7 +13,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -37,7 +36,7 @@ public final class ShooterCommandFactory {
     String robotType;
     switch (RobotRuntimeConstants.MODE) {
       case SIM:
-        robotType = "/sim";
+        robotType = "/real";
         break;
 
       case REPLAY:
@@ -70,7 +69,7 @@ public final class ShooterCommandFactory {
 
     switch (RobotRuntimeConstants.MODE) {
       case SIM:
-        return new InstantCommand(() -> shootSimulatedFuel(), hood);
+        return new InstantCommand(() -> shootSimulatedFuel());
       case REPLAY:
 
       case REAL:
@@ -109,9 +108,7 @@ public final class ShooterCommandFactory {
             new RebuiltFuelOnFly(
                     robotPose.getTranslation(),
                     new Translation2d(),
-                    ChassisSpeeds.fromRobotRelativeSpeeds(
-                        RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds(),
-                        robotPose.getRotation()),
+                    RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds(),
                     getRelativeYaw(), // TODO: replace with turret angle
                     Meters.of(0.5), // TODO:find spot to replace magic number
                     MetersPerSecond.of(getShootingSpeed()), // TODO: replace with flywheel speed
@@ -123,7 +120,7 @@ public final class ShooterCommandFactory {
                             poses.toArray(Pose3d[]::new)),
                     (poses) ->
                         Logger.recordOutput(
-                            "FieldSimulation/missedShotsTrajectory",
-                            poses.toArray(Pose3d[]::new))));
+                            "FieldSimulation/missedShotsTrajectory", poses.toArray(Pose3d[]::new)))
+                .disableBecomesGamePieceOnFieldAfterTouchGround());
   }
 }
