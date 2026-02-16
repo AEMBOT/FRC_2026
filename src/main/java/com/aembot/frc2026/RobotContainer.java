@@ -72,7 +72,7 @@ public class RobotContainer implements Loggerable {
         .a()
         .whileTrue(
             new RepeatCommand(
-                commandFactory.createShootFuelCommand().andThen(new WaitCommand(0.2))));
+                commandFactory.createShootFuelCommand().andThen(new WaitCommand(0.1))));
   }
 
   /**

@@ -92,16 +92,13 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
   public Translation3d getFuelInitVelocity(
       Pose2d robotPose, ChassisSpeeds fieldRelativeChassisSpeeds) {
 
-    ChassisSpeeds absoluteChassisSpeeds =
-        ChassisSpeeds.fromRobotRelativeSpeeds(fieldRelativeChassisSpeeds, robotPose.getRotation());
-
     Translation3d velocity =
         getPoint(robotPose.getX(), robotPose.getY())
             .orElse(Translation3d.kZero)
             .minus(
                 new Translation3d(
-                    absoluteChassisSpeeds.vxMetersPerSecond,
-                    absoluteChassisSpeeds.vyMetersPerSecond,
+                    fieldRelativeChassisSpeeds.vxMetersPerSecond,
+                    fieldRelativeChassisSpeeds.vyMetersPerSecond,
                     0));
     Logger.recordOutput(
         "AutoAim/" + fileName,

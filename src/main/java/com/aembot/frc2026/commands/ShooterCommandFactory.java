@@ -80,9 +80,14 @@ public final class ShooterCommandFactory {
   }
 
   private Rotation3d getShootingAngle() {
-    return shootingHubTable.getFuelInitVelocityRotation3d(
-        RobotStateYearly.get().getLatestFieldRobotPose(),
-        RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds());
+    Rotation3d rot =
+        shootingHubTable.getFuelInitVelocityRotation3d(
+            RobotStateYearly.get().getLatestFieldRobotPose(),
+            RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds());
+
+    Logger.recordOutput("TEST", Units.radiansToDegrees(rot.getY()));
+
+    return rot;
   }
 
   private Rotation2d getRelativeYaw() {
