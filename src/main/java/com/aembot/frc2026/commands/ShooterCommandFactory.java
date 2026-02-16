@@ -125,7 +125,7 @@ public final class ShooterCommandFactory {
                             poses.toArray(Pose3d[]::new)),
                     (poses) ->
                         Logger.recordOutput(
-                            "FieldSimulation/missedShotsTrajectory", poses.toArray(Pose3d[]::new)))
-                .disableBecomesGamePieceOnFieldAfterTouchGround());
+                            "FieldSimulation/missedShotsTrajectory",
+                            poses.toArray(Pose3d[]::new))));
   }
 }
