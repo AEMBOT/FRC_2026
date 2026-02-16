@@ -23,11 +23,11 @@ public class ProductionTurretConfig {
 
   public final double GEAR_RATIO = 100;
 
-  public final int MOTOR_ID = 18;
+  public final int MOTOR_ID = 52;
 
-  public final int CANCODER_A_ID = 19;
+  public final int CANCODER_A_ID = 43;
 
-  public final int CANCODER_B_ID = 20;
+  public final int CANCODER_B_ID = 42;
 
   public final AEMCANCoderConfiguration CANCODER_A_CONFIG =
       new AEMCANCoderConfiguration()
