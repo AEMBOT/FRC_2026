@@ -31,11 +31,11 @@ public final class ShooterCommands {
     return turret.smartVelocitySetpointCommand(() -> 0);
   }
 
-  public Command createTurretUpCommand() {
+  public Command createTurretLeftCommand() {
     return turret.smartVelocitySetpointCommand(() -> 30);
   }
 
-  public Command createTurretDownCommand() {
+  public Command createTurretRightCommand() {
     return turret.smartVelocitySetpointCommand(() -> -30);
   }
 
