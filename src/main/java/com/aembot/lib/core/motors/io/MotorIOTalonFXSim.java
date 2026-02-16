@@ -2,6 +2,7 @@ package com.aembot.lib.core.motors.io;
 
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.aembot.lib.core.can.CANDeviceID;
+import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.visualization.SimulatedTalonFXVisualization;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -31,6 +32,8 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
     double SimPosUnits;
     double SimVelocityUnits;
     double SimAccelerationUnits;
+    double SimStatorCurrentAmps;
+    double SimSupplyCurrentAmps;
     double RotorPosition;
     double RotorVelocity;
     double RotorAcceleration;
@@ -53,6 +56,12 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
 
   /** Visualization of the simulated motor */
   protected SimulatedTalonFXVisualization visualization;
+
+  /**
+   * Cached last known good voltage from CTRE. Used to avoid stale zeros from control request
+   * timeout (e.g., during simulation pause).
+   */
+  protected double cachedSimVoltage = 0.0;
 
   /**
    * Create a new TalonFX Sim IO using a ServoMotorConfiguration.
@@ -136,19 +145,54 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
     lastUpdateTimestamp = Timer.getFPGATimestamp();
   }
 
+  /**
+   * Override updateInputs to read all values directly from simulation state.
+   *
+   * <p>In simulation, CTRE signals can report stale zeros after control request timeout (e.g.,
+   * during pause). Instead of relying on CTRE signals, we read from our own simulation state which
+   * is always accurate since we control it.
+   */
+  @Override
+  public boolean updateInputs(MotorInputs motorInputs) {
+    // Still call super to maintain any side effects, but we'll override all values
+    boolean result = super.updateInputs(motorInputs);
+
+    // Override all values with simulation-accurate data from our DCMotorSim
+    // This avoids stale zeros from CTRE timeout during pause
+    motorInputs.positionUnits = inputs.SimPosUnits;
+    motorInputs.velocityUnitsPerSecond = inputs.SimVelocityUnits;
+    motorInputs.appliedVolts = inputs.SimVoltage;
+    motorInputs.currentStatorAmps = inputs.SimStatorCurrentAmps;
+    motorInputs.currentSupplyAmps = inputs.SimSupplyCurrentAmps;
+    motorInputs.rawRotorPosition = inputs.RotorPosition;
+
+    return result;
+  }
+
   /** Update the state of the motor sim and inputs */
   public void updateSimState() {
     inputs.SupplyVoltage = RobotController.getBatteryVoltage();
 
     simState.setSupplyVoltage(inputs.SupplyVoltage);
 
-    inputs.SimVoltage = simState.getMotorVoltage();
+    double ctreVoltage = simState.getMotorVoltage();
+
+    // Detect stale zero from CTRE timeout (e.g., during pause): if voltage suddenly drops
+    // to near-zero from a significant value, use the cached voltage instead
+    boolean isStaleZero = Math.abs(cachedSimVoltage) > 0.1 && Math.abs(ctreVoltage) < 0.01;
+    if (isStaleZero) {
+      inputs.SimVoltage = cachedSimVoltage;
+    } else {
+      inputs.SimVoltage = ctreVoltage;
+      cachedSimVoltage = ctreVoltage;
+    }
 
     double timestamp = Timer.getFPGATimestamp();
     double dt = timestamp - lastUpdateTimestamp;
     lastUpdateTimestamp = timestamp;
 
     // TODO find place to store these values
+    // Clamp dt to avoid simulation instability after pause
     if (dt > 0.1) {
       dt = 0.005;
     }
@@ -190,6 +234,16 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
     inputs.SimAccelerationUnits =
         config.kRealConfiguration.getMechanismRotationsToUnits(
             Units.radiansToRotations(motorSim.getAngularAccelerationRadPerSecSq()));
+
+    // Calculate stator current from motor model, and supply current from power balance
+    inputs.SimStatorCurrentAmps = motorSim.getCurrentDrawAmps();
+    // Supply current = (Voltage * Stator current) / Supply voltage (power balance)
+    if (inputs.SupplyVoltage > 0.1) {
+      inputs.SimSupplyCurrentAmps =
+          (Math.abs(inputs.SimVoltage) * inputs.SimStatorCurrentAmps) / inputs.SupplyVoltage;
+    } else {
+      inputs.SimSupplyCurrentAmps = 0.0;
+    }
 
     inputs.RotorPosition = config.kRealConfiguration.getUnitsToRotorRotations(inputs.SimPosUnits);
     inputs.RotorVelocity =
