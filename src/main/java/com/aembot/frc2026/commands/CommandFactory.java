@@ -21,8 +21,7 @@ public final class CommandFactory {
       DriveSubsystem driveSubsystem,
       HoodSubsystem hoodSubsystem,
       OverBumperIntakeDeploySubsystem intakeDeploySubsystem,
-      OverBumperIntakeRollerSubsystem intakeRollerSubsystem
-      ) {
+      OverBumperIntakeRollerSubsystem intakeRollerSubsystem) {
     this.driveSubsystem = driveSubsystem;
     this.hoodSubsystem = hoodSubsystem;
 
