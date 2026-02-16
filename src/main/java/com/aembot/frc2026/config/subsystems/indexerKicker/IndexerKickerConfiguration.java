@@ -30,6 +30,12 @@ public class IndexerKickerConfiguration {
   /** Speed to run the kicker at to prevent game pieces from being pushed into the shooter. */
   public Double kResistSpeedRPM;
 
+  /**
+   * The amount of time it takes to transport a game piece from the this indexer stage to the next.
+   * Used in sim.
+   */
+  public Double kGamePieceMoveTime;
+
   public IndexerKickerConfiguration(String name) {
     this.kName = name;
   }
@@ -79,6 +85,17 @@ public class IndexerKickerConfiguration {
   }
 
   /**
+   * Set the time it takes in seconds for a game piece to travel through this indexer stage to the
+   * next
+   *
+   * @return this {@link IndexerKickerConfiguration} for chaining
+   */
+  public IndexerKickerConfiguration withGamePieceMoveTimeSeconds(double seconds) {
+    this.kGamePieceMoveTime = seconds;
+    return this;
+  }
+
+  /**
    * Check that all values required for a kicker subsystem are set on this config. If they are not,
    * throw a {@link VerifyError}. Intended to be called at the end of an initialization chain.
    *
@@ -90,6 +107,7 @@ public class IndexerKickerConfiguration {
     if (this.kSimMotorConfig == null) missing.add("kSimMotorConfig");
     if (this.kTargetSpeedRPM == null) missing.add("kTargetSpeed");
     if (this.kResistSpeedRPM == null) missing.add("kResistSpeedRPM");
+    if (this.kGamePieceMoveTime == null) missing.add("kGamePieceMoveTime");
 
     if (missing.size() != 0) {
       throw new VerifyError(

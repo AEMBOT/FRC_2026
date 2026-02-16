@@ -1,15 +1,34 @@
 package com.aembot.frc2026.commands;
 
+import com.aembot.frc2026.state.RobotStateYearly;
+import com.aembot.frc2026.state.subsystems.indexer.IndexerCompoundState;
+import com.aembot.frc2026.state.subsystems.indexer.IndexerCompoundState.IndexerRunState;
 import com.aembot.frc2026.subsystems.indexerKicker.IndexerKickerSubsystem;
 import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorSubsystem;
 import com.aembot.frc2026.subsystems.spindexer.SpindexerSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public final class IndexerCommands {
+  /** Buffer in seconds added to the expected load time of game pieces for load timeout */
+  private static final double LOAD_TIMEOUT_BUFFER = 2.0;
+
   private final SpindexerSubsystem spindexer;
   private final IndexerSelectorSubsystem selector;
   private final IndexerKickerSubsystem kicker;
+
+  /**
+   * A dummy subsystem for command requirements, ensuring we don't unintentionally run multiple
+   * commands at the same time
+   */
+  private final SubsystemBase dummySubsystem =
+      new SubsystemBase("Indexer Compound Dummy Subsystem") {};
+
+  private static final IndexerCompoundState indexerCompoundState =
+      RobotStateYearly.get().indexerCompoundState;
 
   public IndexerCommands(
       SpindexerSubsystem spindexerSubsystem,
@@ -20,35 +39,56 @@ public final class IndexerCommands {
     this.kicker = indexerKickerSubsystem;
   }
 
-  /** Set the default commands of the spindexer, selector, and kicker to stop running. */
-  public void defaultToStop() {
-    spindexer.setDefaultCommand(spindexer.stopSpindexerCommand());
-    selector.setDefaultCommand(selector.stopSelectorCommand());
-    kicker.setDefaultCommand(kicker.stopKickerCommand());
+  /** InstantCommand to command the indexer to {@link IndexerRunState#OFF}. */
+  public InstantCommand createDisableIndexerCommand() {
+    return new InstantCommand(
+        () -> indexerCompoundState.commandState(IndexerRunState.OFF), dummySubsystem);
   }
 
   /**
-   * Run the spindexer and selector, with the kicker running in reverse to prevent balls from
-   * entering the shooter. Runs until terminated. Does not set velocity to 0 upon termination
-   * (unless that is the default command. See {@link #defaultToStop()})
+   * Command to command the indexer to {@link IndexerRunState#LOAD} until a game piece is detected
+   * at the end of the selector. Nothing will happen upon termination. This is only intended for use
+   * in command composition, and won't be very useful on its own.
    */
-  public Command createRunIndexerCommand() {
-    // Note: this assumes that the kicker is able to resist the selector, that it needs to resist
-    // the selector, and that this is the desired behavior. Alternatively, we might stop the
-    // selector after it detects a game piece with the TOF sensor.
-    return new ParallelCommandGroup(
-        spindexer.runSpindexerCommand(),
-        selector.runSelectorCommand(),
-        kicker.resistKickerCommand());
+  public Command createSimpleLoadIndexerCommand() {
+    return new RunCommand(
+            () -> indexerCompoundState.commandState(IndexerRunState.LOAD), dummySubsystem)
+        .until(indexerCompoundState::getGamePieceAtSelector);
   }
 
   /**
-   * Run all indexer subsystems forwards, feeding fuel from the intake to the shooter. Runs until
-   * terminated. Does not set velocity to 0 upon termination (unless that is the default command.
-   * See {@link #defaultToStop()})
+   * Command to run the indexer at {@link IndexerRunState#LOAD} until a game piece is detected, a
+   * timeout is exceeded (Time it takes for a game piece to travel from intake to kicker base +
+   * {@link #LOAD_TIMEOUT_BUFFER}), or the command is interrupted by another command requiring the
+   * indexer compound. Commands the indexer to {@link IndexerRunState#OFF} afterwards.
    */
-  public Command createFireCommand() {
-    return new ParallelCommandGroup(
-        spindexer.runSpindexerCommand(), selector.runSelectorCommand(), kicker.runKickerCommand());
+  public Command createLoadIndexerUntilTimeoutCommand() {
+    return createSimpleLoadIndexerCommand()
+        .withTimeout(
+            LOAD_TIMEOUT_BUFFER
+                + spindexer.kConfig.kGamePieceMoveTime
+                + selector.kConfig.kGamePieceMoveTime)
+        .andThen(createDisableIndexerCommand());
+  }
+
+  /**
+   * Command to load game pieces from the spindexer to the selector, stopping short of the kicker.
+   * Commands the indexer to {@link IndexerRunState#LOAD}. After termination, will schedule a
+   * command to continue running the indexer at {@link IndexerRunState#LOAD} until a game piece is
+   * detected, a timeout is exceeded (Time it takes for a game piece to travel from intake to kicker
+   * base + {@link #LOAD_TIMEOUT_BUFFER}), or the command is interrupted by another command
+   * requiring the indexer compound. Commands the indexer to {@link IndexerRunState#OFF} afterwards.
+   */
+  public Command createLoadIndexerCommand() {
+    return createSimpleLoadIndexerCommand()
+        .finallyDo(
+            () -> CommandScheduler.getInstance().schedule(createLoadIndexerUntilTimeoutCommand()));
+  }
+
+  public Command createFeedIndexerCommand() {
+    return new RunCommand(
+            () -> indexerCompoundState.commandState(IndexerRunState.FIRE), dummySubsystem)
+        .finallyDo(
+            () -> CommandScheduler.getInstance().schedule(createLoadIndexerUntilTimeoutCommand()));
   }
 }

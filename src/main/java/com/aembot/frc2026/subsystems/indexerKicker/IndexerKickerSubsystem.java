@@ -1,6 +1,7 @@
 package com.aembot.frc2026.subsystems.indexerKicker;
 
 import com.aembot.frc2026.config.subsystems.indexerKicker.IndexerKickerConfiguration;
+import com.aembot.frc2026.state.subsystems.indexer.IndexerCompoundState.IndexerStageRunState;
 import com.aembot.frc2026.subsystems.indexerKicker.io.IndexerKickerMechanismIO;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.core.motors.MotorInputs;
@@ -8,6 +9,7 @@ import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.wpilibj2.command.Command;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -17,16 +19,25 @@ import org.littletonrobotics.junction.Logger;
  */
 public class IndexerKickerSubsystem
     extends MotorSubsystem<MotorInputs, MotorIO, MotorConfiguration<TalonFXConfiguration>> {
+  public final IndexerKickerConfiguration kConfig;
+
   private final IndexerKickerMechanismIO kMechanismIO;
   private final IndexerKickerMechanismInputs kMechanismInputs;
 
-  private final IndexerKickerConfiguration kConfig;
+  private final Supplier<IndexerStageRunState> kCommandedRunStateSupplier;
 
-  public IndexerKickerSubsystem(IndexerKickerConfiguration config, IndexerKickerMechanismIO io) {
+  public IndexerKickerSubsystem(
+      IndexerKickerConfiguration config,
+      IndexerKickerMechanismIO io,
+      Supplier<IndexerStageRunState> commandedRunStateSupplier) {
     super(config.kName, new MotorInputs(), io.getMotor(), config.kMotorConfig);
     this.kMechanismIO = io;
     this.kConfig = config;
     this.kMechanismInputs = new IndexerKickerMechanismInputs();
+
+    this.kCommandedRunStateSupplier = commandedRunStateSupplier;
+
+    setDefaultCommand(followCommandedState());
   }
 
   @Override
@@ -34,6 +45,27 @@ public class IndexerKickerSubsystem
     super.periodic();
 
     kMechanismIO.updateInputs(kMechanismInputs);
+  }
+
+  public Command followCommandedState() {
+    return run(() -> {
+          switch (kCommandedRunStateSupplier.get()) {
+            case FORWARD:
+              this.setSmartVelocitySetpointImpl(kConfig.kTargetSpeedRPM / 60);
+              break;
+            case REVERSE:
+              this.setSmartVelocitySetpointImpl(-(kConfig.kTargetSpeedRPM / 60));
+              break;
+            case RESIST:
+              this.setSmartVelocitySetpointImpl(kConfig.kResistSpeedRPM / 60);
+              break;
+            default:
+            case OFF:
+              this.setSmartVelocitySetpointImpl(0);
+              break;
+          }
+        })
+        .withName("Following commanded state");
   }
 
   /**

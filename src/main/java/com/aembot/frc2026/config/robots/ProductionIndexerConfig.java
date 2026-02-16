@@ -35,6 +35,12 @@ public final class ProductionIndexerConfig {
     /** Target acceleration of the spindexer roller in RPM^2. */
     static final double ACCELERATION_RPM = 400.0; // Copied from intake config
 
+    /**
+     * The amount of time it takes to transport a game piece from the spindexer to the selector.
+     * Used in sim.
+     */
+    public static final double SECONDS_THRU_SPINDEXER = 1;
+
     public static SpindexerConfiguration makeSpindexerConfiguration(String busName) {
       MotorConfiguration<TalonFXConfiguration> motorConfig =
           new MotorConfiguration<TalonFXConfiguration>()
@@ -67,6 +73,7 @@ public final class ProductionIndexerConfig {
           .withMotorConfig(motorConfig)
           .withSimMotorConfig(simMotorConfig)
           .withTargetSpeedRPM(TARGET_SPEED_RPM)
+          .withGamePieceMoveTimeSeconds(SECONDS_THRU_SPINDEXER)
           .validate();
     }
   }
@@ -88,6 +95,12 @@ public final class ProductionIndexerConfig {
 
     /** Target acceleration of the spindexer roller in RPM^2. */
     static final double ACCELERATION_RPM = 400.0; // Copied from intake config
+
+    /**
+     * The amount of time it takes to transport a game piece from the selector to the kicker. Used
+     * in sim.
+     */
+    public static final double SECONDS_THRU_SELECTOR = 1;
 
     public static IndexerSelectorConfiguration makeSelectorConfiguration(String busName) {
       MotorConfiguration<TalonFXConfiguration> motorConfig =
@@ -132,6 +145,7 @@ public final class ProductionIndexerConfig {
           .withSimMotorConfig(simMotorConfig)
           .withTimeOfFlightConfig(timeOfFlightConfig)
           .withTargetSpeedRPM(TARGET_SPEED_RPM)
+          .withGamePieceMoveTimeSeconds(SECONDS_THRU_SELECTOR)
           .validate();
     }
   }
@@ -159,6 +173,12 @@ public final class ProductionIndexerConfig {
 
     /** Target acceleration of the spindexer roller in RPM^2. */
     static final double ACCELERATION_RPM = 400.0; // Copied from intake config
+
+    /**
+     * The amount of time it takes to transport a game piece from the kicker to the shooter. Used in
+     * sim.
+     */
+    public static final double SECONDS_THRU_KICKER = 1;
 
     public static IndexerKickerConfiguration makeKickerConfiguration(String busName) {
       MotorConfiguration<TalonFXConfiguration> motorConfig =
@@ -192,6 +212,7 @@ public final class ProductionIndexerConfig {
           .withSimMotorConfig(simMotorConfig)
           .withTargetSpeedRPM(TARGET_SPEED_RPM)
           .withResistSpeedRPM(RESIST_SPEED_RPM)
+          .withGamePieceMoveTimeSeconds(SECONDS_THRU_KICKER)
           .validate();
     }
   }

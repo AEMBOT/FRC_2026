@@ -26,6 +26,12 @@ public class SpindexerConfiguration {
 
   public Double kTargetSpeedRPM;
 
+  /**
+   * The amount of time it takes to transport a game piece from the this indexer stage to the next.
+   * Used for timeouts and sim.
+   */
+  public Double kGamePieceMoveTime;
+
   public SpindexerConfiguration(String name) {
     this.kName = name;
   }
@@ -63,6 +69,17 @@ public class SpindexerConfiguration {
   }
 
   /**
+   * Set the time it takes in seconds for a game piece to travel through this indexer stage to the
+   * next
+   *
+   * @return this {@link SpindexerConfiguration} for chaining
+   */
+  public SpindexerConfiguration withGamePieceMoveTimeSeconds(double seconds) {
+    this.kGamePieceMoveTime = seconds;
+    return this;
+  }
+
+  /**
    * Check that all values required for a spindexer subsystem are set on this config. If they are
    * not, throw a {@link VerifyError}. Intended to be called at the end of an initialization chain.
    *
@@ -71,6 +88,7 @@ public class SpindexerConfiguration {
   public SpindexerConfiguration validate() {
     List<String> missing = new ArrayList<>();
     if (this.kTargetSpeedRPM == null) missing.add("kTargetSpeed");
+    if (this.kGamePieceMoveTime == null) missing.add("kGamePieceMoveTime");
     if (this.kMotorConfig == null) missing.add("kMotorConfig");
     if (this.kSimMotorConfig == null) missing.add("kSimMotorConfig");
 

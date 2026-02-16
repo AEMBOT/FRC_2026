@@ -101,56 +101,79 @@ public class SubsystemFactory {
 
   public static SpindexerSubsystem createSpindexerSubsystem() {
     var spindexerConfig = RobotRuntimeConstants.ROBOT_CONFIG.getSpindexerConfiguration();
+    var indexerCompoundState = RobotStateYearly.get().indexerCompoundState;
 
     switch (RobotRuntimeConstants.MODE) {
       case SIM:
         return new SpindexerSubsystem(
-            spindexerConfig, new SpindexerMechanismIOSim(spindexerConfig));
+            spindexerConfig,
+            new SpindexerMechanismIOSim(spindexerConfig),
+            indexerCompoundState::getSpindexerCommandedState);
       case REPLAY:
-        return new SpindexerSubsystem(spindexerConfig, new SpindexerMechanismIOReplay());
+        return new SpindexerSubsystem(
+            spindexerConfig,
+            new SpindexerMechanismIOReplay(),
+            indexerCompoundState::getSpindexerCommandedState);
       case REAL:
       default:
         return new SpindexerSubsystem(
-            spindexerConfig, new SpindexerMechanismIOReal(spindexerConfig));
+            spindexerConfig,
+            new SpindexerMechanismIOReal(spindexerConfig),
+            indexerCompoundState::getSpindexerCommandedState);
     }
   }
 
   public static IndexerSelectorSubsystem createIndexerSelectorSubsystem() {
     var selectorConfig = RobotRuntimeConstants.ROBOT_CONFIG.getIndexerSelectorConfiguration();
+    var indexerCompoundState = RobotStateYearly.get().indexerCompoundState;
 
     switch (RobotRuntimeConstants.MODE) {
       case SIM:
         return new IndexerSelectorSubsystem(
             selectorConfig,
             new IndexerSelectorMechanismIOSim(selectorConfig),
-            new TimeOfFlightSimIOCanRange(selectorConfig.kTimeOfFlightConfig));
+            new TimeOfFlightSimIOCanRange(selectorConfig.kTimeOfFlightConfig),
+            indexerCompoundState::getSelectorCommandedState,
+            indexerCompoundState::updateGamePieceAtKicker);
       case REPLAY:
         return new IndexerSelectorSubsystem(
             selectorConfig,
             new IndexerSelectorMechanismIOReplay(),
-            new TimeOfFlightIOReplay(selectorConfig.kTimeOfFlightConfig));
+            new TimeOfFlightIOReplay(selectorConfig.kTimeOfFlightConfig),
+            indexerCompoundState::getSelectorCommandedState,
+            indexerCompoundState::updateGamePieceAtKicker);
       case REAL:
       default:
         return new IndexerSelectorSubsystem(
             selectorConfig,
             new IndexerSelectorMechanismIOReal(selectorConfig),
-            new TimeOfFlightSimIOCanRange(selectorConfig.kTimeOfFlightConfig));
+            new TimeOfFlightSimIOCanRange(selectorConfig.kTimeOfFlightConfig),
+            indexerCompoundState::getSelectorCommandedState,
+            indexerCompoundState::updateGamePieceAtKicker);
     }
   }
 
   public static IndexerKickerSubsystem createIndexerKickerSubsystem() {
     var kickerConfig = RobotRuntimeConstants.ROBOT_CONFIG.getIndexerKickerConfiguration();
+    var indexerCompoundState = RobotStateYearly.get().indexerCompoundState;
 
     switch (RobotRuntimeConstants.MODE) {
       case SIM:
         return new IndexerKickerSubsystem(
-            kickerConfig, new IndexerKickerMechanismIOSim(kickerConfig));
+            kickerConfig,
+            new IndexerKickerMechanismIOSim(kickerConfig),
+            indexerCompoundState::getKickerCommandedState);
       case REPLAY:
-        return new IndexerKickerSubsystem(kickerConfig, new IndexerKickerMechanismIOReplay());
+        return new IndexerKickerSubsystem(
+            kickerConfig,
+            new IndexerKickerMechanismIOReplay(),
+            indexerCompoundState::getKickerCommandedState);
       case REAL:
       default:
         return new IndexerKickerSubsystem(
-            kickerConfig, new IndexerKickerMechanismIOReal(kickerConfig));
+            kickerConfig,
+            new IndexerKickerMechanismIOReal(kickerConfig),
+            indexerCompoundState::getKickerCommandedState);
     }
   }
 

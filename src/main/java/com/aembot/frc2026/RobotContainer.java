@@ -85,14 +85,18 @@ public class RobotContainer implements Loggerable {
     intakeRollerSubsystem.setDefaultCommand(
         commandFactory.intakeCommands.createStopIntakeCommand());
 
-    commandFactory.indexerCommands.defaultToStop();
-
     driverController.a().onTrue(commandFactory.intakeCommands.createUpCommand());
     driverController.b().onTrue(commandFactory.intakeCommands.createDownCommand());
 
     driverController.x().whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
 
-    driverController.y().whileTrue(commandFactory.indexerCommands.createRunIndexerCommand());
+    // While we're pressing x to intake and not y to shoot, run indexer load
+    driverController
+        .x()
+        .and(driverController.y().negate())
+        .whileTrue(commandFactory.indexerCommands.createLoadIndexerCommand());
+
+    driverController.y().whileTrue(commandFactory.indexerCommands.createFeedIndexerCommand());
   }
 
   /**

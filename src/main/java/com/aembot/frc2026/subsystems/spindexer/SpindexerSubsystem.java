@@ -2,6 +2,7 @@ package com.aembot.frc2026.subsystems.spindexer;
 
 import com.aembot.frc2026.config.subsystems.indexerSelector.IndexerSelectorConfiguration;
 import com.aembot.frc2026.config.subsystems.spindexer.SpindexerConfiguration;
+import com.aembot.frc2026.state.subsystems.indexer.IndexerCompoundState.IndexerStageRunState;
 import com.aembot.frc2026.subsystems.spindexer.io.SpindexerMechanismIO;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.core.motors.MotorInputs;
@@ -9,6 +10,7 @@ import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.wpilibj2.command.Command;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -18,16 +20,24 @@ import org.littletonrobotics.junction.Logger;
  */
 public class SpindexerSubsystem
     extends MotorSubsystem<MotorInputs, MotorIO, MotorConfiguration<TalonFXConfiguration>> {
+  public final SpindexerConfiguration kConfig;
+
   private final SpindexerMechanismIO kMechanismIO;
   private final SpindexerMechanismInputs kMechanismInputs;
 
-  private final SpindexerConfiguration kConfig;
+  private final Supplier<IndexerStageRunState> kCommandedRunStateSupplier;
 
-  public SpindexerSubsystem(SpindexerConfiguration config, SpindexerMechanismIO io) {
+  public SpindexerSubsystem(
+      SpindexerConfiguration config,
+      SpindexerMechanismIO io,
+      Supplier<IndexerStageRunState> commandedRunStateSupplier) {
     super(config.kName, new MotorInputs(), io.getMotor(), config.kMotorConfig);
     this.kMechanismIO = io;
     this.kMechanismInputs = new SpindexerMechanismInputs();
     this.kConfig = config;
+    this.kCommandedRunStateSupplier = commandedRunStateSupplier;
+
+    setDefaultCommand(followCommandedState());
   }
 
   @Override
@@ -35,6 +45,25 @@ public class SpindexerSubsystem
     super.periodic();
 
     kMechanismIO.updateInputs(kMechanismInputs);
+  }
+
+  public Command followCommandedState() {
+    return run(() -> {
+          switch (kCommandedRunStateSupplier.get()) {
+            case FORWARD:
+              this.setSmartVelocitySetpointImpl(kConfig.kTargetSpeedRPM / 60);
+              break;
+            case REVERSE:
+              this.setSmartVelocitySetpointImpl(-(kConfig.kTargetSpeedRPM / 60));
+              break;
+            default:
+            case RESIST:
+            case OFF:
+              this.setSmartVelocitySetpointImpl(0);
+              break;
+          }
+        })
+        .withName("Following commanded state");
   }
 
   /**

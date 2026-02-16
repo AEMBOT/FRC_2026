@@ -1,6 +1,7 @@
 package com.aembot.frc2026.subsystems.indexerSelector;
 
 import com.aembot.frc2026.config.subsystems.indexerSelector.IndexerSelectorConfiguration;
+import com.aembot.frc2026.state.subsystems.indexer.IndexerCompoundState.IndexerStageRunState;
 import com.aembot.frc2026.subsystems.indexerSelector.io.IndexerSelectorMechanismIO;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.core.motors.MotorInputs;
@@ -10,6 +11,8 @@ import com.aembot.lib.core.sensors.timeOfFlight.interfaces.TimeOfFlightIO;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.wpilibj2.command.Command;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -20,23 +23,33 @@ import org.littletonrobotics.junction.Logger;
  */
 public class IndexerSelectorSubsystem
     extends MotorSubsystem<MotorInputs, MotorIO, MotorConfiguration<TalonFXConfiguration>> {
+  public final IndexerSelectorConfiguration kConfig;
+
   private final IndexerSelectorMechanismIO kMechanismIO;
   private final IndexerSelectorMechanismInputs kMechanismInputs;
 
   private final TimeOfFlightSensor kTimeOfFlightSensor;
 
-  private final IndexerSelectorConfiguration kConfig;
+  private final Supplier<IndexerStageRunState> kCommandedRunStateSupplier;
+  private final Consumer<Boolean> kGamePieceDetectedConsumer;
 
   public IndexerSelectorSubsystem(
       IndexerSelectorConfiguration config,
       IndexerSelectorMechanismIO mechanismIO,
-      TimeOfFlightIO timeOfFlightIO) {
+      TimeOfFlightIO timeOfFlightIO,
+      Supplier<IndexerStageRunState> commandedRunStateSupplier,
+      Consumer<Boolean> gamePieceDetectedConsumer) {
     super(config.kName, new MotorInputs(), mechanismIO.getMotor(), config.kMotorConfig);
     this.kMechanismIO = mechanismIO;
     this.kMechanismInputs = new IndexerSelectorMechanismInputs();
     this.kTimeOfFlightSensor =
         new TimeOfFlightSensor(timeOfFlightIO, logPrefixStandard, logPrefixInput);
     this.kConfig = config;
+
+    this.kCommandedRunStateSupplier = commandedRunStateSupplier;
+    this.kGamePieceDetectedConsumer = gamePieceDetectedConsumer;
+
+    setDefaultCommand(followCommandedState());
   }
 
   @Override
@@ -45,6 +58,27 @@ public class IndexerSelectorSubsystem
 
     kTimeOfFlightSensor.update();
     kMechanismIO.updateInputs(kMechanismInputs);
+
+    kGamePieceDetectedConsumer.accept(kTimeOfFlightSensor.getObjectDetected());
+  }
+
+  public Command followCommandedState() {
+    return run(() -> {
+          switch (kCommandedRunStateSupplier.get()) {
+            case FORWARD:
+              this.setSmartVelocitySetpointImpl(kConfig.kTargetSpeedRPM / 60);
+              break;
+            case REVERSE:
+              this.setSmartVelocitySetpointImpl(-(kConfig.kTargetSpeedRPM / 60));
+              break;
+            default:
+            case RESIST:
+            case OFF:
+              this.setSmartVelocitySetpointImpl(0);
+              break;
+          }
+        })
+        .withName("Following commanded state");
   }
 
   /**
