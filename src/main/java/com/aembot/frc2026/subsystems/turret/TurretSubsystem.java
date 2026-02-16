@@ -9,16 +9,26 @@ import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import org.littletonrobotics.junction.Logger;
 
+/** Turret subsystm implementation */
 public class TurretSubsystem
     extends MotorSubsystem<MotorInputs, MotorIO, MotorConfiguration<TalonFXConfiguration>> {
+
+  /** IO to use for this subsystem */
   public final TurretIO io;
 
+  /**
+   * Create a new turret subsystem
+   *
+   * @param config Configuration for this subsystem
+   * @param io IO to use
+   */
   public TurretSubsystem(TalonFXTurretConfiguration config, TurretIO io) {
 
     super(config.kName, new MotorInputs(), io.getMotor(), config.kRealMotorConfig);
 
     this.io = io;
 
+    // Zero encoder position based on cancoders
     setEncoderPosition(
         config.getMechanismRotationsFromEncoders(
             io.getCANcoderA().getRawAngle(), io.getCANcoderB().getRawAngle()));

@@ -5,6 +5,7 @@ import com.aembot.lib.core.encoders.interfaces.CANCoderIO;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOReplay;
 
+/** Replay implementation for turret IO */
 public class TurretReplayIO implements TurretIO {
 
   @Override

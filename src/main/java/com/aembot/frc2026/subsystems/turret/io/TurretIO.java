@@ -5,6 +5,7 @@ import com.aembot.lib.core.encoders.interfaces.CANCoderIO;
 import com.aembot.lib.core.logging.Loggable;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 
+/** Turret control interface IO */
 public interface TurretIO extends Loggable {
 
   public MotorIO getMotor();

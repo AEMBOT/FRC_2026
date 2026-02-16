@@ -21,7 +21,7 @@ public class ProductionTurretConfig {
 
   public final double ACCELERATION_DEG_PER_SEC = 360;
 
-  public final double GEAR_RATIO = 80;
+  public final double GEAR_RATIO = 100;
 
   public final int MOTOR_ID = 18;
 

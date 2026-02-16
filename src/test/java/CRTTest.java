@@ -1,21 +1,22 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.aembot.frc2026.config.robots.ProductionTurretConfig;
 import com.aembot.frc2026.config.subsystems.TalonFXTurretConfiguration;
 import org.junit.jupiter.api.Test;
 
 public class CRTTest {
-  public TalonFXTurretConfiguration testconfig =
-      new TalonFXTurretConfiguration("TestConfig")
-          .withCANcoderAGearTeeth(13)
-          .withCANcoderBGearTeeth(17);
+  public TalonFXTurretConfiguration testconfig = new ProductionTurretConfig().TURRET_CONFIG;
 
   @Test
   void DoesItWork() {
     // double result = testconfig.solve(0.230769231, 0.176470588);
 
-    for (double i = 0.; i < 221.0; i += 0.05) {
-      double inputA = (i % 13.0) / 13.0;
-      double inputB = (i % 17.0) / 17.0;
+    for (double i = 0.; i < 750; i += 0.5) {
+
+      double rotorPosition = testconfig.kRealMotorConfig.getUnitsToRotorRotations(i);
+
+      double inputA = (rotorPosition % 17.0) / 17.0;
+      double inputB = (rotorPosition % 13.0) / 13.0;
       try {
         System.currentTimeMillis();
         assertEquals(i, testconfig.getMechanismRotationsFromEncoders(inputA, inputB), 0.01);

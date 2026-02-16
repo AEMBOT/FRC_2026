@@ -8,20 +8,32 @@ import edu.wpi.first.math.MathUtil;
 
 public class TalonFXTurretConfiguration {
 
+  /** Name of the turret subsystem */
   public final String kName;
 
+  /** Configuration of the real motor */
   public MotorConfiguration<TalonFXConfiguration> kRealMotorConfig;
 
+  /** Configuration of the simulated motor */
   public SimulatedMotorConfiguration<TalonFXConfiguration> kSimMotorConfig;
 
+  /** Configuration of CANcoder A */
   public AEMCANCoderConfiguration kCANcoderAConfig;
 
+  /** Configuration of CANcoder B */
   public AEMCANCoderConfiguration kCANcoderBConfig;
 
+  /** Number of teeth on the gear connecting the rotor to CANcoder A */
   public int kCANcoderAGearTeeth;
 
+  /** Number of teeth on the gear connecting the rotor to CANcoder B */
   public int kCANcoderBGearTeeth;
 
+  /**
+   * Create a new turret configuration
+   *
+   * @param name Name of the turret subsystem
+   */
   public TalonFXTurretConfiguration(String name) {
     this.kName = name;
   }
@@ -58,6 +70,13 @@ public class TalonFXTurretConfiguration {
     return this;
   }
 
+  /**
+   * Get the absolute position of the mechanism from the encoder positions
+   *
+   * @param rawCANcoderAPos position in rotations of CANcoder A
+   * @param rawCANcoderBPos position in rotations of CANcoder A
+   * @return The absolute position of the mechanism in units
+   */
   public double getMechanismRotationsFromEncoders(double rawCANcoderAPos, double rawCANcoderBPos) {
 
     double encoderAPos = rawCANcoderAPos * kCANcoderAGearTeeth;
@@ -68,8 +87,10 @@ public class TalonFXTurretConfiguration {
         testPos += kCANcoderAGearTeeth) {
 
       double encoderBTestPos = testPos % kCANcoderBGearTeeth;
+
       if (MathUtil.isNear(encoderBPos, encoderBTestPos, 0.1)) {
-        return testPos;
+        return kRealMotorConfig.getMechanismRotationsToUnits(
+            testPos / kRealMotorConfig.getGearRatio());
       }
     }
 

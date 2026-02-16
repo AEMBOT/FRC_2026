@@ -7,19 +7,29 @@ import com.aembot.lib.core.encoders.io.CANCoderIOHardware;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOTalonFX;
 
+/** Hardware implementation for turret io */
 public class TalonFXTurretHardwareIO implements TurretIO {
 
+  /** Internal motor used */
   private final MotorIOTalonFX motor;
 
+  /** CANcoder A used for absolute positioning */
   @SuppressWarnings("unused")
   private final CANCoderIO CANcoderA;
 
+  /** CANcoder B used for absolute positioning */
   @SuppressWarnings("unused")
   private final CANCoderIO CANcoderB;
 
+  /** Configuration for this turret */
   @SuppressWarnings("unused")
   private final TalonFXTurretConfiguration config;
 
+  /**
+   * Create a new hardware turret IO
+   *
+   * @param config configuration to use for this turret
+   */
   public TalonFXTurretHardwareIO(TalonFXTurretConfiguration config) {
     this.motor = new MotorIOTalonFX(config.kRealMotorConfig);
     this.CANcoderA = new CANCoderIOHardware(config.kCANcoderAConfig);
