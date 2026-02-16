@@ -15,7 +15,7 @@ public class ProductionHoodConfig {
 
   public final double GEAR_RATIO = 80;
 
-  public final double CURISE_VELOCITY_DEG_PER_SEC = 90;
+  public final double CRUISE_VELOCITY_DEG_PER_SEC = 90;
 
   public final double ACCELERATION_DEG_PER_SEC = 180;
 
@@ -28,7 +28,7 @@ public class ProductionHoodConfig {
                   .withMotionMagic(
                       new MotionMagicConfigs()
                           .withMotionMagicCruiseVelocity(
-                              Units.degreesToRotations(CURISE_VELOCITY_DEG_PER_SEC) * GEAR_RATIO)
+                              Units.degreesToRotations(CRUISE_VELOCITY_DEG_PER_SEC) * GEAR_RATIO)
                           .withMotionMagicAcceleration(
                               Units.degreesToRotations(ACCELERATION_DEG_PER_SEC) * GEAR_RATIO))
                   .withSlot0(new Slot0Configs().withKP(.1).withKV(.12)))

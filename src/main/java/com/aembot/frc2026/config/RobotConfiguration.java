@@ -6,6 +6,10 @@ import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
 import com.aembot.lib.config.subsystems.drive.simulation.DrivetrainSimConfiguration;
 import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
 import com.aembot.lib.config.subsystems.hood.simulation.SimulatedHoodConfiguration;
+import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
+import com.aembot.lib.config.subsystems.intake.overBumper.run.TalonFXOverBumperIntakeRollerConfiguration;
+import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
+import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.pathplanner.lib.config.RobotConfig;
@@ -64,11 +68,39 @@ public abstract class RobotConfiguration {
   public abstract SimulatedHoodConfiguration getSimHoodConfig();
 
   /**
+   * Get the configuration of the intake deployment subsystem
+   *
+   * @return intake deployment configuration
+   */
+  public abstract TalonFXOverBumperIntakeDeployConfiguration getIntakeDeployConfig();
+
+  /**
+   * Get the configuration of the intake roller subsystem
+   *
+   * @return intake roller configuration
+   */
+  public abstract TalonFXOverBumperIntakeRollerConfiguration getIntakeRollerConfig();
+
+  /**
    * Get configuration details about the drive train sim for this robot
    *
    * @return DrivetrainSimConfiguration of the given robot
    */
   public abstract DrivetrainSimConfiguration getSimulatedDrivetrainConfiguration();
+
+  /**
+   * Get configuration details of all the cameras for this robot
+   *
+   * @return List of {@link CameraConfiguration}s of the given robot
+   */
+  public abstract List<CameraConfiguration> getCameraConfigurations();
+
+  /**
+   * Get configuration details of all the simulated cameras for this robot
+   *
+   * @return List of {@link SimulatedCameraConfiguration}s of the given robot
+   */
+  public abstract List<SimulatedCameraConfiguration> getSimulatedCameraConfigurations();
 
   /**
    * retrieve the correct robot constants based on the given robot identification
