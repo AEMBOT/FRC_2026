@@ -74,21 +74,21 @@ public class TalonFXTurretConfiguration {
    * Get the absolute position of the mechanism from the encoder positions
    *
    * @param rawCANcoderAPos position in rotations of CANcoder A
-   * @param rawCANcoderBPos position in rotations of CANcoder A
-   * @return The absolute position of the mechanism in units
+   * @param rawCANcoderBPos position in rotations of CANcoder B
+   * @return The absolute position of the mechanism in configured units
    */
   public double getMechanismRotationsFromEncoders(double rawCANcoderAPos, double rawCANcoderBPos) {
 
-    double encoderAPos = rawCANcoderAPos * kCANcoderAGearTeeth;
-    double encoderBPos = rawCANcoderBPos * kCANcoderBGearTeeth;
+    double encoderATeeth = rawCANcoderAPos * kCANcoderAGearTeeth;
+    double encoderBTeeth = rawCANcoderBPos * kCANcoderBGearTeeth;
 
-    for (double testPos = encoderAPos;
+    for (double testPos = encoderATeeth;
         testPos < kCANcoderAGearTeeth * kCANcoderBGearTeeth;
         testPos += kCANcoderAGearTeeth) {
 
       double encoderBTestPos = testPos % kCANcoderBGearTeeth;
 
-      if (MathUtil.isNear(encoderBPos, encoderBTestPos, 0.1)) {
+      if (MathUtil.isNear(encoderBTeeth, encoderBTestPos, 0.1)) {
         return kRealMotorConfig.getMechanismRotationsToUnits(
             testPos / kRealMotorConfig.getGearRatio());
       }
