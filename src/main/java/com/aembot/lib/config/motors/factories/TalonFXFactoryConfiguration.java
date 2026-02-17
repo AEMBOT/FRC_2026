@@ -9,14 +9,14 @@ public class TalonFXFactoryConfiguration {
   public static MotorFollowersConfiguration.FollowerConfiguration<TalonFXConfiguration>
       generateFollowerTalonFXConfiguration() {
     return new MotorFollowersConfiguration.FollowerConfiguration<>(
-        new MotorConfiguration<TalonFXConfiguration>().withConfig(new TalonFXConfiguration()));
+        new MotorConfiguration<TalonFXConfiguration>().withMotorConfig(new TalonFXConfiguration()));
   }
 
   public static MotorFollowersConfiguration.FollowerConfiguration<TalonFXConfiguration>
       generateFollowerTalonFXConfiguration(String name, CANDeviceID device) {
     return new MotorFollowersConfiguration.FollowerConfiguration<>(
         new MotorConfiguration<TalonFXConfiguration>()
-            .withConfig(new TalonFXConfiguration())
+            .withMotorConfig(new TalonFXConfiguration())
             .withName(name)
             .withCANDevice(device));
   }

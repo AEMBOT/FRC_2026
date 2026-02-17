@@ -4,12 +4,19 @@
 
 package com.aembot.frc2026;
 
+import com.aembot.frc2026.commands.CommandFactory;
 import com.aembot.frc2026.subsystems.SubsystemFactory;
-import com.aembot.frc2026.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.core.logging.Loggerable;
+import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
+import com.aembot.lib.subsystems.drive.DriveSubsystem;
+import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
+import com.aembot.lib.subsystems.hood.HoodSubsystem;
+import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
+import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import org.littletonrobotics.junction.LoggedRobot;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -24,16 +31,50 @@ public class RobotContainer implements Loggerable {
 
   private final CommandXboxController secondaryController = new CommandXboxController(1);
 
+  /* ---- FLYWHEEL ---- */
   private final FlywheelSubsystem flywheelSubsystem = SubsystemFactory.createFlywheelSubsystem();
 
+  /* ---- DRIVETRAIN ---- */
+  private final DriveSubsystem driveSubsystem = SubsystemFactory.createDriveSubsystem();
+
+  /* ---- SHOOTER ---- */
+  private final HoodSubsystem hoodSubsystem = SubsystemFactory.createHoodSubsystem();
+
+  /* ---- INTAKE ---- */
+  private final OverBumperIntakeDeploySubsystem intakeDeploySubsystem =
+      SubsystemFactory.createIntakeDeploySubsystem();
+  private final OverBumperIntakeRollerSubsystem intakeRollerSubsystem =
+      SubsystemFactory.createIntakeRollerSubsystem();
+
+  private final CommandFactory commandFactory;
+
+  /* ---- VISION ---- */
+  @SuppressWarnings("unused")
+  private final AprilVisionSubsystem visionSubsystem =
+      SubsystemFactory.createAprilVisionSubsystem();
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
-    // Configure the trigger bindings
+  public RobotContainer(LoggedRobot robot) {
+    setupLogger(robot);
+
+    this.commandFactory =
+        new CommandFactory(
+            driveSubsystem, hoodSubsystem, intakeDeploySubsystem, intakeRollerSubsystem);
     configureBindings();
   }
 
   /** Use this method to define your controller button -> command mappings */
-  private void configureBindings() {}
+  private void configureBindings() {
+    driveSubsystem.setDefaultCommand(commandFactory.createDriveJoystickCmd(driverController));
+    hoodSubsystem.setDefaultCommand(commandFactory.createHoodStopCommand());
+    intakeRollerSubsystem.setDefaultCommand(
+        commandFactory.intakeCommands.createStopIntakeCommand());
+
+    driverController.a().onTrue(commandFactory.intakeCommands.createUpCommand());
+    driverController.b().onTrue(commandFactory.intakeCommands.createDownCommand());
+
+    driverController.x().whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
