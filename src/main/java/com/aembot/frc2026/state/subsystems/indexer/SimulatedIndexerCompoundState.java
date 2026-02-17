@@ -7,6 +7,7 @@ import com.aembot.lib.core.logging.Loggable;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 
@@ -30,11 +31,6 @@ public class SimulatedIndexerCompoundState implements Loggable {
     KICKER(
         RobotRuntimeConstants.ROBOT_CONFIG.getIndexerKickerConfiguration().kGamePieceMoveTime,
         RobotRuntimeConstants.ROBOT_CONFIG.getIndexerKickerConfiguration().kGamePieceCapacity),
-    /**
-     * A deque for the simulated shooter to poll. Not really an indexer stage per se; just tracks
-     * balls the have been fed from the kicker
-     */
-    SHOOTER_QUEUE(0, Integer.MAX_VALUE), // maybe kinda cursed. idk
     ;
 
     public final double kTimeThroughStage;
@@ -107,6 +103,22 @@ public class SimulatedIndexerCompoundState implements Loggable {
       return true;
     } else {
       return false;
+    }
+  }
+
+  /**
+   * Pull a game piece from the kicker
+   *
+   * @return
+   */
+  public Optional<IndexerSimulatedGamePiece> pullFromKicker() {
+    List<IndexerSimulatedGamePiece> gamePieces = IndexerStage.KICKER.gamePieces;
+    if (!gamePieces.isEmpty()) {
+      // This doesn't really need to be FIFO since we don't rlly store meaningful data in these
+      // objects, but we might later
+      return Optional.of(gamePieces.get(gamePieces.size() - 1));
+    } else {
+      return Optional.empty();
     }
   }
 
