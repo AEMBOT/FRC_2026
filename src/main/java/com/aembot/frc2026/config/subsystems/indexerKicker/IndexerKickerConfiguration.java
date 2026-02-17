@@ -36,6 +36,9 @@ public class IndexerKickerConfiguration {
    */
   public Double kGamePieceMoveTime;
 
+  /** The number of game pieces this indexer stage can hold. Used for sim. */
+  public Integer kGamePieceCapacity;
+
   public IndexerKickerConfiguration(String name) {
     this.kName = name;
   }
@@ -96,6 +99,16 @@ public class IndexerKickerConfiguration {
   }
 
   /**
+   * Set the number of game pieces this indexer stage is able to hold. Used in sim.
+   *
+   * @return this {@link IndexerKickerConfiguration} for chaining
+   */
+  public IndexerKickerConfiguration withGamePieceCapacity(int numGamePieces) {
+    this.kGamePieceCapacity = numGamePieces;
+    return this;
+  }
+
+  /**
    * Check that all values required for a kicker subsystem are set on this config. If they are not,
    * throw a {@link VerifyError}. Intended to be called at the end of an initialization chain.
    *
@@ -108,6 +121,7 @@ public class IndexerKickerConfiguration {
     if (this.kTargetSpeedRPM == null) missing.add("kTargetSpeed");
     if (this.kResistSpeedRPM == null) missing.add("kResistSpeedRPM");
     if (this.kGamePieceMoveTime == null) missing.add("kGamePieceMoveTime");
+    if (this.kGamePieceCapacity == null) missing.add("kGamePieceCapacity");
 
     if (missing.size() != 0) {
       throw new VerifyError(

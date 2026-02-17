@@ -28,8 +28,12 @@ public class TimeOfFlightIOCANRange implements TimeOfFlightIO, CANable {
 
   @Override
   public void updateInputs(TimeOfFlightInputs inputs) {
-    inputs.distanceMeters = kCanRange.getDistance().getValueAsDouble();
-    inputs.distanceStdDevMeters = kCanRange.getDistanceStdDev().getValueAsDouble();
+    // Ignore values when the measurement is zero, as it's invalid. This is mostly to patch an issue
+    // in sim.
+    if (kCanRange.getDistance().getValueAsDouble() != 0) {
+      inputs.distanceMeters = kCanRange.getDistance().getValueAsDouble();
+      inputs.distanceStdDevMeters = kCanRange.getDistanceStdDev().getValueAsDouble();
+    }
   }
 
   @Override

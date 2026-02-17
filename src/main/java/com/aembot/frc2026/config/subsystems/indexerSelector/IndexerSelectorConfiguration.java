@@ -34,6 +34,9 @@ public class IndexerSelectorConfiguration {
    */
   public Double kGamePieceMoveTime;
 
+  /** The number of game pieces this indexer stage can hold. Used for sim. */
+  public Integer kGamePieceCapacity;
+
   public IndexerSelectorConfiguration(String name) {
     this.kName = name;
   }
@@ -93,6 +96,16 @@ public class IndexerSelectorConfiguration {
   }
 
   /**
+   * Set the number of game pieces this indexer stage is able to hold. Used in sim.
+   *
+   * @return this {@link IndexerSelectorConfiguration} for chaining
+   */
+  public IndexerSelectorConfiguration withGamePieceCapacity(int numGamePieces) {
+    this.kGamePieceCapacity = numGamePieces;
+    return this;
+  }
+
+  /**
    * Check that all values required for a selector subsystem are set on this config. If they are
    * not, throw a {@link VerifyError}. Intended to be called at the end of an initialization chain.
    *
@@ -102,6 +115,7 @@ public class IndexerSelectorConfiguration {
     List<String> missing = new ArrayList<>();
     if (this.kTargetSpeedRPM == null) missing.add("kTargetSpeed");
     if (this.kGamePieceMoveTime == null) missing.add("kGamePieceMoveTime");
+    if (this.kGamePieceCapacity == null) missing.add("kGamePieceCapacity");
     if (this.kMotorConfig == null) missing.add("kMotorConfig");
     if (this.kSimMotorConfig == null) missing.add("kSimMotorConfig");
     if (this.kTimeOfFlightConfig == null) missing.add("kTimeOfFlightConfig");

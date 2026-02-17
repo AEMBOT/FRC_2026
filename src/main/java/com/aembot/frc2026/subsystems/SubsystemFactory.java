@@ -129,10 +129,16 @@ public class SubsystemFactory {
 
     switch (RobotRuntimeConstants.MODE) {
       case SIM:
+        var timeOfFlightIO = new TimeOfFlightSimIOCanRange(selectorConfig.kTimeOfFlightConfig);
+
+        SimulatedRobotStateYearly.get()
+            .simulatedIndexerCompoundState
+            .setSelectorTimeOfFlightDistanceConsumer(timeOfFlightIO::setSimulatedDistance);
+
         return new IndexerSelectorSubsystem(
             selectorConfig,
             new IndexerSelectorMechanismIOSim(selectorConfig),
-            new TimeOfFlightSimIOCanRange(selectorConfig.kTimeOfFlightConfig),
+            timeOfFlightIO,
             indexerCompoundState::getSelectorCommandedState,
             indexerCompoundState::updateGamePieceAtKicker);
       case REPLAY:

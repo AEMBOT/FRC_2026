@@ -47,6 +47,6 @@ public class RobotStateYearly extends RobotState {
   public void updateLog(String standardPrefix, String inputPrefix) {
     super.updateLog(standardPrefix, inputPrefix);
 
-    indexerCompoundState.updateLog("SensorRobotState/IndexerCompound", inputPrefix);
+    indexerCompoundState.updateLog("SensorRobotState/IndexerCompound", "");
   }
 }

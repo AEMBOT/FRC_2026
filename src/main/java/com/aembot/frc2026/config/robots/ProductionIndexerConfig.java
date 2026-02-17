@@ -39,7 +39,10 @@ public final class ProductionIndexerConfig {
      * The amount of time it takes to transport a game piece from the spindexer to the selector.
      * Used in sim.
      */
-    public static final double SECONDS_THRU_SPINDEXER = 1;
+    public static final double SECONDS_THRU_SPINDEXER = 0.1;
+
+    /** Roughly the number of gamepieces the spindexer is able to hold. Used in sim */
+    public static final int GAMEPIECE_CAPACITY = 34;
 
     public static SpindexerConfiguration makeSpindexerConfiguration(String busName) {
       MotorConfiguration<TalonFXConfiguration> motorConfig =
@@ -74,6 +77,7 @@ public final class ProductionIndexerConfig {
           .withSimMotorConfig(simMotorConfig)
           .withTargetSpeedRPM(TARGET_SPEED_RPM)
           .withGamePieceMoveTimeSeconds(SECONDS_THRU_SPINDEXER)
+          .withGamePieceCapacity(GAMEPIECE_CAPACITY)
           .validate();
     }
   }
@@ -96,11 +100,17 @@ public final class ProductionIndexerConfig {
     /** Target acceleration of the spindexer roller in RPM^2. */
     static final double ACCELERATION_RPM = 400.0; // Copied from intake config
 
+    /** Threshold for the canrange to detect a game piece */
+    static final double CANRANGE_THRESHOLD_METERS = 0.1;
+
     /**
      * The amount of time it takes to transport a game piece from the selector to the kicker. Used
      * in sim.
      */
-    public static final double SECONDS_THRU_SELECTOR = 1;
+    public static final double SECONDS_THRU_SELECTOR = 0.1;
+
+    /** Roughly the number of gamepieces the selector is able to hold. Used in sim */
+    public static final int GAMEPIECE_CAPACITY = 3;
 
     public static IndexerSelectorConfiguration makeSelectorConfiguration(String busName) {
       MotorConfiguration<TalonFXConfiguration> motorConfig =
@@ -138,6 +148,7 @@ public final class ProductionIndexerConfig {
                       SUBSYSTEM_NAME,
                       CANDeviceType.CANRANGE,
                       busName))
+              .withDetectionThresholdMeters(CANRANGE_THRESHOLD_METERS)
               .validate();
 
       return new IndexerSelectorConfiguration(SUBSYSTEM_NAME)
@@ -146,6 +157,7 @@ public final class ProductionIndexerConfig {
           .withTimeOfFlightConfig(timeOfFlightConfig)
           .withTargetSpeedRPM(TARGET_SPEED_RPM)
           .withGamePieceMoveTimeSeconds(SECONDS_THRU_SELECTOR)
+          .withGamePieceCapacity(GAMEPIECE_CAPACITY)
           .validate();
     }
   }
@@ -178,7 +190,10 @@ public final class ProductionIndexerConfig {
      * The amount of time it takes to transport a game piece from the kicker to the shooter. Used in
      * sim.
      */
-    public static final double SECONDS_THRU_KICKER = 1;
+    public static final double SECONDS_THRU_KICKER = 0.05;
+
+    /** Roughly the number of gamepieces the spindexer is able to hold. Used in sim */
+    public static final int GAMEPIECE_CAPACITY = 1;
 
     public static IndexerKickerConfiguration makeKickerConfiguration(String busName) {
       MotorConfiguration<TalonFXConfiguration> motorConfig =
@@ -213,6 +228,7 @@ public final class ProductionIndexerConfig {
           .withTargetSpeedRPM(TARGET_SPEED_RPM)
           .withResistSpeedRPM(RESIST_SPEED_RPM)
           .withGamePieceMoveTimeSeconds(SECONDS_THRU_KICKER)
+          .withGamePieceCapacity(GAMEPIECE_CAPACITY)
           .validate();
     }
   }

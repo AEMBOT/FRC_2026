@@ -32,6 +32,9 @@ public class SpindexerConfiguration {
    */
   public Double kGamePieceMoveTime;
 
+  /** The number of game pieces this indexer stage can hold. Used for sim. */
+  public Integer kGamePieceCapacity;
+
   public SpindexerConfiguration(String name) {
     this.kName = name;
   }
@@ -80,6 +83,16 @@ public class SpindexerConfiguration {
   }
 
   /**
+   * Set the number of game pieces this indexer stage is able to hold. Used in sim.
+   *
+   * @return this {@link SpindexerConfiguration} for chaining
+   */
+  public SpindexerConfiguration withGamePieceCapacity(int numGamePieces) {
+    this.kGamePieceCapacity = numGamePieces;
+    return this;
+  }
+
+  /**
    * Check that all values required for a spindexer subsystem are set on this config. If they are
    * not, throw a {@link VerifyError}. Intended to be called at the end of an initialization chain.
    *
@@ -89,6 +102,7 @@ public class SpindexerConfiguration {
     List<String> missing = new ArrayList<>();
     if (this.kTargetSpeedRPM == null) missing.add("kTargetSpeed");
     if (this.kGamePieceMoveTime == null) missing.add("kGamePieceMoveTime");
+    if (this.kGamePieceCapacity == null) missing.add("kGamePieceCapacity");
     if (this.kMotorConfig == null) missing.add("kMotorConfig");
     if (this.kSimMotorConfig == null) missing.add("kSimMotorConfig");
 
