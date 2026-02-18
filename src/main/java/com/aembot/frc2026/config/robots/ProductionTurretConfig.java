@@ -7,6 +7,7 @@ import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.aembot.lib.core.can.CANDeviceID.CANDeviceType;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -29,6 +30,8 @@ public class ProductionTurretConfig {
 
   public final int CANCODER_B_ID = 42;
 
+  public final double CANCODER_A_MAGNET_OFFSET = 0;
+
   public final AEMCANCoderConfiguration CANCODER_A_CONFIG =
       new AEMCANCoderConfiguration()
           .withDevice(
@@ -37,9 +40,14 @@ public class ProductionTurretConfig {
                   SUBSYSTEM_NAME + "CANCoderA",
                   SUBSYSTEM_NAME,
                   CANDeviceType.CANCODER))
-          .withConfiguration(new CANcoderConfiguration());
+          .withConfiguration(
+              new CANcoderConfiguration()
+                  .withMagnetSensor(
+                      new MagnetSensorConfigs().withMagnetOffset(CANCODER_A_MAGNET_OFFSET)));
 
   public final int CANCODER_A_GEAR_TEETH = 17;
+
+  public final double CANCODER_B_MAGNET_OFFSET = 0;
 
   public final AEMCANCoderConfiguration CANCODER_B_CONFIG =
       new AEMCANCoderConfiguration()
@@ -49,7 +57,10 @@ public class ProductionTurretConfig {
                   SUBSYSTEM_NAME + "CANCoderB",
                   SUBSYSTEM_NAME,
                   CANDeviceType.CANCODER))
-          .withConfiguration(new CANcoderConfiguration());
+          .withConfiguration(
+              new CANcoderConfiguration()
+                  .withMagnetSensor(
+                      new MagnetSensorConfigs().withMagnetOffset(CANCODER_B_MAGNET_OFFSET)));
 
   public final int CANCODER_B_GEAR_TEETH = 13;
 

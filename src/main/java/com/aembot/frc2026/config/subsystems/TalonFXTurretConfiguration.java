@@ -28,6 +28,12 @@ public class TalonFXTurretConfiguration {
   /** Number of teeth on the gear connecting the rotor to CANcoder B */
   public int kCANcoderBGearTeeth;
 
+  /** Magnet offset for CANcoder A */
+  public double kCANcoderAOffset;
+
+  /** Magnet offset for CANcoder B */
+  public double kCANcoderBOffset;
+
   /**
    * Create a new turret configuration
    *
@@ -66,6 +72,16 @@ public class TalonFXTurretConfiguration {
 
   public TalonFXTurretConfiguration withCANcoderBGearTeeth(int CANcoderBGearTeeth) {
     this.kCANcoderBGearTeeth = CANcoderBGearTeeth;
+    return this;
+  }
+
+  public TalonFXTurretConfiguration withCANcoderAOffset(double CANcoderAOffset) {
+    this.kCANcoderAOffset = CANcoderAOffset;
+    return this;
+  }
+
+  public TalonFXTurretConfiguration withCANcoderBOffset(double CANcoderBOffset) {
+    this.kCANcoderAOffset = CANcoderBOffset;
     return this;
   }
 
