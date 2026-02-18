@@ -1,6 +1,7 @@
 package com.aembot.frc2026.config.robots;
 
 import com.aembot.frc2026.config.RobotConfiguration;
+import com.aembot.frc2026.config.subsystems.TalonFXTurretConfiguration;
 import com.aembot.frc2026.config.subsystems.indexerKicker.IndexerKickerConfiguration;
 import com.aembot.frc2026.config.subsystems.indexerSelector.IndexerSelectorConfiguration;
 import com.aembot.frc2026.config.subsystems.spindexer.SpindexerConfiguration;
@@ -43,6 +44,7 @@ public class ProductionConfig extends RobotConfiguration {
   private static final ProductionIndexerConfig INDEXER_CONFIG =
       new ProductionIndexerConfig(PRIMARY_BUS_NAME);
   private static final ProductionIntakeConfig INTAKE_CONFIG = new ProductionIntakeConfig();
+  private static final ProductionTurretConfig TURRET_CONFIG = new ProductionTurretConfig();
 
   private static final ProductionCameraConfig CAMERA_CONFIG = new ProductionCameraConfig();
 
@@ -117,5 +119,9 @@ public class ProductionConfig extends RobotConfiguration {
   @Override
   public IndexerKickerConfiguration getIndexerKickerConfiguration() {
     return INDEXER_CONFIG.kickerConfiguration;
+  }
+
+  public TalonFXTurretConfiguration getTurretConfig() {
+    return TURRET_CONFIG.TURRET_CONFIG;
   }
 }

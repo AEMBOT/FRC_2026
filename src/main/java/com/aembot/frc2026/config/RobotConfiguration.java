@@ -1,6 +1,7 @@
 package com.aembot.frc2026.config;
 
 import com.aembot.frc2026.config.robots.ProductionConfig;
+import com.aembot.frc2026.config.subsystems.TalonFXTurretConfiguration;
 import com.aembot.frc2026.config.subsystems.indexerKicker.IndexerKickerConfiguration;
 import com.aembot.frc2026.config.subsystems.indexerSelector.IndexerSelectorConfiguration;
 import com.aembot.frc2026.config.subsystems.spindexer.SpindexerConfiguration;
@@ -127,4 +128,11 @@ public abstract class RobotConfiguration {
         return new ProductionConfig();
     }
   }
+
+  /**
+   * Get the configuration of the turret
+   *
+   * @return the turret configuration
+   */
+  public abstract TalonFXTurretConfiguration getTurretConfig();
 }

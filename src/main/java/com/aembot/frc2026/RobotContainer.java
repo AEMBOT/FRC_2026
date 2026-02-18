@@ -9,6 +9,7 @@ import com.aembot.frc2026.subsystems.SubsystemFactory;
 import com.aembot.frc2026.subsystems.indexerKicker.IndexerKickerSubsystem;
 import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorSubsystem;
 import com.aembot.frc2026.subsystems.spindexer.SpindexerSubsystem;
+import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.lib.core.logging.Loggerable;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
@@ -55,6 +56,9 @@ public class RobotContainer implements Loggerable {
   private final OverBumperIntakeRollerSubsystem intakeRollerSubsystem =
       SubsystemFactory.createIntakeRollerSubsystem();
 
+  /* ---- TURRET ---- */
+  private final TurretSubsystem turretSubsystem = SubsystemFactory.createTurretSubsystem();
+
   private final CommandFactory commandFactory;
 
   /* ---- VISION ---- */
@@ -74,14 +78,17 @@ public class RobotContainer implements Loggerable {
             intakeRollerSubsystem,
             spindexerSubsystem,
             indexerSelectorSubsystem,
-            indexerKickerSubsystem);
+            indexerKickerSubsystem,
+            turretSubsystem);
     configureBindings();
   }
 
   /** Use this method to define your controller button -> command mappings */
   private void configureBindings() {
     driveSubsystem.setDefaultCommand(commandFactory.createDriveJoystickCmd(driverController));
-    hoodSubsystem.setDefaultCommand(commandFactory.createHoodStopCommand());
+    hoodSubsystem.setDefaultCommand(commandFactory.shooterCommands.createHoodStopCommand());
+    turretSubsystem.setDefaultCommand(
+        commandFactory.shooterCommands.createTurretAbsoluteForwardCommand());
     intakeRollerSubsystem.setDefaultCommand(
         commandFactory.intakeCommands.createStopIntakeCommand());
 

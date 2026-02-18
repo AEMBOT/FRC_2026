@@ -16,6 +16,10 @@ import com.aembot.frc2026.subsystems.spindexer.SpindexerSubsystem;
 import com.aembot.frc2026.subsystems.spindexer.io.SpindexerMechanismIOReal;
 import com.aembot.frc2026.subsystems.spindexer.io.SpindexerMechanismIOReplay;
 import com.aembot.frc2026.subsystems.spindexer.io.SpindexerMechanismIOSim;
+import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
+import com.aembot.frc2026.subsystems.turret.io.TalonFXTurretHardwareIO;
+import com.aembot.frc2026.subsystems.turret.io.TurretReplayIO;
+import com.aembot.frc2026.subsystems.turret.io.TurretSimIO;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
@@ -275,5 +279,23 @@ public class SubsystemFactory {
     }
 
     return new AprilVisionSubsystem(RobotStateYearly.get(), cameraIOs);
+  }
+
+  public static TurretSubsystem createTurretSubsystem() {
+    switch (RobotRuntimeConstants.MODE) {
+      case SIM:
+        return new TurretSubsystem(
+            RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig(),
+            new TurretSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig()));
+      case REPLAY:
+        return new TurretSubsystem(
+            RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig(), new TurretReplayIO());
+      case REAL:
+
+      default:
+        return new TurretSubsystem(
+            RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig(),
+            new TalonFXTurretHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig()));
+    }
   }
 }
