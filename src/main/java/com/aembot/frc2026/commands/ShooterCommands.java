@@ -53,9 +53,9 @@ public final class ShooterCommands {
     this.shootingHubTable =
         new OptimalVelocityTable(
             Filesystem.getDeployDirectory()
-                + "/initital-velocities"
+                + "/initial-velocities"
                 + robotType
-                + "Shooting_Hub_Initial_Velocities.csv");
+                + "/Shooting_Hub_Initial_Velocities.csv");
   }
 
   public Command createHoodStopCommand() {
@@ -82,9 +82,12 @@ public final class ShooterCommands {
     return turret.smartVelocitySetpointCommand(() -> -30);
   }
 
-  private double getTurretForwardFromRobotPose() {
+  private double getTurretTowardsHubFromRobotPose() {
     double targetRotation =
-        RobotStateYearly.get().getLatestFieldRobotPose().getRotation().getDegrees() + 180;
+        getRelativeYaw()
+                .minus(RobotStateYearly.get().getLatestFieldRobotPose().getRotation())
+                .getDegrees()
+            + 180;
 
     if (targetRotation < 0) {
       targetRotation += 360;
@@ -93,16 +96,17 @@ public final class ShooterCommands {
     return targetRotation;
   }
 
-  public Command createTurretAbsoluteForwardCommand() {
-    return turret.smartPositionSetpointCommand(() -> getTurretForwardFromRobotPose());
-  }
-
   public Command createHoodTowardsHubCommand() {
     Supplier<Rotation3d> rotationSupplier = () -> getShootingAngle();
 
     return new RepeatCommand(
         hood.smartPositionSetpointCommand(
             () -> Units.radiansToDegrees(rotationSupplier.get().getY())));
+  }
+
+  public Command createTurretTowardsHubCommand() {
+    return new RepeatCommand(
+        turret.smartPositionSetpointCommand(() -> getTurretTowardsHubFromRobotPose()));
   }
 
   public Command createShootFuelCommand() {
@@ -154,7 +158,8 @@ public final class ShooterCommands {
                     robotPose.getTranslation(),
                     new Translation2d(),
                     RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds(),
-                    getRelativeYaw(), // TODO: replace with turret angle
+                    new Rotation2d(Units.degreesToRadians(turret.getCurrentPosition() + 180))
+                        .plus(robotPose.getRotation()),
                     Meters.of(0.5), // TODO:find spot to replace magic number
                     MetersPerSecond.of(getShootingSpeed()), // TODO: replace with flywheel speed
                     Degrees.of(hood.getCurrentPosition()))
