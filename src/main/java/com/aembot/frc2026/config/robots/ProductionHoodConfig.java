@@ -15,9 +15,9 @@ public class ProductionHoodConfig {
 
   public final double GEAR_RATIO = 80;
 
-  public final double CRUISE_VELOCITY_DEG_PER_SEC = 90;
+  public final double CRUISE_VELOCITY_DEG_PER_SEC = 360;
 
-  public final double ACCELERATION_DEG_PER_SEC = 180;
+  public final double ACCELERATION_DEG_PER_SEC = 720;
 
   public final String SUBSYSTEM_NAME = "HoodSubsystem";
 
@@ -31,7 +31,7 @@ public class ProductionHoodConfig {
                               Units.degreesToRotations(CRUISE_VELOCITY_DEG_PER_SEC) * GEAR_RATIO)
                           .withMotionMagicAcceleration(
                               Units.degreesToRotations(ACCELERATION_DEG_PER_SEC) * GEAR_RATIO))
-                  .withSlot0(new Slot0Configs().withKP(1).withKV(0)))
+                  .withSlot0(new Slot0Configs().withKP(5).withKV(0)))
           .withCANDevice(
               new CANDeviceID(
                   15, SUBSYSTEM_NAME + "Motor", SUBSYSTEM_NAME, CANDeviceID.CANDeviceType.TALON_FX))
