@@ -45,7 +45,7 @@ public class SimulatedIndexerCompoundState implements Loggable {
     }
   }
 
-  class IndexerSimulatedGamePiece {
+  static class IndexerSimulatedGamePiece {
     public double timerStartTimeSeconds;
 
     public IndexerSimulatedGamePiece() {
