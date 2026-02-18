@@ -3,15 +3,21 @@ package com.aembot.frc2026.config.robots;
 import com.aembot.frc2026.config.subsystems.indexerKicker.IndexerKickerConfiguration;
 import com.aembot.frc2026.config.subsystems.indexerSelector.IndexerSelectorConfiguration;
 import com.aembot.frc2026.config.subsystems.spindexer.SpindexerConfiguration;
+import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.aembot.lib.config.sensors.timeOfFlight.TimeOfFlightConfiguration;
+import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.aembot.lib.core.can.CANDeviceID.CANDeviceType;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import java.util.Random;
 
 public final class ProductionIndexerConfig {
   private final class GeneralConstants {
@@ -43,6 +49,33 @@ public final class ProductionIndexerConfig {
 
     /** Roughly the number of gamepieces the spindexer is able to hold. Used in sim */
     public static final int GAMEPIECE_CAPACITY = 34;
+
+    /** Poses that game pieces can appear in. Used for visualization in sim. */
+    public static final Transform3d[] GAMEPIECE_POSITIONS;
+
+    // Setup possible game piece positions
+    static {
+      if (RobotRuntimeConstants.MODE == RuntimeMode.SIM) {
+        GAMEPIECE_POSITIONS = new Transform3d[GAMEPIECE_CAPACITY];
+
+        Translation3d HOPPER_CENTER_POINT = new Translation3d(0.4, 0, 0.3);
+        double HOPPER_WIDTH_METERS = 0.5; // Approximate width of the hopper
+        double HOPPER_LENGTH_METERS = 0.3; // Approximate length of the hopper
+        double HOPPER_HEIGHT_METERS = 0.3; // Approximate height of the hopper
+
+        for (int i = 0; i < GAMEPIECE_CAPACITY; i++) {
+          Random random = new Random();
+          double x =
+              HOPPER_CENTER_POINT.getX() + (random.nextDouble() - 0.5) * HOPPER_LENGTH_METERS;
+          double y = HOPPER_CENTER_POINT.getY() + (random.nextDouble() - 0.5) * HOPPER_WIDTH_METERS;
+          double z =
+              HOPPER_CENTER_POINT.getZ() + (random.nextDouble() - 0.5) * HOPPER_HEIGHT_METERS;
+          GAMEPIECE_POSITIONS[i] = new Transform3d(x, y, z, new Rotation3d());
+        }
+      } else {
+        GAMEPIECE_POSITIONS = new Transform3d[0]; // Only used in sim
+      }
+    }
 
     public static SpindexerConfiguration makeSpindexerConfiguration(String busName) {
       MotorConfiguration<TalonFXConfiguration> motorConfig =
@@ -78,6 +111,7 @@ public final class ProductionIndexerConfig {
           .withTargetSpeedRPM(TARGET_SPEED_RPM)
           .withGamePieceMoveTimeSeconds(SECONDS_THRU_SPINDEXER)
           .withGamePieceCapacity(GAMEPIECE_CAPACITY)
+          .withGamePiecePositions(GAMEPIECE_POSITIONS)
           .validate();
     }
   }
@@ -110,7 +144,13 @@ public final class ProductionIndexerConfig {
     public static final double SECONDS_THRU_SELECTOR = 0.1;
 
     /** Roughly the number of gamepieces the selector is able to hold. Used in sim */
-    public static final int GAMEPIECE_CAPACITY = 3;
+    public static final int GAMEPIECE_CAPACITY = 2;
+
+    /** Poses that game pieces can appear in. Used for visualization in sim. */
+    public static final Transform3d[] GAMEPIECE_POSITIONS = {
+      new Transform3d(-0.135, 0, 0.335, new Rotation3d()),
+      new Transform3d(-0.135, 0, 0.337, new Rotation3d()),
+    };
 
     public static IndexerSelectorConfiguration makeSelectorConfiguration(String busName) {
       MotorConfiguration<TalonFXConfiguration> motorConfig =
@@ -158,6 +198,7 @@ public final class ProductionIndexerConfig {
           .withTargetSpeedRPM(TARGET_SPEED_RPM)
           .withGamePieceMoveTimeSeconds(SECONDS_THRU_SELECTOR)
           .withGamePieceCapacity(GAMEPIECE_CAPACITY)
+          .withGamePiecePositions(GAMEPIECE_POSITIONS)
           .validate();
     }
   }
@@ -195,6 +236,11 @@ public final class ProductionIndexerConfig {
     /** Roughly the number of gamepieces the spindexer is able to hold. Used in sim */
     public static final int GAMEPIECE_CAPACITY = 1;
 
+    /** Poses that game pieces can appear in. Used for visualization in sim. */
+    public static final Transform3d[] GAMEPIECE_POSITIONS = {
+      new Transform3d(-0.135, 0, 0.339, new Rotation3d()),
+    };
+
     public static IndexerKickerConfiguration makeKickerConfiguration(String busName) {
       MotorConfiguration<TalonFXConfiguration> motorConfig =
           new MotorConfiguration<TalonFXConfiguration>()
@@ -229,6 +275,7 @@ public final class ProductionIndexerConfig {
           .withResistSpeedRPM(RESIST_SPEED_RPM)
           .withGamePieceMoveTimeSeconds(SECONDS_THRU_KICKER)
           .withGamePieceCapacity(GAMEPIECE_CAPACITY)
+          .withGamePiecePositions(GAMEPIECE_POSITIONS)
           .validate();
     }
   }

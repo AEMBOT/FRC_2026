@@ -4,6 +4,7 @@ import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.state.subsystems.indexer.IndexerCompoundState.IndexerStageRunState;
 import com.aembot.lib.config.sensors.timeOfFlight.TimeOfFlightConfiguration;
 import com.aembot.lib.core.logging.Loggable;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
 import java.util.List;
@@ -122,6 +123,20 @@ public class SimulatedIndexerCompoundState implements Loggable {
     }
   }
 
+  public List<Transform3d> getRenderedGamePiecePositions() {
+    List<Transform3d> positions = new ArrayList<>();
+
+    for (IndexerStage stage : IndexerStage.values()) {
+      Transform3d[] stagePositions = getGamePiecePositionsFor(stage);
+      if (stagePositions.length == 0) continue;
+      for (int i = 0; i < stage.gamePieces.size(); i++) {
+        positions.add(stagePositions[i % stagePositions.length]);
+      }
+    }
+
+    return positions;
+  }
+
   private void moveGamePieces() {
     IndexerStage[] indexerStages = IndexerStage.values();
 
@@ -187,6 +202,21 @@ public class SimulatedIndexerCompoundState implements Loggable {
         return kRealIndexerState.getKickerCommandedState();
       default:
         return null;
+    }
+  }
+
+  private Transform3d[] getGamePiecePositionsFor(IndexerStage stage) {
+    switch (stage) {
+      case SPINDEXER:
+        return RobotRuntimeConstants.ROBOT_CONFIG.getSpindexerConfiguration().kGamePiecePositions;
+      case SELECTOR:
+        return RobotRuntimeConstants.ROBOT_CONFIG.getIndexerSelectorConfiguration()
+            .kGamePiecePositions;
+      case KICKER:
+        return RobotRuntimeConstants.ROBOT_CONFIG.getIndexerKickerConfiguration()
+            .kGamePiecePositions;
+      default:
+        return new Transform3d[0];
     }
   }
 

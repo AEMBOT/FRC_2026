@@ -3,6 +3,7 @@ package com.aembot.frc2026.config.subsystems.indexerKicker;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.math.geometry.Transform3d;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +39,9 @@ public class IndexerKickerConfiguration {
 
   /** The number of game pieces this indexer stage can hold. Used for sim. */
   public Integer kGamePieceCapacity;
+
+  /** Poses that game pieces can appear in. Used for visualization in sim. */
+  public Transform3d[] kGamePiecePositions = {new Transform3d()};
 
   public IndexerKickerConfiguration(String name) {
     this.kName = name;
@@ -105,6 +109,16 @@ public class IndexerKickerConfiguration {
    */
   public IndexerKickerConfiguration withGamePieceCapacity(int numGamePieces) {
     this.kGamePieceCapacity = numGamePieces;
+    return this;
+  }
+
+  /**
+   * Set poses that game pieces can appear in. Used for visualization in sim.
+   *
+   * @return this {@link IndexerKickerConfiguration} for chaining
+   */
+  public IndexerKickerConfiguration withGamePiecePositions(Transform3d[] positions) {
+    this.kGamePiecePositions = positions;
     return this;
   }
 

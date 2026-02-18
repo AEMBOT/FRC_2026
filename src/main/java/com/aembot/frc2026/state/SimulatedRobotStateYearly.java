@@ -6,6 +6,9 @@ import com.aembot.frc2026.state.subsystems.indexer.SimulatedIndexerCompoundState
 import com.aembot.lib.state.SimulatedRobotState;
 import com.aembot.lib.state.subsystems.intake.over_bumper.SimulatedOverBumperIntakeState;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import java.util.ArrayList;
+import java.util.Arrays;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.Logger;
 
@@ -46,9 +49,16 @@ public class SimulatedRobotStateYearly extends SimulatedRobotState {
     super.updateLog(standardPrefix, inputPrefix);
 
     // Get the positions of the fuel (both on the field and in the air)
-    Pose3d[] fuelPoses = SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel");
+    ArrayList<Pose3d> fuelPoses =
+        new ArrayList<>(
+            Arrays.asList(SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel")));
+
+    for (Transform3d fuelInRobot : simulatedIndexerCompoundState.getRenderedGamePiecePositions()) {
+      fuelPoses.add(new Pose3d(this.getLatestFieldRobotPose()).plus(fuelInRobot));
+    }
+
     // Publish to telemetry using AdvantageKit
-    Logger.recordOutput("SimulatedRobotState/FuelPositions", fuelPoses);
+    Logger.recordOutput("SimulatedRobotState/FuelPositions", fuelPoses.toArray(new Pose3d[0]));
 
     simulatedIndexerCompoundState.updateLog("SimulatedRobotState/IndexerCompound", "");
     simulatedIntakeState.updateLog("SimulatedRobotState/Intake", "");
