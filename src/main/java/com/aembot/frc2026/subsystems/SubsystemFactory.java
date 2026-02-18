@@ -71,17 +71,21 @@ public class SubsystemFactory {
       case SIM:
         return new HoodSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getSimHoodConfig(),
-            new HoodSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getSimHoodConfig()));
+            new HoodSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getSimHoodConfig()),
+            RobotStateYearly.get().hoodState);
 
       case REPLAY:
         return new HoodSubsystem(
-            RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig(), new HoodIOReplay());
+            RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig(),
+            new HoodIOReplay(),
+            RobotStateYearly.get().hoodState);
       case REAL:
 
       default:
         return new HoodSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig(),
-            new TalonFXHoodHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig()));
+            new TalonFXHoodHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig()),
+            RobotStateYearly.get().hoodState);
     }
   }
 
