@@ -7,6 +7,8 @@ import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.Logger;
 
 /** Turret subsystm implementation */
@@ -15,6 +17,9 @@ public class TurretSubsystem
 
   /** IO to use for this subsystem */
   public final TurretIO io;
+
+  /** Configuration for this turret */
+  public final TalonFXTurretConfiguration config;
 
   /**
    * Create a new turret subsystem
@@ -27,11 +32,26 @@ public class TurretSubsystem
     super(config.kName, new MotorInputs(), io.getMotor(), config.kRealMotorConfig);
 
     this.io = io;
+    this.config = config;
+
+    setPositionFromEncoders();
+  }
+
+  private void setPositionFromEncoders() {
+    double absolutePosition =
+        config.getMechanismRotationsFromEncoders(
+            io.getCANcoderA().getRawAngle(), io.getCANcoderB().getRawAngle());
+
+    if (absolutePosition == -1) {
+      CommandScheduler.getInstance()
+          .schedule(
+              dutyCycleCommand(() -> 0)
+                  .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+                  .withName("DisableMotorCommand"));
+    }
 
     // Zero encoder position based on cancoders
-    setEncoderPosition(
-        config.getMechanismRotationsFromEncoders(
-            io.getCANcoderA().getRawAngle(), io.getCANcoderB().getRawAngle()));
+    setEncoderPosition(absolutePosition);
   }
 
   @Override

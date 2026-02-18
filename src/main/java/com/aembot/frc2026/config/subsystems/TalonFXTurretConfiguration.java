@@ -90,7 +90,7 @@ public class TalonFXTurretConfiguration {
    *
    * @param rawCANcoderAPos position in rotations of CANcoder A
    * @param rawCANcoderBPos position in rotations of CANcoder B
-   * @return The absolute position of the mechanism in configured units
+   * @return The absolute position of the mechanism in configured units. If it fails, returns -1
    */
   public double getMechanismRotationsFromEncoders(double rawCANcoderAPos, double rawCANcoderBPos) {
 
@@ -112,6 +112,6 @@ public class TalonFXTurretConfiguration {
       }
     }
 
-    return 0;
+    return -1;
   }
 }
