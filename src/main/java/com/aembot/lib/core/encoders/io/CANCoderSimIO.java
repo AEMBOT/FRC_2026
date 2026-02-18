@@ -42,7 +42,7 @@ public class CANCoderSimIO implements CANCoderIO, CANable {
     if (config.configuration.MagnetSensor.AbsoluteSensorDiscontinuityPoint == 0.5) {
       absolutePositionRotations = MathUtil.inputModulus(position, -0.5, 0.5);
     } else {
-      MathUtil.inputModulus(position, 0, 1);
+      absolutePositionRotations = MathUtil.inputModulus(position, 0, 1);
     }
 
     inputs.encoderPosition = absolutePositionRotations;
