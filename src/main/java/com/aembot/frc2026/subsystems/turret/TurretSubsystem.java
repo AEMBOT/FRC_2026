@@ -16,10 +16,10 @@ public class TurretSubsystem
     extends MotorSubsystem<MotorInputs, MotorIO, MotorConfiguration<TalonFXConfiguration>> {
 
   /** IO to use for this subsystem */
-  public final TurretIO io;
+  private final TurretIO io;
 
   /** Configuration for this turret */
-  public final TalonFXTurretConfiguration config;
+  private final TalonFXTurretConfiguration config;
 
   /**
    * Create a new turret subsystem
