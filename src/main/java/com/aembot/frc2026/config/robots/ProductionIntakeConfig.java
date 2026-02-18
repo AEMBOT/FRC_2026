@@ -42,9 +42,9 @@ public class ProductionIntakeConfig {
 
   public final IntakeSide DEPLOY_SIDE = IntakeSide.FRONT;
 
-  public final double DEPLOY_EXTENSION_METERS = 0.2;
+  public final double DEPLOY_EXTENSION_METERS = Units.inchesToMeters(11);
 
-  public final double INTAKE_WIDTH_METERS = 0.9;
+  public final double INTAKE_WIDTH_METERS = Units.inchesToMeters(26.75);
 
   public final Pose3d DEPLOY_PIVOT_POINT =
       new Pose3d(0.298443, 0, 0.189832, new Rotation3d(0, Math.PI / 2, 0));
