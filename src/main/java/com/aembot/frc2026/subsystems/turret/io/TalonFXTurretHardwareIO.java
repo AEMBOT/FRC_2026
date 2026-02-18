@@ -54,5 +54,5 @@ public class TalonFXTurretHardwareIO implements TurretIO {
   public void updateInputs(TurretInputs inputs) {}
 
   @Override
-  public void updateLog(String standartPrefix, String inputPrefix) {}
+  public void updateLog(String standardPrefix, String inputPrefix) {}
 }
