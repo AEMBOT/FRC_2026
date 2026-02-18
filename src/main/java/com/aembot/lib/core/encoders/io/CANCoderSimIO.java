@@ -26,8 +26,6 @@ public class CANCoderSimIO implements CANCoderIO, CANable {
 
   protected final AEMCANCoderConfiguration config;
 
-  protected double lastUpdateTimestamp = 0.0;
-
   protected SimulatedCANCoderState inputs = new SimulatedCANCoderState();
 
   public CANCoderSimIO(AEMCANCoderConfiguration config) {
@@ -35,8 +33,6 @@ public class CANCoderSimIO implements CANCoderIO, CANable {
     encoder = CANCoderFactory.createRawWithConfig(config.device, config.configuration);
 
     simState = encoder.getSimState();
-
-    lastUpdateTimestamp = Timer.getFPGATimestamp();
   }
 
   public void updateSimState(double position, double velocity, double acceleration) {
