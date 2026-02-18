@@ -14,11 +14,9 @@ public class TalonFXTurretHardwareIO implements TurretIO {
   private final MotorIOTalonFX motor;
 
   /** CANcoder A used for absolute positioning */
-  @SuppressWarnings("unused")
   private final CANCoderIO CANcoderA;
 
   /** CANcoder B used for absolute positioning */
-  @SuppressWarnings("unused")
   private final CANCoderIO CANcoderB;
 
   /** Configuration for this turret */
