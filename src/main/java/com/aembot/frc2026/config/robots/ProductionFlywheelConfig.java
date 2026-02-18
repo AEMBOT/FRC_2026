@@ -15,8 +15,8 @@ import edu.wpi.first.math.system.plant.DCMotor;
 public class ProductionFlywheelConfig {
   //  TODO Placeholder values, values need to be changed cuz they don't make sense
 
-  public final double MAX_VELOCITY = 60.0;
-  public final double MAX_ACCELERATION = 10.0;
+  public final double CRUISE_VELOCITY_METERS_PER_SEC = 16.0;
+  public final double ACCELERATION_METERS_PER_SEC = 32.0;
   public final double JERK = 0.0;
 
   public final double GEAR_RATIO = 1.0;
@@ -27,10 +27,10 @@ public class ProductionFlywheelConfig {
   public final double UNITS_TO_ROTOR_RATIO = 1.0 / (SHOOTER_WHEEL_CIRCUMFERENCE * GEAR_RATIO);
   public final double UNITS_TO_MECHANISM_ROTATION_RATIO = 1.0 / SHOOTER_WHEEL_CIRCUMFERENCE;
 
-  public final double J_KG_METERS_SQ = 2.0;
+  public final double J_KG_METERS_SQ = 0.01;
 
   public final ConfigureSlot0Gains MOTOR_GAINS =
-      new ConfigureSlot0Gains(1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+      new ConfigureSlot0Gains(10.0, 0.0, 0.0, 0.0, 0.0, 0.05, 0.0);
 
   private static final int LEADER_MOTOR_ID = 53;
   private static final String LEADER_MOTOR_NAME = "FlywheelMotor";
@@ -50,8 +50,10 @@ public class ProductionFlywheelConfig {
                   .withSlot0(MOTOR_GAINS)
                   .withMotionMagic(
                       new MotionMagicConfigs()
-                          .withMotionMagicCruiseVelocity(MAX_VELOCITY)
-                          .withMotionMagicAcceleration(MAX_ACCELERATION)
+                          .withMotionMagicCruiseVelocity(
+                              CRUISE_VELOCITY_METERS_PER_SEC * UNITS_TO_ROTOR_RATIO)
+                          .withMotionMagicAcceleration(
+                              ACCELERATION_METERS_PER_SEC * UNITS_TO_ROTOR_RATIO)
                           .withMotionMagicJerk(JERK)))
           .withCANDevice(
               new CANDeviceID(
