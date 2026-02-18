@@ -30,7 +30,7 @@ public final class ProductionIndexerConfig {
 
     static final double GEAR_RATIO = 3.0 / 1.0;
 
-    static final int MOTOR_CAN_ID = 18;
+    static final int MOTOR_CAN_ID = 54;
 
     // constants copied from hood config
     static final Slot0Configs MOTOR_GAINS = new Slot0Configs().withKP(.1).withKV(.12);
@@ -122,8 +122,8 @@ public final class ProductionIndexerConfig {
 
     static final double GEAR_RATIO = 1.0 / 1.0;
 
-    static final int MOTOR_CAN_ID = 19;
-    static final int CANRANGE_CAN_ID = 21;
+    static final int MOTOR_CAN_ID = 55;
+    static final int CANRANGE_CAN_ID = 45;
 
     // constants copied from hood config
     static final Slot0Configs MOTOR_GAINS = new Slot0Configs().withKP(.1).withKV(.12);
@@ -209,7 +209,7 @@ public final class ProductionIndexerConfig {
 
     static final double GEAR_RATIO = 1.0 / 1.0;
 
-    static final int MOTOR_CAN_ID = 20;
+    static final int MOTOR_CAN_ID = 56;
 
     // constants copied from hood config
     static final Slot0Configs MOTOR_GAINS = new Slot0Configs().withKP(.1).withKV(.12);
