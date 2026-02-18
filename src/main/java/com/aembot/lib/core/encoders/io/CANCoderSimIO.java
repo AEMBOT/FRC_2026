@@ -8,6 +8,7 @@ import com.aembot.lib.core.encoders.factories.CANCoderFactory;
 import com.aembot.lib.core.encoders.interfaces.CANCoderIO;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.sim.CANcoderSimState;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Timer;
 import org.littletonrobotics.junction.Logger;
 
@@ -39,7 +40,15 @@ public class CANCoderSimIO implements CANCoderIO, CANable {
   }
 
   public void updateSimState(double position, double velocity, double acceleration) {
-    double absolutePositionRotations = position % 1.0;
+
+    double absolutePositionRotations = 0;
+
+    // Allows for -0.5 to 0.5, -1 to 0, and 0 to 1
+    if (config.configuration.MagnetSensor.AbsoluteSensorDiscontinuityPoint == 0.5) {
+      absolutePositionRotations = MathUtil.inputModulus(position, -0.5, 0.5);
+    } else {
+      MathUtil.inputModulus(position, 0, 1);
+    }
 
     inputs.encoderPosition = absolutePositionRotations;
     inputs.encoderVelocity = velocity;
