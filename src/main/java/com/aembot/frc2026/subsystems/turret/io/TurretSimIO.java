@@ -50,7 +50,7 @@ public class TurretSimIO implements TurretIO {
         simMotor.getTalon().getVelocity().getValueAsDouble() / config.kCANcoderAGearTeeth,
         simMotor.getTalon().getAcceleration().getValueAsDouble() / config.kCANcoderAGearTeeth);
 
-    simCANcoderA.updateSimState(
+    simCANcoderB.updateSimState(
         simMotor.getTalon().getPosition().getValueAsDouble() / config.kCANcoderBGearTeeth,
         simMotor.getTalon().getVelocity().getValueAsDouble() / config.kCANcoderBGearTeeth,
         simMotor.getTalon().getAcceleration().getValueAsDouble() / config.kCANcoderBGearTeeth);
