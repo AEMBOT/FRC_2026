@@ -9,7 +9,6 @@ import com.aembot.lib.core.encoders.interfaces.CANCoderIO;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.sim.CANcoderSimState;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.Timer;
 import org.littletonrobotics.junction.Logger;
 
 public class CANCoderSimIO implements CANCoderIO, CANable {
