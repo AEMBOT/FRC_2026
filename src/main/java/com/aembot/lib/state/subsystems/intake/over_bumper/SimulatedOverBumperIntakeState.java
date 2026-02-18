@@ -48,8 +48,10 @@ public class SimulatedOverBumperIntakeState implements Loggable {
       intakeSim
           .get()
           .setCustomIntakeCondition(
-              (_gamePiece) ->
-                  kRollerStateSupplier.get() != null && kRollerStateSupplier.get().isActive);
+              (_gamePiece) -> {
+                OverBumperIntakeRollerState rollerState = kRollerStateSupplier.get();
+                return rollerState != null && rollerState.isActive;
+              });
     }
   }
 
