@@ -13,7 +13,7 @@ public class CRTTest {
 
     Random rand = new Random();
 
-    for (double i = 0.; i < 750; i += 0.5) {
+    for (double i = 0.; i < 750; i += 0.05) {
 
       double rotorPosition = testconfig.kRealMotorConfig.getUnitsToRotorRotations(i);
 
