@@ -4,6 +4,10 @@ import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.constants.field.Field2026;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.state.SimulatedRobotStateYearly;
+import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
+import com.aembot.frc2026.subsystems.turret.io.TalonFXTurretHardwareIO;
+import com.aembot.frc2026.subsystems.turret.io.TurretReplayIO;
+import com.aembot.frc2026.subsystems.turret.io.TurretSimIO;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
@@ -75,17 +79,21 @@ public class SubsystemFactory {
       case SIM:
         return new HoodSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getSimHoodConfig(),
-            new HoodSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getSimHoodConfig()));
+            new HoodSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getSimHoodConfig()),
+            RobotStateYearly.get().hoodState);
 
       case REPLAY:
         return new HoodSubsystem(
-            RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig(), new HoodIOReplay());
+            RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig(),
+            new HoodIOReplay(),
+            RobotStateYearly.get().hoodState);
       case REAL:
 
       default:
         return new HoodSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig(),
-            new TalonFXHoodHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig()));
+            new TalonFXHoodHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig()),
+            RobotStateYearly.get().hoodState);
     }
   }
 
@@ -187,6 +195,22 @@ public class SubsystemFactory {
         return new FlywheelSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration(),
             new FlywheelHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration()));
+        
+  public static TurretSubsystem createTurretSubsystem() {
+    switch (RobotRuntimeConstants.MODE) {
+      case SIM:
+        return new TurretSubsystem(
+            RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig(),
+            new TurretSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig()));
+      case REPLAY:
+        return new TurretSubsystem(
+            RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig(), new TurretReplayIO());
+      case REAL:
+
+      default:
+        return new TurretSubsystem(
+            RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig(),
+            new TalonFXTurretHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig()));
     }
   }
 }

@@ -125,6 +125,9 @@ public class MotorIOTalonFX implements MotorIO, CANable {
 
     // Optimization the bus utilization for the talon
     CTREUtil.Configuration.Motors.optimizeBusUtilization(talon);
+
+    // Call has reset occured in order to reset it (returns true by default)
+    hasResetOccurred();
   }
 
   /**
@@ -430,5 +433,10 @@ public class MotorIOTalonFX implements MotorIO, CANable {
                 .withVelocity(getUnitsToRotorRotations(velocity))
                 .withSlot(slot))
         == StatusCode.OK;
+  }
+
+  @Override
+  public boolean hasResetOccurred() {
+    return talon.hasResetOccurred();
   }
 }

@@ -1,6 +1,7 @@
 package com.aembot.frc2026.config.robots;
 
 import com.aembot.frc2026.config.RobotConfiguration;
+import com.aembot.frc2026.config.subsystems.TalonFXTurretConfiguration;
 import com.aembot.lib.config.robot.PhysicalConfiguration;
 import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
 import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
@@ -42,6 +43,10 @@ public class ProductionConfig extends RobotConfiguration {
   private static final ProductionCameraConfig CAMERA_CONFIG = new ProductionCameraConfig();
 
   private static final ProductionFlywheelConfig FLYWHEEL_CONFIG = new ProductionFlywheelConfig();
+
+  private static final ProductionTurretConfig TURRET_CONFIG = new ProductionTurretConfig();
+
+  private static final ProductionCameraConfig CAMERA_CONFIG = new ProductionCameraConfig();
 
   @Override
   public String getRobotName() {
@@ -104,5 +109,9 @@ public class ProductionConfig extends RobotConfiguration {
   @Override
   public TalonFXFlywheelConfiguration getFlywheelConfiguration() {
     return FLYWHEEL_CONFIG.CONFIG;
+    
+  @Override
+  public TalonFXTurretConfiguration getTurretConfig() {
+    return TURRET_CONFIG.TURRET_CONFIG;
   }
 }

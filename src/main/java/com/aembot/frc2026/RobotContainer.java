@@ -10,6 +10,7 @@ import com.aembot.lib.core.logging.Loggerable;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
+import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
@@ -46,6 +47,9 @@ public class RobotContainer implements Loggerable {
   private final OverBumperIntakeRollerSubsystem intakeRollerSubsystem =
       SubsystemFactory.createIntakeRollerSubsystem();
 
+  /* ---- TURRET ---- */
+  private final TurretSubsystem turretSubsystem = SubsystemFactory.createTurretSubsystem();
+
   private final CommandFactory commandFactory;
 
   /* ---- VISION ---- */
@@ -64,17 +68,14 @@ public class RobotContainer implements Loggerable {
             intakeDeploySubsystem,
             intakeRollerSubsystem,
             flywheelSubsystem);
+            turretSubsystem);
     configureBindings();
   }
 
   /** Use this method to define your controller button -> command mappings */
   private void configureBindings() {
     driveSubsystem.setDefaultCommand(commandFactory.createDriveJoystickCmd(driverController));
-    hoodSubsystem.setDefaultCommand(commandFactory.createHoodStopCommand());
     flywheelSubsystem.setDefaultCommand(commandFactory.createFlywheelSlowSpinCommand());
-
-    intakeRollerSubsystem.setDefaultCommand(
-        commandFactory.intakeCommands.createStopIntakeCommand());
 
     driverController.a().onTrue(commandFactory.intakeCommands.createUpCommand());
     driverController.b().onTrue(commandFactory.intakeCommands.createDownCommand());
@@ -83,6 +84,11 @@ public class RobotContainer implements Loggerable {
 
     // --- Flywheel Commands
     driverController.rightBumper().whileTrue(commandFactory.createFlywheelFastSpinCommand());
+    hoodSubsystem.setDefaultCommand(commandFactory.shooterCommands.createHoodStopCommand());
+    turretSubsystem.setDefaultCommand(
+        commandFactory.shooterCommands.createTurretAbsoluteForwardCommand());
+    intakeRollerSubsystem.setDefaultCommand(
+        commandFactory.intakeCommands.createStopIntakeCommand());
   }
 
   /**

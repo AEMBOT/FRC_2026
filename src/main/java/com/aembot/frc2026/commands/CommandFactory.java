@@ -7,6 +7,7 @@ import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public final class CommandFactory {
@@ -14,6 +15,8 @@ public final class CommandFactory {
   private final HoodSubsystem hoodSubsystem;
   private final FlywheelSubsystem flywheelSubsystem;
 
+
+  public final ShooterCommands shooterCommands;
   public final IntakeCommands intakeCommands;
 
   public CommandFactory(
@@ -21,35 +24,20 @@ public final class CommandFactory {
       HoodSubsystem hoodSubsystem,
       OverBumperIntakeDeploySubsystem intakeDeploySubsystem,
       OverBumperIntakeRollerSubsystem intakeRollerSubsystem,
-      FlywheelSubsystem flywheelSubsystem) {
+      FlywheelSubsystem flywheelSubsystem,
+      TurretSubsystem turretSubsystem) {
     this.driveSubsystem = driveSubsystem;
     this.hoodSubsystem = hoodSubsystem;
     this.flywheelSubsystem = flywheelSubsystem;
 
     this.intakeCommands = new IntakeCommands(intakeDeploySubsystem, intakeRollerSubsystem);
+    this.driveSubsystem = driveSubsystem;
+
+    this.intakeCommands = new IntakeCommands(intakeDeploySubsystem, intakeRollerSubsystem);
+    this.shooterCommands = new ShooterCommands(hoodSubsystem, turretSubsystem);
   }
 
   public JoystickDriveCommand createDriveJoystickCmd(CommandXboxController driverController) {
     return DriveCommands.createDriveJoystickCmd(driveSubsystem, driverController.getHID());
-  }
-
-  public Command createHoodStopCommand() {
-    return hoodSubsystem.smartVelocitySetpointCommand(() -> 0);
-  }
-
-  public Command createHoodUpCommand() {
-    return hoodSubsystem.smartVelocitySetpointCommand(() -> 30);
-  }
-
-  public Command createHoodDownCommand() {
-    return hoodSubsystem.smartVelocitySetpointCommand(() -> -30);
-  }
-
-  public Command createFlywheelSlowSpinCommand() {
-    return flywheelSubsystem.smartVelocitySetpointCommand(() -> 10);
-  }
-
-  public Command createFlywheelFastSpinCommand() {
-    return flywheelSubsystem.smartVelocitySetpointCommand(() -> 20);
   }
 }

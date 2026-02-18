@@ -13,9 +13,9 @@ import edu.wpi.first.math.util.Units;
 
 public class ProductionIntakeConfig {
 
-  public final int DEPLOY_CAN_ID = 16;
+  public final int DEPLOY_CAN_ID = 51;
 
-  public final int ROLLER_CAN_ID = 17;
+  public final int ROLLER_CAN_ID = 50;
 
   public final double UP_DEPLOY_ANGLE = 90;
 
