@@ -171,7 +171,7 @@ public final class ProductionIndexerConfig {
                       busName))
               .withName(SUBSYSTEM_NAME + "Motor")
               .withUnitToMechanismRotationRatio(1) // Use RPM
-              .withUnitToRotorRotationRatio(GEAR_RATIO);
+              .withUnitToRotorRotationRatio(1 / GEAR_RATIO);
 
       SimulatedMotorConfiguration<TalonFXConfiguration> simMotorConfig =
           new SimulatedMotorConfiguration<TalonFXConfiguration>()
@@ -260,7 +260,7 @@ public final class ProductionIndexerConfig {
                       busName))
               .withName(SUBSYSTEM_NAME + "Motor")
               .withUnitToMechanismRotationRatio(1) // Use RPM
-              .withUnitToRotorRotationRatio(GEAR_RATIO);
+              .withUnitToRotorRotationRatio(1 / GEAR_RATIO);
 
       SimulatedMotorConfiguration<TalonFXConfiguration> simMotorConfig =
           new SimulatedMotorConfiguration<TalonFXConfiguration>()
