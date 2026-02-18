@@ -38,7 +38,7 @@ public class TimeOfFlightIOCANRange implements TimeOfFlightIO, CANable {
     kStatusSignals = List.of(kDistanceSignal, kStdDevsSignal);
 
     CTREUtil.setUpdateFrequencyForAll(
-        50.0, kStatusSignals.toArray(new BaseStatusSignal[0]), kId.getDeviceID());
+        100.0, kStatusSignals.toArray(new BaseStatusSignal[0]), kId.getDeviceID());
 
     CTREUtil.Configuration.Sensors.TimeOfFlight.optimizeBusUtilization(kCanRange);
 
