@@ -57,8 +57,8 @@ public final class IndexerCommands {
     return new RunCommand(
             () -> indexerCompoundState.commandState(IndexerRunState.LOAD), dummySubsystem)
         .withName(NAME)
-        .until(indexerCompoundState::getGamePieceAtSelector)
-        .unless(indexerCompoundState::getGamePieceAtSelector);
+        .until(indexerCompoundState::getGamePieceInSelector)
+        .unless(indexerCompoundState::getGamePieceInSelector);
   }
 
   /**

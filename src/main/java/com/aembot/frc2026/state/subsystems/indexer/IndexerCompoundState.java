@@ -64,20 +64,20 @@ public class IndexerCompoundState implements Loggable {
       new AtomicReference<>(IndexerRunState.OFF);
 
   /** Whether or not a game piece has been detected at the end of the selector */
-  public AtomicBoolean gamePieceAtKicker = new AtomicBoolean(false);
+  public AtomicBoolean gamePieceInSelector = new AtomicBoolean(false);
 
   /** Command the indexer to run a given {@link IndexerRunState} */
   public void commandState(IndexerRunState state) {
     this.commandedState.set(state);
   }
 
-  public void updateGamePieceAtKicker(boolean value) {
-    gamePieceAtKicker.set(value);
+  public void updateGamePieceInSelector(boolean value) {
+    gamePieceInSelector.set(value);
   }
 
   /** Get whether or not a game piece has been detected at the end of the selector */
-  public boolean getGamePieceAtSelector() {
-    return gamePieceAtKicker.get();
+  public boolean getGamePieceInSelector() {
+    return gamePieceInSelector.get();
   }
 
   /** Get the commanded state of the indexer compound subsystem */
@@ -111,6 +111,6 @@ public class IndexerCompoundState implements Loggable {
         standardPrefix + "/" + kKickerName + "/CommandedState", getKickerCommandedState());
 
     Logger.recordOutput(
-        standardPrefix + "/" + kSelectorName + "/GamePieceDetected", getGamePieceAtSelector());
+        standardPrefix + "/" + kSelectorName + "/GamePieceDetected", getGamePieceInSelector());
   }
 }

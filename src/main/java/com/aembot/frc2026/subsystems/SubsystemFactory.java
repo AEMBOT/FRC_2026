@@ -155,14 +155,14 @@ public class SubsystemFactory {
             new IndexerSelectorMechanismIOSim(selectorConfig),
             timeOfFlightIO,
             indexerCompoundState::getSelectorCommandedState,
-            indexerCompoundState::updateGamePieceAtKicker);
+            indexerCompoundState::updateGamePieceInSelector);
       case REPLAY:
         return new IndexerSelectorSubsystem(
             selectorConfig,
             new IndexerSelectorMechanismIOReplay(),
             new TimeOfFlightIOReplay(selectorConfig.kTimeOfFlightConfig),
             indexerCompoundState::getSelectorCommandedState,
-            indexerCompoundState::updateGamePieceAtKicker);
+            indexerCompoundState::updateGamePieceInSelector);
       case REAL:
       default:
         return new IndexerSelectorSubsystem(
@@ -170,7 +170,7 @@ public class SubsystemFactory {
             new IndexerSelectorMechanismIOReal(selectorConfig),
             new TimeOfFlightSimIOCanRange(selectorConfig.kTimeOfFlightConfig),
             indexerCompoundState::getSelectorCommandedState,
-            indexerCompoundState::updateGamePieceAtKicker);
+            indexerCompoundState::updateGamePieceInSelector);
     }
   }
 
