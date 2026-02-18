@@ -129,7 +129,7 @@ public class SimulatedIndexerCompoundState implements Loggable {
     if (!gamePieces.isEmpty()) {
       // This doesn't really need to be FIFO since we don't rlly store meaningful data in these
       // objects, but we might later
-      return Optional.of(gamePieces.get(gamePieces.size() - 1));
+      return Optional.of(gamePieces.remove(gamePieces.size() - 1));
     } else {
       return Optional.empty();
     }
