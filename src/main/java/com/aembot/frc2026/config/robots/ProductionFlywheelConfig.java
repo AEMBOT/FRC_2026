@@ -16,21 +16,22 @@ import edu.wpi.first.math.util.Units;
 public class ProductionFlywheelConfig {
   //  TODO Placeholder values, values need to be changed cuz they don't make sense
 
-  public final double CRUISE_VELOCITY_METERS_PER_SEC = 16.0;
-  public final double ACCELERATION_METERS_PER_SEC = 32.0;
-  public final double JERK = 0.0;
+  public static final double CRUISE_VELOCITY_METERS_PER_SEC = 16.0;
+  public static final double ACCELERATION_METERS_PER_SEC = 32.0;
+  public static final double JERK = 0.0;
 
-  public final double GEAR_RATIO = 1.0;
+  public static final double GEAR_RATIO = 1.0;
 
-  public final double SHOOTER_WHEEL_RADIUS = Units.inchesToMeters(2.0);
-  public final double SHOOTER_WHEEL_CIRCUMFERENCE = 2.0 * Math.PI * SHOOTER_WHEEL_RADIUS;
+  public static final double J_KG_METERS_SQ = 0.01;
 
-  public final double UNITS_TO_ROTOR_RATIO = 1.0 / (SHOOTER_WHEEL_CIRCUMFERENCE * GEAR_RATIO);
-  public final double UNITS_TO_MECHANISM_ROTATION_RATIO = 1.0 / SHOOTER_WHEEL_CIRCUMFERENCE;
+  public static final double SHOOTER_WHEEL_RADIUS = Units.inchesToMeters(2.0);
+  public static final double SHOOTER_WHEEL_CIRCUMFERENCE = 2.0 * Math.PI * SHOOTER_WHEEL_RADIUS;
 
-  public final double J_KG_METERS_SQ = 0.01;
+  public static final double UNITS_TO_ROTOR_RATIO =
+      1.0 / (SHOOTER_WHEEL_CIRCUMFERENCE * GEAR_RATIO);
+  public static final double UNITS_TO_MECHANISM_ROTATION_RATIO = 1.0 / SHOOTER_WHEEL_CIRCUMFERENCE;
 
-  public final ConfigureSlot0Gains MOTOR_GAINS =
+  public static final ConfigureSlot0Gains MOTOR_GAINS =
       new ConfigureSlot0Gains(1.0, 0.0, 0.0, 0.0, 0.0, 0.1222, 0.0);
 
   private static final int LEADER_MOTOR_ID = 53;
@@ -39,7 +40,7 @@ public class ProductionFlywheelConfig {
 
   private static final String FLYWHEEL_SUBSYTEM_NAME = "FlywheelSubsystem";
 
-  public final MotorConfiguration<TalonFXConfiguration> MOTOR_CONFIG =
+  public static final MotorConfiguration<TalonFXConfiguration> MOTOR_CONFIG =
       new MotorConfiguration<TalonFXConfiguration>()
           .withMotorConfig(
               new TalonFXConfiguration()
@@ -67,13 +68,13 @@ public class ProductionFlywheelConfig {
           .withMomentOfInertia(J_KG_METERS_SQ)
           .withUnitToMechanismRotationRatio(UNITS_TO_MECHANISM_ROTATION_RATIO);
 
-  public final SimulatedMotorConfiguration<TalonFXConfiguration> SIM_MOTOR_CONFIG =
+  public static final SimulatedMotorConfiguration<TalonFXConfiguration> SIM_MOTOR_CONFIG =
       new SimulatedMotorConfiguration<TalonFXConfiguration>()
           .withRealConfiguration(MOTOR_CONFIG)
           .withStartingRotation(0)
           .withSimMotorConstants(DCMotor.getKrakenX60(1));
 
-  public final TalonFXFlywheelConfiguration CONFIG =
+  public static final TalonFXFlywheelConfiguration CONFIG =
       new TalonFXFlywheelConfiguration(FLYWHEEL_SUBSYTEM_NAME)
           .withRealMotorConfig(MOTOR_CONFIG)
           .withSimulatedMotorConfig(SIM_MOTOR_CONFIG);

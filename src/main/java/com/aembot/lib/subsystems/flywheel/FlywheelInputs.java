@@ -5,15 +5,10 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 /** Inputs for the flywheel subsystem */
 public class FlywheelInputs implements LoggableInputs {
-  public double velocity = 0.0;
 
   @Override
-  public void toLog(LogTable table) {
-    table.put("Velocity", velocity);
-  }
+  public void toLog(LogTable table) {}
 
   @Override
-  public void fromLog(LogTable table) {
-    velocity = table.get("Velocity", velocity);
-  }
+  public void fromLog(LogTable table) {}
 }
