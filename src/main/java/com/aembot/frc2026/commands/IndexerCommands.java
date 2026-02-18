@@ -27,8 +27,7 @@ public final class IndexerCommands {
   private final SubsystemBase dummySubsystem =
       new SubsystemBase("Indexer Compound Dummy Subsystem") {};
 
-  private static final IndexerCompoundState indexerCompoundState =
-      RobotStateYearly.get().indexerCompoundState;
+  private final IndexerCompoundState indexerCompoundState;
 
   public IndexerCommands(
       SpindexerSubsystem spindexerSubsystem,
@@ -37,6 +36,8 @@ public final class IndexerCommands {
     this.spindexer = spindexerSubsystem;
     this.selector = indexerSelectorSubsystem;
     this.kicker = indexerKickerSubsystem;
+
+    this.indexerCompoundState = RobotStateYearly.get().indexerCompoundState;
   }
 
   /** InstantCommand to command the indexer to {@link IndexerRunState#OFF}. */
