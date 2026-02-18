@@ -37,10 +37,10 @@ public class ProductionConfig extends RobotConfiguration {
 
   private static final ProductionDrivetrainConfig DRIVETRAIN_CONFIG =
       new ProductionDrivetrainConfig(PHYSICAL_CONFIGURATION, DRIVETRAIN_BUS_NAME);
-  private static final ProductionHoodConfig HOOD_CONFIG = new ProductionHoodConfig();
-  private static final ProductionIntakeConfig INTAKE_CONFIG = new ProductionIntakeConfig();
 
-  private static final ProductionCameraConfig CAMERA_CONFIG = new ProductionCameraConfig();
+  private static final ProductionHoodConfig HOOD_CONFIG = new ProductionHoodConfig();
+
+  private static final ProductionIntakeConfig INTAKE_CONFIG = new ProductionIntakeConfig();
 
   private static final ProductionFlywheelConfig FLYWHEEL_CONFIG = new ProductionFlywheelConfig();
 
@@ -109,7 +109,8 @@ public class ProductionConfig extends RobotConfiguration {
   @Override
   public TalonFXFlywheelConfiguration getFlywheelConfiguration() {
     return FLYWHEEL_CONFIG.CONFIG;
-    
+  }
+
   @Override
   public TalonFXTurretConfiguration getTurretConfig() {
     return TURRET_CONFIG.TURRET_CONFIG;

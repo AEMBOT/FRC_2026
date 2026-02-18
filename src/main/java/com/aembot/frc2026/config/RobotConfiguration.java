@@ -1,11 +1,11 @@
 package com.aembot.frc2026.config;
 
 import com.aembot.frc2026.config.robots.ProductionConfig;
+import com.aembot.frc2026.config.subsystems.TalonFXTurretConfiguration;
 import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
 import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
 import com.aembot.lib.config.subsystems.drive.simulation.DrivetrainSimConfiguration;
 import com.aembot.lib.config.subsystems.flywheel.TalonFXFlywheelConfiguration;
-import com.aembot.frc2026.config.subsystems.TalonFXTurretConfiguration;
 import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
 import com.aembot.lib.config.subsystems.hood.simulation.SimulatedHoodConfiguration;
 import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;

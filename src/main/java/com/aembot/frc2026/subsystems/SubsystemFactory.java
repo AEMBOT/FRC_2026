@@ -195,7 +195,9 @@ public class SubsystemFactory {
         return new FlywheelSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration(),
             new FlywheelHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration()));
-        
+    }
+  }
+
   public static TurretSubsystem createTurretSubsystem() {
     switch (RobotRuntimeConstants.MODE) {
       case SIM:

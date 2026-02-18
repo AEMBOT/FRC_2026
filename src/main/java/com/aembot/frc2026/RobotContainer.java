@@ -6,11 +6,11 @@ package com.aembot.frc2026;
 
 import com.aembot.frc2026.commands.CommandFactory;
 import com.aembot.frc2026.subsystems.SubsystemFactory;
+import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.lib.core.logging.Loggerable;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
-import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
@@ -67,7 +67,7 @@ public class RobotContainer implements Loggerable {
             hoodSubsystem,
             intakeDeploySubsystem,
             intakeRollerSubsystem,
-            flywheelSubsystem);
+            flywheelSubsystem,
             turretSubsystem);
     configureBindings();
   }
@@ -75,20 +75,19 @@ public class RobotContainer implements Loggerable {
   /** Use this method to define your controller button -> command mappings */
   private void configureBindings() {
     driveSubsystem.setDefaultCommand(commandFactory.createDriveJoystickCmd(driverController));
-    flywheelSubsystem.setDefaultCommand(commandFactory.createFlywheelSlowSpinCommand());
 
     driverController.a().onTrue(commandFactory.intakeCommands.createUpCommand());
     driverController.b().onTrue(commandFactory.intakeCommands.createDownCommand());
 
     driverController.x().whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
 
-    // --- Flywheel Commands
-    driverController.rightBumper().whileTrue(commandFactory.createFlywheelFastSpinCommand());
     hoodSubsystem.setDefaultCommand(commandFactory.shooterCommands.createHoodStopCommand());
     turretSubsystem.setDefaultCommand(
         commandFactory.shooterCommands.createTurretAbsoluteForwardCommand());
     intakeRollerSubsystem.setDefaultCommand(
         commandFactory.intakeCommands.createStopIntakeCommand());
+    flywheelSubsystem.setDefaultCommand(
+        commandFactory.shooterCommands.createFlywheelSlowSpinCommand());
   }
 
   /**
