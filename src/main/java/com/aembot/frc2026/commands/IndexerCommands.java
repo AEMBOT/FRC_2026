@@ -52,8 +52,11 @@ public final class IndexerCommands {
    * in command composition, and won't be very useful on its own.
    */
   public Command createSimpleLoadIndexerCommand() {
+    final String NAME = "SimpleLoad";
+
     return new RunCommand(
             () -> indexerCompoundState.commandState(IndexerRunState.LOAD), dummySubsystem)
+        .withName(NAME)
         .until(indexerCompoundState::getGamePieceAtSelector)
         .unless(indexerCompoundState::getGamePieceAtSelector);
   }
@@ -65,7 +68,10 @@ public final class IndexerCommands {
    * indexer compound. Commands the indexer to {@link IndexerRunState#OFF} afterwards.
    */
   public Command createLoadIndexerUntilTimeoutCommand() {
+    final String NAME = "LoadToTimeout";
+
     return createSimpleLoadIndexerCommand()
+        .withName(NAME)
         .withTimeout(
             LOAD_TIMEOUT_BUFFER
                 + spindexer.kConfig.kGamePieceMoveTime
@@ -82,15 +88,31 @@ public final class IndexerCommands {
    * requiring the indexer compound. Commands the indexer to {@link IndexerRunState#OFF} afterwards.
    */
   public Command createLoadIndexerCommand() {
+    final String NAME = "Load";
+
     return createSimpleLoadIndexerCommand()
+        .withName(NAME)
         .finallyDo(
-            () -> CommandScheduler.getInstance().schedule(createLoadIndexerUntilTimeoutCommand()));
+            () -> {
+              var cmd = CommandScheduler.getInstance().requiring(dummySubsystem);
+              if (cmd == null || cmd.getName() == NAME) {
+                CommandScheduler.getInstance().schedule(createLoadIndexerUntilTimeoutCommand());
+              }
+            });
   }
 
   public Command createFeedIndexerCommand() {
+    final String NAME = "Feed";
+
     return new RunCommand(
             () -> indexerCompoundState.commandState(IndexerRunState.FIRE), dummySubsystem)
+        .withName(NAME)
         .finallyDo(
-            () -> CommandScheduler.getInstance().schedule(createLoadIndexerUntilTimeoutCommand()));
+            () -> {
+              var cmd = CommandScheduler.getInstance().requiring(dummySubsystem);
+              if (cmd == null || cmd.getName() == NAME) {
+                CommandScheduler.getInstance().schedule(createLoadIndexerUntilTimeoutCommand());
+              }
+            });
   }
 }
