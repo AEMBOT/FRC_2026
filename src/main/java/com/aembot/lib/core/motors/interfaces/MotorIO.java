@@ -304,4 +304,9 @@ public interface MotorIO {
   public default boolean setSmartVelocitySetpoint(double unitsPerSecond) {
     return setSmartVelocitySetpoint(unitsPerSecond, 0);
   }
+
+  /**
+   * @return True the first time this is called since the motor has reset
+   */
+  public boolean hasResetOccurred();
 }

@@ -1,6 +1,7 @@
 package com.aembot.frc2026.config;
 
 import com.aembot.frc2026.config.robots.ProductionConfig;
+import com.aembot.frc2026.config.subsystems.TalonFXTurretConfiguration;
 import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
 import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
 import com.aembot.lib.config.subsystems.drive.simulation.DrivetrainSimConfiguration;
@@ -115,4 +116,11 @@ public abstract class RobotConfiguration {
         return new ProductionConfig();
     }
   }
+
+  /**
+   * Get the configuration of the turret
+   *
+   * @return the turret configuration
+   */
+  public abstract TalonFXTurretConfiguration getTurretConfig();
 }
