@@ -23,6 +23,7 @@ import com.aembot.frc2026.subsystems.turret.io.TurretSimIO;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
+import com.aembot.lib.core.sensors.timeOfFlight.io.TimeOfFlightIOCANRange;
 import com.aembot.lib.core.sensors.timeOfFlight.io.TimeOfFlightIOReplay;
 import com.aembot.lib.core.sensors.timeOfFlight.io.TimeOfFlightSimIOCanRange;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
@@ -168,7 +169,7 @@ public class SubsystemFactory {
         return new IndexerSelectorSubsystem(
             selectorConfig,
             new IndexerSelectorMechanismIOReal(selectorConfig),
-            new TimeOfFlightSimIOCanRange(selectorConfig.kTimeOfFlightConfig),
+            new TimeOfFlightIOCANRange(selectorConfig.kTimeOfFlightConfig),
             indexerCompoundState::getSelectorCommandedState,
             indexerCompoundState::updateGamePieceInSelector);
     }
