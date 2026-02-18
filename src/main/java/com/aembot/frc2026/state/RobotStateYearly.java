@@ -2,11 +2,17 @@ package com.aembot.frc2026.state;
 
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.state.subsystems.indexer.IndexerCompoundState;
+import com.aembot.lib.math.PositionUtil;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.state.subsystems.hood.HoodState;
 import com.aembot.lib.state.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeployState;
 import com.aembot.lib.state.subsystems.intake.over_bumper.run.OverBumperIntakeRollerState;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 import java.util.concurrent.atomic.AtomicReference;
+import org.littletonrobotics.junction.Logger;
 
 public class RobotStateYearly extends RobotState {
   // Ppl on the interwebs say this is good & thread safe
@@ -23,7 +29,7 @@ public class RobotStateYearly extends RobotState {
           RobotRuntimeConstants.ROBOT_CONFIG.getSpindexerConfiguration().kName,
           RobotRuntimeConstants.ROBOT_CONFIG.getIndexerSelectorConfiguration().kName,
           RobotRuntimeConstants.ROBOT_CONFIG.getIndexerKickerConfiguration().kName);
-          
+
   public HoodState hoodState = new HoodState();
 
   public void updateIntakeDeployState(OverBumperIntakeDeployState state) {
@@ -49,6 +55,39 @@ public class RobotStateYearly extends RobotState {
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
     super.updateLog(standardPrefix, inputPrefix);
+
+    // placeholder
+    Pose3d turretPose = new Pose3d(-0.134944, -0.000127, 0.339133, new Rotation3d());
+
+    Pose3d intakePose =
+        RobotRuntimeConstants.ROBOT_CONFIG
+            .getIntakeDeployConfig()
+            .kPivotPoint
+            .plus(
+                new Transform3d(
+                    0,
+                    0,
+                    0,
+                    new Rotation3d(
+                        0,
+                        -Units.degreesToRadians(intakeDeployState.get().deployPositionUnits),
+                        0)));
+
+    Pose3d hoodPose =
+        turretPose.transformBy(
+            PositionUtil.toTransform3d(
+                RobotRuntimeConstants.ROBOT_CONFIG
+                    .getHoodConfig()
+                    .kHoodOriginPose
+                    .plus(
+                        new Transform3d(
+                            0,
+                            0,
+                            0,
+                            new Rotation3d(0, -hoodState.getHoodAngle().getRadians(), 0)))));
+
+    Logger.recordOutput(
+        "SensorRobotState/MechanismPositions", new Pose3d[] {turretPose, intakePose, hoodPose});
 
     indexerCompoundState.updateLog("SensorRobotState/IndexerCompound", "");
     hoodState.updateLog("SensorRobotState/Hood", "");

@@ -5,7 +5,6 @@
 package com.aembot.frc2026;
 
 import com.aembot.frc2026.commands.CommandFactory;
-import com.aembot.frc2026.state.SimulatedRobotStateYearly;
 import com.aembot.frc2026.subsystems.SubsystemFactory;
 import com.aembot.frc2026.subsystems.indexerKicker.IndexerKickerSubsystem;
 import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorSubsystem;
@@ -18,7 +17,6 @@ import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeplo
 import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.littletonrobotics.junction.LoggedRobot;
 
@@ -90,15 +88,7 @@ public class RobotContainer implements Loggerable {
     driverController.a().onTrue(commandFactory.intakeCommands.createUpCommand());
     driverController.b().onTrue(commandFactory.intakeCommands.createDownCommand());
 
-    driverController
-        .x()
-        .whileTrue(commandFactory.intakeCommands.createRunIntakeCommand())
-        .onTrue(
-            new InstantCommand(
-                    SimulatedRobotStateYearly.get().simulatedIndexerCompoundState
-                        ::addSimulatedGamePiece)
-                .repeatedly()
-                .withTimeout(0.1)); // Temporary because intake simulation doesn't exist yet
+    driverController.x().whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
 
     // While we're pressing x to intake and not y to shoot, run indexer load
     driverController

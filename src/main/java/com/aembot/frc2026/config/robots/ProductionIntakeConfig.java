@@ -8,8 +8,11 @@ import com.aembot.lib.core.can.CANDeviceID;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import org.ironmaple.simulation.IntakeSimulation.IntakeSide;
 
 public class ProductionIntakeConfig {
 
@@ -36,6 +39,15 @@ public class ProductionIntakeConfig {
   public final double ROLLER_CRUISE_VELOCITY_ROT_PER_MIN = 200;
 
   public final double ROLLER_ACCELERATION_ROT_PER_MIN = 400;
+
+  public final IntakeSide DEPLOY_SIDE = IntakeSide.FRONT;
+
+  public final double DEPLOY_EXTENSION_METERS = 0.2;
+
+  public final double INTAKE_WIDTH_METERS = 0.9;
+
+  public final Pose3d DEPLOY_PIVOT_POINT =
+      new Pose3d(0.298443, 0, 0.189832, new Rotation3d(0, Math.PI / 2, 0));
 
   public final MotorConfiguration<TalonFXConfiguration> DEPLOY_MOTOR_CONFIG =
       new MotorConfiguration<TalonFXConfiguration>()
@@ -99,7 +111,11 @@ public class ProductionIntakeConfig {
       new TalonFXOverBumperIntakeDeployConfiguration(SUBSYSTEM_NAME + "Deploy")
           .withRealMotorConfiguration(DEPLOY_MOTOR_CONFIG)
           .withSimulatedMotorConfiguration(DEPLOY_SIM_MOTOR_CONFIG)
-          .withZeroingSpeed(ZEROING_SPEED_DEG_PER_SEC);
+          .withZeroingSpeed(ZEROING_SPEED_DEG_PER_SEC)
+          .withIntakeSide(DEPLOY_SIDE)
+          .withExtensionMeters(DEPLOY_EXTENSION_METERS)
+          .withWidthMeters(INTAKE_WIDTH_METERS)
+          .withPivotPoint(DEPLOY_PIVOT_POINT);
 
   public final TalonFXOverBumperIntakeRollerConfiguration ROLLER_CONFIG =
       new TalonFXOverBumperIntakeRollerConfiguration(SUBSYSTEM_NAME + "Roller")

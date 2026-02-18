@@ -55,12 +55,19 @@ public class SubsystemFactory {
   public static DriveSubsystem createDriveSubsystem() {
     switch (RobotRuntimeConstants.MODE) {
       case SIM:
+        var io =
+            new DrivetrainSimIO(
+                RobotRuntimeConstants.ROBOT_CONFIG.getSimulatedDrivetrainConfiguration(),
+                RobotRuntimeConstants.ROBOT_CONFIG.getDrivetrainConfiguration(),
+                RobotRuntimeConstants.ROBOT_CONFIG.getSwerveConfigurations());
+
+        SimulatedRobotStateYearly.get()
+            .simulatedIntakeState
+            .setDriveSim(io.drivetrainSim.mapleSimSwerveDrivetrain);
+
         return new DriveSubsystem(
                 RobotRuntimeConstants.ROBOT_CONFIG.getDrivetrainConfiguration(),
-                new DrivetrainSimIO(
-                    RobotRuntimeConstants.ROBOT_CONFIG.getSimulatedDrivetrainConfiguration(),
-                    RobotRuntimeConstants.ROBOT_CONFIG.getDrivetrainConfiguration(),
-                    RobotRuntimeConstants.ROBOT_CONFIG.getSwerveConfigurations()),
+                io,
                 RobotStateYearly.get())
             .withSetPose(new Pose2d(2.5, 4, Rotation2d.fromDegrees(0)));
       case REPLAY:
