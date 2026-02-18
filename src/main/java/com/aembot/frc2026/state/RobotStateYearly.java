@@ -3,6 +3,7 @@ package com.aembot.frc2026.state;
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.state.subsystems.indexer.IndexerCompoundState;
 import com.aembot.lib.state.RobotState;
+import com.aembot.lib.state.subsystems.hood.HoodState;
 import com.aembot.lib.state.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeployState;
 import com.aembot.lib.state.subsystems.intake.over_bumper.run.OverBumperIntakeRollerState;
 import java.util.concurrent.atomic.AtomicReference;
@@ -22,6 +23,8 @@ public class RobotStateYearly extends RobotState {
           RobotRuntimeConstants.ROBOT_CONFIG.getSpindexerConfiguration().kName,
           RobotRuntimeConstants.ROBOT_CONFIG.getIndexerSelectorConfiguration().kName,
           RobotRuntimeConstants.ROBOT_CONFIG.getIndexerKickerConfiguration().kName);
+          
+  public HoodState hoodState = new HoodState();
 
   public void updateIntakeDeployState(OverBumperIntakeDeployState state) {
     intakeDeployState = new AtomicReference<OverBumperIntakeDeployState>(state);
@@ -48,5 +51,6 @@ public class RobotStateYearly extends RobotState {
     super.updateLog(standardPrefix, inputPrefix);
 
     indexerCompoundState.updateLog("SensorRobotState/IndexerCompound", "");
+    hoodState.updateLog("SensorRobotState/Hood", "");
   }
 }
