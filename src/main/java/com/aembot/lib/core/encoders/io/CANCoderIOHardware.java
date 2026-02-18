@@ -75,4 +75,9 @@ public class CANCoderIOHardware implements CANCoderIO, CANable {
   public CANDeviceID getCANDevice() {
     return this.config.device;
   }
+
+  @Override
+  public double getRawAngle() {
+    return positionSignal.getValueAsDouble();
+  }
 }

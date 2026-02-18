@@ -10,4 +10,14 @@ public class AEMCANCoderConfiguration {
 
   /** Underlying ctre config */
   public CANcoderConfiguration configuration;
+
+  public AEMCANCoderConfiguration withDevice(CANDeviceID device) {
+    this.device = device;
+    return this;
+  }
+
+  public AEMCANCoderConfiguration withConfiguration(CANcoderConfiguration configuration) {
+    this.configuration = configuration;
+    return this;
+  }
 }

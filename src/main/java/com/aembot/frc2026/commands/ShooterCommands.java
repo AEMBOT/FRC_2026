@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.state.RobotStateYearly;
+import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.frc2026.util.OptimalVelocityTable;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -24,14 +25,15 @@ import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
 import org.littletonrobotics.junction.Logger;
 
-public final class ShooterCommandFactory {
+public final class ShooterCommands {
 
   private final HoodSubsystem hood;
-
+  private final TurretSubsystem turret;
   private final OptimalVelocityTable shootingHubTable;
 
-  public ShooterCommandFactory(HoodSubsystem hood) {
+  public ShooterCommands(HoodSubsystem hood, TurretSubsystem turret) {
     this.hood = hood;
+    this.turret = turret;
 
     String robotType;
     switch (RobotRuntimeConstants.MODE) {
@@ -47,14 +49,52 @@ public final class ShooterCommandFactory {
         robotType = "/real";
         break;
     }
-    ;
 
     this.shootingHubTable =
         new OptimalVelocityTable(
             Filesystem.getDeployDirectory()
-                + "/initial-velocities"
+                + "/initital-velocities"
                 + robotType
-                + "/Shooting_Hub_Initial_Velocities.csv");
+                + "Shooting_Hub_Initial_Velocities.csv");
+  }
+
+  public Command createHoodStopCommand() {
+    return hood.smartVelocitySetpointCommand(() -> 0);
+  }
+
+  public Command createHoodUpCommand() {
+    return hood.smartVelocitySetpointCommand(() -> 30);
+  }
+
+  public Command createHoodDownCommand() {
+    return hood.smartVelocitySetpointCommand(() -> -30);
+  }
+
+  public Command createTurretStopCommand() {
+    return turret.smartVelocitySetpointCommand(() -> 0);
+  }
+
+  public Command createTurretLeftCommand() {
+    return turret.smartVelocitySetpointCommand(() -> 30);
+  }
+
+  public Command createTurretRightCommand() {
+    return turret.smartVelocitySetpointCommand(() -> -30);
+  }
+
+  private double getTurretForwardFromRobotPose() {
+    double targetRotation =
+        RobotStateYearly.get().getLatestFieldRobotPose().getRotation().getDegrees() + 180;
+
+    if (targetRotation < 0) {
+      targetRotation += 360;
+    }
+
+    return targetRotation;
+  }
+
+  public Command createTurretAbsoluteForwardCommand() {
+    return turret.smartPositionSetpointCommand(() -> getTurretForwardFromRobotPose());
   }
 
   public Command createHoodTowardsHubCommand() {

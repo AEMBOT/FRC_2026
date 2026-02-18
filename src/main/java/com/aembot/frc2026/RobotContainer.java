@@ -6,6 +6,7 @@ package com.aembot.frc2026;
 
 import com.aembot.frc2026.commands.CommandFactory;
 import com.aembot.frc2026.subsystems.SubsystemFactory;
+import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.lib.core.logging.Loggerable;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
@@ -44,6 +45,9 @@ public class RobotContainer implements Loggerable {
   private final OverBumperIntakeRollerSubsystem intakeRollerSubsystem =
       SubsystemFactory.createIntakeRollerSubsystem();
 
+  /* ---- TURRET ---- */
+  private final TurretSubsystem turretSubsystem = SubsystemFactory.createTurretSubsystem();
+
   private final CommandFactory commandFactory;
 
   /* ---- VISION ---- */
@@ -57,14 +61,20 @@ public class RobotContainer implements Loggerable {
 
     this.commandFactory =
         new CommandFactory(
-            driveSubsystem, hoodSubsystem, intakeDeploySubsystem, intakeRollerSubsystem);
+            driveSubsystem,
+            hoodSubsystem,
+            intakeDeploySubsystem,
+            intakeRollerSubsystem,
+            turretSubsystem);
     configureBindings();
   }
 
   /** Use this method to define your controller button -> command mappings */
   private void configureBindings() {
     driveSubsystem.setDefaultCommand(commandFactory.createDriveJoystickCmd(driverController));
-    hoodSubsystem.setDefaultCommand(commandFactory.createHoodTowardsHubCommand());
+    hoodSubsystem.setDefaultCommand(commandFactory.shooterCommands.createHoodStopCommand());
+    turretSubsystem.setDefaultCommand(
+        commandFactory.shooterCommands.createTurretAbsoluteForwardCommand());
     intakeRollerSubsystem.setDefaultCommand(
         commandFactory.intakeCommands.createStopIntakeCommand());
 
@@ -72,7 +82,10 @@ public class RobotContainer implements Loggerable {
         .a()
         .whileTrue(
             new RepeatCommand(
-                commandFactory.createShootFuelCommand().andThen(new WaitCommand(0.1))));
+                commandFactory
+                    .shooterCommands
+                    .createShootFuelCommand()
+                    .andThen(new WaitCommand(0.1))));
   }
 
   /**

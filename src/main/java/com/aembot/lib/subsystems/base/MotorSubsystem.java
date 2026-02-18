@@ -125,7 +125,7 @@ public abstract class MotorSubsystem<
     io.setCurrentEncoderPosition(position);
   }
 
-  /** Set current encoder location to be the percieved zero of the motor-embedded encoder */
+  /** Set current encoder location to be the perceived zero of the motor-embedded encoder */
   protected void zeroEncoderPosition() {
     io.zeroEncoderPosition();
   }
