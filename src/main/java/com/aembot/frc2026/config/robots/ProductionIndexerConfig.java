@@ -63,8 +63,8 @@ public final class ProductionIndexerConfig {
         double HOPPER_LENGTH_METERS = 0.3; // Approximate length of the hopper
         double HOPPER_HEIGHT_METERS = 0.3; // Approximate height of the hopper
 
+        Random random = new Random(6443);
         for (int i = 0; i < GAMEPIECE_CAPACITY; i++) {
-          Random random = new Random();
           double x =
               HOPPER_CENTER_POINT.getX() + (random.nextDouble() - 0.5) * HOPPER_LENGTH_METERS;
           double y = HOPPER_CENTER_POINT.getY() + (random.nextDouble() - 0.5) * HOPPER_WIDTH_METERS;
