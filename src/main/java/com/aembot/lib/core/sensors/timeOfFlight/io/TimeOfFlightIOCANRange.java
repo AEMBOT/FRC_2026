@@ -4,6 +4,7 @@ import com.aembot.lib.config.sensors.timeOfFlight.CANRangeTimeOfFlightConfigurat
 import com.aembot.lib.config.sensors.timeOfFlight.TimeOfFlightConfiguration;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.aembot.lib.core.can.interfaces.CANable;
+import com.aembot.lib.core.phoenix6.CTREUtil;
 import com.aembot.lib.core.sensors.timeOfFlight.TimeOfFlightInputs;
 import com.aembot.lib.core.sensors.timeOfFlight.interfaces.TimeOfFlightIO;
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -34,12 +35,17 @@ public class TimeOfFlightIOCANRange implements TimeOfFlightIO, CANable {
     kStdDevsSignal = kCanRange.getDistanceStdDev();
 
     kStatusSignals = List.of(kDistanceSignal, kStdDevsSignal);
+
+    CTREUtil.setUpdateFrequencyForAll(
+        50.0, kStatusSignals.toArray(new BaseStatusSignal[0]), kId.getDeviceID());
+
+    CTREUtil.Configuration.Sensors.TimeOfFlight.optimizeBusUtilization(kCanRange);
   }
 
   public TimeOfFlightIOCANRange(CANRangeTimeOfFlightConfiguration config) {
     this((TimeOfFlightConfiguration) config);
 
-    kCanRange.getConfigurator().apply(config.kCTREConfig);
+    CTREUtil.Configuration.Sensors.TimeOfFlight.applyConfiguration(kCanRange, config);
   }
 
   @Override
