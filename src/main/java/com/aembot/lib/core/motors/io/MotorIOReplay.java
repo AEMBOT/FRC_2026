@@ -115,4 +115,8 @@ public class MotorIOReplay implements MotorIO {
     return true;
   }
   ;
+
+  public boolean hasResetOccurred() {
+    return false;
+  }
 }

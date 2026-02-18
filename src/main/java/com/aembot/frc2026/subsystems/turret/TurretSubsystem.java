@@ -57,6 +57,10 @@ public class TurretSubsystem
   @Override
   public void periodic() {
     super.periodic();
+    // If motor has reset (e.g. brownout) then rezero
+    if (io.getMotor().hasResetOccurred()) {
+      setPositionFromEncoders();
+    }
   }
 
   @Override

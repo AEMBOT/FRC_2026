@@ -244,7 +244,7 @@ public interface MotorIO {
    *
    * @param positionUnits The position with which the motor should be driven to (these units are
    *     relative to whatever config is used on this motor)
-   * @param velocity Velocity at which we wish to drive the motor at (rps)
+   * @param velocity Velocity at which we wish to driveBthe motor at (rps)
    * @param acceleration Acceleration at which we wish to drive the motor (rps^2)
    * @param jerk The rate at which we can accelerate (rps^3)
    * @param feedforward The feedforward gains for the motor in volts
@@ -304,4 +304,9 @@ public interface MotorIO {
   public default boolean setSmartVelocitySetpoint(double unitsPerSecond) {
     return setSmartVelocitySetpoint(unitsPerSecond, 0);
   }
+
+  /**
+   * @return True the first time this is called since the motor has reset
+   */
+  public boolean hasResetOccurred();
 }
