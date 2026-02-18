@@ -6,7 +6,7 @@ import com.aembot.frc2026.config.subsystems.spindexer.SpindexerConfiguration;
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
-import com.aembot.lib.config.sensors.timeOfFlight.TimeOfFlightConfiguration;
+import com.aembot.lib.config.sensors.timeOfFlight.CANRangeTimeOfFlightConfiguration;
 import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.aembot.lib.core.can.CANDeviceID.CANDeviceType;
@@ -179,8 +179,8 @@ public final class ProductionIndexerConfig {
               .withStartingRotation(0)
               .withSimMotorConstants(DCMotor.getKrakenX60(1));
 
-      TimeOfFlightConfiguration timeOfFlightConfig =
-          new TimeOfFlightConfiguration("CANRange")
+      CANRangeTimeOfFlightConfiguration timeOfFlightConfig =
+          new CANRangeTimeOfFlightConfiguration("CANRange")
               .withCANDeviceID(
                   new CANDeviceID(
                       CANRANGE_CAN_ID,
