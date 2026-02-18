@@ -10,7 +10,6 @@ public class CRTTest {
 
   @Test
   void DualEncoderTurretAngleCalculation() {
-    // double result = testconfig.solve(0.230769231, 0.176470588);
 
     Random rand = new Random();
 
