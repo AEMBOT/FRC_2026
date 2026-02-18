@@ -18,9 +18,9 @@ public class RobotStateYearly extends RobotState {
   // Ppl on the interwebs say this is good & thread safe
   private static final RobotStateYearly INSTANCE = new RobotStateYearly();
 
-  public AtomicReference<OverBumperIntakeDeployState> intakeDeployState =
+  public final AtomicReference<OverBumperIntakeDeployState> intakeDeployState =
       new AtomicReference<OverBumperIntakeDeployState>();
-  public AtomicReference<OverBumperIntakeRollerState> intakeRollerState =
+  public final AtomicReference<OverBumperIntakeRollerState> intakeRollerState =
       new AtomicReference<OverBumperIntakeRollerState>();
 
   // note: this doesn't need to be atomic because all of its fields should be thread-safe.
@@ -33,7 +33,7 @@ public class RobotStateYearly extends RobotState {
   public HoodState hoodState = new HoodState();
 
   public void updateIntakeDeployState(OverBumperIntakeDeployState state) {
-    intakeDeployState = new AtomicReference<OverBumperIntakeDeployState>(state);
+    intakeDeployState.set(state);
   }
 
   public OverBumperIntakeDeployState getIntakeDeployState() {
@@ -41,7 +41,7 @@ public class RobotStateYearly extends RobotState {
   }
 
   public void updateIntakeRollerState(OverBumperIntakeRollerState state) {
-    intakeRollerState = new AtomicReference<OverBumperIntakeRollerState>(state);
+    intakeRollerState.set(state);
   }
 
   public OverBumperIntakeRollerState getIntakeRollerState() {
