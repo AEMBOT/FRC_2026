@@ -4,7 +4,6 @@ import com.aembot.lib.config.encoders.AEMCANCoderConfiguration;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import edu.wpi.first.math.MathUtil;
 
 public class TalonFXTurretConfiguration {
 
@@ -88,7 +87,10 @@ public class TalonFXTurretConfiguration {
 
       double encoderBTestPos = testPos % kCANcoderBGearTeeth;
 
-      if (MathUtil.isNear(encoderBTeeth, encoderBTestPos, 0.1)) {
+      double diff = Math.abs(encoderBTeeth - encoderBTestPos);
+      double circularDiff = Math.min(diff, kCANcoderBGearTeeth - diff);
+
+      if (circularDiff < 0.1) {
         return kRealMotorConfig.getMechanismRotationsToUnits(
             testPos / kRealMotorConfig.getGearRatio());
       }
