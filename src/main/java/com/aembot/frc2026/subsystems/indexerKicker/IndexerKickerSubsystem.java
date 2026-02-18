@@ -99,6 +99,7 @@ public class IndexerKickerSubsystem
   public void updateLog(String standardPrefix, String inputPrefix) {
     super.updateLog(standardPrefix, inputPrefix);
 
+    kMechanismIO.updateLog(standardPrefix, inputPrefix);
     Logger.processInputs(inputPrefix + "/AuxilaryInputs", kMechanismInputs);
   }
 }

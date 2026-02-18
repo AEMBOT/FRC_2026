@@ -27,9 +27,7 @@ public class IndexerKickerMechanismIOReal implements IndexerKickerMechanismIO {
   }
 
   @Override
-  public void updateInputs(IndexerKickerMechanismInputs inputs) {
-    updateLog();
-  }
+  public void updateInputs(IndexerKickerMechanismInputs inputs) {}
 
   @Override
   public void updateLog(String standardPrefix, String inputs) {}

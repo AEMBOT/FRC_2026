@@ -27,9 +27,7 @@ public class SpindexerMechanismIOReal implements SpindexerMechanismIO {
   }
 
   @Override
-  public void updateInputs(SpindexerMechanismInputs inputs) {
-    updateLog();
-  }
+  public void updateInputs(SpindexerMechanismInputs inputs) {}
 
   @Override
   public void updateLog(String standardPrefix, String inputs) {}

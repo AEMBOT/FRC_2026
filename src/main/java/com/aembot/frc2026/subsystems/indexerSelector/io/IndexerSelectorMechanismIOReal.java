@@ -27,9 +27,7 @@ public class IndexerSelectorMechanismIOReal implements IndexerSelectorMechanismI
   }
 
   @Override
-  public void updateInputs(IndexerSelectorMechanismInputs inputs) {
-    updateLog();
-  }
+  public void updateInputs(IndexerSelectorMechanismInputs inputs) {}
 
   @Override
   public void updateLog(String standardPrefix, String inputs) {}
