@@ -7,7 +7,6 @@ import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.aembot.lib.subsystems.flywheel.io.FlywheelIO;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import edu.wpi.first.wpilibj2.command.Command;
 
 public class FlywheelSubsystem
     extends MotorSubsystem<MotorInputs, MotorIO, MotorConfiguration<TalonFXConfiguration>> {
@@ -19,7 +18,6 @@ public class FlywheelSubsystem
     this.flywheel = flywheel;
 
     zeroEncoderPosition();
-    setDefaultCommand(DefaultSpin());
   }
 
   @Override
@@ -27,13 +25,9 @@ public class FlywheelSubsystem
     super.periodic();
   }
 
-  public Command holdPositionCommand() {
-    return smartPositionSetpointCommand(this::getPositionSetpointUnits)
-        .withName("HoldPosition")
-        .ignoringDisable(true);
-  }
-
-  public Command DefaultSpin() {
-    return smartVelocitySetpointCommand(() -> 20).withName("DefaultSpin").ignoringDisable(true);
+  @Override
+  public void updateLog(String standardPrefix, String inputPrefix) {
+    flywheel.updateLog(standardPrefix, inputPrefix);
+    super.updateLog(standardPrefix, inputPrefix);
   }
 }

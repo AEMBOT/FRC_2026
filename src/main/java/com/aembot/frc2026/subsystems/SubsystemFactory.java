@@ -18,9 +18,8 @@ import com.aembot.lib.subsystems.drive.io.DrivetrainIOReplay;
 import com.aembot.lib.subsystems.drive.io.DrivetrainSimIO;
 import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.flywheel.io.FlywheelHardwareIO;
+import com.aembot.lib.subsystems.flywheel.io.FlywheelReplayIO;
 import com.aembot.lib.subsystems.flywheel.io.FlywheelSimIO;
-// TODO make flywheel replay
-// import com.aembot.lib.subsystems.flywheel.io.FlywheelReplayIO;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import com.aembot.lib.subsystems.hood.io.HoodIOReplay;
 import com.aembot.lib.subsystems.hood.io.HoodSimIO;
@@ -179,9 +178,11 @@ public class SubsystemFactory {
         return new FlywheelSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration(),
             new FlywheelSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration()));
-
       case REPLAY:
+        return new FlywheelSubsystem(
+            RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration(), new FlywheelReplayIO());
       case REAL:
+
       default:
         return new FlywheelSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration(),

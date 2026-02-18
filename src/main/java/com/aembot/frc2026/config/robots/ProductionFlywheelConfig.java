@@ -19,12 +19,18 @@ public class ProductionFlywheelConfig {
   public final double MAX_ACCELERATION = 10.0;
   public final double JERK = 0.0;
 
-  public final double ROTOR_TO_MECHANISM_ROTATION_METER_RATIO = (1.0 / 4.0) * (2.0 * Math.PI * 0.3);
-  public final double MECHANISM_METER_TO_ROTOR_ROTATION_RATIO = (4.0 / 1.0) / (2.0 * Math.PI * 0.3);
-  public final double J_KG_METERS_SQ = 2;
+  public final double GEAR_RATIO = 1.0;
+
+  public final double SHOOTER_WHEEL_RADIUS = 0.3;
+  public final double SHOOTER_WHEEL_CIRCUMFERENCE = 2.0 * Math.PI * SHOOTER_WHEEL_RADIUS;
+
+  public final double UNITS_TO_ROTOR_RATIO = 1.0 / (SHOOTER_WHEEL_CIRCUMFERENCE * GEAR_RATIO);
+  public final double UNITS_TO_MECHANISM_ROTATION_RATIO = 1.0 / SHOOTER_WHEEL_CIRCUMFERENCE;
+
+  public final double J_KG_METERS_SQ = 2.0;
 
   public final ConfigureSlot0Gains MOTOR_GAINS =
-      new ConfigureSlot0Gains(1.0, 0.0, 0.0, 0.3, 0.4, 0.0, 0.0);
+      new ConfigureSlot0Gains(1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
   private static final int LEADER_MOTOR_ID = 53;
   private static final String LEADER_MOTOR_NAME = "FlywheelMotor";
@@ -54,9 +60,9 @@ public class ProductionFlywheelConfig {
                   FLYWHEEL_SUBSYTEM_NAME,
                   CANDeviceID.CANDeviceType.TALON_FX))
           .withName("FlywheelSubsystem")
-          .withUnitToRotorRotationRatio(MECHANISM_METER_TO_ROTOR_ROTATION_RATIO)
+          .withUnitToRotorRotationRatio(UNITS_TO_ROTOR_RATIO)
           .withMomentOfInertia(J_KG_METERS_SQ)
-          .withUnitToMechanismRotationRatio(ROTOR_TO_MECHANISM_ROTATION_METER_RATIO);
+          .withUnitToMechanismRotationRatio(UNITS_TO_MECHANISM_ROTATION_RATIO);
 
   public final SimulatedMotorConfiguration<TalonFXConfiguration> SIM_MOTOR_CONFIG =
       new SimulatedMotorConfiguration<TalonFXConfiguration>()

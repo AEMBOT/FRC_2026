@@ -59,7 +59,11 @@ public class RobotContainer implements Loggerable {
 
     this.commandFactory =
         new CommandFactory(
-            driveSubsystem, hoodSubsystem, intakeDeploySubsystem, intakeRollerSubsystem);
+            driveSubsystem,
+            hoodSubsystem,
+            intakeDeploySubsystem,
+            intakeRollerSubsystem,
+            flywheelSubsystem);
     configureBindings();
   }
 
@@ -67,6 +71,8 @@ public class RobotContainer implements Loggerable {
   private void configureBindings() {
     driveSubsystem.setDefaultCommand(commandFactory.createDriveJoystickCmd(driverController));
     hoodSubsystem.setDefaultCommand(commandFactory.createHoodStopCommand());
+    flywheelSubsystem.setDefaultCommand(commandFactory.createFlywheelSlowSpinCommand());
+
     intakeRollerSubsystem.setDefaultCommand(
         commandFactory.intakeCommands.createStopIntakeCommand());
 
@@ -74,6 +80,9 @@ public class RobotContainer implements Loggerable {
     driverController.b().onTrue(commandFactory.intakeCommands.createDownCommand());
 
     driverController.x().whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
+
+    // --- Flywheel Commands
+    driverController.rightBumper().whileTrue(commandFactory.createFlywheelFastSpinCommand());
   }
 
   /**
