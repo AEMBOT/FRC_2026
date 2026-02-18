@@ -107,6 +107,11 @@ public class SimulatedIndexerCompoundState implements Loggable {
     }
   }
 
+  /** Check that there's room in the indexer to intake a game piece */
+  public boolean getRoomInIndexer() {
+    return IndexerStage.SPINDEXER.gamePieces.size() < IndexerStage.SPINDEXER.kGamePieceCapacity;
+  }
+
   /**
    * Pull a game piece from the kicker
    *

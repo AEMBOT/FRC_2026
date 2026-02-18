@@ -40,7 +40,8 @@ public class SimulatedRobotStateYearly extends SimulatedRobotState {
     super.updateState();
 
     simulatedIntakeState.update();
-    if (simulatedIntakeState.pullGamePiece()) simulatedIndexerCompoundState.addSimulatedGamePiece();
+    if (simulatedIndexerCompoundState.getRoomInIndexer() && simulatedIntakeState.pullGamePiece())
+      simulatedIndexerCompoundState.addSimulatedGamePiece();
     simulatedIndexerCompoundState.update();
   }
 
