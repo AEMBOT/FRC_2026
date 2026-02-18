@@ -11,6 +11,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 
 public class ProductionFlywheelConfig {
   //  TODO Placeholder values, values need to be changed cuz they don't make sense
@@ -21,7 +22,7 @@ public class ProductionFlywheelConfig {
 
   public final double GEAR_RATIO = 1.0;
 
-  public final double SHOOTER_WHEEL_RADIUS = 0.3;
+  public final double SHOOTER_WHEEL_RADIUS = Units.inchesToMeters(2.0);
   public final double SHOOTER_WHEEL_CIRCUMFERENCE = 2.0 * Math.PI * SHOOTER_WHEEL_RADIUS;
 
   public final double UNITS_TO_ROTOR_RATIO = 1.0 / (SHOOTER_WHEEL_CIRCUMFERENCE * GEAR_RATIO);
@@ -30,7 +31,7 @@ public class ProductionFlywheelConfig {
   public final double J_KG_METERS_SQ = 0.01;
 
   public final ConfigureSlot0Gains MOTOR_GAINS =
-      new ConfigureSlot0Gains(10.0, 0.0, 0.0, 0.0, 0.0, 0.05, 0.0);
+      new ConfigureSlot0Gains(1.0, 0.0, 0.0, 0.0, 0.0, 0.1222, 0.0);
 
   private static final int LEADER_MOTOR_ID = 53;
   private static final String LEADER_MOTOR_NAME = "FlywheelMotor";
