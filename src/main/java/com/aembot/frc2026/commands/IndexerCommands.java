@@ -94,7 +94,10 @@ public final class IndexerCommands {
         .withName(NAME)
         .finallyDo(
             () -> {
+              // Check that we're not interrupting another command.
               var cmd = CommandScheduler.getInstance().requiring(dummySubsystem);
+              // Often, the "Load" cmd will still be technically requiring the subsystem atp, so
+              // check against that
               if (cmd == null || cmd.getName() == NAME) {
                 CommandScheduler.getInstance().schedule(createLoadIndexerUntilTimeoutCommand());
               }
@@ -109,7 +112,10 @@ public final class IndexerCommands {
         .withName(NAME)
         .finallyDo(
             () -> {
+              // Check that we're not interrupting another command.
               var cmd = CommandScheduler.getInstance().requiring(dummySubsystem);
+              // Often, the "Load" cmd will still be technically requiring the subsystem atp, so
+              // check against that;
               if (cmd == null || cmd.getName() == NAME) {
                 CommandScheduler.getInstance().schedule(createLoadIndexerUntilTimeoutCommand());
               }
