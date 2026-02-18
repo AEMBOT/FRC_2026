@@ -7,7 +7,9 @@ import com.aembot.lib.core.logging.Loggable;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
@@ -37,13 +39,9 @@ public class SimulatedIndexerCompoundState implements Loggable {
     public final double kTimeThroughStage;
     public final int kGamePieceCapacity;
 
-    public final List<IndexerSimulatedGamePiece> gamePieces;
-
     private IndexerStage(double timeThroughStage, int capacity) {
       this.kTimeThroughStage = timeThroughStage;
       this.kGamePieceCapacity = capacity;
-
-      gamePieces = new ArrayList<>();
     }
   }
 
@@ -62,8 +60,15 @@ public class SimulatedIndexerCompoundState implements Loggable {
    */
   private Consumer<Double> kSelectorTOFDistanceConsumer;
 
+  private final Map<IndexerStage, List<IndexerSimulatedGamePiece>> gamePiecesByStage;
+
   public SimulatedIndexerCompoundState(IndexerCompoundState realIndexerState) {
     this.kRealIndexerState = realIndexerState;
+
+    this.gamePiecesByStage = new EnumMap<>(IndexerStage.class);
+    for (IndexerStage stage : IndexerStage.values()) {
+      gamePiecesByStage.put(stage, new ArrayList<>());
+    }
   }
 
   public void setSelectorTimeOfFlightDistanceConsumer(Consumer<Double> consumer) {
@@ -80,7 +85,7 @@ public class SimulatedIndexerCompoundState implements Loggable {
       // Set the tof sensor to detect a game piece if there's one in the kicker. Technically the
       // sensor would be tripped at the end of the selector, but this is a lot easier with the way
       // this sim works, and shouldn't affect too much
-      if (IndexerStage.KICKER.gamePieces.size() >= 1) {
+      if (getGamePiecesFor(IndexerStage.KICKER).size() >= 1) {
         kSelectorTOFDistanceConsumer.accept(
             selectorTOFConfig.kDetectionThresholdMeters
                 - selectorTOFConfig.kDetectionHysteresisMeters
@@ -99,8 +104,9 @@ public class SimulatedIndexerCompoundState implements Loggable {
    * @return True if successful, false if failed because the hopper is at capacity.
    */
   public boolean addSimulatedGamePiece() {
-    if (IndexerStage.SPINDEXER.gamePieces.size() < IndexerStage.SPINDEXER.kGamePieceCapacity) {
-      IndexerStage.SPINDEXER.gamePieces.add(new IndexerSimulatedGamePiece());
+    if (getGamePiecesFor(IndexerStage.SPINDEXER).size()
+        < IndexerStage.SPINDEXER.kGamePieceCapacity) {
+      getGamePiecesFor(IndexerStage.SPINDEXER).add(new IndexerSimulatedGamePiece());
       return true;
     } else {
       return false;
@@ -109,7 +115,8 @@ public class SimulatedIndexerCompoundState implements Loggable {
 
   /** Check that there's room in the indexer to intake a game piece */
   public boolean getRoomInIndexer() {
-    return IndexerStage.SPINDEXER.gamePieces.size() < IndexerStage.SPINDEXER.kGamePieceCapacity;
+    return getGamePiecesFor(IndexerStage.SPINDEXER).size()
+        < IndexerStage.SPINDEXER.kGamePieceCapacity;
   }
 
   /**
@@ -118,7 +125,7 @@ public class SimulatedIndexerCompoundState implements Loggable {
    * @return
    */
   public Optional<IndexerSimulatedGamePiece> pullFromKicker() {
-    List<IndexerSimulatedGamePiece> gamePieces = IndexerStage.KICKER.gamePieces;
+    List<IndexerSimulatedGamePiece> gamePieces = getGamePiecesFor(IndexerStage.KICKER);
     if (!gamePieces.isEmpty()) {
       // This doesn't really need to be FIFO since we don't rlly store meaningful data in these
       // objects, but we might later
@@ -128,13 +135,18 @@ public class SimulatedIndexerCompoundState implements Loggable {
     }
   }
 
+  /** Get the list of simulated game pieces for the given stage */
+  private List<IndexerSimulatedGamePiece> getGamePiecesFor(IndexerStage stage) {
+    return gamePiecesByStage.get(stage);
+  }
+
   public List<Transform3d> getRenderedGamePiecePositions() {
     List<Transform3d> positions = new ArrayList<>();
 
     for (IndexerStage stage : IndexerStage.values()) {
       Transform3d[] stagePositions = getGamePiecePositionsFor(stage);
       if (stagePositions.length == 0) continue;
-      for (int i = 0; i < stage.gamePieces.size(); i++) {
+      for (int i = 0; i < getGamePiecesFor(stage).size(); i++) {
         positions.add(stagePositions[i % stagePositions.length]);
       }
     }
@@ -165,7 +177,7 @@ public class SimulatedIndexerCompoundState implements Loggable {
         default:
         case RESIST:
         case OFF:
-          for (IndexerSimulatedGamePiece gamePiece : stage.gamePieces) {
+          for (IndexerSimulatedGamePiece gamePiece : getGamePiecesFor(stage)) {
             // Reset the timer because the gamepiece isn't being moved
             gamePiece.timerStartTimeSeconds = Timer.getFPGATimestamp();
           }
@@ -178,9 +190,9 @@ public class SimulatedIndexerCompoundState implements Loggable {
        */
       List<IndexerSimulatedGamePiece> toPush = new ArrayList<>();
 
-      for (IndexerSimulatedGamePiece gamePiece : stage.gamePieces) {
+      for (IndexerSimulatedGamePiece gamePiece : getGamePiecesFor(stage)) {
         if (nextStage == null
-            || nextStage.gamePieces.size() + toPush.size() >= nextStage.kGamePieceCapacity) {
+            || getGamePiecesFor(nextStage).size() + toPush.size() >= nextStage.kGamePieceCapacity) {
           break;
         }
 
@@ -190,8 +202,8 @@ public class SimulatedIndexerCompoundState implements Loggable {
       }
 
       for (IndexerSimulatedGamePiece gamePiece : toPush) {
-        stage.gamePieces.remove(gamePiece);
-        nextStage.gamePieces.add(gamePiece);
+        getGamePiecesFor(stage).remove(gamePiece);
+        getGamePiecesFor(nextStage).add(gamePiece);
         gamePiece.timerStartTimeSeconds = Timer.getFPGATimestamp();
       }
     }
@@ -230,7 +242,7 @@ public class SimulatedIndexerCompoundState implements Loggable {
     for (IndexerStage stage : IndexerStage.values()) {
       Logger.recordOutput(
           standardPrefix + "/" + stage.toString() + "/SimulatedGamePieces",
-          stage.gamePieces.size());
+          getGamePiecesFor(stage).size());
     }
   }
 }
