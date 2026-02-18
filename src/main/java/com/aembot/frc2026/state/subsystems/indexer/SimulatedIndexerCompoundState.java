@@ -172,7 +172,7 @@ public class SimulatedIndexerCompoundState implements Loggable {
           break;
         case REVERSE:
           // if there's a stage before this, that one. Otherwise null
-          nextStage = (i - 1 <= 0) ? indexerStages[i - 1] : null;
+          nextStage = (i - 1 >= 0) ? indexerStages[i - 1] : null;
           break;
         default:
         case RESIST:
