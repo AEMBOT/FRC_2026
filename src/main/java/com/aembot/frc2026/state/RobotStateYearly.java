@@ -5,6 +5,7 @@ import com.aembot.frc2026.state.subsystems.indexer.IndexerCompoundState;
 import com.aembot.frc2026.state.subsystems.turret.TurretState;
 import com.aembot.lib.math.PositionUtil;
 import com.aembot.lib.state.RobotState;
+import com.aembot.lib.state.subsystems.flywheel.FlywheelState;
 import com.aembot.lib.state.subsystems.hood.HoodState;
 import com.aembot.lib.state.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeployState;
 import com.aembot.lib.state.subsystems.intake.over_bumper.run.OverBumperIntakeRollerState;
@@ -31,7 +32,9 @@ public class RobotStateYearly extends RobotState {
           RobotRuntimeConstants.ROBOT_CONFIG.getIndexerSelectorConfiguration().kName,
           RobotRuntimeConstants.ROBOT_CONFIG.getIndexerKickerConfiguration().kName);
 
-  public HoodState hoodState = new HoodState();
+  public final HoodState hoodState = new HoodState();
+
+  public final FlywheelState shooterFlywheelState = new FlywheelState();
 
   public TurretState turretState = new TurretState();
 
@@ -100,5 +103,6 @@ public class RobotStateYearly extends RobotState {
     indexerCompoundState.updateLog("SensorRobotState/IndexerCompound", "");
     turretState.updateLog("SensorRobotState/Turret", "");
     hoodState.updateLog("SensorRobotState/Hood", "");
+    shooterFlywheelState.updateLog("SensorRobotState/ShooterFlywheel", "");
   }
 }

@@ -4,6 +4,7 @@ import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.constants.field.Field2026;
 import com.aembot.frc2026.state.subsystems.indexer.SimulatedIndexerCompoundState;
 import com.aembot.lib.state.SimulatedRobotState;
+import com.aembot.lib.state.subsystems.flywheel.SimulatedShooterFlywheelState;
 import com.aembot.lib.state.subsystems.intake.over_bumper.SimulatedOverBumperIntakeState;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -35,6 +36,8 @@ public class SimulatedRobotStateYearly extends SimulatedRobotState {
   public final SimulatedIndexerCompoundState simulatedIndexerCompoundState =
       new SimulatedIndexerCompoundState(RobotStateYearly.get().indexerCompoundState);
 
+  public final SimulatedShooterFlywheelState simulatedShooterFlywheelState = new SimulatedShooterFlywheelState(RobotStateYearly.get());
+
   @Override
   public void updateState() {
     super.updateState();
@@ -43,6 +46,8 @@ public class SimulatedRobotStateYearly extends SimulatedRobotState {
     if (simulatedIndexerCompoundState.getRoomInIndexer() && simulatedIntakeState.pullGamePiece())
       simulatedIndexerCompoundState.addSimulatedGamePiece();
     simulatedIndexerCompoundState.update();
+    if (simulatedIndexerCompoundState.pullFromKicker())
+      simulatedShooterFlywheelState.simulateShot(null, 0);
   }
 
   @Override

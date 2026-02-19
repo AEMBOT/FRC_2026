@@ -126,7 +126,8 @@ public class SimulatedIndexerCompoundState implements Loggable {
    */
   public Optional<IndexerSimulatedGamePiece> pullFromKicker() {
     List<IndexerSimulatedGamePiece> gamePieces = getGamePiecesFor(IndexerStage.KICKER);
-    if (!gamePieces.isEmpty()) {
+    if (!gamePieces.isEmpty()
+        && getRunStateFor(IndexerStage.KICKER) == IndexerStageRunState.FORWARD) {
       // This doesn't really need to be FIFO since we don't rlly store meaningful data in these
       // objects, but we might later
       return Optional.of(gamePieces.remove(gamePieces.size() - 1));

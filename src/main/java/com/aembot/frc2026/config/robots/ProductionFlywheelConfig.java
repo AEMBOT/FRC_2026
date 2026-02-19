@@ -19,6 +19,8 @@ public class ProductionFlywheelConfig {
   public static final double ACCELERATION_METERS_PER_SEC = 32.0;
   public static final double JERK = 0.0;
 
+  public static final double VELOCITY_TOLERANCE_METERS_PER_SEC = 0.2;
+
   public static final double GEAR_RATIO = 1.0;
 
   public static final double J_KG_METERS_SQ = 0.01;
@@ -72,6 +74,7 @@ public class ProductionFlywheelConfig {
 
   public final TalonFXFlywheelConfiguration CONFIG =
       new TalonFXFlywheelConfiguration(FLYWHEEL_SUBSYTEM_NAME)
+          .withSpeedToleranceUnitsPerSecond(VELOCITY_TOLERANCE_METERS_PER_SEC)
           .withRealMotorConfig(MOTOR_CONFIG)
           .withSimulatedMotorConfig(SIM_MOTOR_CONFIG);
 }

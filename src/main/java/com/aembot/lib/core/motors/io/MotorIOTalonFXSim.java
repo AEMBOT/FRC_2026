@@ -25,15 +25,15 @@ import org.littletonrobotics.junction.Logger;
 public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorController {
 
   /** Helper class for simulated talon fx data */
-  class SimulatedTalonFXState {
-    double SupplyVoltage;
-    double SimVoltage;
-    double SimPosUnits;
-    double SimVelocityUnits;
-    double SimAccelerationUnits;
-    double RotorPosition;
-    double RotorVelocity;
-    double RotorAcceleration;
+  public class SimulatedTalonFXState {
+    public double SupplyVoltage;
+    public double SimVoltage;
+    public double SimPosUnits;
+    public double SimVelocityUnits;
+    public double SimAccelerationUnits;
+    public double RotorPosition;
+    public double RotorVelocity;
+    public double RotorAcceleration;
   }
 
   /** Sim state of the talonfx */
@@ -217,6 +217,17 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
 
   public TalonFXSimState getSimState() {
     return simState;
+  }
+
+  /** Forcibly set the simulated velocity to the given velocity. */
+  public void forceSetMotorVelocity(double velocityUnitsPerSecond) {
+    motorSim.setAngularVelocity(
+        Units.rotationsToRadians(
+            config.kRealConfiguration.getUnitsToRotorRotations(velocityUnitsPerSecond)));
+  }
+
+  public SimulatedTalonFXState getState() {
+    return this.inputs;
   }
 
   /**

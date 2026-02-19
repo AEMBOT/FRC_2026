@@ -10,6 +10,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
@@ -25,6 +26,8 @@ public class ProductionHoodConfig {
 
   public final Pose3d HOOD_ORIGIN_POSE =
       new Pose3d(0.134944, 0.000127, 0.083591, new Rotation3d(0, Units.degreesToRadians(20), 0));
+
+  public final Transform3d GAMEPIECE_EXIT_POINT_FROM_TURRET = new Transform3d();
 
   public final MotorConfiguration<TalonFXConfiguration> MOTOR_CONFIG =
       new MotorConfiguration<TalonFXConfiguration>()
@@ -53,7 +56,8 @@ public class ProductionHoodConfig {
 
   public final TalonFXHoodConfiguration HOOD_CONFIG =
       new TalonFXHoodConfiguration(MOTOR_CONFIG, SUBSYSTEM_NAME)
-          .withHoodOriginPose(HOOD_ORIGIN_POSE);
+          .withHoodOriginPose(HOOD_ORIGIN_POSE)
+          .withGamePieceExitPoint(GAMEPIECE_EXIT_POINT_FROM_TURRET);
 
   public final SimulatedHoodConfiguration SIMULATED_HOOD_CONFIG =
       new SimulatedHoodConfiguration(SIM_MOTOR_CONFIG, SUBSYSTEM_NAME);
