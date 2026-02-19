@@ -59,13 +59,12 @@ public class RobotStateYearly extends RobotState {
   public void updateLog(String standardPrefix, String inputPrefix) {
     super.updateLog(standardPrefix, inputPrefix);
 
-    // placeholder
     Pose3d turretPose =
-        new Pose3d(
-            -0.134944,
-            -0.000127,
-            0.339133,
-            new Rotation3d(turretState.turretYaw.get().unaryMinus()));
+        RobotRuntimeConstants.ROBOT_CONFIG
+            .getTurretConfig()
+            .kTurretOriginPose
+            .plus(
+                new Transform3d(0, 0, 0, new Rotation3d(turretState.turretYaw.get().unaryMinus())));
 
     Pose3d intakePose =
         RobotRuntimeConstants.ROBOT_CONFIG

@@ -4,6 +4,7 @@ import com.aembot.lib.config.encoders.AEMCANCoderConfiguration;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.math.geometry.Pose3d;
 
 public class TalonFXTurretConfiguration {
 
@@ -33,6 +34,9 @@ public class TalonFXTurretConfiguration {
 
   /** Magnet offset for CANcoder B */
   public double kCANcoderBOffset;
+
+  /** The origin pose of the turret for visualization in advantagescope. */
+  public Pose3d kTurretOriginPose;
 
   /**
    * Create a new turret configuration
@@ -82,6 +86,16 @@ public class TalonFXTurretConfiguration {
 
   public TalonFXTurretConfiguration withCANcoderBOffset(double CANcoderBOffset) {
     this.kCANcoderAOffset = CANcoderBOffset;
+    return this;
+  }
+
+  /**
+   * Set the origin pose of the turret for visualization in advantagescope.
+   *
+   * @return this {@link TalonFXTurretConfiguration} for chaining
+   */
+  public TalonFXTurretConfiguration withTurretOriginPose(Pose3d turretOriginPose) {
+    this.kTurretOriginPose = turretOriginPose;
     return this;
   }
 

@@ -11,6 +11,8 @@ import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
@@ -31,6 +33,9 @@ public class ProductionTurretConfig {
   public final int CANCODER_B_ID = 42;
 
   public final double CANCODER_A_MAGNET_OFFSET = 0;
+
+  public final Pose3d TURRET_ORIGIN_POSE =
+      new Pose3d(-0.134944, -0.000127, 0.339133, new Rotation3d());
 
   public final AEMCANCoderConfiguration CANCODER_A_CONFIG =
       new AEMCANCoderConfiguration()
@@ -96,5 +101,6 @@ public class ProductionTurretConfig {
           .withCANcoderBConfig(CANCODER_B_CONFIG)
           .withCANcoderBGearTeeth(CANCODER_B_GEAR_TEETH)
           .withRealMotorConfig(MOTOR_CONFIG)
-          .withSimMotorConfig(SIM_MOTOR_CONFIG);
+          .withSimMotorConfig(SIM_MOTOR_CONFIG)
+          .withTurretOriginPose(TURRET_ORIGIN_POSE);
 }
