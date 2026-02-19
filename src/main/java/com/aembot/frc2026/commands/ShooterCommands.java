@@ -7,6 +7,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
+import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.frc2026.util.OptimalVelocityTable;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -29,9 +30,10 @@ public final class ShooterCommands {
 
   private final HoodSubsystem hood;
   private final TurretSubsystem turret;
+  private final FlywheelSubsystem flywheel;
   private final OptimalVelocityTable shootingHubTable;
 
-  public ShooterCommands(HoodSubsystem hood, TurretSubsystem turret) {
+  public ShooterCommands(HoodSubsystem hood, TurretSubsystem turret, FlywheelSubsystem flywheel) {
     this.hood = hood;
     this.turret = turret;
 
@@ -56,6 +58,7 @@ public final class ShooterCommands {
                 + "/initial-velocities"
                 + robotType
                 + "/Shooting_Hub_Initial_Velocities.csv");
+    this.flywheel = flywheel;
   }
 
   public Command createHoodStopCommand() {
@@ -82,7 +85,15 @@ public final class ShooterCommands {
     return turret.smartVelocitySetpointCommand(() -> -30);
   }
 
-  private double getTurretTowardsHubFromRobotPose() {
+  public Command createFlywheelSlowSpinCommand() {
+    return flywheel.smartVelocitySetpointCommand(() -> 10);
+  }
+
+  public Command createFlywheelFastSpinCommand() {
+    return flywheel.smartVelocitySetpointCommand(() -> 20);
+  }
+
+  private double getTurretForwardFromRobotPose() {
     double targetRotation =
         getRelativeYaw()
                 .minus(RobotStateYearly.get().getLatestFieldRobotPose().getRotation())

@@ -1,6 +1,7 @@
 package com.aembot.frc2026.state;
 
 import com.aembot.lib.state.RobotState;
+import com.aembot.lib.state.subsystems.hood.HoodState;
 import com.aembot.lib.state.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeployState;
 import com.aembot.lib.state.subsystems.intake.over_bumper.run.OverBumperIntakeRollerState;
 import java.util.concurrent.atomic.AtomicReference;
@@ -15,6 +16,8 @@ public class RobotStateYearly extends RobotState {
       new AtomicReference<OverBumperIntakeDeployState>();
   public AtomicReference<OverBumperIntakeRollerState> intakeRollerState =
       new AtomicReference<OverBumperIntakeRollerState>();
+
+  public HoodState hoodState = new HoodState();
 
   public void updateIntakeDeployState(OverBumperIntakeDeployState state) {
     intakeDeployState = new AtomicReference<OverBumperIntakeDeployState>(state);
@@ -42,5 +45,7 @@ public class RobotStateYearly extends RobotState {
 
     Logger.recordOutput(
         "FieldSimulation/Fuel", SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
+
+    hoodState.updateLog("SensorRobotState/Hood", "");
   }
 }
