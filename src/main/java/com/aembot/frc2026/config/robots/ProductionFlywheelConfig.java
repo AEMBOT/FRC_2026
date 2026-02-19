@@ -58,10 +58,7 @@ public class ProductionFlywheelConfig {
                           .withMotionMagicJerk(JERK)))
           .withCANDevice(
               new CANDeviceID(
-                  MOTOR_ID,
-                  MOTOR_NAME,
-                  FLYWHEEL_SUBSYTEM_NAME,
-                  CANDeviceID.CANDeviceType.TALON_FX))
+                  MOTOR_ID, MOTOR_NAME, FLYWHEEL_SUBSYTEM_NAME, CANDeviceID.CANDeviceType.TALON_FX))
           .withName(FLYWHEEL_SUBSYTEM_NAME + "Motor")
           .withUnitToRotorRotationRatio(UNITS_TO_ROTOR_RATIO)
           .withMomentOfInertia(J_KG_METERS_SQ)
