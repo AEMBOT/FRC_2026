@@ -93,20 +93,6 @@ public final class ShooterCommands {
     return flywheel.smartVelocitySetpointCommand(() -> 20);
   }
 
-  private double getTurretForwardFromRobotPose() {
-    double targetRotation =
-        getRelativeYaw()
-                .minus(RobotStateYearly.get().getLatestFieldRobotPose().getRotation())
-                .getDegrees()
-            + 180;
-
-    if (targetRotation < 0) {
-      targetRotation += 360;
-    }
-
-    return targetRotation;
-  }
-
   public Command createHoodTowardsHubCommand() {
     Supplier<Rotation3d> rotationSupplier = () -> getShootingAngle();
 
