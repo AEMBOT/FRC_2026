@@ -36,6 +36,7 @@ public final class ShooterCommands {
   public ShooterCommands(HoodSubsystem hood, TurretSubsystem turret, FlywheelSubsystem flywheel) {
     this.hood = hood;
     this.turret = turret;
+    this.flywheel = flywheel;
 
     String robotType;
     switch (RobotRuntimeConstants.MODE) {
@@ -58,7 +59,6 @@ public final class ShooterCommands {
                 + "/initial-velocities"
                 + robotType
                 + "/Shooting_Hub_Initial_Velocities.csv");
-    this.flywheel = flywheel;
   }
 
   public Command createHoodStopCommand() {
@@ -120,6 +120,10 @@ public final class ShooterCommands {
         turret.smartPositionSetpointCommand(() -> getTurretTowardsHubFromRobotPose()));
   }
 
+  public Command createFlywheelHubSpeedCommand() {
+    return new RepeatCommand(flywheel.smartVelocitySetpointCommand(() -> getShootingSpeed()));
+  }
+
   public Command createShootFuelCommand() {
 
     switch (RobotRuntimeConstants.MODE) {
@@ -172,7 +176,7 @@ public final class ShooterCommands {
                     new Rotation2d(Units.degreesToRadians(turret.getCurrentPosition() + 180))
                         .plus(robotPose.getRotation()),
                     Meters.of(0.5), // TODO:find spot to replace magic number
-                    MetersPerSecond.of(getShootingSpeed()), // TODO: replace with flywheel speed
+                    MetersPerSecond.of(flywheel.getCurrentVelocity()),
                     Degrees.of(hood.getCurrentPosition()))
                 .withProjectileTrajectoryDisplayCallBack(
                     (poses) ->
