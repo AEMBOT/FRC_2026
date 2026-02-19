@@ -1,7 +1,9 @@
 package com.aembot.lib.core.motors.factories;
 
+import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.aembot.lib.core.can.CANStatusLogger;
+import com.aembot.lib.core.motors.io.MotorIOTalonFX;
 import com.aembot.lib.core.phoenix6.CTREUtil;
 import com.ctre.phoenix6.configs.AudioConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -21,6 +23,16 @@ import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
 
 /** Factory methods for creating TalonFXs */
 public class TalonFXFactory {
+  /**
+   * Create a new TalonFXIO
+   *
+   * @param config ServoMotorConfiguration for this TalonFXIO
+   * @return The newly created TalonFXIO
+   */
+  public static MotorIOTalonFX createIO(MotorConfiguration<TalonFXConfiguration> config) {
+    return new MotorIOTalonFX(config);
+  }
+
   /**
    * Create a new TalonFX with the talon FX configuration supplied
    *

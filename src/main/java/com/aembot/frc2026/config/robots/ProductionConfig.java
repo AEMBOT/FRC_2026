@@ -9,6 +9,7 @@ import com.aembot.lib.config.robot.PhysicalConfiguration;
 import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
 import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
 import com.aembot.lib.config.subsystems.drive.simulation.DrivetrainSimConfiguration;
+import com.aembot.lib.config.subsystems.flywheel.TalonFXFlywheelConfiguration;
 import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
 import com.aembot.lib.config.subsystems.hood.simulation.SimulatedHoodConfiguration;
 import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
@@ -40,10 +41,15 @@ public class ProductionConfig extends RobotConfiguration {
 
   private static final ProductionDrivetrainConfig DRIVETRAIN_CONFIG =
       new ProductionDrivetrainConfig(PHYSICAL_CONFIGURATION, DRIVETRAIN_BUS_NAME);
+
   private static final ProductionHoodConfig HOOD_CONFIG = new ProductionHoodConfig();
   private static final ProductionIndexerConfig INDEXER_CONFIG =
       new ProductionIndexerConfig(PRIMARY_BUS_NAME);
+
   private static final ProductionIntakeConfig INTAKE_CONFIG = new ProductionIntakeConfig();
+
+  private static final ProductionFlywheelConfig FLYWHEEL_CONFIG = new ProductionFlywheelConfig();
+
   private static final ProductionTurretConfig TURRET_CONFIG = new ProductionTurretConfig();
 
   private static final ProductionCameraConfig CAMERA_CONFIG = new ProductionCameraConfig();
@@ -121,6 +127,12 @@ public class ProductionConfig extends RobotConfiguration {
     return INDEXER_CONFIG.kickerConfiguration;
   }
 
+  @Override
+  public TalonFXFlywheelConfiguration getFlywheelConfiguration() {
+    return FLYWHEEL_CONFIG.CONFIG;
+  }
+
+  @Override
   public TalonFXTurretConfiguration getTurretConfig() {
     return TURRET_CONFIG.TURRET_CONFIG;
   }
