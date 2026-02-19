@@ -8,13 +8,13 @@ import edu.wpi.first.wpilibj.Notifier;
 
 /** Flywheel IO implementation for simulation */
 public class FlywheelSimIO extends FlywheelHardwareIO {
-  private final MotorIOTalonFXSim leadMotorSim;
+  private final MotorIOTalonFXSim simMotor;
   private final Notifier simNotifier;
 
   public FlywheelSimIO(TalonFXFlywheelConfiguration flywheel) {
     super(flywheel);
-    leadMotorSim = new MotorIOTalonFXSim(flywheel.kSimMotorConfig);
-    this.simNotifier = new Notifier(() -> leadMotorSim.updateSimState());
+    simMotor = new MotorIOTalonFXSim(flywheel.kSimMotorConfig);
+    this.simNotifier = new Notifier(() -> simMotor.updateSimState());
     simNotifier.setName(flywheel.kName + "Notifier");
     simNotifier.startPeriodic(0.005);
   }
@@ -22,7 +22,7 @@ public class FlywheelSimIO extends FlywheelHardwareIO {
 
   @Override
   public MotorIO getMotor() {
-    return leadMotorSim;
+    return simMotor;
   }
 
   @Override
@@ -30,6 +30,6 @@ public class FlywheelSimIO extends FlywheelHardwareIO {
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
-    leadMotorSim.logSim(standardPrefix, inputPrefix);
+    simMotor.logSim(standardPrefix, inputPrefix);
   }
 }

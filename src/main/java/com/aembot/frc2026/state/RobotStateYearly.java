@@ -2,6 +2,7 @@ package com.aembot.frc2026.state;
 
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.state.subsystems.indexer.IndexerCompoundState;
+import com.aembot.frc2026.state.subsystems.turret.TurretState;
 import com.aembot.lib.math.PositionUtil;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.state.subsystems.hood.HoodState;
@@ -32,6 +33,8 @@ public class RobotStateYearly extends RobotState {
 
   public HoodState hoodState = new HoodState();
 
+  public TurretState turretState = new TurretState();
+
   public void updateIntakeDeployState(OverBumperIntakeDeployState state) {
     intakeDeployState.set(state);
   }
@@ -57,7 +60,12 @@ public class RobotStateYearly extends RobotState {
     super.updateLog(standardPrefix, inputPrefix);
 
     // placeholder
-    Pose3d turretPose = new Pose3d(-0.134944, -0.000127, 0.339133, new Rotation3d());
+    Pose3d turretPose =
+        new Pose3d(
+            -0.134944,
+            -0.000127,
+            0.339133,
+            new Rotation3d(turretState.turretYaw.get().unaryMinus()));
 
     Pose3d intakePose =
         RobotRuntimeConstants.ROBOT_CONFIG
@@ -90,6 +98,7 @@ public class RobotStateYearly extends RobotState {
         "SensorRobotState/MechanismPositions", new Pose3d[] {turretPose, intakePose, hoodPose});
 
     indexerCompoundState.updateLog("SensorRobotState/IndexerCompound", "");
+    turretState.updateLog("SensorRobotState/Turret", "");
     hoodState.updateLog("SensorRobotState/Hood", "");
   }
 }

@@ -8,11 +8,11 @@ import com.aembot.lib.subsystems.flywheel.FlywheelInputs;
 
 /** Hardware IO implementation for a flywheel */
 public class FlywheelHardwareIO implements FlywheelIO {
-  private final MotorIOTalonFX leadMotor;
+  private final MotorIOTalonFX flywheelMotor;
 
   public FlywheelHardwareIO(TalonFXFlywheelConfiguration flywheel) {
     // Setup our leader motor based on the configuration
-    leadMotor = TalonFXFactory.createIO(flywheel.kMotorConfig);
+    flywheelMotor = TalonFXFactory.createIO(flywheel.kMotorConfig);
   }
 
   @Override
@@ -25,6 +25,6 @@ public class FlywheelHardwareIO implements FlywheelIO {
 
   @Override
   public MotorIO getMotor() {
-    return leadMotor;
+    return flywheelMotor;
   }
 }

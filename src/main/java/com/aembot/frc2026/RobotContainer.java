@@ -102,6 +102,8 @@ public class RobotContainer implements Loggerable {
         commandFactory.shooterCommands.createTurretAbsoluteForwardCommand());
     intakeRollerSubsystem.setDefaultCommand(
         commandFactory.intakeCommands.createStopIntakeCommand());
+    flywheelSubsystem.setDefaultCommand(
+        commandFactory.shooterCommands.createFlywheelSlowSpinCommand());
 
     driverController.a().onTrue(commandFactory.intakeCommands.createUpCommand());
     driverController.b().onTrue(commandFactory.intakeCommands.createDownCommand());
