@@ -3,7 +3,7 @@ package com.aembot.lib.config.subsystems.hood;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 
 public class TalonFXHoodConfiguration {
 
@@ -18,7 +18,7 @@ public class TalonFXHoodConfiguration {
    * The robot-relative or turret-relative (if turret present) point at which game-pieces exit the
    * shooter. Used in sim.
    */
-  public Transform3d kGamePieceExitPoint = new Transform3d();
+  public Translation3d kGamePieceExitPoint = new Translation3d();
 
   public TalonFXHoodConfiguration(
       MotorConfiguration<TalonFXConfiguration> motorConfig, String name) {
@@ -42,7 +42,7 @@ public class TalonFXHoodConfiguration {
    *
    * @return This {@link TalonFXHoodConfiguration} for chaining
    */
-  public TalonFXHoodConfiguration withGamePieceExitPoint(Transform3d gamePieceExitPoint) {
+  public TalonFXHoodConfiguration withGamePieceExitPoint(Translation3d gamePieceExitPoint) {
     this.kGamePieceExitPoint = gamePieceExitPoint;
     return this;
   }

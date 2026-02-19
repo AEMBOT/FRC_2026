@@ -7,6 +7,7 @@ import com.aembot.lib.state.SimulatedRobotState;
 import com.aembot.lib.state.subsystems.flywheel.SimulatedShooterFlywheelState;
 import com.aembot.lib.state.subsystems.intake.over_bumper.SimulatedOverBumperIntakeState;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +37,8 @@ public class SimulatedRobotStateYearly extends SimulatedRobotState {
   public final SimulatedIndexerCompoundState simulatedIndexerCompoundState =
       new SimulatedIndexerCompoundState(RobotStateYearly.get().indexerCompoundState);
 
-  public final SimulatedShooterFlywheelState simulatedShooterFlywheelState = new SimulatedShooterFlywheelState(RobotStateYearly.get());
+  public final SimulatedShooterFlywheelState simulatedShooterFlywheelState =
+      new SimulatedShooterFlywheelState(RobotStateYearly.get());
 
   @Override
   public void updateState() {
@@ -46,8 +48,25 @@ public class SimulatedRobotStateYearly extends SimulatedRobotState {
     if (simulatedIndexerCompoundState.getRoomInIndexer() && simulatedIntakeState.pullGamePiece())
       simulatedIndexerCompoundState.addSimulatedGamePiece();
     simulatedIndexerCompoundState.update();
-    if (simulatedIndexerCompoundState.pullFromKicker())
-      simulatedShooterFlywheelState.simulateShot(null, 0);
+    if (simulatedIndexerCompoundState.pullFromKicker().isPresent()) {
+      simulatedShooterFlywheelState.simulateShot(
+          new Transform3d(
+              RobotRuntimeConstants.ROBOT_CONFIG
+                  .getTurretConfig()
+                  .kTurretOriginPose
+                  .getTranslation(),
+              new Rotation3d(
+                  0,
+                  RobotStateYearly.get().hoodState.getHoodAngle().getRadians(),
+                  RobotStateYearly.get().getLatestFieldRobotPose().getRotation().getRadians()
+                      + RobotStateYearly.get()
+                          .turretState
+                          .turretYaw
+                          .get()
+                          .unaryMinus()
+                          .getRadians())),
+          RobotStateYearly.get().shooterFlywheelState.flywheelSpeedUnitsPerSecond.get());
+    }
   }
 
   @Override
@@ -68,5 +87,6 @@ public class SimulatedRobotStateYearly extends SimulatedRobotState {
 
     simulatedIndexerCompoundState.updateLog("SimulatedRobotState/IndexerCompound", "");
     simulatedIntakeState.updateLog("SimulatedRobotState/Intake", "");
+    simulatedShooterFlywheelState.updateLog("SimulatedRobotState/ShooterFlywheel", "");
   }
 }
