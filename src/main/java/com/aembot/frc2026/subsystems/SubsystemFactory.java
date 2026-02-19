@@ -309,16 +309,20 @@ public class SubsystemFactory {
       case SIM:
         return new TurretSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig(),
-            new TurretSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig()));
+            new TurretSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig()),
+            RobotStateYearly.get().turretState);
       case REPLAY:
         return new TurretSubsystem(
-            RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig(), new TurretReplayIO());
+            RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig(),
+            new TurretReplayIO(),
+            RobotStateYearly.get().turretState);
       case REAL:
 
       default:
         return new TurretSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig(),
-            new TalonFXTurretHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig()));
+            new TalonFXTurretHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig()),
+            RobotStateYearly.get().turretState);
     }
   }
 }
