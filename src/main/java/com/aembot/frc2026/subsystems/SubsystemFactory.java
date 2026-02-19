@@ -20,6 +20,10 @@ import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.drive.io.DrivetrainHardwareIO;
 import com.aembot.lib.subsystems.drive.io.DrivetrainIOReplay;
 import com.aembot.lib.subsystems.drive.io.DrivetrainSimIO;
+import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
+import com.aembot.lib.subsystems.flywheel.io.FlywheelHardwareIO;
+import com.aembot.lib.subsystems.flywheel.io.FlywheelReplayIO;
+import com.aembot.lib.subsystems.flywheel.io.FlywheelSimIO;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import com.aembot.lib.subsystems.hood.io.HoodIOReplay;
 import com.aembot.lib.subsystems.hood.io.HoodSimIO;
@@ -174,6 +178,24 @@ public class SubsystemFactory {
     }
 
     return new AprilVisionSubsystem(RobotStateYearly.get(), cameraIOs);
+  }
+
+  public static FlywheelSubsystem createFlywheelSubsystem() {
+    switch (RobotRuntimeConstants.MODE) {
+      case SIM:
+        return new FlywheelSubsystem(
+            RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration(),
+            new FlywheelSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration()));
+      case REPLAY:
+        return new FlywheelSubsystem(
+            RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration(), new FlywheelReplayIO());
+      case REAL:
+
+      default:
+        return new FlywheelSubsystem(
+            RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration(),
+            new FlywheelHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration()));
+    }
   }
 
   public static TurretSubsystem createTurretSubsystem() {

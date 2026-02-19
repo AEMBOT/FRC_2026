@@ -2,6 +2,7 @@ package com.aembot.frc2026.commands;
 
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
+import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -9,10 +10,12 @@ public final class ShooterCommands {
 
   private final HoodSubsystem hood;
   private final TurretSubsystem turret;
+  private final FlywheelSubsystem flywheel;
 
-  public ShooterCommands(HoodSubsystem hood, TurretSubsystem turret) {
+  public ShooterCommands(HoodSubsystem hood, TurretSubsystem turret, FlywheelSubsystem flywheel) {
     this.hood = hood;
     this.turret = turret;
+    this.flywheel = flywheel;
   }
 
   public Command createHoodStopCommand() {
@@ -37,6 +40,14 @@ public final class ShooterCommands {
 
   public Command createTurretRightCommand() {
     return turret.smartVelocitySetpointCommand(() -> -30);
+  }
+
+  public Command createFlywheelSlowSpinCommand() {
+    return flywheel.smartVelocitySetpointCommand(() -> 10);
+  }
+
+  public Command createFlywheelFastSpinCommand() {
+    return flywheel.smartVelocitySetpointCommand(() -> 20);
   }
 
   private double getTurretForwardFromRobotPose() {
