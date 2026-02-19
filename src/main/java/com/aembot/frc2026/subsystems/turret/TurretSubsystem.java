@@ -33,13 +33,13 @@ public class TurretSubsystem
    * @param io IO to use
    */
   public TurretSubsystem(
-      TalonFXTurretConfiguration config, TurretIO io, TurretState hoodStateInstance) {
+      TalonFXTurretConfiguration config, TurretIO io, TurretState turretStateInstance) {
 
     super(config.kName, new MotorInputs(), io.getMotor(), config.kRealMotorConfig);
 
     this.io = io;
     this.config = config;
-    this.state = hoodStateInstance;
+    this.state = turretStateInstance;
 
     setPositionFromEncoders();
   }
