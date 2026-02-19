@@ -11,11 +11,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public final class CommandFactory {
   private final DriveSubsystem driveSubsystem;
-  private final HoodSubsystem hoodSubsystem;
-  private final FlywheelSubsystem flywheelSubsystem;
-
-  public final ShooterCommands shooterCommands;
   public final IntakeCommands intakeCommands;
+  public final ShooterCommands shooterCommands;
 
   public CommandFactory(
       DriveSubsystem driveSubsystem,
@@ -25,12 +22,8 @@ public final class CommandFactory {
       FlywheelSubsystem flywheelSubsystem,
       TurretSubsystem turretSubsystem) {
 
-    this.hoodSubsystem = hoodSubsystem;
-    this.flywheelSubsystem = flywheelSubsystem;
-
-    this.intakeCommands = new IntakeCommands(intakeDeploySubsystem, intakeRollerSubsystem);
     this.driveSubsystem = driveSubsystem;
-
+    this.intakeCommands = new IntakeCommands(intakeDeploySubsystem, intakeRollerSubsystem);
     this.shooterCommands = new ShooterCommands(hoodSubsystem, turretSubsystem, flywheelSubsystem);
   }
 
