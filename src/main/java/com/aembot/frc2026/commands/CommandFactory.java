@@ -15,8 +15,6 @@ public final class CommandFactory {
   public final IntakeCommands intakeCommands;
   public final ShooterCommands shooterCommands;
 
-  public final IntakeCommands intakeCommands;
-
   public CommandFactory(
       DriveSubsystem driveSubsystem,
       HoodSubsystem hoodSubsystem,

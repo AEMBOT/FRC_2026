@@ -7,8 +7,8 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
-import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.frc2026.util.OptimalVelocityTable;
+import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -113,6 +113,20 @@ public final class ShooterCommands {
     return new RepeatCommand(
         hood.smartPositionSetpointCommand(
             () -> Units.radiansToDegrees(rotationSupplier.get().getY())));
+  }
+
+  private double getTurretTowardsHubFromRobotPose() {
+    double targetRotation =
+        getRelativeYaw()
+                .minus(RobotStateYearly.get().getLatestFieldRobotPose().getRotation())
+                .getDegrees()
+            + 180;
+
+    if (targetRotation < 0) {
+      targetRotation += 360;
+    }
+
+    return targetRotation;
   }
 
   public Command createTurretTowardsHubCommand() {
