@@ -33,7 +33,6 @@ public final class CommandFactory {
     this.intakeCommands = new IntakeCommands(intakeDeploySubsystem, intakeRollerSubsystem);
     this.indexerCommands =
         new IndexerCommands(spindexerSubsystem, indexerSelectorSubsystem, indexerKickerSubsystem);
-
     this.shooterCommands = new ShooterCommands(hoodSubsystem, turretSubsystem, flywheelSubsystem);
   }
 
