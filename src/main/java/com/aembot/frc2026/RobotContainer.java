@@ -6,6 +6,9 @@ package com.aembot.frc2026;
 
 import com.aembot.frc2026.commands.CommandFactory;
 import com.aembot.frc2026.subsystems.SubsystemFactory;
+import com.aembot.frc2026.subsystems.indexerKicker.IndexerKickerSubsystem;
+import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorSubsystem;
+import com.aembot.frc2026.subsystems.spindexer.SpindexerSubsystem;
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.lib.core.logging.Loggerable;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
@@ -30,6 +33,7 @@ public class RobotContainer implements Loggerable {
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverController = new CommandXboxController(0);
 
+  @SuppressWarnings("unused")
   private final CommandXboxController secondaryController = new CommandXboxController(1);
 
   /* ---- FLYWHEEL ---- */
@@ -37,6 +41,15 @@ public class RobotContainer implements Loggerable {
 
   /* ---- DRIVETRAIN ---- */
   private final DriveSubsystem driveSubsystem = SubsystemFactory.createDriveSubsystem();
+
+  /* ---- INDEXER ---- */
+  private final SpindexerSubsystem spindexerSubsystem = SubsystemFactory.createSpindexerSubsystem();
+
+  private final IndexerSelectorSubsystem indexerSelectorSubsystem =
+      SubsystemFactory.createIndexerSelectorSubsystem();
+
+  private final IndexerKickerSubsystem indexerKickerSubsystem =
+      SubsystemFactory.createIndexerKickerSubsystem();
 
   /* ---- SHOOTER ---- */
   private final HoodSubsystem hoodSubsystem = SubsystemFactory.createHoodSubsystem();
@@ -67,6 +80,9 @@ public class RobotContainer implements Loggerable {
             hoodSubsystem,
             intakeDeploySubsystem,
             intakeRollerSubsystem,
+            spindexerSubsystem,
+            indexerSelectorSubsystem,
+            indexerKickerSubsystem,
             flywheelSubsystem,
             turretSubsystem);
     configureBindings();
@@ -75,12 +91,6 @@ public class RobotContainer implements Loggerable {
   /** Use this method to define your controller button -> command mappings */
   private void configureBindings() {
     driveSubsystem.setDefaultCommand(commandFactory.createDriveJoystickCmd(driverController));
-
-    driverController.a().onTrue(commandFactory.intakeCommands.createUpCommand());
-    driverController.b().onTrue(commandFactory.intakeCommands.createDownCommand());
-
-    driverController.x().whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
-
     hoodSubsystem.setDefaultCommand(commandFactory.shooterCommands.createHoodStopCommand());
     turretSubsystem.setDefaultCommand(
         commandFactory.shooterCommands.createTurretAbsoluteForwardCommand());
@@ -88,6 +98,19 @@ public class RobotContainer implements Loggerable {
         commandFactory.intakeCommands.createStopIntakeCommand());
     flywheelSubsystem.setDefaultCommand(
         commandFactory.shooterCommands.createFlywheelSlowSpinCommand());
+
+    driverController.a().onTrue(commandFactory.intakeCommands.createUpCommand());
+    driverController.b().onTrue(commandFactory.intakeCommands.createDownCommand());
+
+    driverController.x().whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
+
+    // While we're pressing x to intake and not y to shoot, run indexer load
+    driverController
+        .x()
+        .and(driverController.y().negate())
+        .whileTrue(commandFactory.indexerCommands.createLoadIndexerCommand());
+
+    driverController.y().whileTrue(commandFactory.indexerCommands.createFeedIndexerCommand());
   }
 
   /**

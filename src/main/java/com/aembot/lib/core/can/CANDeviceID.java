@@ -9,6 +9,7 @@ public class CANDeviceID {
   public enum CANDeviceType {
     TALON_FX("TalonFX"),
     CANCODER("CANcoder"),
+    CANRANGE("CANRange"),
     PIGEON2("Pigeon2");
 
     private final String name;

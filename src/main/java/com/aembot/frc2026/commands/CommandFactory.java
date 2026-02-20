@@ -1,5 +1,8 @@
 package com.aembot.frc2026.commands;
 
+import com.aembot.frc2026.subsystems.indexerKicker.IndexerKickerSubsystem;
+import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorSubsystem;
+import com.aembot.frc2026.subsystems.spindexer.SpindexerSubsystem;
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.drive.commands.JoystickDriveCommand;
@@ -12,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public final class CommandFactory {
   private final DriveSubsystem driveSubsystem;
   public final IntakeCommands intakeCommands;
+  public final IndexerCommands indexerCommands;
   public final ShooterCommands shooterCommands;
 
   public CommandFactory(
@@ -19,11 +23,16 @@ public final class CommandFactory {
       HoodSubsystem hoodSubsystem,
       OverBumperIntakeDeploySubsystem intakeDeploySubsystem,
       OverBumperIntakeRollerSubsystem intakeRollerSubsystem,
+      SpindexerSubsystem spindexerSubsystem,
+      IndexerSelectorSubsystem indexerSelectorSubsystem,
+      IndexerKickerSubsystem indexerKickerSubsystem,
       FlywheelSubsystem flywheelSubsystem,
       TurretSubsystem turretSubsystem) {
 
     this.driveSubsystem = driveSubsystem;
     this.intakeCommands = new IntakeCommands(intakeDeploySubsystem, intakeRollerSubsystem);
+    this.indexerCommands =
+        new IndexerCommands(spindexerSubsystem, indexerSelectorSubsystem, indexerKickerSubsystem);
     this.shooterCommands = new ShooterCommands(hoodSubsystem, turretSubsystem, flywheelSubsystem);
   }
 

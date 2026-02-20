@@ -2,6 +2,9 @@ package com.aembot.frc2026.config;
 
 import com.aembot.frc2026.config.robots.ProductionConfig;
 import com.aembot.frc2026.config.subsystems.TalonFXTurretConfiguration;
+import com.aembot.frc2026.config.subsystems.indexerKicker.IndexerKickerConfiguration;
+import com.aembot.frc2026.config.subsystems.indexerSelector.IndexerSelectorConfiguration;
+import com.aembot.frc2026.config.subsystems.spindexer.SpindexerConfiguration;
 import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
 import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
 import com.aembot.lib.config.subsystems.drive.simulation.DrivetrainSimConfiguration;
@@ -103,6 +106,15 @@ public abstract class RobotConfiguration {
    * @return List of {@link SimulatedCameraConfiguration}s of the given robot
    */
   public abstract List<SimulatedCameraConfiguration> getSimulatedCameraConfigurations();
+
+  /** Get configuration details for the spindexer subsystem of this robot */
+  public abstract SpindexerConfiguration getSpindexerConfiguration();
+
+  /** Get configuration details for the indexer selector subsystem of this robot */
+  public abstract IndexerSelectorConfiguration getIndexerSelectorConfiguration();
+
+  /** Get configuration details for the indexer kicker subsystem of this robot */
+  public abstract IndexerKickerConfiguration getIndexerKickerConfiguration();
 
   /**
    * Get config details of the flywheel for the robot
