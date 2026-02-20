@@ -16,7 +16,7 @@ import edu.wpi.first.math.util.Units;
 
 public class ProductionHoodConfig {
 
-  public final double GEAR_RATIO = 80;
+  public final double GEAR_RATIO = 144;
 
   public final double CRUISE_VELOCITY_DEG_PER_SEC = 90;
 
