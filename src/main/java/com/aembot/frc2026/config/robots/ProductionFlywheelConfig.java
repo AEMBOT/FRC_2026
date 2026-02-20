@@ -28,9 +28,8 @@ public class ProductionFlywheelConfig {
   public static final double SHOOTER_WHEEL_RADIUS = Units.inchesToMeters(2.0);
   public static final double SHOOTER_WHEEL_CIRCUMFERENCE = 2.0 * Math.PI * SHOOTER_WHEEL_RADIUS;
 
-  public static final double UNITS_TO_ROTOR_RATIO =
-      1.0 / (SHOOTER_WHEEL_CIRCUMFERENCE * GEAR_RATIO);
-  public static final double UNITS_TO_MECHANISM_ROTATION_RATIO = 1.0 / SHOOTER_WHEEL_CIRCUMFERENCE;
+  public static final double UNITS_TO_ROTOR_RATIO = SHOOTER_WHEEL_CIRCUMFERENCE * GEAR_RATIO;
+  public static final double UNITS_TO_MECHANISM_ROTATION_RATIO = SHOOTER_WHEEL_CIRCUMFERENCE;
 
   public static final ConfigureSlot0Gains MOTOR_GAINS =
       new ConfigureSlot0Gains(1.0, 0.0, 0.0, 0.0, 0.0, 0.1222, 0.0);
