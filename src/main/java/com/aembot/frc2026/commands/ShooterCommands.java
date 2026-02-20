@@ -72,8 +72,7 @@ public final class ShooterCommands {
    * @return
    */
   private OptimalVelocityTable getCurrentVelocityTable() {
-    // TODO: get actual point to switch to passing
-    if (RobotStateYearly.get().getLatestFieldRobotPose().getX() < 4) {
+    if (RobotStateYearly.get().getLatestFieldRobotPose().getX() < 4.02844) {
       return shootingHubTable;
     } else {
       return passingTableSupplier.get();
