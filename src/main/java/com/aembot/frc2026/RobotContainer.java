@@ -16,8 +16,6 @@ import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeplo
 import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.littletonrobotics.junction.LoggedRobot;
 
@@ -91,14 +89,7 @@ public class RobotContainer implements Loggerable {
     flywheelSubsystem.setDefaultCommand(
         commandFactory.shooterCommands.createFlywheelHubSpeedCommand());
 
-    driverController
-        .a()
-        .whileTrue(
-            new RepeatCommand(
-                commandFactory
-                    .shooterCommands
-                    .createShootFuelCommand()
-                    .andThen(new WaitCommand(0.1))));
+    driverController.a().whileTrue(commandFactory.createShootFuelCommand());
   }
 
   /**

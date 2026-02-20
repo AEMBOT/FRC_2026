@@ -11,6 +11,7 @@ import com.aembot.frc2026.util.OptimalVelocityTable;
 import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -183,6 +184,17 @@ public final class ShooterCommands {
   public Command createTurretTowardsHubCommand() {
     return new RepeatCommand(
         turret.smartPositionSetpointCommand(() -> getTurretTowardsHubFromRobotPose()));
+  }
+
+  /**
+   * Exists to prevent us from wasting fuel and from shooting fuel out of the field
+   *
+   * <p>TODO: find better value than 10
+   *
+   * @return True if turret is within 10 degrees of goal position, false otherwise
+   */
+  public boolean isTurretNearGoal() {
+    return MathUtil.isNear(turret.getCurrentPosition(), getTurretTowardsHubFromRobotPose(), 10);
   }
 
   /* ---- FLYWHEEL COMMANDS ---- */
