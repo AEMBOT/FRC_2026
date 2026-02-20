@@ -8,6 +8,8 @@ import com.aembot.lib.core.can.CANDeviceID;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
@@ -20,6 +22,9 @@ public class ProductionHoodConfig {
   public final double ACCELERATION_DEG_PER_SEC = 720;
 
   public final String SUBSYSTEM_NAME = "HoodSubsystem";
+
+  public final Pose3d HOOD_ORIGIN_POSE =
+      new Pose3d(0.134944, 0.000127, 0.083591, new Rotation3d(0, Units.degreesToRadians(20), 0));
 
   public final MotorConfiguration<TalonFXConfiguration> MOTOR_CONFIG =
       new MotorConfiguration<TalonFXConfiguration>()
@@ -47,7 +52,8 @@ public class ProductionHoodConfig {
           .withSimMotorConstants(DCMotor.getKrakenX60(1));
 
   public final TalonFXHoodConfiguration HOOD_CONFIG =
-      new TalonFXHoodConfiguration(MOTOR_CONFIG, SUBSYSTEM_NAME);
+      new TalonFXHoodConfiguration(MOTOR_CONFIG, SUBSYSTEM_NAME)
+          .withHoodOriginPose(HOOD_ORIGIN_POSE);
 
   public final SimulatedHoodConfiguration SIMULATED_HOOD_CONFIG =
       new SimulatedHoodConfiguration(SIM_MOTOR_CONFIG, SUBSYSTEM_NAME);
