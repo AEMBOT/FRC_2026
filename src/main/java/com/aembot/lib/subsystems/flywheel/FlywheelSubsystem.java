@@ -8,6 +8,8 @@ import com.aembot.lib.state.subsystems.flywheel.FlywheelState;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.aembot.lib.subsystems.flywheel.io.FlywheelIO;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.wpilibj.Timer;
+import org.littletonrobotics.junction.Logger;
 
 public class FlywheelSubsystem
     extends MotorSubsystem<MotorInputs, MotorIO, MotorConfiguration<TalonFXConfiguration>> {
@@ -32,12 +34,17 @@ public class FlywheelSubsystem
 
   @Override
   public void periodic() {
+    double timestamp = Timer.getFPGATimestamp();
     super.periodic();
 
     state.flywheelSpeedUnitsPerSecond.set(inputs.velocityUnitsPerSecond);
     state.atAcceptableSpeed.set(
         Math.abs(inputs.velocityUnitsPerSecond - targetSpeed)
             < config.kSpeedToleranceUnitsPerSecond);
+
+    // Log latency with time between periodic being called and finishing
+    Logger.recordOutput(
+        logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
   }
 
   @Override

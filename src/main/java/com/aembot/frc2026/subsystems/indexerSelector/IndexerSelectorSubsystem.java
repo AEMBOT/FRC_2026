@@ -10,6 +10,7 @@ import com.aembot.lib.core.sensors.timeOfFlight.TimeOfFlightSensor;
 import com.aembot.lib.core.sensors.timeOfFlight.interfaces.TimeOfFlightIO;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -54,12 +55,18 @@ public class IndexerSelectorSubsystem
 
   @Override
   public void periodic() {
+    double timestamp = Timer.getFPGATimestamp();
+
     super.periodic();
 
     kTimeOfFlightSensor.update();
     kMechanismIO.updateInputs(kMechanismInputs);
 
     kGamePieceDetectedConsumer.accept(kTimeOfFlightSensor.getObjectDetected());
+
+    // Log latency with time between periodic being called and finishing
+    Logger.recordOutput(
+        logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
   }
 
   public Command followCommandedState() {
