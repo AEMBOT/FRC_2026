@@ -117,8 +117,6 @@ public class RobotContainer implements Loggerable {
         .whileTrue(commandFactory.indexerCommands.createLoadIndexerCommand());
 
     driverController.y().whileTrue(commandFactory.indexerCommands.createFeedIndexerCommand());
-    flywheelSubsystem.setDefaultCommand(
-        commandFactory.shooterCommands.createFlywheelSlowSpinCommand());
   }
 
   /**
