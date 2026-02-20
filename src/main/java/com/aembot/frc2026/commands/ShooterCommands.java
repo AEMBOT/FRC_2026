@@ -8,12 +8,12 @@ import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.frc2026.util.OptimalVelocityTable;
+import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -31,79 +31,144 @@ public final class ShooterCommands {
   private final HoodSubsystem hood;
   private final TurretSubsystem turret;
   private final FlywheelSubsystem flywheel;
+
   private final OptimalVelocityTable shootingHubTable;
+  private final OptimalVelocityTable passingOutpostTable;
+  private final OptimalVelocityTable passingLeftTable;
+  private final OptimalVelocityTable passingMiddleTable;
+  private final OptimalVelocityTable passingRightTable;
+
+  private Supplier<OptimalVelocityTable> passingTableSupplier;
 
   public ShooterCommands(HoodSubsystem hood, TurretSubsystem turret, FlywheelSubsystem flywheel) {
     this.hood = hood;
     this.turret = turret;
     this.flywheel = flywheel;
 
-    String robotType;
-    switch (RobotRuntimeConstants.MODE) {
-      case SIM:
-        robotType = "/real";
-        break;
-
-      case REPLAY:
-
-      case REAL:
-
-      default:
-        robotType = "/real";
-        break;
+    String velocityTableDirectory = Filesystem.getDeployDirectory() + "/initial-velocities/real/";
+    if (RobotRuntimeConstants.MODE == RuntimeMode.SIM) {
+      velocityTableDirectory = Filesystem.getDeployDirectory() + "/initial-velocities/sim/";
     }
 
+    // Override shooting hub table to always use real trajectories
     this.shootingHubTable =
         new OptimalVelocityTable(
-            Filesystem.getDeployDirectory()
-                + "/initial-velocities"
-                + robotType
-                + "/Shooting_Hub_Initial_Velocities.csv");
+            velocityTableDirectory + "../real/Shooting_Hub_Initial_Velocities.csv");
+    this.passingOutpostTable =
+        new OptimalVelocityTable(velocityTableDirectory + "Passing_Outpost_Initial_Velocities.csv");
+    this.passingLeftTable =
+        new OptimalVelocityTable(velocityTableDirectory + "Passing_Left_Initial_Velocities.csv");
+    this.passingMiddleTable =
+        new OptimalVelocityTable(velocityTableDirectory + "Passing_Middle_Initial_Velocities.csv");
+    this.passingRightTable =
+        new OptimalVelocityTable(velocityTableDirectory + "Passing_Right_Initial_Velocities.csv");
+    passingTableSupplier = () -> passingMiddleTable;
   }
 
-  public Command createHoodStopCommand() {
-    return hood.smartVelocitySetpointCommand(() -> 0);
+  /* ---- VELOCITY TABLES ---- */
+
+  /**
+   * @return
+   */
+  private OptimalVelocityTable getCurrentVelocityTable() {
+    // TODO: get actual point to switch to passing
+    if (RobotStateYearly.get().getLatestFieldRobotPose().getX() < 4) {
+      return shootingHubTable;
+    } else {
+      return passingTableSupplier.get();
+    }
   }
 
-  public Command createHoodUpCommand() {
-    return hood.smartVelocitySetpointCommand(() -> 30);
+  /**
+   * @return
+   */
+  public Command createSetPassingPoseOutpostCommand() {
+    return new InstantCommand(
+        () -> {
+          passingTableSupplier = () -> passingOutpostTable;
+        });
   }
 
-  public Command createHoodDownCommand() {
-    return hood.smartVelocitySetpointCommand(() -> -30);
+  /**
+   * @return
+   */
+  public Command createSetPassingPoseLeftCommand() {
+    return new InstantCommand(
+        () -> {
+          passingTableSupplier = () -> passingLeftTable;
+        });
   }
 
-  public Command createTurretStopCommand() {
-    return turret.smartVelocitySetpointCommand(() -> 0);
+  /**
+   * @return
+   */
+  public Command createSetPassingPoseMiddleCommand() {
+    return new InstantCommand(
+        () -> {
+          passingTableSupplier = () -> passingMiddleTable;
+        });
   }
 
-  public Command createTurretLeftCommand() {
-    return turret.smartVelocitySetpointCommand(() -> 30);
+  /**
+   * @return
+   */
+  public Command createSetPassingPoseRightCommand() {
+    return new InstantCommand(
+        () -> {
+          passingTableSupplier = () -> passingRightTable;
+        });
   }
 
-  public Command createTurretRightCommand() {
-    return turret.smartVelocitySetpointCommand(() -> -30);
+  /**
+   * @return
+   */
+  private Rotation2d getCurrentYaw() {
+    return getCurrentVelocityTable()
+        .getFuelInitVelocityRotation3d(
+            RobotStateYearly.get().getLatestFieldRobotPose(),
+            RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds())
+        .toRotation2d();
   }
 
-  public Command createFlywheelSlowSpinCommand() {
-    return flywheel.smartVelocitySetpointCommand(() -> 10);
+  /**
+   * @return
+   */
+  private double getCurrentPitch() {
+    return Units.radiansToDegrees(
+        getCurrentVelocityTable()
+            .getFuelInitVelocityRotation3d(
+                RobotStateYearly.get().getLatestFieldRobotPose(),
+                RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds())
+            .getY());
   }
 
-  public Command createFlywheelFastSpinCommand() {
-    return flywheel.smartVelocitySetpointCommand(() -> 20);
+  /**
+   * @return
+   */
+  private double getCurrentSpeed() {
+    return getCurrentVelocityTable()
+        .getFuelInitVelocityMagnitude(
+            RobotStateYearly.get().getLatestFieldRobotPose(),
+            RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds());
   }
 
+  /* ---- HOOD COMMANDS ---- */
+
+  /**
+   * @return
+   */
   public Command createHoodTowardsHubCommand() {
-    Supplier<Rotation3d> rotationSupplier = () -> getShootingAngle();
-
-    return new RepeatCommand(
-        hood.smartPositionSetpointCommand(
-            () -> Units.radiansToDegrees(rotationSupplier.get().getY())));
+    return new RepeatCommand(hood.smartPositionSetpointCommand(() -> getCurrentPitch()));
   }
 
+  /* ---- TURRET COMMANDS ---- */
+
+  /**
+   * @return
+   */
   private double getTurretTowardsHubFromRobotPose() {
     double targetRotation =
-        getRelativeYaw()
+        getCurrentYaw()
                 .minus(RobotStateYearly.get().getLatestFieldRobotPose().getRotation())
                 .getDegrees()
             + 180;
@@ -120,9 +185,13 @@ public final class ShooterCommands {
         turret.smartPositionSetpointCommand(() -> getTurretTowardsHubFromRobotPose()));
   }
 
+  /* ---- FLYWHEEL COMMANDS ---- */
+
   public Command createFlywheelHubSpeedCommand() {
-    return new RepeatCommand(flywheel.smartVelocitySetpointCommand(() -> getShootingSpeed()));
+    return new RepeatCommand(flywheel.smartVelocitySetpointCommand(() -> getCurrentSpeed()));
   }
+
+  /* ---- FUEL SHOOTING FUNCTIONS ---- */
 
   public Command createShootFuelCommand() {
 
@@ -138,31 +207,7 @@ public final class ShooterCommands {
     }
   }
 
-  private Rotation3d getShootingAngle() {
-    Rotation3d rot =
-        shootingHubTable.getFuelInitVelocityRotation3d(
-            RobotStateYearly.get().getLatestFieldRobotPose(),
-            RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds());
-
-    Logger.recordOutput("TEST", Units.radiansToDegrees(rot.getY()));
-
-    return rot;
-  }
-
-  private Rotation2d getRelativeYaw() {
-    return shootingHubTable
-        .getFuelInitVelocityRotation3d(
-            RobotStateYearly.get().getLatestFieldRobotPose(),
-            RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds())
-        .toRotation2d();
-  }
-
-  private double getShootingSpeed() {
-    return shootingHubTable.getFuelInitVelocityMagnitude(
-        RobotStateYearly.get().getLatestFieldRobotPose(),
-        RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds());
-  }
-
+  /** Create a RebuiltFuelOnFly based off of the current state of all of the subsystems */
   private void shootSimulatedFuel() {
 
     Pose2d robotPose = RobotStateYearly.get().getLatestFieldRobotPose();
