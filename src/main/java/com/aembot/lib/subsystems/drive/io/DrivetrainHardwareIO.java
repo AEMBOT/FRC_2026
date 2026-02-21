@@ -148,7 +148,7 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
     for (int i = 0; i < getModules().length; i++) {
       Logger.recordOutput(
           modulePrefix + moduleNames.get(i) + "/Absolute Encoder Angle",
-          getModule(i).getEncoder().getAbsolutePosition(false).getValueAsDouble() * 360);
+          getModule(i).getEncoder().getAbsolutePosition().getValueAsDouble() * 360);
       Logger.recordOutput(
           modulePrefix + moduleNames.get(i) + "/Steering Angle", state.ModuleStates[i].angle);
       Logger.recordOutput(
