@@ -70,7 +70,7 @@ public final class ShooterCommands {
   /* ---- VELOCITY TABLES ---- */
 
   /**
-   * @return
+   * @return The current velocity table to use for aiming
    */
   private OptimalVelocityTable getCurrentVelocityTable() {
     if (RobotStateYearly.get().getLatestFieldRobotPose().getX() < 4.02844) {
@@ -81,7 +81,7 @@ public final class ShooterCommands {
   }
 
   /**
-   * @return
+   * @return a command that sets the passing position to the outpost
    */
   public Command createSetPassingPoseOutpostCommand() {
     return new InstantCommand(
@@ -91,7 +91,7 @@ public final class ShooterCommands {
   }
 
   /**
-   * @return
+   * @return a command that sets the passing position to the left
    */
   public Command createSetPassingPoseLeftCommand() {
     return new InstantCommand(
@@ -101,7 +101,7 @@ public final class ShooterCommands {
   }
 
   /**
-   * @return
+   * @return a command that sets the passing position to the middle 
    */
   public Command createSetPassingPoseMiddleCommand() {
     return new InstantCommand(
@@ -111,7 +111,7 @@ public final class ShooterCommands {
   }
 
   /**
-   * @return
+   * @return a command that sets the passing position to the right
    */
   public Command createSetPassingPoseRightCommand() {
     return new InstantCommand(
@@ -121,7 +121,7 @@ public final class ShooterCommands {
   }
 
   /**
-   * @return
+   * @return the current optimal yaw to shoot to the goal position
    */
   private Rotation2d getCurrentYaw() {
     return getCurrentVelocityTable()
@@ -132,7 +132,7 @@ public final class ShooterCommands {
   }
 
   /**
-   * @return
+   * @return the current optimal pitch to shoot to the goal position
    */
   private double getCurrentPitch() {
     return Units.radiansToDegrees(
@@ -144,7 +144,7 @@ public final class ShooterCommands {
   }
 
   /**
-   * @return
+   * @return the current optimal speed to shoot to the goal position
    */
   private double getCurrentSpeed() {
     return getCurrentVelocityTable()
@@ -156,14 +156,16 @@ public final class ShooterCommands {
   /* ---- HOOD COMMANDS ---- */
 
   /**
-   * @return
+   * @return a command that sets the hood goal angle to the optimal shooting pitch
    */
   public Command createHoodTowardsHubCommand() {
     return hood.smartPositionSetpointCommand(() -> getCurrentPitch());
   }
 
   /**
-   * @return
+   * Exists to prevent us from wasting fuel and from shooting fuel out of the field
+   * 
+   * @return true if hood is within 10 degrees of target position, false otherwise
    */
   public boolean isHoodNearGoal() {
     return MathUtil.isNear(hood.getCurrentPosition(), getCurrentPitch(), 10);
@@ -172,9 +174,9 @@ public final class ShooterCommands {
   /* ---- TURRET COMMANDS ---- */
 
   /**
-   * @return
+   * @return Robot-Relative angle of the otimal yaw  
    */
-  private double getTurretTowardsHubFromRobotPose() {
+  private double getTurretTowardsGoalFromRobotPose() {
     double targetRotation =
         getCurrentYaw()
                 .minus(RobotStateYearly.get().getLatestFieldRobotPose().getRotation())
@@ -188,33 +190,43 @@ public final class ShooterCommands {
     return targetRotation;
   }
 
+  /**
+   * @return a command that sets the turret goal angle to the optimal shooting yaw
+   */
   public Command createTurretTowardsHubCommand() {
-    return turret.smartPositionSetpointCommand(() -> getTurretTowardsHubFromRobotPose());
+    return turret.smartPositionSetpointCommand(() -> getTurretTowardsGoalFromRobotPose());
   }
 
   /**
    * Exists to prevent us from wasting fuel and from shooting fuel out of the field
    *
-   * <p>TODO: find better value than 10
-   *
    * @return True if turret is within 10 degrees of goal position, false otherwise
    */
   public boolean isTurretNearGoal() {
-    return MathUtil.isNear(turret.getCurrentPosition(), getTurretTowardsHubFromRobotPose(), 10);
+    return MathUtil.isNear(turret.getCurrentPosition(), getTurretTowardsGoalFromRobotPose(), 10);
   }
 
   /* ---- FLYWHEEL COMMANDS ---- */
 
+  /**
+   * @return a command that sets the flywheel goal velocity to the optimal shooting velocity
+   */
   public Command createFlywheelHubSpeedCommand() {
     return flywheel.smartVelocitySetpointCommand(() -> getCurrentSpeed());
   }
 
+  /**
+   * CURRENTLY EMPTY
+   * @return a command that sets the flywheel to the idle speed
+   */
   public Command createFlywheelIdleSpeedCommand() {
     return new Command() {};
   }
 
   /**
-   * @return
+   * Exists to prevent us from wasting fuel and from shooting fuel out of the field
+   *
+   * @return True if the flywheel is within 2 meters per second of goal velocity, false otherwise
    */
   public boolean isFlywheelNearGoal() {
     return MathUtil.isNear(flywheel.getCurrentVelocity(), getCurrentSpeed(), 2);
@@ -223,12 +235,17 @@ public final class ShooterCommands {
   /* ---- FUEL SHOOTING FUNCTIONS ---- */
 
   /**
-   * @return
+   * Exists to prevent us from wasting fuel and from shooting fuel out of the field
+   * 
+   * @return true if shooter is near goal position, see subsystem specific commands for actual values
    */
   public boolean isShooterNearGoal() {
     return isFlywheelNearGoal() && isHoodNearGoal() && isTurretNearGoal();
   }
 
+  /**
+   * @return A command that begins the fuel shooting process
+   */
   public Command createShootFuelCommand() {
 
     switch (RobotRuntimeConstants.MODE) {
@@ -242,7 +259,7 @@ public final class ShooterCommands {
       case REAL:
 
       default:
-        return new RunCommand(() -> {}); // TODO create real shoot command
+        return new RunCommand(() -> {}); // Indexer handles fuel supplying
     }
   }
 
