@@ -121,7 +121,8 @@ public class MotorIOTalonFX implements MotorIO, CANable {
         };
 
     // Set the update frequency for all the signals
-    CTREUtil.setUpdateFrequencyForAll(50.0, signals, talon.getDeviceID());
+    // FIXME prior to PR: make this a config val
+    CTREUtil.setUpdateFrequencyForAll(10.0, signals, talon.getDeviceID());
 
     // Optimization the bus utilization for the talon
     CTREUtil.Configuration.Motors.optimizeBusUtilization(talon);
