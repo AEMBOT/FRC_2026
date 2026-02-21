@@ -125,16 +125,6 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
 
     inputs.importSwerveDriveState(swerveTelemetryCache.get());
 
-    // Update all gyro signals
-    BaseStatusSignal.refreshAll(
-        angularRollVelocity,
-        angularPitchVelocity,
-        angularYawVelocity,
-        pitch,
-        roll,
-        accelerationX,
-        accelerationY);
-
     inputs.kinematics = getKinematics();
     inputs.gyroYawAngle = inputs.Pose.getRotation().getDegrees();
     inputs.yawAngularVelocity = angularYawVelocity.getValueAsDouble();
