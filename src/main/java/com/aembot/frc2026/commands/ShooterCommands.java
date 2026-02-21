@@ -162,6 +162,13 @@ public final class ShooterCommands {
     return new RepeatCommand(hood.smartPositionSetpointCommand(() -> getCurrentPitch()));
   }
 
+  /**
+   * @return
+   */
+  public boolean isHoodNearGoal() {
+    return MathUtil.isNear(hood.getCurrentPosition(), getCurrentPitch(), 10);
+  }
+
   /* ---- TURRET COMMANDS ---- */
 
   /**
@@ -203,7 +210,21 @@ public final class ShooterCommands {
     return new RepeatCommand(flywheel.smartVelocitySetpointCommand(() -> getCurrentSpeed()));
   }
 
+  /**
+   * @return
+   */
+  public boolean isFlywheelNearGoal() {
+    return MathUtil.isNear(flywheel.getCurrentVelocity(), getCurrentSpeed(), 2);
+  }
+
   /* ---- FUEL SHOOTING FUNCTIONS ---- */
+
+  /**
+   * @return
+   */
+  public boolean isShooterNearGoal() {
+    return isFlywheelNearGoal() && isHoodNearGoal() && isTurretNearGoal();
+  }
 
   public Command createShootFuelCommand() {
 

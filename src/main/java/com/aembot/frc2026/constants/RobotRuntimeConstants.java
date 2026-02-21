@@ -10,6 +10,6 @@ public class RobotRuntimeConstants extends RuntimeConstants {
   public static final RobotConfiguration ROBOT_CONFIG =
       RobotConfiguration.getRobotConstants((RobotIDYearly) ROBOT_ID);
 
-      // TODO tune value
+  // TODO tune value
   public static final double AUTO_AIM_LATENCY_COMPENSATION_MS = 25;
 }
