@@ -159,7 +159,7 @@ public final class ShooterCommands {
    * @return
    */
   public Command createHoodTowardsHubCommand() {
-    return new RepeatCommand(hood.smartPositionSetpointCommand(() -> getCurrentPitch()));
+    return hood.smartPositionSetpointCommand(() -> getCurrentPitch());
   }
 
   /**
@@ -189,8 +189,7 @@ public final class ShooterCommands {
   }
 
   public Command createTurretTowardsHubCommand() {
-    return new RepeatCommand(
-        turret.smartPositionSetpointCommand(() -> getTurretTowardsHubFromRobotPose()));
+    return turret.smartPositionSetpointCommand(() -> getTurretTowardsHubFromRobotPose());
   }
 
   /**
@@ -207,7 +206,11 @@ public final class ShooterCommands {
   /* ---- FLYWHEEL COMMANDS ---- */
 
   public Command createFlywheelHubSpeedCommand() {
-    return new RepeatCommand(flywheel.smartVelocitySetpointCommand(() -> getCurrentSpeed()));
+    return flywheel.smartVelocitySetpointCommand(() -> getCurrentSpeed());
+  }
+
+  public Command createFlywheelIdleSpeedCommand() {
+    return new Command() {};
   }
 
   /**
@@ -231,7 +234,9 @@ public final class ShooterCommands {
     switch (RobotRuntimeConstants.MODE) {
       case SIM:
         return new RepeatCommand(
-            new InstantCommand(() -> shootSimulatedFuel()).andThen(new WaitCommand(0.05)));
+            new InstantCommand(() -> shootSimulatedFuel())
+                .andThen(new WaitCommand(0.05))
+                .onlyIf(() -> isShooterNearGoal()));
       case REPLAY:
 
       case REAL:

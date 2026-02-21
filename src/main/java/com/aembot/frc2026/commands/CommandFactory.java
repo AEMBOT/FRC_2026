@@ -41,8 +41,7 @@ public final class CommandFactory {
 
   public Command createShootFuelCommand() {
     return new ParallelCommandGroup(
-        indexerCommands.createFeedIndexerCommand(),
-        shooterCommands.createShootFuelCommand().onlyIf(() -> shooterCommands.isShooterNearGoal()));
+        indexerCommands.createFeedIndexerCommand(), shooterCommands.createShootFuelCommand());
   }
 
   public JoystickDriveCommand createDriveJoystickCmd(CommandXboxController driverController) {
