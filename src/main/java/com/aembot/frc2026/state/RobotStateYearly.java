@@ -115,7 +115,6 @@ public class RobotStateYearly extends RobotState {
     robotcentricMechanismPositions[1] = intakePose;
     robotcentricMechanismPositions[2] = hoodPose;
 
-    Logger.recordOutput(
-        "SensorRobotState/MechanismPositions", robotcentricMechanismPositions);
+    Logger.recordOutput("SensorRobotState/MechanismPositions", robotcentricMechanismPositions);
   }
 }
