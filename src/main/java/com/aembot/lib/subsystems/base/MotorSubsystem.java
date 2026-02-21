@@ -48,6 +48,9 @@ public abstract class MotorSubsystem<
   /** The current position in servo motor configuration units of where this motor should be */
   protected double currentPositionSetpoint = 0;
 
+  /** The current velocity setpoint in servo motor configuration units per second */
+  protected double currentVelocitySetpoint = 0;
+
   /**
    * Create new servo motor subsystem with the desired motor and motor config
    *
@@ -176,6 +179,7 @@ public abstract class MotorSubsystem<
   // --- CONTROL: PID Velocity
 
   protected void setPIDVelocitySetpointImpl(double velocity, int slot) {
+    currentVelocitySetpoint = velocity;
     Logger.recordOutput(logPrefixStandard + "/SetPIDVelocitySetpoint", velocity);
     io.setPIDVelocitySetpoint(velocity, slot);
   }
@@ -254,6 +258,7 @@ public abstract class MotorSubsystem<
   // --- CONTROL: Dynamic Smart Velocity
 
   protected void setSmartVelocitySetpointImpl(double velocity, int slot) {
+    currentVelocitySetpoint = velocity;
     Logger.recordOutput(logPrefixStandard + "/SetSmartVelocitySetpoint/Velocity", velocity);
     Logger.recordOutput(logPrefixStandard + "/SetSmartVelocitySetpoint/Slot", slot);
     io.setSmartVelocitySetpoint(velocity, slot);

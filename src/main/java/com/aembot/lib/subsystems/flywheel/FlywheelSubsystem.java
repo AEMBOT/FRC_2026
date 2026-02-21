@@ -19,8 +19,6 @@ public class FlywheelSubsystem
   /** Flywheel state instance to update */
   private final FlywheelState state;
 
-  private double targetSpeed = 0;
-
   public FlywheelSubsystem(
       TalonFXFlywheelConfiguration config, FlywheelIO flywheel, FlywheelState stateInstance) {
     super(new MotorInputs(), flywheel.getMotor(), config.kMotorConfig);
@@ -39,24 +37,12 @@ public class FlywheelSubsystem
 
     state.flywheelSpeedUnitsPerSecond.set(inputs.velocityUnitsPerSecond);
     state.atAcceptableSpeed.set(
-        Math.abs(inputs.velocityUnitsPerSecond - targetSpeed)
+        Math.abs(inputs.velocityUnitsPerSecond - this.currentVelocitySetpoint)
             < config.kSpeedToleranceUnitsPerSecond);
 
     // Log latency with time between periodic being called and finishing
     Logger.recordOutput(
         logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
-  }
-
-  @Override
-  public void setSmartVelocitySetpointImpl(double velocity, int slot) {
-    super.setSmartVelocitySetpointImpl(velocity, slot);
-    targetSpeed = velocity;
-  }
-
-  @Override
-  public void setPIDPositionSetpointImpl(double velocity, int slot) {
-    super.setPIDPositionSetpointImpl(velocity, slot);
-    targetSpeed = velocity;
   }
 
   @Override
