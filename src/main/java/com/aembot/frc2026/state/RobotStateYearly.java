@@ -106,10 +106,7 @@ public class RobotStateYearly extends RobotState {
                     .kHoodOriginPose
                     .plus(
                         new Transform3d(
-                            0,
-                            0,
-                            0,
-                            new Rotation3d(0, -hoodState.getHoodAngle().getRadians(), 0)))));
+                            0, 0, 0, new Rotation3d(0, -hoodState.getHoodAngleRadians(), 0)))));
 
     robotcentricMechanismPositions[0] = turretPose;
     robotcentricMechanismPositions[1] = intakePose;

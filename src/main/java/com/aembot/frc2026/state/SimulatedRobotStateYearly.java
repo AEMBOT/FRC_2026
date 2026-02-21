@@ -57,7 +57,7 @@ public class SimulatedRobotStateYearly extends SimulatedRobotState {
                   .getTranslation(),
               new Rotation3d(
                   0,
-                  RobotStateYearly.get().hoodState.getHoodAngle().getRadians(),
+                  RobotStateYearly.get().hoodState.getHoodAngleRadians(),
                   RobotStateYearly.get().getLatestFieldRobotPose().getRotation().getRadians()
                       + RobotStateYearly.get()
                           .turretState

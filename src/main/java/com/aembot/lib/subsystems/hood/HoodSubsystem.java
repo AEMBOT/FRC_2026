@@ -8,7 +8,6 @@ import com.aembot.lib.state.subsystems.hood.HoodState;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.aembot.lib.subsystems.hood.io.HoodIO;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import org.littletonrobotics.junction.Logger;
@@ -45,7 +44,7 @@ public class HoodSubsystem
     double timestamp = Timer.getFPGATimestamp();
     super.periodic();
 
-    state.updateHoodAngle(new Rotation2d(Units.degreesToRadians(inputs.positionUnits)));
+    state.updateHoodAngle(Units.degreesToRadians(inputs.positionUnits));
 
     // Log latency with time between periodic being called and finishing
     Logger.recordOutput(
