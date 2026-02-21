@@ -5,9 +5,12 @@ import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
 import com.aembot.lib.config.subsystems.intake.overBumper.run.TalonFXOverBumperIntakeRollerConfiguration;
 import com.aembot.lib.core.can.CANDeviceID;
+import com.aembot.lib.core.motors.interfaces.MotorIO.NeutralMode;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -23,6 +26,10 @@ public class ProductionIntakeConfig {
   public final double UP_DEPLOY_ANGLE = 90;
 
   public final double DOWN_DEPLOY_ANGLE = 0;
+
+  public final boolean DEPLOY_MOTOR_INVERTED = true;
+
+  public final NeutralMode DEPLOY_NEUTRAL_MODE = NeutralMode.BRAKE;
 
   public final double ZEROING_SPEED_DEG_PER_SEC = 45;
 
@@ -62,7 +69,14 @@ public class ProductionIntakeConfig {
                               Units.degreesToRotations(DEPLOY_ACCELERATION_DEG_PER_SEC)
                                   * DEPLOY_GEAR_RATIO))
                   // constants copies from hood config
-                  .withSlot0(new Slot0Configs().withKP(.1).withKV(.12)))
+                  .withSlot0(new Slot0Configs().withKP(.1).withKV(.12))
+                  .withMotorOutput(
+                      new MotorOutputConfigs()
+                          .withInverted(
+                              DEPLOY_MOTOR_INVERTED
+                                  ? InvertedValue.CounterClockwise_Positive
+                                  : InvertedValue.Clockwise_Positive)
+                          .withNeutralMode(DEPLOY_NEUTRAL_MODE.toCTRENeutralMode())))
           .withCANDevice(
               new CANDeviceID(
                   DEPLOY_CAN_ID,
