@@ -101,7 +101,7 @@ public final class ShooterCommands {
   }
 
   /**
-   * @return a command that sets the passing position to the middle 
+   * @return a command that sets the passing position to the middle
    */
   public Command createSetPassingPoseMiddleCommand() {
     return new InstantCommand(
@@ -164,7 +164,7 @@ public final class ShooterCommands {
 
   /**
    * Exists to prevent us from wasting fuel and from shooting fuel out of the field
-   * 
+   *
    * @return true if hood is within 10 degrees of target position, false otherwise
    */
   public boolean isHoodNearGoal() {
@@ -174,7 +174,7 @@ public final class ShooterCommands {
   /* ---- TURRET COMMANDS ---- */
 
   /**
-   * @return Robot-Relative angle of the otimal yaw  
+   * @return Robot-Relative angle of the otimal yaw
    */
   private double getTurretTowardsGoalFromRobotPose() {
     double targetRotation =
@@ -217,6 +217,7 @@ public final class ShooterCommands {
 
   /**
    * CURRENTLY EMPTY
+   *
    * @return a command that sets the flywheel to the idle speed
    */
   public Command createFlywheelIdleSpeedCommand() {
@@ -236,8 +237,9 @@ public final class ShooterCommands {
 
   /**
    * Exists to prevent us from wasting fuel and from shooting fuel out of the field
-   * 
-   * @return true if shooter is near goal position, see subsystem specific commands for actual values
+   *
+   * @return true if shooter is near goal position, see subsystem specific commands for actual
+   *     values
    */
   public boolean isShooterNearGoal() {
     return isFlywheelNearGoal() && isHoodNearGoal() && isTurretNearGoal();
