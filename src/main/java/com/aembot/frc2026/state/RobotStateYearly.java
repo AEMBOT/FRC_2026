@@ -20,6 +20,8 @@ public class RobotStateYearly extends RobotState {
   // Ppl on the interwebs say this is good & thread safe
   private static final RobotStateYearly INSTANCE = new RobotStateYearly();
 
+  private final Pose3d[] robotcentricMechanismPositions = new Pose3d[3];
+
   public final AtomicReference<OverBumperIntakeDeployState> intakeDeployState =
       new AtomicReference<OverBumperIntakeDeployState>();
   public final AtomicReference<OverBumperIntakeRollerState> intakeRollerState =
@@ -62,6 +64,19 @@ public class RobotStateYearly extends RobotState {
   public void updateLog(String standardPrefix, String inputPrefix) {
     super.updateLog(standardPrefix, inputPrefix);
 
+    indexerCompoundState.updateLog("SensorRobotState/IndexerCompound", "");
+    turretState.updateLog("SensorRobotState/Turret", "");
+    hoodState.updateLog("SensorRobotState/Hood", "");
+    shooterFlywheelState.updateLog("SensorRobotState/ShooterFlywheel", "");
+
+    // 10Hz update bcuz allocating these poses is 'spensive
+    if (expensiveLogNoopCounter >= 5) {
+      logMechanismPositions("SensorRobotState/MechanismPositions");
+      expensiveLogNoopCounter = -1;
+    }
+  }
+
+  private void logMechanismPositions(String prefix) {
     Pose3d turretPose =
         RobotRuntimeConstants.ROBOT_CONFIG
             .getTurretConfig()
@@ -96,12 +111,11 @@ public class RobotStateYearly extends RobotState {
                             0,
                             new Rotation3d(0, -hoodState.getHoodAngle().getRadians(), 0)))));
 
-    Logger.recordOutput(
-        "SensorRobotState/MechanismPositions", new Pose3d[] {turretPose, intakePose, hoodPose});
+    robotcentricMechanismPositions[0] = turretPose;
+    robotcentricMechanismPositions[1] = intakePose;
+    robotcentricMechanismPositions[2] = hoodPose;
 
-    indexerCompoundState.updateLog("SensorRobotState/IndexerCompound", "");
-    turretState.updateLog("SensorRobotState/Turret", "");
-    hoodState.updateLog("SensorRobotState/Hood", "");
-    shooterFlywheelState.updateLog("SensorRobotState/ShooterFlywheel", "");
+    Logger.recordOutput(
+        "SensorRobotState/MechanismPositions", robotcentricMechanismPositions);
   }
 }
