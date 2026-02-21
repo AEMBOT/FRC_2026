@@ -28,7 +28,7 @@ public class FlywheelSimIO extends FlywheelHardwareIO {
    */
   public void simulateImpulseLoad() {
     simMotor.forceSetMotorVelocity(
-        config.kSimulateLoadImpulseFunction.apply(simMotor.getState().SimVelocityUnits));
+        config.kSimulateLoadImpulseFunction.apply(simMotor.getSimState().SimVelocityUnits));
   }
 
   @Override

@@ -215,7 +215,7 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
     Logger.recordOutput(standardPrefix + "/Simulation/Mechanism2d", visualization.getMech2d());
   }
 
-  public TalonFXSimState getSimState() {
+  public TalonFXSimState getCTRESimState() {
     return simState;
   }
 
@@ -226,7 +226,7 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
             config.kRealConfiguration.getUnitsToRotorRotations(velocityUnitsPerSecond)));
   }
 
-  public SimulatedTalonFXState getState() {
+  public SimulatedTalonFXState getSimState() {
     return this.inputs;
   }
 
