@@ -38,6 +38,8 @@ public class HoodSubsystem
     this.io = io;
     this.config = config;
     this.state = state;
+
+    this.setEncoderPosition(config.upwardsHardStopUnits);
   }
 
   @Override
