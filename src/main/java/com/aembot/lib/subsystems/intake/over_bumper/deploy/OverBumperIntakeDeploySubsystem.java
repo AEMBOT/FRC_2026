@@ -48,6 +48,8 @@ public class OverBumperIntakeDeploySubsystem
     this.config = config;
     this.state = new OverBumperIntakeDeployState();
     this.stateConsumer = stateConsumer;
+
+    this.setEncoderPosition(config.kRealMotorConfig.kMaxPositionUnits);
   }
 
   /**
