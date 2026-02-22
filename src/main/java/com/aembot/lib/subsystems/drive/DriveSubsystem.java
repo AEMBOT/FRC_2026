@@ -8,6 +8,7 @@ import com.aembot.lib.subsystems.drive.io.DrivetrainIO;
 import com.aembot.lib.subsystems.drive.io.DrivetrainSimIO;
 import com.aembot.lib.subsystems.drive.simulation.MapleSimSwerveDrivetrain;
 import com.aembot.lib.subsystems.drive.visualizations.SwerveVisualizer;
+import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -196,5 +197,19 @@ public class DriveSubsystem extends AEMSubsystem {
     }
 
     return null;
+  }
+
+  /**
+   * Create a new swerve request from a robot relative chassis speeds variable
+   *
+   * @param speeds robot relative chassis speeds
+   */
+  public void setRequestFromChassisSpeeds(ChassisSpeeds speeds) {
+    setRequest(
+        new SwerveRequest.RobotCentric()
+            .withVelocityX(speeds.vxMetersPerSecond)
+            .withVelocityY(speeds.vyMetersPerSecond)
+            .withRotationalRate(speeds.omegaRadiansPerSecond)
+            .withDriveRequestType(SwerveModule.DriveRequestType.Velocity));
   }
 }

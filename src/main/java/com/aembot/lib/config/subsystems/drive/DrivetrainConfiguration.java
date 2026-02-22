@@ -4,6 +4,7 @@ import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 public class DrivetrainConfiguration {
   public String configurationName;
@@ -41,6 +42,8 @@ public class DrivetrainConfiguration {
 
   /** Standard deviations of odometry while the robot is disabled */
   public OdometryStandardDevs disabledOdometryStandardDevs;
+
+  public PPHolonomicDriveController autoController;
 
   public DrivetrainConfiguration() {}
 
@@ -115,6 +118,17 @@ public class DrivetrainConfiguration {
       OdometryStandardDevs enabledStandardDevs, OdometryStandardDevs disabledStandardDevs) {
     this.enabledOdometryStandardDevs = enabledStandardDevs;
     this.disabledOdometryStandardDevs = disabledStandardDevs;
+    return this;
+  }
+
+  /**
+   * Set the controller to use during auto
+   *
+   * @param autoPIDConstants PPHolonomicDrive contoller to use when auto pathing
+   * @return self for chaining
+   */
+  public DrivetrainConfiguration withAutoController(PPHolonomicDriveController autoController) {
+    this.autoController = autoController;
     return this;
   }
 }
