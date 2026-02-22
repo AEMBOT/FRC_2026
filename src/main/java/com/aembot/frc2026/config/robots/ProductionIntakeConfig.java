@@ -27,9 +27,13 @@ public class ProductionIntakeConfig {
 
   public final double DOWN_DEPLOY_ANGLE = 0;
 
+  public final double STARTING_ANGLE_DEG = 131.67;
+
+  public final double ZERO_ANGLE_DEG = 0;
+
   public final boolean DEPLOY_MOTOR_INVERTED = true;
 
-  public final NeutralMode DEPLOY_NEUTRAL_MODE = NeutralMode.BRAKE;
+  public final NeutralMode DEPLOY_NEUTRAL_MODE = NeutralMode.COAST;
 
   public final double ZEROING_SPEED_DEG_PER_SEC = 45;
 
