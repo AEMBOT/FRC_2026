@@ -20,6 +20,8 @@ public class TalonFXHoodConfiguration {
    */
   public Translation3d kGamePieceExitPoint = new Translation3d();
 
+  public double upwardsHardStopUnits = 0;
+
   public TalonFXHoodConfiguration(
       MotorConfiguration<TalonFXConfiguration> motorConfig, String name) {
     this.kMotorConfig = motorConfig;
@@ -44,6 +46,16 @@ public class TalonFXHoodConfiguration {
    */
   public TalonFXHoodConfiguration withGamePieceExitPoint(Translation3d gamePieceExitPoint) {
     this.kGamePieceExitPoint = gamePieceExitPoint;
+    return this;
+  }
+
+  /**
+   * Set the position of the upwards hard stop in units. Used for zeroing.
+   *
+   * @return This {@link TalonFXHoodConfiguration} for chaining
+   */
+  public TalonFXHoodConfiguration withUpwardsHardStopUnits(double units) {
+    this.upwardsHardStopUnits = units;
     return this;
   }
 }
