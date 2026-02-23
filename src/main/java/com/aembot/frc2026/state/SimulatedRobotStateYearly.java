@@ -59,12 +59,8 @@ public class SimulatedRobotStateYearly extends SimulatedRobotState {
                   0,
                   RobotStateYearly.get().hoodState.getHoodAngleRadians(),
                   RobotStateYearly.get().getLatestFieldRobotPose().getRotation().getRadians()
-                      + RobotStateYearly.get()
-                          .turretState
-                          .turretYaw
-                          .get()
-                          .unaryMinus()
-                          .getRadians())),
+                      + RobotStateYearly.get().turretState.turretYawRadians.get()
+                      + Math.PI)),
           RobotStateYearly.get().shooterFlywheelState.flywheelSpeedUnitsPerSecond.get());
     }
   }

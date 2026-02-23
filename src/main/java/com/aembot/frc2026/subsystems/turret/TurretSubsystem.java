@@ -8,7 +8,7 @@ import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -72,7 +72,7 @@ public class TurretSubsystem
       setPositionFromEncoders();
     }
 
-    state.updateTurretYaw(Rotation2d.fromDegrees(inputs.positionUnits));
+    state.updateTurretYaw(Units.degreesToRadians(inputs.positionUnits));
 
     // Log latency with time between periodic being called and finishing
     Logger.recordOutput(
