@@ -158,7 +158,7 @@ public final class ShooterCommands {
   /**
    * @return a command that sets the hood goal angle to the optimal shooting pitch
    */
-  public Command createHoodTowardsHubCommand() {
+  public Command createHoodTowardsGoalCommand() {
     return hood.smartPositionSetpointCommand(() -> getCurrentPitch());
   }
 
@@ -193,7 +193,7 @@ public final class ShooterCommands {
   /**
    * @return a command that sets the turret goal angle to the optimal shooting yaw
    */
-  public Command createTurretTowardsHubCommand() {
+  public Command createTurretTowardsGoalCommand() {
     return turret.smartPositionSetpointCommand(() -> getTurretTowardsGoalFromRobotPose());
   }
 
@@ -213,7 +213,7 @@ public final class ShooterCommands {
   /**
    * @return a command that sets the flywheel goal velocity to the optimal shooting velocity
    */
-  public Command createFlywheelHubSpeedCommand() {
+  public Command createFlywheelGoalSpeedCommand() {
     return flywheel.smartVelocitySetpointCommand(() -> getCurrentSpeed());
   }
 
