@@ -1,7 +1,7 @@
 package com.aembot.frc2026.config.robots;
 
 // TODO Need constants from 26 bot
-import com.aembot.frc2026.config.robots.swerve_tunings.NautilusSwerveConstants;
+import com.aembot.frc2026.config.robots.swerve_tunings.TimothyTunerConstants;
 import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
 import com.aembot.lib.config.subsystems.drive.TalonFXSwerveModuleConfiguration;
 import com.aembot.lib.core.can.CANDeviceID;
@@ -39,12 +39,12 @@ public class ProductionSwerveModuleConfigs {
 
     this.frontLeftModule =
         new TalonFXSwerveModuleConfiguration(
-            NautilusSwerveConstants.FrontLeft,
+            TimothyTunerConstants.FrontLeft,
             "FrontLeftSwerveModule",
 
             // Drive Motor
             new CANDeviceID(
-                NautilusSwerveConstants.FrontLeft.DriveMotorId,
+                TimothyTunerConstants.FrontLeft.DriveMotorId,
                 "FrontLeftSwerveDriveMotor",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.TALON_FX,
@@ -52,7 +52,7 @@ public class ProductionSwerveModuleConfigs {
 
             // Steer Motor
             new CANDeviceID(
-                NautilusSwerveConstants.FrontLeft.SteerMotorId,
+                TimothyTunerConstants.FrontLeft.SteerMotorId,
                 "FrontLeftSwerveSteerMotor",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.TALON_FX,
@@ -60,7 +60,7 @@ public class ProductionSwerveModuleConfigs {
 
             // Steer Encoder
             new CANDeviceID(
-                NautilusSwerveConstants.FrontLeft.EncoderId,
+                TimothyTunerConstants.FrontLeft.EncoderId,
                 "FrontLeftSwerveSteerEncoder",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.CANCODER,
@@ -68,12 +68,12 @@ public class ProductionSwerveModuleConfigs {
 
     this.frontRightModule =
         new TalonFXSwerveModuleConfiguration(
-            NautilusSwerveConstants.FrontRight,
+            TimothyTunerConstants.FrontRight,
             "FrontRightSwerveModule",
 
             // Drive Motor
             new CANDeviceID(
-                NautilusSwerveConstants.FrontRight.DriveMotorId,
+                TimothyTunerConstants.FrontRight.DriveMotorId,
                 "FrontRightSwerveDriveMotor",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.TALON_FX,
@@ -81,7 +81,7 @@ public class ProductionSwerveModuleConfigs {
 
             // Steer Motor
             new CANDeviceID(
-                NautilusSwerveConstants.FrontRight.SteerMotorId,
+                TimothyTunerConstants.FrontRight.SteerMotorId,
                 "FrontRightSwerveSteerMotor",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.TALON_FX,
@@ -89,7 +89,7 @@ public class ProductionSwerveModuleConfigs {
 
             // Steer Encoder
             new CANDeviceID(
-                NautilusSwerveConstants.FrontRight.EncoderId,
+                TimothyTunerConstants.FrontRight.EncoderId,
                 "FrontRightSwerveSteerEncoder",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.CANCODER,
@@ -97,12 +97,12 @@ public class ProductionSwerveModuleConfigs {
 
     this.backLeftModule =
         new TalonFXSwerveModuleConfiguration(
-            NautilusSwerveConstants.BackLeft,
+            TimothyTunerConstants.BackLeft,
             "BackLeftSwerveModule",
 
             // Drive Motor
             new CANDeviceID(
-                NautilusSwerveConstants.BackLeft.DriveMotorId,
+                TimothyTunerConstants.BackLeft.DriveMotorId,
                 "BackLeftSwerveDriveMotor",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.TALON_FX,
@@ -110,7 +110,7 @@ public class ProductionSwerveModuleConfigs {
 
             // Steer Motor
             new CANDeviceID(
-                NautilusSwerveConstants.BackLeft.SteerMotorId,
+                TimothyTunerConstants.BackLeft.SteerMotorId,
                 "BackLeftSwerveSteerMotor",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.TALON_FX,
@@ -118,7 +118,7 @@ public class ProductionSwerveModuleConfigs {
 
             // Steer Encoder
             new CANDeviceID(
-                NautilusSwerveConstants.BackLeft.EncoderId,
+                TimothyTunerConstants.BackLeft.EncoderId,
                 "BackLeftSwerveSteerEncoder",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.CANCODER,
@@ -126,12 +126,12 @@ public class ProductionSwerveModuleConfigs {
 
     this.backRightModule =
         new TalonFXSwerveModuleConfiguration(
-            NautilusSwerveConstants.BackRight,
+            TimothyTunerConstants.BackRight,
             "BackRightSwerveModule",
 
             // Drive Motor
             new CANDeviceID(
-                NautilusSwerveConstants.BackRight.DriveMotorId,
+                TimothyTunerConstants.BackRight.DriveMotorId,
                 "BackRightSwerveDriveMotor",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.TALON_FX,
@@ -139,7 +139,7 @@ public class ProductionSwerveModuleConfigs {
 
             // Steer Motor
             new CANDeviceID(
-                NautilusSwerveConstants.BackRight.SteerMotorId,
+                TimothyTunerConstants.BackRight.SteerMotorId,
                 "BackRightSwerveSteerMotor",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.TALON_FX,
@@ -147,7 +147,7 @@ public class ProductionSwerveModuleConfigs {
 
             // Steer Encoder
             new CANDeviceID(
-                NautilusSwerveConstants.BackRight.EncoderId,
+                TimothyTunerConstants.BackRight.EncoderId,
                 "BackRightSwerveSteerEncoder",
                 driveSubsystemName,
                 CANDeviceID.CANDeviceType.CANCODER,

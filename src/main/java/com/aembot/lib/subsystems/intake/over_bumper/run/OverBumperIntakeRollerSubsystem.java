@@ -8,6 +8,7 @@ import com.aembot.lib.state.subsystems.intake.over_bumper.run.OverBumperIntakeRo
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.run.io.OverBumperIntakeRollerIO;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
@@ -67,8 +68,14 @@ public class OverBumperIntakeRollerSubsystem
 
   @Override
   public void periodic() {
+    double timestamp = Timer.getFPGATimestamp();
+
     super.periodic();
     updateState();
+
+    // Log latency with time between periodic being called and finishing
+    Logger.recordOutput(
+        logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
   }
 
   @Override

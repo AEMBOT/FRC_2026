@@ -291,16 +291,20 @@ public class SubsystemFactory {
       case SIM:
         return new FlywheelSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration(),
-            new FlywheelSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration()));
+            new FlywheelSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration()),
+            RobotStateYearly.get().shooterFlywheelState);
       case REPLAY:
         return new FlywheelSubsystem(
-            RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration(), new FlywheelReplayIO());
+            RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration(),
+            new FlywheelReplayIO(),
+            RobotStateYearly.get().shooterFlywheelState);
       case REAL:
 
       default:
         return new FlywheelSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration(),
-            new FlywheelHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration()));
+            new FlywheelHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration()),
+            RobotStateYearly.get().shooterFlywheelState);
     }
   }
 
