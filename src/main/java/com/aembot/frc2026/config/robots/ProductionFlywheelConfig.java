@@ -39,6 +39,8 @@ public class ProductionFlywheelConfig {
 
   public static final String FLYWHEEL_SUBSYTEM_NAME = "FlywheelSubsystem";
 
+  public final double AUTO_AIM_LENCIANCY = 2;
+
   public final MotorConfiguration<TalonFXConfiguration> MOTOR_CONFIG =
       new MotorConfiguration<TalonFXConfiguration>()
           .withMotorConfig(
@@ -73,5 +75,6 @@ public class ProductionFlywheelConfig {
   public final TalonFXFlywheelConfiguration CONFIG =
       new TalonFXFlywheelConfiguration(FLYWHEEL_SUBSYTEM_NAME)
           .withRealMotorConfig(MOTOR_CONFIG)
-          .withSimulatedMotorConfig(SIM_MOTOR_CONFIG);
+          .withSimulatedMotorConfig(SIM_MOTOR_CONFIG)
+          .withAutoAimLeniance(AUTO_AIM_LENCIANCY);
 }

@@ -168,7 +168,8 @@ public final class ShooterCommands {
    * @return true if hood is within 10 degrees of target position, false otherwise
    */
   public boolean isHoodNearGoal() {
-    return MathUtil.isNear(hood.getCurrentPosition(), getCurrentPitch(), 10);
+    double tolerance = RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig().kAutoAimLeniance;
+    return MathUtil.isNear(hood.getCurrentPosition(), getCurrentPitch(), tolerance);
   }
 
   /* ---- TURRET COMMANDS ---- */
@@ -198,7 +199,9 @@ public final class ShooterCommands {
    * @return True if turret is within 10 degrees of goal position, false otherwise
    */
   public boolean isTurretNearGoal() {
-    return MathUtil.isNear(turret.getCurrentPosition(), getTurretTowardsGoalFromRobotPose(), 10);
+    double tolerance = RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig().kAutoAimLeniance;
+    return MathUtil.isNear(
+        turret.getCurrentPosition(), getTurretTowardsGoalFromRobotPose(), tolerance);
   }
 
   /* ---- FLYWHEEL COMMANDS ---- */
@@ -225,7 +228,9 @@ public final class ShooterCommands {
    * @return True if the flywheel is within 2 meters per second of goal velocity, false otherwise
    */
   public boolean isFlywheelNearGoal() {
-    return MathUtil.isNear(flywheel.getCurrentVelocity(), getCurrentSpeed(), 2);
+    double tolerance =
+        RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration().kAutoAimLeniance;
+    return MathUtil.isNear(flywheel.getCurrentVelocity(), getCurrentSpeed(), tolerance);
   }
 
   /* ---- FUEL SHOOTING FUNCTIONS ---- */

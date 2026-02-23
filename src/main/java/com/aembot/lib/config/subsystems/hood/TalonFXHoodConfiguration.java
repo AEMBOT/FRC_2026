@@ -13,6 +13,9 @@ public class TalonFXHoodConfiguration {
   /** The origin pose of the hood for visualization in advantagescope. */
   public Pose3d kHoodOriginPose;
 
+  /** The amount of units we can be off and still shoot */
+  public double kAutoAimLeniance;
+
   public TalonFXHoodConfiguration(
       MotorConfiguration<TalonFXConfiguration> motorConfig, String name) {
     this.kMotorConfig = motorConfig;
@@ -26,6 +29,19 @@ public class TalonFXHoodConfiguration {
    */
   public TalonFXHoodConfiguration withHoodOriginPose(Pose3d hoodOriginPose) {
     this.kHoodOriginPose = hoodOriginPose;
+    return this;
+  }
+
+  /**
+   * Set the amount of units that we can be off in order to still shoot
+   *
+   * <p>Counts both directions, so for example if this was 10, we could have a deviance of -10
+   * through +10
+   *
+   * @return this {@link TalonFXHoodConfiguration} for chaining
+   */
+  public TalonFXHoodConfiguration withAutoAimLeniance(double autoAimLeniance) {
+    this.kAutoAimLeniance = autoAimLeniance;
     return this;
   }
 }

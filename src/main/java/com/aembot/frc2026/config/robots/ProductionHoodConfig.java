@@ -23,6 +23,8 @@ public class ProductionHoodConfig {
 
   public final String SUBSYSTEM_NAME = "HoodSubsystem";
 
+  public final double AUTO_AIM_LENIANCY = 10;
+
   public final Pose3d HOOD_ORIGIN_POSE =
       new Pose3d(0.134944, 0.000127, 0.083591, new Rotation3d(0, Units.degreesToRadians(20), 0));
 
@@ -53,7 +55,8 @@ public class ProductionHoodConfig {
 
   public final TalonFXHoodConfiguration HOOD_CONFIG =
       new TalonFXHoodConfiguration(MOTOR_CONFIG, SUBSYSTEM_NAME)
-          .withHoodOriginPose(HOOD_ORIGIN_POSE);
+          .withHoodOriginPose(HOOD_ORIGIN_POSE)
+          .withAutoAimLeniance(AUTO_AIM_LENIANCY);
 
   public final SimulatedHoodConfiguration SIMULATED_HOOD_CONFIG =
       new SimulatedHoodConfiguration(SIM_MOTOR_CONFIG, SUBSYSTEM_NAME);

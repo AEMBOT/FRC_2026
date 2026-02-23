@@ -37,6 +37,8 @@ public class ProductionTurretConfig {
   public final Pose3d TURRET_ORIGIN_POSE =
       new Pose3d(-0.134944, -0.000127, 0.339133, new Rotation3d());
 
+  public final double AUTO_AIM_LENCIANCY = 10;
+
   public final AEMCANCoderConfiguration CANCODER_A_CONFIG =
       new AEMCANCoderConfiguration()
           .withDevice(
@@ -102,5 +104,6 @@ public class ProductionTurretConfig {
           .withCANcoderBGearTeeth(CANCODER_B_GEAR_TEETH)
           .withRealMotorConfig(MOTOR_CONFIG)
           .withSimMotorConfig(SIM_MOTOR_CONFIG)
-          .withTurretOriginPose(TURRET_ORIGIN_POSE);
+          .withTurretOriginPose(TURRET_ORIGIN_POSE)
+          .withAutoAimLeniance(AUTO_AIM_LENCIANCY);
 }
