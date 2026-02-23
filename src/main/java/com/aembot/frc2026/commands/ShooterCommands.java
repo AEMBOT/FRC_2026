@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import java.util.function.Supplier;
 import org.ironmaple.simulation.SimulatedArena;
@@ -180,15 +179,10 @@ public final class ShooterCommands {
   private double getTurretTowardsGoalFromRobotPose() {
     double targetRotation =
         getCurrentYaw()
-                .minus(RobotStateYearly.get().getLatestFieldRobotPose().getRotation())
-                .getDegrees()
-            + 180;
+            .minus(RobotStateYearly.get().getLatestFieldRobotPose().getRotation())
+            .getDegrees();
 
-    if (targetRotation < 0) {
-      targetRotation += 360;
-    }
-
-    return targetRotation;
+    return MathUtil.inputModulus(targetRotation, 0, 360);
   }
 
   /**
