@@ -52,15 +52,15 @@ using namespace std;
 // Y position of the right edge of the net
 // Extra space added to account for the fact 
 // that fuel is not just a single point
-#define NET_RIGHT_EDGE HUB_POSITION.y + 0.741807 + 0.1
+#define NET_RIGHT_EDGE (HUB_POSITION.y + 0.741807 + 0.1)
 
 // Y position of the left edge of the net
 // Extra space added to account for the fact 
 // that fuel is not just a single point
-#define NET_LEFT_EDGE HUB_POSITION.y - 0.741807 - 0.1
+#define NET_LEFT_EDGE (HUB_POSITION.y - 0.741807 - 0.1)
 
 // X position of the net
-#define NET_X_POS HUB_POSITION.x + 0.857504
+#define NET_X_POS (HUB_POSITION.x + 0.857504)
 
 // Height of the trench from the ground
 #define TRENCH_HEIGHT 1.02235
