@@ -3,6 +3,7 @@ package com.aembot.lib.subsystems.aprilvision.io;
 import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
+import com.aembot.lib.math.PositionUtil;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionInputs;
 import com.aembot.lib.subsystems.aprilvision.interfaces.AprilCameraIO;
@@ -11,9 +12,7 @@ import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers;
 import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers.PoseEstimate;
 import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.List;
@@ -67,7 +66,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
     if (inputs.hasTag && inputs.tagID >= 1 && inputs.tagID <= fieldConstants.getNumTags()) {
       inputs.tagPosition = fieldConstants.getAprilTagPose3d(inputs.tagID);
     } else {
-      inputs.tagPosition = new Pose3d(Double.NaN, Double.NaN, Double.NaN, new Rotation3d());
+      inputs.tagPosition = PositionUtil.NaN.POSE3D;
     }
 
     VisionPoseEstimation coprocessorPoseEstimation = getMegatag2Estimate();
