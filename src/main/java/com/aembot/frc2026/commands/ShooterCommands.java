@@ -18,16 +18,8 @@ public final class ShooterCommands {
     this.flywheel = flywheel;
   }
 
-  public Command createHoodStopCommand() {
-    return hood.smartVelocitySetpointCommand(() -> 0);
-  }
-
-  public Command createHoodUpCommand() {
-    return hood.smartVelocitySetpointCommand(() -> 30);
-  }
-
-  public Command createHoodDownCommand() {
-    return hood.smartVelocitySetpointCommand(() -> -30);
+  public Command createHoodHoldPositionCommand() {
+    return hood.smartPositionSetpointCommand(hood::getCurrentPosition);
   }
 
   public Command createTurretStopCommand() {
