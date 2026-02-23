@@ -6,13 +6,9 @@ import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvToBeanBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
@@ -97,34 +93,29 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
   public Translation3d getFuelInitVelocity(
       Pose2d robotPose, ChassisSpeeds fieldRelativeChassisSpeeds) {
 
-    Transform2d latencyCompansationRobotPoseChange =
-        new Transform2d(
-            new Translation2d(
-                fieldRelativeChassisSpeeds.vxMetersPerSecond
-                    * Units.millisecondsToSeconds(
-                        RobotRuntimeConstants.AUTO_AIM_LATENCY_COMPENSATION_MS),
-                fieldRelativeChassisSpeeds.vyMetersPerSecond
-                    * Units.millisecondsToSeconds(
-                        RobotRuntimeConstants.AUTO_AIM_LATENCY_COMPENSATION_MS)),
-            new Rotation2d(
-                fieldRelativeChassisSpeeds.omegaRadiansPerSecond
-                    * Units.millisecondsToSeconds(
-                        RobotRuntimeConstants.AUTO_AIM_LATENCY_COMPENSATION_MS)));
+    double compensatedX =
+        robotPose.getX()
+            + fieldRelativeChassisSpeeds.vxMetersPerSecond
+                * RobotRuntimeConstants.AUTO_AIM_LATENCY_COMPENSATION_MS;
+    double compensatedY =
+        robotPose.getY()
+            + fieldRelativeChassisSpeeds.vyMetersPerSecond
+                * RobotRuntimeConstants.AUTO_AIM_LATENCY_COMPENSATION_MS;
 
-    Pose2d latencyCompensatedRobotPose = robotPose.plus(latencyCompansationRobotPoseChange);
+    Translation3d velocity = getPoint(compensatedX, compensatedY).orElse(Translation3d.kZero);
 
-    Translation3d velocity =
-        getPoint(latencyCompensatedRobotPose.getX(), latencyCompensatedRobotPose.getY())
-            .orElse(Translation3d.kZero)
-            .minus(
-                new Translation3d(
-                    fieldRelativeChassisSpeeds.vxMetersPerSecond,
-                    fieldRelativeChassisSpeeds.vyMetersPerSecond,
-                    0));
     Logger.recordOutput(
         "AutoAim/" + fileName,
-        new Pose3d(velocity.plus(new Translation3d(robotPose.getTranslation())), Rotation3d.kZero));
-    return velocity;
+        new Pose3d(
+            velocity.getX() + robotPose.getY(),
+            velocity.getY() + robotPose.getY(),
+            velocity.getZ(),
+            Rotation3d.kZero));
+
+    return new Translation3d(
+        velocity.getX() - fieldRelativeChassisSpeeds.vxMetersPerSecond,
+        velocity.getY() - fieldRelativeChassisSpeeds.vyMetersPerSecond,
+        velocity.getZ());
   }
 
   /**
