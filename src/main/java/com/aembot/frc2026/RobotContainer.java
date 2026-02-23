@@ -5,10 +5,9 @@
 package com.aembot.frc2026;
 
 import com.aembot.frc2026.commands.CommandFactory;
-import com.aembot.frc2026.constants.RobotRuntimeConstants;
-import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.subsystems.SubsystemFactory;
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
+import com.aembot.frc2026.util.AutoHelper;
 import com.aembot.lib.core.logging.Loggerable;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
@@ -16,9 +15,8 @@ import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
-import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.littletonrobotics.junction.LoggedRobot;
 
@@ -73,15 +71,11 @@ public class RobotContainer implements Loggerable {
             flywheelSubsystem,
             turretSubsystem);
 
-    AutoBuilder.configure(
-        () -> RobotStateYearly.get().getLatestFieldRobotPose(),
-        (pose) -> driveSubsystem.resetPose(pose),
-        () -> RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds(),
-        (speeds, feedforwards) -> driveSubsystem.setRequestFromChassisSpeeds(speeds),
-        RobotRuntimeConstants.ROBOT_CONFIG.getDrivetrainConfiguration().autoController,
-        RobotRuntimeConstants.getPathplannerConfig(),
-        () -> RobotRuntimeConstants.isRedAlliance(),
-        driveSubsystem);
+    AutoHelper.setupAutoBuilder(driveSubsystem);
+
+    AutoHelper.setupAutoChooser();
+
+    SmartDashboard.putData("Choose Auto Routine", AutoHelper.autoChooser);
 
     configureBindings();
   }
@@ -110,6 +104,6 @@ public class RobotContainer implements Loggerable {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return Commands.none();
+    return AutoHelper.autoChooser.getSelected();
   }
 }
