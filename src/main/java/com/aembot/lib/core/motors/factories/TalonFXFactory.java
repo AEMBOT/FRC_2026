@@ -45,7 +45,7 @@ public class TalonFXFactory {
     CTREUtil.Configuration.Motors.applyConfiguration(talon, config);
 
     // Set update rate of our CANDeviceID status signal to update at 100 hz
-    device.setStatusSignal(talon.getSupplyVoltage(), 100);
+    device.setStatusSignal(talon.getSupplyVoltage(), 10);
 
     // Automatically register the Talon with the CAN status logger upon creation
     CANStatusLogger.get(device.getBusName()).registerCANDevice(device);
@@ -62,7 +62,7 @@ public class TalonFXFactory {
     TalonFX talon = createRaw(device);
 
     // Set update rate of our CANDeviceID status signal to update at 100 hz
-    device.setStatusSignal(talon.getSupplyVoltage(), 100);
+    device.setStatusSignal(talon.getSupplyVoltage(), 10);
 
     // Automatically register the Talon with the CAN status logger upon creation
     CANStatusLogger.get(device.getBusName()).registerCANDevice(device);

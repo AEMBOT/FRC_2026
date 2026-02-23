@@ -112,12 +112,12 @@ public class CANStatusLogger implements Loggable {
 
       moduleConfig
           .getDriveMotorID()
-          .setStatusSignal(module.getDriveMotor().getSupplyVoltage(), 100);
+          .setStatusSignal(module.getDriveMotor().getSupplyVoltage(), 10);
       moduleConfig
           .getSteerMotorID()
-          .setStatusSignal(module.getSteerMotor().getSupplyVoltage(), 100);
-      moduleConfig.getSteerEncoderID().setStatusSignal(module.getEncoder().getSupplyVoltage(), 100);
-      gyroDevice.setStatusSignal(drivetrain.getPigeon2().getSupplyVoltage(), 100);
+          .setStatusSignal(module.getSteerMotor().getSupplyVoltage(), 10);
+      moduleConfig.getSteerEncoderID().setStatusSignal(module.getEncoder().getSupplyVoltage(), 10);
+      gyroDevice.setStatusSignal(drivetrain.getPigeon2().getSupplyVoltage(), 10);
 
       devices.add(moduleConfig.getDriveMotorID());
       devices.add(moduleConfig.getSteerMotorID());
