@@ -183,6 +183,10 @@ public final class ShooterCommands {
             .minus(RobotStateYearly.get().getLatestFieldRobotPose().getRotation())
             .getDegrees();
 
+    // Add 180 to turret rotation because 'forward' according to the turret is actually 180 degrees
+    // offset from what forward is
+    targetRotation += 180;
+
     return MathUtil.inputModulus(targetRotation, 0, 360);
   }
 
