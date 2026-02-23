@@ -265,11 +265,18 @@ public final class ShooterCommands {
 
     Pose2d robotPose = RobotStateYearly.get().getLatestFieldRobotPose();
 
+    Translation2d turretPosition =
+        RobotRuntimeConstants.ROBOT_CONFIG
+            .getTurretConfig()
+            .kTurretOriginPose
+            .getTranslation()
+            .toTranslation2d();
+
     SimulatedArena.getInstance()
         .addGamePieceProjectile(
             new RebuiltFuelOnFly(
                     robotPose.getTranslation(),
-                    new Translation2d(),
+                    turretPosition,
                     RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds(),
                     new Rotation2d(Units.degreesToRadians(turret.getCurrentPosition() + 180))
                         .plus(robotPose.getRotation()),
