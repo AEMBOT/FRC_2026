@@ -110,9 +110,9 @@ public class CANStatusLogger implements Loggable {
       SwerveModuleConfiguration<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
           moduleConfig = moduleConfigurations.get(i);
 
-      moduleConfig.getDriveMotorID().setStatusSignal(module.getDriveMotor().getSupplyVoltage(), 10);
-      moduleConfig.getSteerMotorID().setStatusSignal(module.getSteerMotor().getSupplyVoltage(), 10);
-      moduleConfig.getSteerEncoderID().setStatusSignal(module.getEncoder().getSupplyVoltage(), 10);
+      moduleConfig.getDriveMotorID().setStatusSignal(module.getDriveMotor().getSupplyVoltage());
+      moduleConfig.getSteerMotorID().setStatusSignal(module.getSteerMotor().getSupplyVoltage());
+      moduleConfig.getSteerEncoderID().setStatusSignal(module.getEncoder().getSupplyVoltage());
       gyroDevice.setStatusSignal(drivetrain.getPigeon2().getSupplyVoltage(), 10);
 
       devices.add(moduleConfig.getDriveMotorID());
