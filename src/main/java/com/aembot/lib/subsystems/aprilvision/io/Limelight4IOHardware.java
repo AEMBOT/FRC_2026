@@ -15,8 +15,17 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableEvent;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import org.opencv.core.Point;
 
 public class Limelight4IOHardware implements AprilCameraIO {
@@ -30,6 +39,14 @@ public class Limelight4IOHardware implements AprilCameraIO {
    */
   public final String cameraName;
 
+  protected final NetworkTable networkTable;
+
+  /**
+   * double NT entry indicating the heartbeat of the limelight. "hb" on network table. Resets at
+   * two-billion
+   */
+  protected final NetworkTableEntry heartbeatEntry;
+
   protected final List<Point> tagCorners =
       List.of(new Point(), new Point(), new Point(), new Point());
 
@@ -41,6 +58,25 @@ public class Limelight4IOHardware implements AprilCameraIO {
    */
   private double lastMegatag2Timestamp = Double.NaN;
 
+  /* ---- ASYNCHRONOUSLY UPDATED FIELDS ---- */
+  private AtomicReference<Double> latencyMs = new AtomicReference<>(0.0);
+
+  private AtomicBoolean hasTag = new AtomicBoolean(false);
+
+  private AtomicInteger tagID = new AtomicInteger(-1);
+
+  private AtomicReference<Rotation2d> horizontalAngleToTagRadians =
+      new AtomicReference<>(PositionUtil.NaN.ROTATION2D);
+
+  private AtomicReference<double[]> tagCornerPositionsRaw = new AtomicReference<>(new double[0]);
+
+  private AtomicReference<PoseEstimate> megatag2Estimate =
+      new AtomicReference<>(new PoseEstimate());
+
+  private AtomicReference<double[]> limelightStdDevs = new AtomicReference<>(new double[0]);
+
+  protected final Consumer<NetworkTableEvent> heartbeatCallback = this::updateNtValuesCache;
+
   public Limelight4IOHardware(
       CameraConfiguration config,
       YearFieldConstantable fieldConstants,
@@ -49,17 +85,41 @@ public class Limelight4IOHardware implements AprilCameraIO {
     this.cameraName = "limelight-" + config.cameraName;
     this.fieldConstants = fieldConstants;
     this.robotStateInstance = robotStateInstance;
+
+    this.networkTable = NetworkTableInstance.getDefault().getTable(cameraName);
+    this.heartbeatEntry = networkTable.getEntry("hb");
+
+    NetworkTableInstance.getDefault()
+        .addListener(
+            heartbeatEntry, EnumSet.of(NetworkTableEvent.Kind.kValueAll), heartbeatCallback);
+  }
+
+  /**
+   * Updates the cached values from NetworkTables. Called asynchronously as {@link
+   * #heartbeatCallback} for every limelight heartbeat
+   */
+  public void updateNtValuesCache(NetworkTableEvent event) {
+    latencyMs.set(
+        LimelightHelpers.getLatency_Capture(cameraName)
+            + LimelightHelpers.getLatency_Pipeline(cameraName));
+
+    hasTag.set(LimelightHelpers.getTV(cameraName));
+    tagID.set((int) LimelightHelpers.getFiducialID(cameraName));
+    horizontalAngleToTagRadians.set(Rotation2d.fromDegrees(LimelightHelpers.getTX(cameraName)));
+    tagCornerPositionsRaw.set(LimelightHelpers.getCornerCoordinates(cameraName));
+
+    megatag2Estimate.set(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName));
+
+    limelightStdDevs.set(LimelightExtras.getStandardDeviations(cameraName));
   }
 
   @Override
   public void updateInputs(AprilVisionInputs inputs) {
-    inputs.latency =
-        LimelightHelpers.getLatency_Capture(cameraName)
-            + LimelightHelpers.getLatency_Pipeline(cameraName);
+    inputs.latency = latencyMs.get();
 
-    inputs.hasTag = LimelightHelpers.getTV(cameraName);
-    inputs.tagID = (int) LimelightHelpers.getFiducialID(cameraName);
-    inputs.horizontalAngleToTag = Rotation2d.fromDegrees(LimelightHelpers.getTX(cameraName));
+    inputs.hasTag = hasTag.get();
+    inputs.tagID = tagID.get();
+    inputs.horizontalAngleToTag = horizontalAngleToTagRadians.get();
 
     updateCornerPositions();
     inputs.tagCornerPositions = this.tagCorners;
@@ -93,7 +153,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
     double robotYaw = robotStateInstance.getLatestFieldRobotPose().getRotation().getDegrees();
     LimelightHelpers.SetRobotOrientation(cameraName, robotYaw, 0, 0, 0, 0, 0);
 
-    PoseEstimate estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
+    PoseEstimate estimate = megatag2Estimate.get();
     // Check that there actually is an estimate, and that we haven't processed it yet
     if (estimate.tagCount > 0 && estimate.timestampSeconds != lastMegatag2Timestamp) {
       Pose2d latencyUncompensatedPose = estimate.pose;
@@ -120,7 +180,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
    * representing the corner positions in pixels
    */
   private void updateCornerPositions() {
-    double[] cornerPositions = LimelightHelpers.getCornerCoordinates(cameraName);
+    double[] cornerPositions = tagCornerPositionsRaw.get();
 
     if (cornerPositions.length >= 8) {
       // 4 iterations bcuz we process 2 at a time
@@ -133,7 +193,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
   /** Get standard deviations for the given pose estimate */
   protected OdometryStandardDevs getStdDevs(PoseEstimate estimate) {
-    double[] doubleArray = LimelightExtras.getStandardDeviations(cameraName);
+    double[] doubleArray = limelightStdDevs.get();
 
     return adjustStdDevsWithOdomPose(
         new OdometryStandardDevs(doubleArray[0], doubleArray[1], doubleArray[5]),
