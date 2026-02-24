@@ -35,7 +35,7 @@ public class ProductionIntakeConfig {
 
   public final NeutralMode DEPLOY_NEUTRAL_MODE = NeutralMode.BRAKE;
 
-  public final double ZEROING_SPEED_DEG_PER_SEC = 45;
+  public final double ZEROING_VOLTAGE = 2.0;
 
   public final String SUBSYSTEM_NAME = "IntakeSubsystem";
 
@@ -129,7 +129,7 @@ public class ProductionIntakeConfig {
       new TalonFXOverBumperIntakeDeployConfiguration(SUBSYSTEM_NAME + "Deploy")
           .withRealMotorConfiguration(DEPLOY_MOTOR_CONFIG)
           .withSimulatedMotorConfiguration(DEPLOY_SIM_MOTOR_CONFIG)
-          .withZeroingSpeed(ZEROING_SPEED_DEG_PER_SEC)
+          .withZeroingVoltage(ZEROING_VOLTAGE)
           .withIntakeSide(DEPLOY_SIDE)
           .withExtensionMeters(DEPLOY_EXTENSION_METERS)
           .withWidthMeters(INTAKE_WIDTH_METERS)

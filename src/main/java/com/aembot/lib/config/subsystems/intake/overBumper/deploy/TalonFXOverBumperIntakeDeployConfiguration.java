@@ -16,8 +16,8 @@ public class TalonFXOverBumperIntakeDeployConfiguration {
   /** Motor configuration for simulated subsystem */
   public SimulatedMotorConfiguration<TalonFXConfiguration> kSimMotorConfig;
 
-  /** Speed at which to run the motor while zeroing, in degrees per second. Used in sim */
-  public double kZeroingSpeedDegPerSec;
+  /** Voltage to apply to the motor while zeroing. Should be positive. */
+  public double kZeroingVoltage;
 
   /** The width of the intake in meters when deployed. Used in sim. */
   public double kWidthMeters;
@@ -42,6 +42,9 @@ public class TalonFXOverBumperIntakeDeployConfiguration {
   /** The angle of the downwards hardstop in degrees */
   public double kDownwardsZeroAngleDeg;
 
+  /** The angle of the upwards hardstop in degrees */
+  public double kUpwardsZeroAngleDeg;
+
   public TalonFXOverBumperIntakeDeployConfiguration(String name) {
     this.kName = name;
   }
@@ -59,11 +62,11 @@ public class TalonFXOverBumperIntakeDeployConfiguration {
   }
 
   /**
-   * @param zeroingSpeed Speed at which to run the motor while zeroing, in degrees per second
+   * @param zeroingVoltage Voltage to apply to the motor while zeroing. Should be positive.
    * @return A reference to this object for chaining
    */
-  public TalonFXOverBumperIntakeDeployConfiguration withZeroingSpeed(double zeroingSpeed) {
-    this.kZeroingSpeedDegPerSec = zeroingSpeed;
+  public TalonFXOverBumperIntakeDeployConfiguration withZeroingVoltage(double zeroingVoltage) {
+    this.kZeroingVoltage = zeroingVoltage;
     return this;
   }
 
@@ -128,6 +131,18 @@ public class TalonFXOverBumperIntakeDeployConfiguration {
   public TalonFXOverBumperIntakeDeployConfiguration withDownwardsZeroAngleDeg(
       double downwardsZeroAngleDeg) {
     this.kDownwardsZeroAngleDeg = downwardsZeroAngleDeg;
+    return this;
+  }
+
+  /**
+   * Set the angle of the upwards hardstop in degrees. This is used for zeroing the intake when
+   * deployed upwards.
+   *
+   * @return A reference to this object for chaining
+   */
+  public TalonFXOverBumperIntakeDeployConfiguration withUpwardsZeroAngleDeg(
+      double upwardsZeroAngleDeg) {
+    this.kUpwardsZeroAngleDeg = upwardsZeroAngleDeg;
     return this;
   }
 }
