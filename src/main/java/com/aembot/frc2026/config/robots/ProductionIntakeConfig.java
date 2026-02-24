@@ -23,9 +23,9 @@ public class ProductionIntakeConfig {
 
   public final int ROLLER_CAN_ID = 50;
 
-  public final double UP_DEPLOY_ANGLE = 90;
+  public final double UP_DEPLOY_ANGLE = 120;
 
-  public final double DOWN_DEPLOY_ANGLE = 0;
+  public final double DOWN_DEPLOY_ANGLE = 36.64655; // Extremely temporary
 
   public final double STARTING_ANGLE_DEG = 131.67;
 
@@ -33,7 +33,7 @@ public class ProductionIntakeConfig {
 
   public final boolean DEPLOY_MOTOR_INVERTED = true;
 
-  public final NeutralMode DEPLOY_NEUTRAL_MODE = NeutralMode.COAST;
+  public final NeutralMode DEPLOY_NEUTRAL_MODE = NeutralMode.BRAKE;
 
   public final double ZEROING_SPEED_DEG_PER_SEC = 45;
 
@@ -73,7 +73,7 @@ public class ProductionIntakeConfig {
                               Units.degreesToRotations(DEPLOY_ACCELERATION_DEG_PER_SEC)
                                   * DEPLOY_GEAR_RATIO))
                   // constants copies from hood config
-                  .withSlot0(new Slot0Configs().withKP(.1).withKV(.12))
+                  .withSlot0(new Slot0Configs().withKP(1).withKV(0))
                   .withMotorOutput(
                       new MotorOutputConfigs()
                           .withInverted(
@@ -116,7 +116,7 @@ public class ProductionIntakeConfig {
   public final SimulatedMotorConfiguration<TalonFXConfiguration> DEPLOY_SIM_MOTOR_CONFIG =
       new SimulatedMotorConfiguration<TalonFXConfiguration>()
           .withRealConfiguration(DEPLOY_MOTOR_CONFIG)
-          .withStartingRotation(90)
+          .withStartingRotation(STARTING_ANGLE_DEG)
           .withSimMotorConstants(DCMotor.getKrakenX60(1));
 
   public final SimulatedMotorConfiguration<TalonFXConfiguration> ROLLER_SIM_MOTOR_CONFIG =
@@ -133,7 +133,9 @@ public class ProductionIntakeConfig {
           .withIntakeSide(DEPLOY_SIDE)
           .withExtensionMeters(DEPLOY_EXTENSION_METERS)
           .withWidthMeters(INTAKE_WIDTH_METERS)
-          .withPivotPoint(DEPLOY_PIVOT_POINT);
+          .withPivotPoint(DEPLOY_PIVOT_POINT)
+          .withInitialAngleDeg(STARTING_ANGLE_DEG)
+          .withDownwardsZeroAngleDeg(ZERO_ANGLE_DEG);
 
   public final TalonFXOverBumperIntakeRollerConfiguration ROLLER_CONFIG =
       new TalonFXOverBumperIntakeRollerConfiguration(SUBSYSTEM_NAME + "Roller")
