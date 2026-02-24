@@ -36,6 +36,12 @@ public class TalonFXOverBumperIntakeDeployConfiguration {
    */
   public Pose3d kPivotPoint;
 
+  /** The starting angle of the intake in degrees */
+  public double kInitialAngleDeg;
+
+  /** The angle of the downwards hardstop in degrees */
+  public double kDownwardsZeroAngleDeg;
+
   public TalonFXOverBumperIntakeDeployConfiguration(String name) {
     this.kName = name;
   }
@@ -100,6 +106,28 @@ public class TalonFXOverBumperIntakeDeployConfiguration {
    */
   public TalonFXOverBumperIntakeDeployConfiguration withPivotPoint(Pose3d pivotPoint) {
     this.kPivotPoint = pivotPoint;
+    return this;
+  }
+
+  /**
+   * Set the starting angle of the intake in degrees.
+   *
+   * @return A reference to this object for chaining
+   */
+  public TalonFXOverBumperIntakeDeployConfiguration withInitialAngleDeg(double initialAngleDeg) {
+    this.kInitialAngleDeg = initialAngleDeg;
+    return this;
+  }
+
+  /**
+   * Set the angle of the downwards hardstop in degrees. This is used for zeroing the intake when
+   * deployed downwards.
+   *
+   * @return A reference to this object for chaining
+   */
+  public TalonFXOverBumperIntakeDeployConfiguration withDownwardsZeroAngleDeg(
+      double downwardsZeroAngleDeg) {
+    this.kDownwardsZeroAngleDeg = downwardsZeroAngleDeg;
     return this;
   }
 }

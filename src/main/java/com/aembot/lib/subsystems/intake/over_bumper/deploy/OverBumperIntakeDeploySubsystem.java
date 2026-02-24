@@ -49,7 +49,7 @@ public class OverBumperIntakeDeploySubsystem
     this.state = new OverBumperIntakeDeployState();
     this.stateConsumer = stateConsumer;
 
-    this.setEncoderPosition(config.kRealMotorConfig.kMaxPositionUnits);
+    this.setEncoderPosition(config.kInitialAngleDeg);
   }
 
   /**
@@ -74,15 +74,21 @@ public class OverBumperIntakeDeploySubsystem
    *     encoder position
    */
   public Command getZeroDownwardCommand() {
-    return new InstantCommand(() -> setEncoderPosition(config.kRealMotorConfig.kMaxPositionUnits))
+    Timer timer = new Timer();
+    return new InstantCommand(
+            () -> {
+              setEncoderPosition(config.kRealMotorConfig.kMaxPositionUnits);
+              timer.restart();
+            })
         .andThen(
-            smartVelocitySetpointCommand(() -> -config.kZeroingSpeedDegPerSec)
-                .until(() -> (MathUtil.isNear(0, getCurrentVelocity(), 0.1)))
+            dutyCycleCommand(() -> -0.05)
+                .until(
+                    () -> (MathUtil.isNear(0, getCurrentVelocity(), 0.5) && timer.hasElapsed(0.1)))
                 .finallyDo(
                     () -> {
                       setEncoderPosition(
                           config.kRealMotorConfig.getUnitsToRotorRotations(
-                              config.kRealMotorConfig.kMinPositionUnits));
+                              config.kDownwardsZeroAngleDeg));
                     }));
   }
 
