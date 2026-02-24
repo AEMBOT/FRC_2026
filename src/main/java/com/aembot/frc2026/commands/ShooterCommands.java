@@ -5,6 +5,8 @@ import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import java.util.Set;
 
 public final class ShooterCommands {
 
@@ -19,7 +21,13 @@ public final class ShooterCommands {
   }
 
   public Command createHoodHoldPositionCommand() {
-    return hood.smartPositionSetpointCommand(hood::getCurrentPosition);
+    // return hood.smartPositionSetpointCommand(hood::getCurrentPosition);
+    return new DeferredCommand(
+        () -> {
+          double pos = hood.getCurrentPosition();
+          return hood.smartPositionSetpointCommand(() -> pos);
+        },
+        Set.of(hood));
   }
 
   public Command createTurretStopCommand() {

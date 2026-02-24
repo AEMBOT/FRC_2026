@@ -48,7 +48,7 @@ public class ProductionHoodConfig {
                               Units.degreesToRotations(CRUISE_VELOCITY_DEG_PER_SEC) * GEAR_RATIO)
                           .withMotionMagicAcceleration(
                               Units.degreesToRotations(ACCELERATION_DEG_PER_SEC) * GEAR_RATIO))
-                  .withSlot0(new Slot0Configs().withKP(66).withKV(.0).withKS(0.4))
+                  .withSlot0(new Slot0Configs().withKP(40).withKV(.0).withKS(0.4))
                   .withMotorOutput(
                       new MotorOutputConfigs()
                           .withInverted(
