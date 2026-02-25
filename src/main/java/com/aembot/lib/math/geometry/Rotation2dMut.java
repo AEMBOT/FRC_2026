@@ -24,7 +24,11 @@ public class Rotation2dMut implements StructSerializable {
   private double cos;
   private double sin;
 
-  /* ---- CONSTRUCTORS ---- */
+  /*
+   * |--------------------|
+   * |--- CONSTRUCTORS ---|
+   * |--------------------|
+   */
   public Rotation2dMut(double radians) {
     setRadians(radians);
   }
@@ -80,7 +84,11 @@ public class Rotation2dMut implements StructSerializable {
     this.sin = Math.sin(getRadians());
   }
 
-  /** ---- SETTERS ---- */
+  /*
+   * |---------------|
+   * |--- SETTERS ---|
+   * |---------------|
+   */
 
   /**
    * Set the value of this Rotation2dMut in radians. Returns self for chaining.
@@ -253,7 +261,11 @@ public class Rotation2dMut implements StructSerializable {
     return MatBuilder.fill(Nat.N2(), Nat.N2(), getCos(), -getSin(), getSin(), getCos());
   }
 
-  /* ---- OPERATIONS ---- */
+  /*
+   * |------------------|
+   * |--- OPERATIONS ---|
+   * |------------------|
+   */
 
   /**
    * Normalize the rotation to be within the range [-π, π].
@@ -433,6 +445,12 @@ public class Rotation2dMut implements StructSerializable {
     // literally just the subtract method, but it exists in Rotation2d & ig it's more inuitive?
     return subtract(otherRadians);
   }
+
+  /*
+   * |------------------------|
+   * |--- OBJECT OVERRIDES ---|
+   * |------------------------|
+   */
 
   @Override
   public String toString() {
