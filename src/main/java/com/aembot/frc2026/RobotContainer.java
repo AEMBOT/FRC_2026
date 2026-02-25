@@ -75,6 +75,8 @@ public class RobotContainer implements Loggerable {
 
     AutoHelper.setupAutoChooser();
 
+    AutoHelper.registerAutoCommands(commandFactory);
+
     SmartDashboard.putData("Choose Auto Routine", AutoHelper.autoChooser);
 
     configureBindings();
