@@ -3,6 +3,7 @@ package com.aembot.lib.config.subsystems.hood;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Translation3d;
 
 public class TalonFXHoodConfiguration {
 
@@ -12,6 +13,12 @@ public class TalonFXHoodConfiguration {
 
   /** The origin pose of the hood for visualization in advantagescope. */
   public Pose3d kHoodOriginPose;
+
+  /**
+   * The robot-relative or turret-relative (if turret present) point at which game-pieces exit the
+   * shooter. Used in sim.
+   */
+  public Translation3d kGamePieceExitPoint = new Translation3d();
 
   /** The amount of units we can be off and still shoot */
   public double kAutoAimLeniance;
@@ -29,6 +36,17 @@ public class TalonFXHoodConfiguration {
    */
   public TalonFXHoodConfiguration withHoodOriginPose(Pose3d hoodOriginPose) {
     this.kHoodOriginPose = hoodOriginPose;
+    return this;
+  }
+
+  /**
+   * Set the robot-relative or turret-relative (if turret present) point at which game-pieces exit
+   * the shooter. Used in sim.
+   *
+   * @return This {@link TalonFXHoodConfiguration} for chaining
+   */
+  public TalonFXHoodConfiguration withGamePieceExitPoint(Translation3d gamePieceExitPoint) {
+    this.kGamePieceExitPoint = gamePieceExitPoint;
     return this;
   }
 

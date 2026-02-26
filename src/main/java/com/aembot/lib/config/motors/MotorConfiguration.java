@@ -5,7 +5,6 @@
 package com.aembot.lib.config.motors;
 
 import com.aembot.lib.core.can.CANDeviceID;
-import com.aembot.lib.core.motors.interfaces.MotorIO.NeutralMode;
 
 /**
  * Configuration for treating a motor as effectively a servo
@@ -53,9 +52,6 @@ public class MotorConfiguration<T> {
    * rotational speed)
    */
   public double kMomentOfInertia = 0.5;
-
-  /** The neutral mode of the motor */
-  public NeutralMode kNeutralMode = NeutralMode.BRAKE;
 
   /**
    * Convert the current rotor rotations to the real-world units specified scaled by the
@@ -202,17 +198,6 @@ public class MotorConfiguration<T> {
    */
   public MotorConfiguration<T> withMomentOfInertia(double moi) {
     this.kMomentOfInertia = moi;
-    return this;
-  }
-
-  /**
-   * Update the neutral mode of the motor
-   *
-   * @param mode The neutral mode to set
-   * @return Reference to this motor configuration for chaining
-   */
-  public MotorConfiguration<T> withNeutralMode(NeutralMode mode) {
-    this.kNeutralMode = mode;
     return this;
   }
 }

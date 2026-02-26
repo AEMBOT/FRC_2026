@@ -26,8 +26,8 @@ import java.util.List;
 public class ProductionConfig extends RobotConfiguration {
   private static final String ROBOT_NAME = "Timothy";
 
-  private static final String DRIVETRAIN_BUS_NAME = "drivetrain";
-  private static final String PRIMARY_BUS_NAME = "rio"; // TODO
+  private static final String DRIVETRAIN_BUS_NAME = "Clyde";
+  private static final String PRIMARY_BUS_NAME = "rio";
   private static final List<String> CAN_BUS_NAMES = List.of(DRIVETRAIN_BUS_NAME, PRIMARY_BUS_NAME);
 
   private static final PhysicalConfiguration PHYSICAL_CONFIGURATION =

@@ -5,12 +5,35 @@ import com.aembot.lib.core.motors.MotorInputs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.Pair;
 
 public interface MotorIO {
   public enum NeutralMode {
     COAST,
-    BRAKE
+    BRAKE,
+    ;
+
+    public static NeutralMode fromCTRENeutralMode(
+        com.ctre.phoenix6.signals.NeutralModeValue value) {
+      switch (value) {
+        case Brake:
+          return BRAKE;
+        case Coast:
+        default:
+          return COAST;
+      }
+    }
+
+    public NeutralModeValue toCTRENeutralMode() {
+      switch (this) {
+        case BRAKE:
+          return NeutralModeValue.Brake;
+        case COAST:
+        default:
+          return NeutralModeValue.Coast;
+      }
+    }
   }
 
   public enum FollowDirection {

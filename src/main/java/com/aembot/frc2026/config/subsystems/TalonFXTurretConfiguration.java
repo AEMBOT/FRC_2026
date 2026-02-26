@@ -88,7 +88,7 @@ public class TalonFXTurretConfiguration {
   }
 
   public TalonFXTurretConfiguration withCANcoderBOffset(double CANcoderBOffset) {
-    this.kCANcoderAOffset = CANcoderBOffset;
+    this.kCANcoderBOffset = CANcoderBOffset;
     return this;
   }
 

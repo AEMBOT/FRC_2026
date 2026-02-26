@@ -7,6 +7,7 @@ import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
 import com.aembot.lib.subsystems.base.AEMSubsystem;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
@@ -29,6 +30,8 @@ public class AprilVisionSubsystem extends AEMSubsystem {
 
   @Override
   public void periodic() {
+    double timestamp = Timer.getFPGATimestamp();
+
     List<AprilCameraOutput> aprilTagObservations = new ArrayList<>();
 
     for (Pair<AprilCameraIO, AprilVisionInputs> cameraWithInput : camerasWithInputs) {
@@ -65,6 +68,10 @@ public class AprilVisionSubsystem extends AEMSubsystem {
       Logger.recordOutput(
           logPrefixStandard + "/VisionEstimatedRobotPose", observation.estimatedPose());
     }
+
+    // Log latency with time between periodic being called and finishing
+    Logger.recordOutput(
+        logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
   }
 
   @Override

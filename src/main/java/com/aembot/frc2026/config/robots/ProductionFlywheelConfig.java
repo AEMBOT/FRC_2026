@@ -19,6 +19,8 @@ public class ProductionFlywheelConfig {
   public static final double ACCELERATION_METERS_PER_SEC = 32.0;
   public static final double JERK = 0.0;
 
+  public static final double VELOCITY_TOLERANCE_METERS_PER_SEC = 0.2;
+
   public static final double GEAR_RATIO = 1.0;
 
   public static final double J_KG_METERS_SQ = 0.01;
@@ -26,9 +28,8 @@ public class ProductionFlywheelConfig {
   public static final double SHOOTER_WHEEL_RADIUS = Units.inchesToMeters(2.0);
   public static final double SHOOTER_WHEEL_CIRCUMFERENCE = 2.0 * Math.PI * SHOOTER_WHEEL_RADIUS;
 
-  public static final double UNITS_TO_ROTOR_RATIO =
-      1.0 / (SHOOTER_WHEEL_CIRCUMFERENCE * GEAR_RATIO);
-  public static final double UNITS_TO_MECHANISM_ROTATION_RATIO = 1.0 / SHOOTER_WHEEL_CIRCUMFERENCE;
+  public static final double UNITS_TO_ROTOR_RATIO = SHOOTER_WHEEL_CIRCUMFERENCE / GEAR_RATIO;
+  public static final double UNITS_TO_MECHANISM_ROTATION_RATIO = SHOOTER_WHEEL_CIRCUMFERENCE;
 
   public static final ConfigureSlot0Gains MOTOR_GAINS =
       new ConfigureSlot0Gains(1.0, 0.0, 0.0, 0.0, 0.0, 0.1222, 0.0);
@@ -54,9 +55,9 @@ public class ProductionFlywheelConfig {
                   .withMotionMagic(
                       new MotionMagicConfigs()
                           .withMotionMagicCruiseVelocity(
-                              CRUISE_VELOCITY_METERS_PER_SEC * UNITS_TO_ROTOR_RATIO)
+                              CRUISE_VELOCITY_METERS_PER_SEC / UNITS_TO_ROTOR_RATIO)
                           .withMotionMagicAcceleration(
-                              ACCELERATION_METERS_PER_SEC * UNITS_TO_ROTOR_RATIO)
+                              ACCELERATION_METERS_PER_SEC / UNITS_TO_ROTOR_RATIO)
                           .withMotionMagicJerk(JERK)))
           .withCANDevice(
               new CANDeviceID(
@@ -74,6 +75,7 @@ public class ProductionFlywheelConfig {
 
   public final TalonFXFlywheelConfiguration CONFIG =
       new TalonFXFlywheelConfiguration(FLYWHEEL_SUBSYTEM_NAME)
+          .withSpeedToleranceUnitsPerSecond(VELOCITY_TOLERANCE_METERS_PER_SEC)
           .withRealMotorConfig(MOTOR_CONFIG)
           .withSimulatedMotorConfig(SIM_MOTOR_CONFIG)
           .withAutoAimLeniance(AUTO_AIM_LENCIANCY);

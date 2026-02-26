@@ -10,9 +10,12 @@ import com.aembot.lib.config.sensors.timeOfFlight.CANRangeTimeOfFlightConfigurat
 import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.aembot.lib.core.can.CANDeviceID.CANDeviceType;
+import com.aembot.lib.core.motors.interfaces.MotorIO.NeutralMode;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -31,6 +34,10 @@ public final class ProductionIndexerConfig {
     static final double GEAR_RATIO = 3.0 / 1.0;
 
     static final int MOTOR_CAN_ID = 54;
+
+    static final boolean MOTOR_INVERTED = true;
+
+    static final NeutralMode MOTOR_NEUTRAL_MODE = NeutralMode.BRAKE;
 
     // constants copied from hood config
     static final Slot0Configs MOTOR_GAINS = new Slot0Configs().withKP(.1).withKV(.12);
@@ -86,7 +93,14 @@ public final class ProductionIndexerConfig {
                           new MotionMagicConfigs()
                               .withMotionMagicCruiseVelocity((TARGET_SPEED_RPM / 60) * GEAR_RATIO)
                               .withMotionMagicAcceleration((ACCELERATION_RPM / 60) * GEAR_RATIO))
-                      .withSlot0(MOTOR_GAINS))
+                      .withSlot0(MOTOR_GAINS)
+                      .withMotorOutput(
+                          new MotorOutputConfigs()
+                              .withInverted(
+                                  MOTOR_INVERTED
+                                      ? InvertedValue.CounterClockwise_Positive
+                                      : InvertedValue.Clockwise_Positive)
+                              .withNeutralMode(MOTOR_NEUTRAL_MODE.toCTRENeutralMode())))
               .withMomentOfInertia(0.01)
               .withCANDevice(
                   new CANDeviceID(
@@ -125,6 +139,10 @@ public final class ProductionIndexerConfig {
     static final int MOTOR_CAN_ID = 55;
     static final int CANRANGE_CAN_ID = 45;
 
+    static final boolean MOTOR_INVERTED = true;
+
+    static final NeutralMode MOTOR_NEUTRAL_MODE = NeutralMode.BRAKE;
+
     // constants copied from hood config
     static final Slot0Configs MOTOR_GAINS = new Slot0Configs().withKP(.1).withKV(.12);
 
@@ -160,7 +178,14 @@ public final class ProductionIndexerConfig {
                       .withMotionMagic(
                           new MotionMagicConfigs()
                               .withMotionMagicAcceleration((ACCELERATION_RPM / 60) * GEAR_RATIO))
-                      .withSlot0(MOTOR_GAINS))
+                      .withSlot0(MOTOR_GAINS)
+                      .withMotorOutput(
+                          new MotorOutputConfigs()
+                              .withInverted(
+                                  MOTOR_INVERTED
+                                      ? InvertedValue.CounterClockwise_Positive
+                                      : InvertedValue.Clockwise_Positive)
+                              .withNeutralMode(MOTOR_NEUTRAL_MODE.toCTRENeutralMode())))
               .withMomentOfInertia(0.01)
               .withCANDevice(
                   new CANDeviceID(
@@ -211,6 +236,10 @@ public final class ProductionIndexerConfig {
 
     static final int MOTOR_CAN_ID = 56;
 
+    static final boolean MOTOR_INVERTED = true;
+
+    static final NeutralMode MOTOR_NEUTRAL_MODE = NeutralMode.BRAKE;
+
     // constants copied from hood config
     static final Slot0Configs MOTOR_GAINS = new Slot0Configs().withKP(.1).withKV(.12);
 
@@ -249,7 +278,14 @@ public final class ProductionIndexerConfig {
                       .withMotionMagic(
                           new MotionMagicConfigs()
                               .withMotionMagicAcceleration((ACCELERATION_RPM / 60) * GEAR_RATIO))
-                      .withSlot0(MOTOR_GAINS))
+                      .withSlot0(MOTOR_GAINS)
+                      .withMotorOutput(
+                          new MotorOutputConfigs()
+                              .withInverted(
+                                  MOTOR_INVERTED
+                                      ? InvertedValue.CounterClockwise_Positive
+                                      : InvertedValue.Clockwise_Positive)
+                              .withNeutralMode(MOTOR_NEUTRAL_MODE.toCTRENeutralMode())))
               .withMomentOfInertia(0.01)
               .withCANDevice(
                   new CANDeviceID(
