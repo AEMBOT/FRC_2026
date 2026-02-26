@@ -3,6 +3,7 @@ package com.aembot.lib.math.geometry;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 
+import com.aembot.lib.math.geometry.structs.Pose2dMutStruct;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -21,6 +22,8 @@ import java.util.Comparator;
 import java.util.Objects;
 
 public class Pose2dMut implements StructSerializable {
+  public static final Pose2dMutStruct struct = new Pose2dMutStruct();
+
   private final Translation2dMut translation;
   private final Rotation2dMut rotation;
 
@@ -241,16 +244,10 @@ public class Pose2dMut implements StructSerializable {
    */
 
   /**
-   * Transforms the pose by the given transformation and returns the new transformed pose.
+   * Add a pose, assuming both are field relative.
    *
-   * <pre>
-   * [x_new]    [cos, -sin, 0][transform.x]
-   * [y_new] += [sin,  cos, 0][transform.y]
-   * [t_new]    [  0,    0, 1][transform.t]
-   * </pre>
-   *
-   * @param other The transform to transform the pose by.
-   * @return The transformed pose.
+   * @param other The pose to add to this pose.
+   * @return This Pose2dMut for chaining
    */
   public Pose2dMut add(Pose2d other) {
     this.getTranslation().add(other.getTranslation());
@@ -259,16 +256,10 @@ public class Pose2dMut implements StructSerializable {
   }
 
   /**
-   * Transforms the pose by the given transformation and returns the new transformed pose.
+   * Add a pose, assuming both are field relative.
    *
-   * <pre>
-   * [x_new]    [cos, -sin, 0][transform.x]
-   * [y_new] += [sin,  cos, 0][transform.y]
-   * [t_new]    [  0,    0, 1][transform.t]
-   * </pre>
-   *
-   * @param other The transform to transform the pose by.
-   * @return This Pose2dMut for chaining.
+   * @param other The pose to add to this pose.
+   * @return This Pose2dMut for chaining
    */
   public Pose2dMut add(Pose2dMut other) {
     this.getTranslation().add(other.getTranslation());
@@ -277,16 +268,10 @@ public class Pose2dMut implements StructSerializable {
   }
 
   /**
-   * Transforms the pose by the given transformation and returns the new transformed pose.
+   * Add a pose, assuming both are field relative.
    *
-   * <pre>
-   * [x_new]    [cos, -sin, 0][transform.x]
-   * [y_new] += [sin,  cos, 0][transform.y]
-   * [t_new]    [  0,    0, 1][transform.t]
-   * </pre>
-   *
-   * @param other The transform to transform the pose by.
-   * @return This Pose2dMut for chaining.
+   * @param other The pose to add to this pose.
+   * @return This Pose2dMut for chaining
    */
   public Pose2dMut add(Transform2d other) {
     this.getTranslation().add(other.getTranslation());
@@ -295,7 +280,7 @@ public class Pose2dMut implements StructSerializable {
   }
 
   /**
-   * Subtract the given pose from this one.
+   * Subtract the given pose from this one, assuming both are field relative
    *
    * @param other The initial pose of the transformation.
    * @return This Pose2dMut for chaining.
@@ -307,7 +292,7 @@ public class Pose2dMut implements StructSerializable {
   }
 
   /**
-   * Subtract the given pose from this one.
+   * Subtract the given pose from this one, assuming both are field relative
    *
    * @param other The initial pose of the transformation.
    * @return This Pose2dMut for chaining.
@@ -319,7 +304,7 @@ public class Pose2dMut implements StructSerializable {
   }
 
   /**
-   * Subtract the given pose from this one.
+   * Subtract the given pose from this one, assuming both are field relative
    *
    * @param other The initial pose of the transformation.
    * @return This Pose2dMut for chaining.
@@ -327,6 +312,93 @@ public class Pose2dMut implements StructSerializable {
   public Pose2dMut subtract(Transform2d other) {
     this.getTranslation().subtract(other.getTranslation());
     this.getRotation().subtract(other.getRotation());
+    return this;
+  }
+
+  /**
+   * Transform this pose in a robot-relative manner.
+   *
+   * <pre>
+   * [x_new]    [cos, -sin, 0][transform.x]
+   * [y_new] += [sin,  cos, 0][transform.y]
+   * [t_new]    [  0,    0, 1][transform.t]
+   * </pre>
+   *
+   * @param transform A transform that is relative to this pose.
+   * @return This Pose2dMut for chaining
+   */
+  public Pose2dMut transformBy(Pose2dMut transform) {
+    // Perform this math here instead of using the methods to avoid unneeded allocation of copying
+    // the transform
+    double fieldRelativeTransformX =
+        transform.getX() * getRotation().getCos()
+            - transform.getTranslation().getY() * getRotation().getSin();
+    double fieldRelativeTransformY =
+        transform.getX() * getRotation().getSin() + transform.getY() * getRotation().getCos();
+
+    this.getTranslation()
+        .set(
+            getTranslation().getX() + fieldRelativeTransformX,
+            getTranslation().getY() + fieldRelativeTransformY);
+    this.getRotation().add(transform.getRotation());
+    return this;
+  }
+
+  /**
+   * Transform this pose in a robot-relative manner.
+   *
+   * <pre>
+   * [x_new]    [cos, -sin, 0][transform.x]
+   * [y_new] += [sin,  cos, 0][transform.y]
+   * [t_new]    [  0,    0, 1][transform.t]
+   * </pre>
+   *
+   * @param transform A transform that is relative to this pose.
+   * @return This Pose2dMut for chaining
+   */
+  public Pose2dMut transformBy(Transform2d transform) {
+    // Perform this math here instead of using the methods to avoid unneeded allocation of copying
+    // the transform
+    double fieldRelativeTransformX =
+        transform.getX() * getRotation().getCos()
+            - transform.getTranslation().getY() * getRotation().getSin();
+    double fieldRelativeTransformY =
+        transform.getX() * getRotation().getSin() + transform.getY() * getRotation().getCos();
+
+    this.getTranslation()
+        .set(
+            getTranslation().getX() + fieldRelativeTransformX,
+            getTranslation().getY() + fieldRelativeTransformY);
+    this.getRotation().add(transform.getRotation());
+    return this;
+  }
+
+  /**
+   * Transform this pose in a robot-relative manner.
+   *
+   * <pre>
+   * [x_new]    [cos, -sin, 0][transform.x]
+   * [y_new] += [sin,  cos, 0][transform.y]
+   * [t_new]    [  0,    0, 1][transform.t]
+   * </pre>
+   *
+   * @param transform A transform that is relative to this pose.
+   * @return This Pose2dMut for chaining
+   */
+  public Pose2dMut transformBy(Pose2d transform) {
+    // Perform this math here instead of using the methods to avoid unneeded allocation of copying
+    // the transform
+    double fieldRelativeTransformX =
+        transform.getX() * getRotation().getCos()
+            - transform.getTranslation().getY() * getRotation().getSin();
+    double fieldRelativeTransformY =
+        transform.getX() * getRotation().getSin() + transform.getY() * getRotation().getCos();
+
+    this.getTranslation()
+        .set(
+            getTranslation().getX() + fieldRelativeTransformX,
+            getTranslation().getY() + fieldRelativeTransformY);
+    this.getRotation().add(transform.getRotation());
     return this;
   }
 
