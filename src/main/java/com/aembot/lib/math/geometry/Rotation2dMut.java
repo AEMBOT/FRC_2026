@@ -41,6 +41,10 @@ public class Rotation2dMut implements StructSerializable {
     this(from.getRadians());
   }
 
+  public Rotation2dMut(Rotation2dMut from) {
+    this(from.getRadians());
+  }
+
   /**
    * Constructs a Rotation2dMut with the given x and y (cosine and sine) components.
    *
@@ -396,7 +400,7 @@ public class Rotation2dMut implements StructSerializable {
    * @param scalar The scalar.
    * @return This Rotation2dMut for chaining
    */
-  public Rotation2dMut times(double scalar) {
+  public Rotation2dMut multiply(double scalar) {
     return setRadians(getRadians() * scalar);
   }
 
@@ -406,8 +410,8 @@ public class Rotation2dMut implements StructSerializable {
    * @param scalar The scalar.
    * @return This Rotation2dMut for chaining
    */
-  public Rotation2dMut div(double scalar) {
-    return times(1.0 / scalar);
+  public Rotation2dMut divide(double scalar) {
+    return multiply(1.0 / scalar);
   }
 
   /**
@@ -455,7 +459,7 @@ public class Rotation2dMut implements StructSerializable {
   @Override
   public String toString() {
     return String.format(
-        "Rotation2d(Rads: %.2f, Deg: %.2f)", getRadians(), Math.toDegrees(getRadians()));
+        "Rotation2dMut(Rads: %.2f, Deg: %.2f)", getRadians(), Math.toDegrees(getRadians()));
   }
 
   /**
