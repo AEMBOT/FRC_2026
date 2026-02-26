@@ -108,8 +108,8 @@ public class ConcurrentInterpolatable2DMap<T> {
       return Optional.empty();
     }
 
-    Double q1KeyDistance = q1Ceil.getKey() - q1Floor.getKey();
-    Double q2KeyDistance = q12.getKey() - q11.getKey();
+    double q1KeyDistance = q1Ceil.getKey() - q1Floor.getKey();
+    double q2KeyDistance = q12.getKey() - q11.getKey();
 
     if (q1KeyDistance == 0) {
       q1KeyDistance = Double.MAX_VALUE;
@@ -118,8 +118,8 @@ public class ConcurrentInterpolatable2DMap<T> {
       q2KeyDistance = Double.MAX_VALUE;
     }
 
-    Double q1InterpolationTime = (q1Key - q1Floor.getKey()) / q1KeyDistance;
-    Double q2InterpolationTime = (q2Key - q11.getKey()) / q2KeyDistance;
+    double q1InterpolationTime = (q1Key - q1Floor.getKey()) / q1KeyDistance;
+    double q2InterpolationTime = (q2Key - q11.getKey()) / q2KeyDistance;
 
     T floorInterpolatedQ1Value =
         interpolatingFunc.interpolate(q11.getValue(), q12.getValue(), q2InterpolationTime);
