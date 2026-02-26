@@ -1,11 +1,15 @@
 package com.aembot.lib.math.geometry;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import com.aembot.lib.math.geometry.structs.Translation2dMutStruct;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -65,6 +69,28 @@ public class Translation2dMut implements StructSerializable {
   }
 
   /**
+   * Set the x value of this Translation2dMut.
+   *
+   * @param x The new x value
+   * @return This Translation2dMut for chaining
+   */
+  public Translation2dMut setX(Distance x) {
+    this.xMeters = x.in(Meters);
+    return this;
+  }
+
+  /**
+   * Set the x value of this Translation2dMut.
+   *
+   * @param x The new x value
+   * @return This Translation2dMut for chaining
+   */
+  public Translation2dMut setX(MutDistance x) {
+    this.xMeters = x.in(Meters);
+    return this;
+  }
+
+  /**
    * Set the y value of this Translation2dMut.
    *
    * @param yMeters The new y value in meters
@@ -72,6 +98,28 @@ public class Translation2dMut implements StructSerializable {
    */
   public Translation2dMut setY(double yMeters) {
     this.yMeters = yMeters;
+    return this;
+  }
+
+  /**
+   * Set the y value of this Translation2dMut.
+   *
+   * @param y The new y value
+   * @return This Translation2dMut for chaining
+   */
+  public Translation2dMut setY(Distance y) {
+    this.yMeters = y.in(Meters);
+    return this;
+  }
+
+  /**
+   * Set the y value of this Translation2dMut.
+   *
+   * @param y The new y value
+   * @return This Translation2dMut for chaining
+   */
+  public Translation2dMut setY(MutDistance y) {
+    this.yMeters = y.in(Meters);
     return this;
   }
 
@@ -85,6 +133,32 @@ public class Translation2dMut implements StructSerializable {
   public Translation2dMut set(double xMeters, double yMeters) {
     this.xMeters = xMeters;
     this.yMeters = yMeters;
+    return this;
+  }
+
+  /**
+   * Set both the x and y values of this Translation2dMut.
+   *
+   * @param x The new x value
+   * @param y The new y value
+   * @return This Translation2dMut for chaining
+   */
+  public Translation2dMut set(Distance x, Distance y) {
+    this.xMeters = x.in(Meters);
+    this.yMeters = y.in(Meters);
+    return this;
+  }
+
+  /**
+   * Set both the x and y values of this Translation2dMut.
+   *
+   * @param x The new x value
+   * @param y The new y value
+   * @return This Translation2dMut for chaining
+   */
+  public Translation2dMut set(MutDistance x, MutDistance y) {
+    this.xMeters = x.in(Meters);
+    this.yMeters = y.in(Meters);
     return this;
   }
 
@@ -127,7 +201,7 @@ public class Translation2dMut implements StructSerializable {
   }
 
   /** Create a new {@link Translation2d} with the same values as this mutable translation */
-  public Translation2d toImmutable() {
+  public Translation2d exportImmutable() {
     return new Translation2d(getX(), getY());
   }
 
@@ -507,7 +581,7 @@ public class Translation2dMut implements StructSerializable {
 
   @Override
   public String toString() {
-    return String.format("Translation2d(X: %.2f, Y: %.2f)", getX(), getY());
+    return String.format("Translation2dMut(X: %.2f, Y: %.2f)", getX(), getY());
   }
 
   /**
