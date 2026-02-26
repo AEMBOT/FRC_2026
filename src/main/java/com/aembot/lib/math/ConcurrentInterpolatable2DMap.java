@@ -79,18 +79,21 @@ public class ConcurrentInterpolatable2DMap<T> {
       return Optional.empty();
     }
 
-    if (internalMap.floorEntry(q1Key) == null) {
+    Entry<Double, ConcurrentNavigableMap<Double, T>> q1Floor = internalMap.floorEntry(q1Key);
+    Entry<Double, ConcurrentNavigableMap<Double, T>> q1Ceil = internalMap.ceilingEntry(q1Key);
+
+    if (q1Floor == null) {
       return Optional.empty();
     }
 
-    if (internalMap.ceilingEntry(q1Key) == null) {
+    if (q1Ceil == null) {
       return Optional.empty();
     }
 
-    Entry<Double, T> q11 = internalMap.floorEntry(q1Key).getValue().floorEntry(q2Key);
-    Entry<Double, T> q12 = internalMap.floorEntry(q1Key).getValue().ceilingEntry(q2Key);
-    Entry<Double, T> q21 = internalMap.ceilingEntry(q1Key).getValue().floorEntry(q2Key);
-    Entry<Double, T> q22 = internalMap.ceilingEntry(q1Key).getValue().ceilingEntry(q2Key);
+    Entry<Double, T> q11 = q1Floor.getValue().floorEntry(q2Key);
+    Entry<Double, T> q12 = q1Floor.getValue().ceilingEntry(q2Key);
+    Entry<Double, T> q21 = q1Ceil.getValue().floorEntry(q2Key);
+    Entry<Double, T> q22 = q1Ceil.getValue().ceilingEntry(q2Key);
 
     if (q11 == null) {
       return Optional.empty();
@@ -105,8 +108,7 @@ public class ConcurrentInterpolatable2DMap<T> {
       return Optional.empty();
     }
 
-    Double q1KeyDistance =
-        internalMap.ceilingEntry(q1Key).getKey() - internalMap.floorEntry(q1Key).getKey();
+    Double q1KeyDistance = q1Ceil.getKey() - q1Floor.getKey();
     Double q2KeyDistance = q12.getKey() - q11.getKey();
 
     if (q1KeyDistance == 0) {
@@ -116,7 +118,7 @@ public class ConcurrentInterpolatable2DMap<T> {
       q2KeyDistance = Double.MAX_VALUE;
     }
 
-    Double q1InterpolationTime = (q1Key - internalMap.floorEntry(q1Key).getKey()) / q1KeyDistance;
+    Double q1InterpolationTime = (q1Key - q1Floor.getKey()) / q1KeyDistance;
     Double q2InterpolationTime = (q2Key - q11.getKey()) / q2KeyDistance;
 
     T floorInterpolatedQ1Value =
