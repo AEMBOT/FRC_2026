@@ -4,6 +4,7 @@ import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.lib.math.ConcurrentInterpolatable2DMap;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvToBeanBuilder;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -143,8 +144,14 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
 
     double yaw = Math.atan2(velocity.getY(), velocity.getX());
 
-    double pitch =
-        (Math.PI / 2) - Math.acos(velocity.getZ() / velocity.getDistance(Translation3d.kZero));
+    double magnitude = velocity.getDistance(Translation3d.kZero);
+
+    double pitch = 0.0;
+
+    if (magnitude > 0) {
+      double ratio = MathUtil.clamp(velocity.getZ() / magnitude, -1, 1);
+      pitch = (Math.PI / 2) - Math.acos(ratio);
+    }
 
     return new Rotation3d(0, pitch, yaw);
   }
