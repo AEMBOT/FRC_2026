@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
@@ -41,6 +42,8 @@ public final class ShooterCommands {
   private final OptimalVelocityTable passingRightTable;
 
   private Supplier<OptimalVelocityTable> passingTableSupplier;
+
+  private final BooleanSupplier inShootingZone;
 
   public ShooterCommands(HoodSubsystem hood, TurretSubsystem turret, FlywheelSubsystem flywheel) {
     this.hood = hood;
@@ -65,6 +68,12 @@ public final class ShooterCommands {
     this.passingRightTable =
         new OptimalVelocityTable(velocityTableDirectory + "Passing_Right_Initial_Velocities.csv");
     passingTableSupplier = () -> passingMiddleTable;
+
+    // Supplier so that our shooting zones are different whether we are blue or red
+    inShootingZone =
+        RobotRuntimeConstants.isBlueAlliance()
+            ? () -> RobotStateYearly.get().getLatestFieldRobotPose().getX() < 4.02844
+            : () -> RobotStateYearly.get().getLatestFieldRobotPose().getX() > 12.512548;
   }
 
   /* ---- VELOCITY TABLES ---- */
@@ -73,7 +82,8 @@ public final class ShooterCommands {
    * @return The current velocity table to use for aiming
    */
   private OptimalVelocityTable getCurrentVelocityTable() {
-    if (RobotStateYearly.get().getLatestFieldRobotPose().getX() < 4.02844) {
+
+    if (inShootingZone.getAsBoolean()) {
       return shootingHubTable;
     } else {
       return passingTableSupplier.get();
@@ -186,6 +196,12 @@ public final class ShooterCommands {
     // Add 180 to turret rotation because 'forward' according to the turret is actually 180 degrees
     // offset from what forward is
     targetRotation += 180;
+
+    // Because of the way the the auto aim tables are set up, need to rotate turret 180 when on red
+    // alliance
+    if (RobotRuntimeConstants.isRedAlliance()) {
+      targetRotation += 180;
+    }
 
     return MathUtil.inputModulus(targetRotation, 0, 360);
   }

@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
@@ -96,11 +97,20 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
     double compensatedX =
         robotPose.getX()
             + fieldRelativeChassisSpeeds.vxMetersPerSecond
-                * RobotRuntimeConstants.AUTO_AIM_LATENCY_COMPENSATION_MS;
+                * Units.millisecondsToSeconds(
+                    RobotRuntimeConstants.AUTO_AIM_LATENCY_COMPENSATION_MS);
+
     double compensatedY =
         robotPose.getY()
             + fieldRelativeChassisSpeeds.vyMetersPerSecond
-                * RobotRuntimeConstants.AUTO_AIM_LATENCY_COMPENSATION_MS;
+                * Units.millisecondsToSeconds(
+                    RobotRuntimeConstants.AUTO_AIM_LATENCY_COMPENSATION_MS);
+
+    if (RobotRuntimeConstants.isRedAlliance()) {
+      // Field is 16.540988 x 8.069326 meters
+      compensatedX = 16.540988 - compensatedX;
+      compensatedY = 8.069326 - compensatedY;
+    }
 
     Translation3d velocity = getPoint(compensatedX, compensatedY).orElse(Translation3d.kZero);
 
