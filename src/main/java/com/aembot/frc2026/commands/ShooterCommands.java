@@ -71,6 +71,11 @@ public final class ShooterCommands {
    */
   private OptimalVelocityTable getCurrentVelocityTable() {
 
+    // Check if there are no robot pose measurements, mostly applicable at start of program runtime
+    if (RobotStateYearly.get().getLatestFieldRobotPose() == null) {
+      return passingTableSupplier.get();
+    }
+
     if (inShootingZone.getAsBoolean()) {
       return shootingHubTable;
     } else {
