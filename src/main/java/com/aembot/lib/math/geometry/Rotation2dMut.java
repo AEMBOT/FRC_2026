@@ -9,6 +9,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
@@ -213,6 +214,24 @@ public class Rotation2dMut implements StructSerializable {
     this.cos = from.cos;
     this.sin = from.sin;
     return this;
+  }
+
+  /**
+   * Import z value from an immutable Rotation3d. Returns self for chaining.
+   *
+   * @return this Rotation2dMut
+   */
+  public Rotation2dMut importImmutable(Rotation3d from) {
+    return this.setRadians(from.getZ());
+  }
+
+  /**
+   * Import z value from a mutable Rotation3d. Returns self for chaining.
+   *
+   * @return this Rotation2dMut
+   */
+  public Rotation2dMut importMutable(Rotation3dMut from) {
+    return this.setRadians(from.getZ());
   }
 
   /* ---- GETTERS ---- */

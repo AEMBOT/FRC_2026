@@ -1,5 +1,6 @@
 package com.aembot.lib.math.geometry;
 
+import com.aembot.lib.math.geometry.structs.QuaternionMutStruct;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Quaternion;
@@ -7,11 +8,9 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.struct.StructSerializable;
 import java.util.Objects;
 
-import com.aembot.lib.math.geometry.structs.QuaternionMutStruct;
-
 /** Mutable representation of a quaternion */
 public class QuaternionMut implements StructSerializable {
-  public static final QuaternionMutStruct stuct = new QuaternionMutStruct();
+  public static final QuaternionMutStruct struct = new QuaternionMutStruct();
 
   // Scalar r in versor form
   private double w;
@@ -203,22 +202,32 @@ public class QuaternionMut implements StructSerializable {
    * @param other The other quaternion.
    * @return This QuaternionMut for chaining
    */
-  public QuaternionMut multiply(Quaternion other) {
+  public QuaternionMut multiply(double w, double x, double y, double z) {
     // https://en.wikipedia.org/wiki/Quaternion#Scalar_and_vector_parts
     final double r1 = getW();
-    final double r2 = other.getW();
+    final double r2 = w;
 
     // v₁ ⋅ v₂
-    double dot = getX() * other.getX() + getY() * other.getY() + getZ() * other.getZ();
+    double dot = getX() * x + getY() * y + getZ() * z;
     // v₁ x v₂
-    double cross_x = getY() * other.getZ() - other.getY() * getZ();
-    double cross_y = other.getX() * getZ() - getX() * other.getZ();
-    double cross_z = getX() * other.getY() - other.getX() * getY();
+    double cross_x = getY() * z - z * getZ();
+    double cross_y = x * getZ() - getX() * z;
+    double cross_z = getX() * y - x * getY();
 
     return this.setW(r1 * r2 - dot)
-        .setX(r1 * other.getX() + r2 * getX() + cross_x)
-        .setY(r1 * other.getY() + r2 * getY() + cross_y)
-        .setZ(r1 * other.getZ() + r2 * getZ() + cross_z);
+        .setX(r1 * x + r2 * getX() + cross_x)
+        .setY(r1 * y + r2 * getY() + cross_y)
+        .setZ(r1 * z + r2 * getZ() + cross_z);
+  }
+
+  /**
+   * Multiply by another quaternion.
+   *
+   * @param other The other quaternion.
+   * @return This QuaternionMut for chaining
+   */
+  public QuaternionMut multiply(Quaternion other) {
+    return multiply(other.getW(), other.getX(), other.getY(), other.getZ());
   }
 
   /**
@@ -228,21 +237,23 @@ public class QuaternionMut implements StructSerializable {
    * @return This QuaternionMut for chaining
    */
   public QuaternionMut multiply(QuaternionMut other) {
-    // https://en.wikipedia.org/wiki/Quaternion#Scalar_and_vector_parts
-    final var r1 = getW();
-    final var r2 = other.getW();
+    return multiply(other.getW(), other.getX(), other.getY(), other.getZ());
+  }
 
-    // v₁ ⋅ v₂
-    double dot = getX() * other.getX() + getY() * other.getY() + getZ() * other.getZ();
-    // v₁ x v₂
-    double cross_x = getY() * other.getZ() - other.getY() * getZ();
-    double cross_y = other.getX() * getZ() - getX() * other.getZ();
-    double cross_z = getX() * other.getY() - other.getX() * getY();
+  public QuaternionMut premultiply(double w, double x, double y, double z) {
+    final double r1 = w;
+    final double r2 = getW();
+
+    double dot = x * getX() + y * getY() + z * getZ();
+
+    double cross_x = y * getZ() - getY() * z;
+    double cross_y = getX() * z - x * getZ();
+    double cross_z = x * getY() - getX() * y;
 
     return this.setW(r1 * r2 - dot)
-        .setX(r1 * other.getX() + r2 * getX() + cross_x)
-        .setY(r1 * other.getY() + r2 * getY() + cross_y)
-        .setZ(r1 * other.getZ() + r2 * getZ() + cross_z);
+        .setX(r1 * getX() + r2 * x + cross_x)
+        .setY(r1 * getY() + r2 * y + cross_y)
+        .setZ(r1 * getZ() + r2 * z + cross_z);
   }
 
   /**
@@ -252,19 +263,7 @@ public class QuaternionMut implements StructSerializable {
    * @return This QuaternionMut for chaining
    */
   public QuaternionMut premultiply(Quaternion other) {
-    final double r1 = other.getW();
-    final double r2 = getW();
-
-    double dot = other.getX() * getX() + other.getY() * getY() + other.getZ() * getZ();
-
-    double cross_x = other.getY() * getZ() - getY() * other.getZ();
-    double cross_y = getX() * other.getZ() - other.getX() * getZ();
-    double cross_z = other.getX() * getY() - getX() * other.getY();
-
-    return this.setW(r1 * r2 - dot)
-        .setX(r1 * getX() + r2 * other.getX() + cross_x)
-        .setY(r1 * getY() + r2 * other.getY() + cross_y)
-        .setZ(r1 * getZ() + r2 * other.getZ() + cross_z);
+    return premultiply(other.getW(), other.getX(), other.getY(), other.getZ());
   }
 
   /**
@@ -274,19 +273,7 @@ public class QuaternionMut implements StructSerializable {
    * @return This QuaternionMut for chaining
    */
   public QuaternionMut premultiply(QuaternionMut other) {
-    final double r1 = other.getW();
-    final double r2 = getW();
-
-    double dot = other.getX() * getX() + other.getY() * getY() + other.getZ() * getZ();
-
-    double cross_x = other.getY() * getZ() - getY() * other.getZ();
-    double cross_y = getX() * other.getZ() - other.getX() * getZ();
-    double cross_z = other.getX() * getY() - getX() * other.getY();
-
-    return this.setW(r1 * r2 - dot)
-        .setX(r1 * getX() + r2 * other.getX() + cross_x)
-        .setY(r1 * getY() + r2 * other.getY() + cross_y)
-        .setZ(r1 * getZ() + r2 * other.getZ() + cross_z);
+    return premultiply(other.getW(), other.getX(), other.getY(), other.getZ());
   }
 
   /**
