@@ -11,9 +11,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,6 +91,9 @@ public class Limelight4IOSim extends Limelight4IOHardware {
 
   private final PhotonPoseEstimator photonPoseEstimator;
 
+  /** Heartbeat value of the simulated limelight. Resets at 2 billion */
+  private int heartbeat = 0;
+
   /**
    * Constructor go brrr
    *
@@ -122,8 +123,6 @@ public class Limelight4IOSim extends Limelight4IOHardware {
     this.visionSystemSim =
         visionSimulationRegistrar.apply(
             photonCameraSim, PositionUtil.toTransform3d(cameraConfiguration.getCameraPosition()));
-
-    NetworkTable networkTable = NetworkTableInstance.getDefault().getTable(cameraName);
 
     validTagEntry = networkTable.getEntry("tv");
     xOffsetEntry = networkTable.getEntry("tx");
@@ -178,6 +177,10 @@ public class Limelight4IOSim extends Limelight4IOHardware {
 
       /* --- "Coprocessor" pose estimation --- */
       updateMegatag2(result);
+
+      heartbeat++;
+      if (heartbeat > 2e9) heartbeat = 0;
+      heartbeatEntry.setDouble(heartbeat);
     }
 
     super.updateInputs(inputs);
