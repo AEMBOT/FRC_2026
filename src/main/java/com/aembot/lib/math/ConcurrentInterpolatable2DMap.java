@@ -111,6 +111,9 @@ public class ConcurrentInterpolatable2DMap<T> {
     double q1KeyDistance = q1Ceil.getKey() - q1Floor.getKey();
     double q2KeyDistance = q12.getKey() - q11.getKey();
 
+    // These prevent div by zero in the case that the keys are the same
+    // That might happen when sampling a point that exists itself in the map
+    // In that case the start and end values are the same, so t does not matter
     if (q1KeyDistance == 0) {
       q1KeyDistance = Double.MAX_VALUE;
     }
