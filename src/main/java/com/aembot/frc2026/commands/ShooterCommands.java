@@ -1,9 +1,5 @@
 package com.aembot.frc2026.commands;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
@@ -12,22 +8,14 @@ import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
-import org.littletonrobotics.junction.Logger;
 
 public final class ShooterCommands {
 
@@ -272,10 +260,7 @@ public final class ShooterCommands {
 
     switch (RobotRuntimeConstants.MODE) {
       case SIM:
-        return new RepeatCommand(
-            new InstantCommand(() -> shootSimulatedFuel())
-                .andThen(new WaitCommand(0.05))
-                .onlyIf(() -> isShooterNearGoal()));
+        return Commands.none();
       case REPLAY:
 
       case REAL:
@@ -283,39 +268,5 @@ public final class ShooterCommands {
       default:
         return Commands.none(); // Indexer handles fuel supplying
     }
-  }
-
-  /** Create a RebuiltFuelOnFly based off of the current state of all of the subsystems */
-  private void shootSimulatedFuel() {
-
-    Pose2d robotPose = RobotStateYearly.get().getLatestFieldRobotPose();
-
-    Translation2d turretPosition =
-        RobotRuntimeConstants.ROBOT_CONFIG
-            .getTurretConfig()
-            .kTurretOriginPose
-            .getTranslation()
-            .toTranslation2d();
-
-    SimulatedArena.getInstance()
-        .addGamePieceProjectile(
-            new RebuiltFuelOnFly(
-                    robotPose.getTranslation(),
-                    turretPosition,
-                    RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds(),
-                    new Rotation2d(Units.degreesToRadians(turret.getCurrentPosition() + 180))
-                        .plus(robotPose.getRotation()),
-                    Meters.of(0.5), // TODO:find spot to replace magic number
-                    MetersPerSecond.of(flywheel.getCurrentVelocity()),
-                    Degrees.of(hood.getCurrentPosition()))
-                .withProjectileTrajectoryDisplayCallBack(
-                    (poses) ->
-                        Logger.recordOutput(
-                            "FieldSimulation/successfulShotsTrajectory",
-                            poses.toArray(Pose3d[]::new)),
-                    (poses) ->
-                        Logger.recordOutput(
-                            "FieldSimulation/missedShotsTrajectory",
-                            poses.toArray(Pose3d[]::new))));
   }
 }
