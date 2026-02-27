@@ -117,7 +117,7 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
     Logger.recordOutput(
         "AutoAim/" + fileName,
         new Pose3d(
-            velocity.getX() + robotPose.getY(),
+            velocity.getX() + robotPose.getX(),
             velocity.getY() + robotPose.getY(),
             velocity.getZ(),
             Rotation3d.kZero));
