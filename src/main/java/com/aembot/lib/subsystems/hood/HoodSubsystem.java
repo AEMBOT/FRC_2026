@@ -4,10 +4,15 @@ import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
+import com.aembot.lib.math.geometry.Pose2dMut;
+import com.aembot.lib.math.geometry.Rotation2dMut;
+import com.aembot.lib.math.geometry.Translation2dMut;
 import com.aembot.lib.state.subsystems.hood.HoodState;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.aembot.lib.subsystems.hood.io.HoodIO;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import org.littletonrobotics.junction.Logger;
@@ -25,6 +30,10 @@ public class HoodSubsystem
 
   /** The HoodState instance to update */
   private final HoodState state;
+
+  private final Rotation2dMut test = new Rotation2dMut(1);
+  private final Translation2dMut test2 = new Translation2dMut(1.0, 2.0);
+  private final Pose2dMut test3 = new Pose2dMut(test2, test);
 
   /**
    * Construct a new hood subsystem
@@ -51,6 +60,13 @@ public class HoodSubsystem
     // Log latency with time between periodic being called and finishing
     Logger.recordOutput(
         logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
+
+    test.add(0.1);
+    test3.transformBy(new Pose2d(0.1, 0, Rotation2d.kZero));
+
+    Logger.recordOutput("testRot", test);
+    Logger.recordOutput("TestTrans", test2);
+    Logger.recordOutput("TestPose", test3);
   }
 
   @Override
