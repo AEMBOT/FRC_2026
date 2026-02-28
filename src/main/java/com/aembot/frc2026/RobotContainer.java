@@ -91,13 +91,13 @@ public class RobotContainer implements Loggerable {
   /** Use this method to define your controller button -> command mappings */
   private void configureBindings() {
     driveSubsystem.setDefaultCommand(commandFactory.createDriveJoystickCmd(driverController));
-    hoodSubsystem.setDefaultCommand(commandFactory.shooterCommands.createHoodTowardsGoalCommand());
+    hoodSubsystem.setDefaultCommand(commandFactory.shooterCommands.createHoodDownCommand());
     turretSubsystem.setDefaultCommand(
         commandFactory.shooterCommands.createTurretTowardsGoalCommand());
     intakeRollerSubsystem.setDefaultCommand(
         commandFactory.intakeCommands.createStopIntakeCommand());
     flywheelSubsystem.setDefaultCommand(
-        commandFactory.shooterCommands.createFlywheelGoalSpeedCommand());
+        commandFactory.shooterCommands.createFlywheelIdleSpeedCommand());
 
     driverController.a().onTrue(commandFactory.intakeCommands.createUpCommand());
     driverController.b().onTrue(commandFactory.intakeCommands.createDownCommand());

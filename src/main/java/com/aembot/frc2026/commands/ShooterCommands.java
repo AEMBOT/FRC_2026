@@ -12,8 +12,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -166,6 +166,10 @@ public final class ShooterCommands {
     return hood.smartPositionSetpointCommand(() -> getCurrentPitch());
   }
 
+  public Command createHoodDownCommand() {
+    return hood.smartPositionSetpointCommand(() -> 90);
+  }
+
   /**
    * Exists to prevent us from wasting fuel and from shooting fuel out of the field
    *
@@ -228,12 +232,10 @@ public final class ShooterCommands {
   }
 
   /**
-   * CURRENTLY EMPTY
-   *
    * @return a command that sets the flywheel to the idle speed
    */
   public Command createFlywheelIdleSpeedCommand() {
-    return new Command() {};
+    return flywheel.smartVelocitySetpointCommand(() -> 5);
   }
 
   /**
@@ -264,15 +266,7 @@ public final class ShooterCommands {
    */
   public Command createShootFuelCommand() {
 
-    switch (RobotRuntimeConstants.MODE) {
-      case SIM:
-        return Commands.none();
-      case REPLAY:
-
-      case REAL:
-
-      default:
-        return Commands.none(); // Indexer handles fuel supplying
-    }
+    return new ParallelCommandGroup(
+        createFlywheelGoalSpeedCommand(), createHoodTowardsGoalCommand());
   }
 }
