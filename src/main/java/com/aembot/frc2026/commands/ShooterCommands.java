@@ -194,7 +194,6 @@ public final class ShooterCommands {
     // Because of the way the the auto aim tables are set up, need to rotate turret 180 when on red
     // alliance
     if (RobotRuntimeConstants.isRedAlliance()) {
-      targetRotation *= -1;
       targetRotation += 180;
     }
 
