@@ -188,7 +188,7 @@ public final class ShooterCommands {
 
     // Add 180 to turret rotation because 'forward' according to the turret is actually 180 degrees
     // offset from what forward is
-    targetRotation += 180;
+    //targetRotation += 180;
 
     // Because of the way the the auto aim tables are set up, need to rotate turret 180 when on red
     // alliance

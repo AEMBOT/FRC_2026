@@ -63,7 +63,6 @@ public class SimulatedRobotStateYearly extends SimulatedRobotState {
                           .turretState
                           .turretYaw
                           .get()
-                          .unaryMinus()
                           .getRadians())),
           RobotStateYearly.get().shooterFlywheelState.flywheelSpeedUnitsPerSecond.get());
     }
