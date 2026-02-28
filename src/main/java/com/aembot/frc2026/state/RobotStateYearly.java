@@ -66,8 +66,7 @@ public class RobotStateYearly extends RobotState {
         RobotRuntimeConstants.ROBOT_CONFIG
             .getTurretConfig()
             .kTurretOriginPose
-            .plus(
-                new Transform3d(0, 0, 0, new Rotation3d(turretState.turretYaw.get())));
+            .plus(new Transform3d(0, 0, 0, new Rotation3d(turretState.turretYaw.get())));
 
     Pose3d intakePose =
         RobotRuntimeConstants.ROBOT_CONFIG

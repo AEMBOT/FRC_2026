@@ -59,9 +59,10 @@ public final class ShooterCommands {
 
     // Supplier so that our shooting zones are different whether we are blue or red
     inShootingZone =
-        RobotRuntimeConstants.isBlueAlliance()
-            ? () -> RobotStateYearly.get().getLatestFieldRobotPose().getX() < 4.02844
-            : () -> RobotStateYearly.get().getLatestFieldRobotPose().getX() > 12.512548;
+        () ->
+            RobotRuntimeConstants.isBlueAlliance()
+                ? RobotStateYearly.get().getLatestFieldRobotPose().getX() < 4.02844
+                : RobotStateYearly.get().getLatestFieldRobotPose().getX() > 12.512548;
   }
 
   /* ---- VELOCITY TABLES ---- */
@@ -188,11 +189,12 @@ public final class ShooterCommands {
 
     // Add 180 to turret rotation because 'forward' according to the turret is actually 180 degrees
     // offset from what forward is
-    //targetRotation += 180;
+    // targetRotation += 180;
 
     // Because of the way the the auto aim tables are set up, need to rotate turret 180 when on red
     // alliance
     if (RobotRuntimeConstants.isRedAlliance()) {
+      targetRotation *= -1;
       targetRotation += 180;
     }
 
