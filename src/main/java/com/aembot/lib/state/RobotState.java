@@ -22,6 +22,9 @@ import org.littletonrobotics.junction.Logger;
  * <p>The states stored in this SHOULD ALL BE THREAD SAFE
  */
 public abstract class RobotState implements Loggable {
+  /** Number of loops we've been no-op for expensive logging (ie. mechanism locations). */
+  protected int expensiveLogNoopCounter = -1;
+
   /** Tracks only values as the relate to robot odometry */
   class Odometry {
     /** Thread safe buffer to track robot pose over time. this pose includes updates from vision */
@@ -246,6 +249,8 @@ public abstract class RobotState implements Loggable {
   // --- Loggable Implementation ---
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
+    expensiveLogNoopCounter++;
+
     RobotState.Odometry.logTimeInterpolatedPose(
         "SensorRobotState/RobotPose2d", odometryState.timeInterpolatableEstimatedRobotPose);
   }

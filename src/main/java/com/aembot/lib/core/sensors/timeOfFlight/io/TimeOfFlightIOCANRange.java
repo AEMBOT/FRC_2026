@@ -30,7 +30,7 @@ public class TimeOfFlightIOCANRange implements TimeOfFlightIO, CANable {
     this.kId = config.kCANDeviceID;
     this.kCanRange = new CANrange(kId.getDeviceID(), kId.getBus());
 
-    kId.setStatusSignal(kCanRange.getSupplyVoltage());
+    kId.setStatusSignal(kCanRange.getSupplyVoltage(), 10);
 
     kDistanceSignal = kCanRange.getDistance();
     kStdDevsSignal = kCanRange.getDistanceStdDev();

@@ -10,7 +10,6 @@ import com.aembot.lib.subsystems.drive.simulation.MapleSimSwerveDrivetrain;
 import com.aembot.lib.subsystems.drive.visualizations.SwerveVisualizer;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -126,8 +125,7 @@ public class DriveSubsystem extends AEMSubsystem {
 
     Logger.recordOutput(
         standardPrefix + "/Odometry/SpeedMetersPerSecond",
-        new Translation2d(inputs.Speeds.vxMetersPerSecond, inputs.Speeds.vyMetersPerSecond)
-            .getNorm());
+        Math.hypot(inputs.Speeds.vxMetersPerSecond, inputs.Speeds.vyMetersPerSecond));
 
     // Update the swerve module states
     visualizer.updateSwerveState(inputs);

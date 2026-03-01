@@ -19,7 +19,7 @@ public class CANCoderFactory {
 
     CTREUtil.Configuration.Encoders.applyConfiguration(encoder, config);
 
-    device.setStatusSignal(encoder.getSupplyVoltage(), 100);
+    device.setStatusSignal(encoder.getSupplyVoltage(), 10);
 
     // Automatically register the encoder with the CAN status logger upon creation
     CANStatusLogger.get(device.getBusName()).registerCANDevice(device);
