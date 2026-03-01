@@ -38,6 +38,8 @@ public class TalonFXTurretConfiguration {
   /** The origin pose of the turret for visualization in advantagescope. */
   public Pose3d kTurretOriginPose;
 
+  public double startingRotation;
+
   /**
    * Create a new turret configuration
    *
@@ -99,6 +101,11 @@ public class TalonFXTurretConfiguration {
     return this;
   }
 
+  public TalonFXTurretConfiguration withStartingRotation(double offet) {
+    this.startingRotation = offet;
+    return this;
+  }
+
   /**
    * Get the absolute position of the mechanism from the encoder positions
    *
@@ -120,9 +127,9 @@ public class TalonFXTurretConfiguration {
       double diff = Math.abs(encoderBTeeth - encoderBTestPos);
       double circularDiff = Math.min(diff, kCANcoderBGearTeeth - diff);
 
-      if (circularDiff < 0.1) {
-        return kRealMotorConfig.getMechanismRotationsToUnits(
-            testPos / kRealMotorConfig.getGearRatio());
+      if (circularDiff < 0.3) {
+        return kRealMotorConfig.getMechanismRotationsToUnits(testPos / 100.0) // FIXME magic num
+            + this.startingRotation;
       }
     }
 

@@ -7,6 +7,7 @@ import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.aembot.lib.core.can.CANDeviceID.CANDeviceType;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -24,7 +25,7 @@ public class ProductionTurretConfig {
 
   public final double ACCELERATION_DEG_PER_SEC = 360;
 
-  public final double GEAR_RATIO = 400.0 / 13.0;
+  public final double GEAR_RATIO = 480.0 / 13.0;
 
   public final int MOTOR_ID = 52;
 
@@ -37,6 +38,8 @@ public class ProductionTurretConfig {
   public final Pose3d TURRET_ORIGIN_POSE =
       new Pose3d(-0.134944, -0.000127, 0.339133, new Rotation3d());
 
+  public final double TURRET_START_ROT = 180;
+
   public final AEMCANCoderConfiguration CANCODER_A_CONFIG =
       new AEMCANCoderConfiguration()
           .withDevice(
@@ -48,7 +51,9 @@ public class ProductionTurretConfig {
           .withConfiguration(
               new CANcoderConfiguration()
                   .withMagnetSensor(
-                      new MagnetSensorConfigs().withMagnetOffset(CANCODER_A_MAGNET_OFFSET)));
+                      new MagnetSensorConfigs()
+                          .withMagnetOffset(CANCODER_A_MAGNET_OFFSET)
+                          .withAbsoluteSensorDiscontinuityPoint(1)));
 
   public final int CANCODER_A_GEAR_TEETH = 17;
 
@@ -65,7 +70,9 @@ public class ProductionTurretConfig {
           .withConfiguration(
               new CANcoderConfiguration()
                   .withMagnetSensor(
-                      new MagnetSensorConfigs().withMagnetOffset(CANCODER_B_MAGNET_OFFSET)));
+                      new MagnetSensorConfigs()
+                          .withMagnetOffset(CANCODER_B_MAGNET_OFFSET)
+                          .withAbsoluteSensorDiscontinuityPoint(1)));
 
   public final int CANCODER_B_GEAR_TEETH = 13;
 
@@ -79,14 +86,15 @@ public class ProductionTurretConfig {
                               Units.degreesToRotations(CRUISE_VELOCITY_DEG_PER_SEC) * GEAR_RATIO)
                           .withMotionMagicAcceleration(
                               Units.degreesToRotations(ACCELERATION_DEG_PER_SEC) * GEAR_RATIO))
-                  .withSlot0(new Slot0Configs().withKP(.1).withKV(.1)))
+                  .withSlot0(new Slot0Configs().withKP(0.4).withKS(.4).withKV(0.123))
+                  .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(20)))
           .withCANDevice(
               new CANDeviceID(
                   MOTOR_ID, SUBSYSTEM_NAME + "Motor", SUBSYSTEM_NAME, CANDeviceType.TALON_FX))
           .withName(SUBSYSTEM_NAME + "Motor")
           .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / GEAR_RATIO))
-          .withMaxPositionUnits(380)
-          .withMinPositionUnits(-20);
+          .withMaxPositionUnits(270)
+          .withMinPositionUnits(90);
 
   public final SimulatedMotorConfiguration<TalonFXConfiguration> SIM_MOTOR_CONFIG =
       new SimulatedMotorConfiguration<TalonFXConfiguration>()
@@ -102,5 +110,6 @@ public class ProductionTurretConfig {
           .withCANcoderBGearTeeth(CANCODER_B_GEAR_TEETH)
           .withRealMotorConfig(MOTOR_CONFIG)
           .withSimMotorConfig(SIM_MOTOR_CONFIG)
-          .withTurretOriginPose(TURRET_ORIGIN_POSE);
+          .withTurretOriginPose(TURRET_ORIGIN_POSE)
+          .withStartingRotation(180);
 }
