@@ -6,10 +6,9 @@ import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import choreo.trajectory.SwerveSample;
 import com.aembot.frc2026.commands.CommandFactory;
-import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
-import edu.wpi.first.wpilibj2.command.Commands;
+import org.littletonrobotics.junction.Logger;
 
 public class AutoHelper {
 
@@ -28,11 +27,10 @@ public class AutoHelper {
         new AutoFactory(
             () -> RobotStateYearly.get().getLatestFieldRobotPose(),
             (pose) -> driveSubsystem.resetPose(pose),
-            (sample) ->
-                driveSubsystem.setRequestFromSwerveSample(
-                    (SwerveSample) sample, RobotStateYearly.get().getLatestFieldRobotPose()),
-            RobotRuntimeConstants.isRedAlliance(),
-            driveSubsystem);
+            (SwerveSample sample) -> driveSubsystem.setRequestFromSwerveSample(sample),
+            false,
+            driveSubsystem,
+            (state, isStart) -> Logger.recordOutput("AUTO_TRAJ", state.getPoses()));
   }
 
   /**
@@ -43,6 +41,7 @@ public class AutoHelper {
   public static void setupAutoChooser() {
 
     addAuto("EventMarkerTest");
+    addAuto("ShootingTest");
   }
 
   /**
@@ -69,10 +68,11 @@ public class AutoHelper {
   public static void registerAutoCommands(CommandFactory commandFactory) {
 
     autoFactory
-        .bind("Test", Commands.print("TRIGGERED"))
         .bind("DeployIntake", commandFactory.intakeCommands.createDownCommand())
         .bind("RaiseIntake", commandFactory.intakeCommands.createUpCommand())
         .bind("RunIntake", commandFactory.intakeCommands.createRunIntakeCommand())
-        .bind("StopIntake", commandFactory.intakeCommands.createStopIntakeCommand());
+        .bind("StopIntake", commandFactory.intakeCommands.createStopIntakeCommand())
+        .bind("StartShooting", commandFactory.createStartShootingFuelCommand())
+        .bind("StopShooting", commandFactory.createStopShootingFuelCommand());
   }
 }

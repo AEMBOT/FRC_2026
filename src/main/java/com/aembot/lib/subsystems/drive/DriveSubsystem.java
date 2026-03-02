@@ -210,22 +210,22 @@ public class DriveSubsystem extends AEMSubsystem {
    */
   public void setRequestFromChassisSpeeds(ChassisSpeeds speeds) {
     setRequest(
-        new SwerveRequest.RobotCentric()
+        new SwerveRequest.FieldCentric()
             .withVelocityX(speeds.vxMetersPerSecond)
             .withVelocityY(speeds.vyMetersPerSecond)
             .withRotationalRate(speeds.omegaRadiansPerSecond)
             .withDriveRequestType(SwerveModule.DriveRequestType.Velocity));
   }
 
-  public void setRequestFromSwerveSample(SwerveSample sample, Pose2d robotPose) {
+  public void setRequestFromSwerveSample(SwerveSample sample) {
 
     ChassisSpeeds speeds =
         new ChassisSpeeds(
-            sample.vx + config.autoTranslationController.calculate(robotPose.getX(), sample.x),
-            sample.vy + config.autoTranslationController.calculate(robotPose.getY(), sample.y),
+            sample.vx + config.autoTranslationController.calculate(inputs.Pose.getX(), sample.x),
+            sample.vy + config.autoTranslationController.calculate(inputs.Pose.getY(), sample.y),
             sample.omega
                 + config.autoRotationController.calculate(
-                    robotPose.getRotation().getRadians(), sample.omega));
+                    inputs.Pose.getRotation().getRadians(), sample.omega));
 
     setRequestFromChassisSpeeds(speeds);
   }
