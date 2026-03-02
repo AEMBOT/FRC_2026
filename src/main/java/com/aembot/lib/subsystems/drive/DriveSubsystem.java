@@ -91,12 +91,15 @@ public class DriveSubsystem extends AEMSubsystem {
     /** Chassis speeds from drive encoders */
     ChassisSpeeds actualRobotRelative = inputs.Speeds;
 
+    ChassisSpeeds actualFieldRelative =
+        ChassisSpeeds.fromRobotRelativeSpeeds(actualRobotRelative, inputs.Pose.getRotation());
+
     /** Chassis speeds from drivetrain encoders + gyro */
     ChassisSpeeds gyroFusedFieldRelative =
-        ChassisSpeeds.fromRobotRelativeSpeeds(
-            new ChassisSpeeds(
-                inputs.Speeds.vxMetersPerSecond, inputs.Speeds.vyMetersPerSecond, yawRadsPerS),
-            inputs.Pose.getRotation());
+        new ChassisSpeeds(
+            actualFieldRelative.vxMetersPerSecond,
+            actualFieldRelative.vyMetersPerSecond,
+            yawRadsPerS);
 
     ChassisSpeeds desiredRobotRelative = inputs.kinematics.toChassisSpeeds(inputs.ModuleTargets);
 
@@ -115,7 +118,7 @@ public class DriveSubsystem extends AEMSubsystem {
         inputs.accelX,
         inputs.accelY,
         actualRobotRelative,
-        inputs.Speeds,
+        actualFieldRelative,
         desiredRobotRelative,
         desiredFieldRelative,
         gyroFusedFieldRelative);

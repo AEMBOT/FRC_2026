@@ -1,12 +1,15 @@
 package com.aembot.frc2026.subsystems.turret;
 
 import com.aembot.frc2026.config.subsystems.TalonFXTurretConfiguration;
+import com.aembot.frc2026.state.subsystems.turret.TurretState;
 import com.aembot.frc2026.subsystems.turret.io.TurretIO;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.Logger;
@@ -21,18 +24,23 @@ public class TurretSubsystem
   /** Configuration for this turret */
   private final TalonFXTurretConfiguration config;
 
+  /** TurretState instance to update */
+  private final TurretState state;
+
   /**
    * Create a new turret subsystem
    *
    * @param config Configuration for this subsystem
    * @param io IO to use
    */
-  public TurretSubsystem(TalonFXTurretConfiguration config, TurretIO io) {
+  public TurretSubsystem(
+      TalonFXTurretConfiguration config, TurretIO io, TurretState turretStateInstance) {
 
     super(config.kName, new MotorInputs(), io.getMotor(), config.kRealMotorConfig);
 
     this.io = io;
     this.config = config;
+    this.state = turretStateInstance;
 
     setPositionFromEncoders();
   }
@@ -56,11 +64,19 @@ public class TurretSubsystem
 
   @Override
   public void periodic() {
+    double timestamp = Timer.getFPGATimestamp();
+
     super.periodic();
     // If motor has reset (e.g. brownout) then rezero
     if (io.getMotor().hasResetOccurred()) {
       setPositionFromEncoders();
     }
+
+    state.updateTurretYaw(Rotation2d.fromDegrees(inputs.positionUnits));
+
+    // Log latency with time between periodic being called and finishing
+    Logger.recordOutput(
+        logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
   }
 
   @Override

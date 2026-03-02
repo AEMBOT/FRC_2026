@@ -4,6 +4,18 @@ import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.constants.field.Field2026;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.state.SimulatedRobotStateYearly;
+import com.aembot.frc2026.subsystems.indexerKicker.IndexerKickerSubsystem;
+import com.aembot.frc2026.subsystems.indexerKicker.io.IndexerKickerMechanismIOReal;
+import com.aembot.frc2026.subsystems.indexerKicker.io.IndexerKickerMechanismIOReplay;
+import com.aembot.frc2026.subsystems.indexerKicker.io.IndexerKickerMechanismIOSim;
+import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorSubsystem;
+import com.aembot.frc2026.subsystems.indexerSelector.io.IndexerSelectorMechanismIOReal;
+import com.aembot.frc2026.subsystems.indexerSelector.io.IndexerSelectorMechanismIOReplay;
+import com.aembot.frc2026.subsystems.indexerSelector.io.IndexerSelectorMechanismIOSim;
+import com.aembot.frc2026.subsystems.spindexer.SpindexerSubsystem;
+import com.aembot.frc2026.subsystems.spindexer.io.SpindexerMechanismIOReal;
+import com.aembot.frc2026.subsystems.spindexer.io.SpindexerMechanismIOReplay;
+import com.aembot.frc2026.subsystems.spindexer.io.SpindexerMechanismIOSim;
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.frc2026.subsystems.turret.io.TalonFXTurretHardwareIO;
 import com.aembot.frc2026.subsystems.turret.io.TurretReplayIO;
@@ -11,6 +23,9 @@ import com.aembot.frc2026.subsystems.turret.io.TurretSimIO;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
+import com.aembot.lib.core.sensors.timeOfFlight.io.TimeOfFlightIOCANRange;
+import com.aembot.lib.core.sensors.timeOfFlight.io.TimeOfFlightIOReplay;
+import com.aembot.lib.core.sensors.timeOfFlight.io.TimeOfFlightSimIOCanRange;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
 import com.aembot.lib.subsystems.aprilvision.interfaces.AprilCameraIO;
 import com.aembot.lib.subsystems.aprilvision.io.AprilCameraReplayIO;
@@ -49,12 +64,19 @@ public class SubsystemFactory {
   public static DriveSubsystem createDriveSubsystem() {
     switch (RobotRuntimeConstants.MODE) {
       case SIM:
+        var io =
+            new DrivetrainSimIO(
+                RobotRuntimeConstants.ROBOT_CONFIG.getSimulatedDrivetrainConfiguration(),
+                RobotRuntimeConstants.ROBOT_CONFIG.getDrivetrainConfiguration(),
+                RobotRuntimeConstants.ROBOT_CONFIG.getSwerveConfigurations());
+
+        SimulatedRobotStateYearly.get()
+            .simulatedIntakeState
+            .setDriveSim(io.drivetrainSim.mapleSimSwerveDrivetrain);
+
         return new DriveSubsystem(
                 RobotRuntimeConstants.ROBOT_CONFIG.getDrivetrainConfiguration(),
-                new DrivetrainSimIO(
-                    RobotRuntimeConstants.ROBOT_CONFIG.getSimulatedDrivetrainConfiguration(),
-                    RobotRuntimeConstants.ROBOT_CONFIG.getDrivetrainConfiguration(),
-                    RobotRuntimeConstants.ROBOT_CONFIG.getSwerveConfigurations()),
+                io,
                 RobotStateYearly.get())
             .withSetPose(new Pose2d(2.5, 4, Rotation2d.fromDegrees(0)));
       case REPLAY:
@@ -94,6 +116,90 @@ public class SubsystemFactory {
             RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig(),
             new TalonFXHoodHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig()),
             RobotStateYearly.get().hoodState);
+    }
+  }
+
+  public static SpindexerSubsystem createSpindexerSubsystem() {
+    var spindexerConfig = RobotRuntimeConstants.ROBOT_CONFIG.getSpindexerConfiguration();
+    var indexerCompoundState = RobotStateYearly.get().indexerCompoundState;
+
+    switch (RobotRuntimeConstants.MODE) {
+      case SIM:
+        return new SpindexerSubsystem(
+            spindexerConfig,
+            new SpindexerMechanismIOSim(spindexerConfig),
+            indexerCompoundState::getSpindexerCommandedState);
+      case REPLAY:
+        return new SpindexerSubsystem(
+            spindexerConfig,
+            new SpindexerMechanismIOReplay(),
+            indexerCompoundState::getSpindexerCommandedState);
+      case REAL:
+      default:
+        return new SpindexerSubsystem(
+            spindexerConfig,
+            new SpindexerMechanismIOReal(spindexerConfig),
+            indexerCompoundState::getSpindexerCommandedState);
+    }
+  }
+
+  public static IndexerSelectorSubsystem createIndexerSelectorSubsystem() {
+    var selectorConfig = RobotRuntimeConstants.ROBOT_CONFIG.getIndexerSelectorConfiguration();
+    var indexerCompoundState = RobotStateYearly.get().indexerCompoundState;
+
+    switch (RobotRuntimeConstants.MODE) {
+      case SIM:
+        var timeOfFlightIO = new TimeOfFlightSimIOCanRange(selectorConfig.kTimeOfFlightConfig);
+
+        SimulatedRobotStateYearly.get()
+            .simulatedIndexerCompoundState
+            .setSelectorTimeOfFlightDistanceConsumer(timeOfFlightIO::setSimulatedDistance);
+
+        return new IndexerSelectorSubsystem(
+            selectorConfig,
+            new IndexerSelectorMechanismIOSim(selectorConfig),
+            timeOfFlightIO,
+            indexerCompoundState::getSelectorCommandedState,
+            indexerCompoundState::updateGamePieceInSelector);
+      case REPLAY:
+        return new IndexerSelectorSubsystem(
+            selectorConfig,
+            new IndexerSelectorMechanismIOReplay(),
+            new TimeOfFlightIOReplay(selectorConfig.kTimeOfFlightConfig),
+            indexerCompoundState::getSelectorCommandedState,
+            indexerCompoundState::updateGamePieceInSelector);
+      case REAL:
+      default:
+        return new IndexerSelectorSubsystem(
+            selectorConfig,
+            new IndexerSelectorMechanismIOReal(selectorConfig),
+            new TimeOfFlightIOCANRange(selectorConfig.kTimeOfFlightConfig),
+            indexerCompoundState::getSelectorCommandedState,
+            indexerCompoundState::updateGamePieceInSelector);
+    }
+  }
+
+  public static IndexerKickerSubsystem createIndexerKickerSubsystem() {
+    var kickerConfig = RobotRuntimeConstants.ROBOT_CONFIG.getIndexerKickerConfiguration();
+    var indexerCompoundState = RobotStateYearly.get().indexerCompoundState;
+
+    switch (RobotRuntimeConstants.MODE) {
+      case SIM:
+        return new IndexerKickerSubsystem(
+            kickerConfig,
+            new IndexerKickerMechanismIOSim(kickerConfig),
+            indexerCompoundState::getKickerCommandedState);
+      case REPLAY:
+        return new IndexerKickerSubsystem(
+            kickerConfig,
+            new IndexerKickerMechanismIOReplay(),
+            indexerCompoundState::getKickerCommandedState);
+      case REAL:
+      default:
+        return new IndexerKickerSubsystem(
+            kickerConfig,
+            new IndexerKickerMechanismIOReal(kickerConfig),
+            indexerCompoundState::getKickerCommandedState);
     }
   }
 
@@ -185,16 +291,20 @@ public class SubsystemFactory {
       case SIM:
         return new FlywheelSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration(),
-            new FlywheelSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration()));
+            new FlywheelSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration()),
+            RobotStateYearly.get().shooterFlywheelState);
       case REPLAY:
         return new FlywheelSubsystem(
-            RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration(), new FlywheelReplayIO());
+            RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration(),
+            new FlywheelReplayIO(),
+            RobotStateYearly.get().shooterFlywheelState);
       case REAL:
 
       default:
         return new FlywheelSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration(),
-            new FlywheelHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration()));
+            new FlywheelHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getFlywheelConfiguration()),
+            RobotStateYearly.get().shooterFlywheelState);
     }
   }
 
@@ -203,16 +313,20 @@ public class SubsystemFactory {
       case SIM:
         return new TurretSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig(),
-            new TurretSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig()));
+            new TurretSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig()),
+            RobotStateYearly.get().turretState);
       case REPLAY:
         return new TurretSubsystem(
-            RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig(), new TurretReplayIO());
+            RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig(),
+            new TurretReplayIO(),
+            RobotStateYearly.get().turretState);
       case REAL:
 
       default:
         return new TurretSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig(),
-            new TalonFXTurretHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig()));
+            new TalonFXTurretHardwareIO(RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig()),
+            RobotStateYearly.get().turretState);
     }
   }
 }
