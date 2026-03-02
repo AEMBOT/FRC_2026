@@ -152,9 +152,10 @@ public final class ShooterCommands {
    */
   private double getCurrentSpeed() {
     return getCurrentVelocityTable()
-        .getFuelInitVelocityMagnitude(
-            RobotStateYearly.get().getLatestFieldRobotPose(),
-            RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds());
+            .getFuelInitVelocityMagnitude(
+                RobotStateYearly.get().getLatestFieldRobotPose(),
+                RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds())
+        + 0.4;
   }
 
   /* ---- HOOD COMMANDS ---- */
