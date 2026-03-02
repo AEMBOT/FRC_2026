@@ -149,9 +149,10 @@ public final class ShooterCommands {
 
   /**
    * Function to get an amount to artifically boost flywheel speed
-   * 
-   * NOTE: currently just a static number but in future we may want to scale with distance or something
-   * 
+   *
+   * <p>NOTE: currently just a static number but in future we may want to scale with distance or
+   * something
+   *
    * @return amount to boost flywheel speed in m/s
    */
   private double getFlywheelSpeedBoost() {
