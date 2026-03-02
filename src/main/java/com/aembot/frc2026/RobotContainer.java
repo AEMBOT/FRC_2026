@@ -87,11 +87,11 @@ public class RobotContainer implements Loggerable {
             flywheelSubsystem,
             turretSubsystem);
 
-    AutoHelper.setupAutoBuilder(driveSubsystem);
-
-    AutoHelper.setupAutoChooser();
+    AutoHelper.setupAutoFactory(driveSubsystem);
 
     AutoHelper.registerAutoCommands(commandFactory);
+
+    AutoHelper.setupAutoChooser();
 
     SmartDashboard.putData("Choose Auto Routine", AutoHelper.autoChooser);
 
@@ -129,6 +129,6 @@ public class RobotContainer implements Loggerable {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return AutoHelper.autoChooser.getSelected();
+    return AutoHelper.autoChooser.selectedCommandScheduler();
   }
 }

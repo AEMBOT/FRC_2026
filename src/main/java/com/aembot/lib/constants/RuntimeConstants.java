@@ -2,8 +2,6 @@ package com.aembot.lib.constants;
 
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.lib.config.RobotID;
-import com.pathplanner.lib.config.ModuleConfig;
-import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -53,18 +51,5 @@ public class RuntimeConstants {
   public static boolean isBlueAlliance() {
     return DriverStation.getAlliance().isPresent()
         && DriverStation.getAlliance().equals(Optional.of(Alliance.Blue));
-  }
-
-  /**
-   * Returns the robot config set up in the pathplanner gui, prints error stack trace if gui config
-   * cannot be found, however still returns an essentially empty robot config
-   */
-  public static RobotConfig getPathplannerConfig() {
-    try {
-      return RobotConfig.fromGUISettings();
-    } catch (Exception e) {
-      e.printStackTrace();
-      return new RobotConfig(0, 0, new ModuleConfig(null, null, 0, null, null, 0), 0);
-    }
   }
 }

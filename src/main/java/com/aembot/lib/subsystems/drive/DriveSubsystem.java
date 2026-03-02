@@ -1,5 +1,6 @@
 package com.aembot.lib.subsystems.drive;
 
+import choreo.trajectory.SwerveSample;
 import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
 import com.aembot.lib.state.RobotState;
@@ -214,5 +215,18 @@ public class DriveSubsystem extends AEMSubsystem {
             .withVelocityY(speeds.vyMetersPerSecond)
             .withRotationalRate(speeds.omegaRadiansPerSecond)
             .withDriveRequestType(SwerveModule.DriveRequestType.Velocity));
+  }
+
+  public void setRequestFromSwerveSample(SwerveSample sample, Pose2d robotPose) {
+
+    ChassisSpeeds speeds =
+        new ChassisSpeeds(
+            sample.vx + config.autoTranslationController.calculate(robotPose.getX(), sample.x),
+            sample.vy + config.autoTranslationController.calculate(robotPose.getY(), sample.y),
+            sample.omega
+                + config.autoRotationController.calculate(
+                    robotPose.getRotation().getRadians(), sample.omega));
+
+    setRequestFromChassisSpeeds(speeds);
   }
 }

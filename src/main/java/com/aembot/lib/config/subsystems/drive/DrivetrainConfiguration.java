@@ -4,7 +4,7 @@ import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
 
 public class DrivetrainConfiguration {
   public String configurationName;
@@ -43,7 +43,8 @@ public class DrivetrainConfiguration {
   /** Standard deviations of odometry while the robot is disabled */
   public OdometryStandardDevs disabledOdometryStandardDevs;
 
-  public PPHolonomicDriveController autoController;
+  public PIDController autoTranslationController;
+  public PIDController autoRotationController;
 
   public DrivetrainConfiguration() {}
 
@@ -122,13 +123,25 @@ public class DrivetrainConfiguration {
   }
 
   /**
-   * Set the controller to use during auto
+   * set the controller to use during auto for movement
    *
-   * @param autoPIDConstants PPHolonomicDrive contoller to use when auto pathing
+   * @param autoTranslationController PID controller to use for movement in auto
    * @return self for chaining
    */
-  public DrivetrainConfiguration withAutoController(PPHolonomicDriveController autoController) {
-    this.autoController = autoController;
+  public DrivetrainConfiguration withAutoTranslationController(
+      PIDController autoTranslationController) {
+    this.autoTranslationController = autoTranslationController;
+    return this;
+  }
+
+  /**
+   * set the controller to use during auto for rotation
+   *
+   * @param autoRotationController PID controller to use for rotation in auto
+   * @return self for chaining
+   */
+  public DrivetrainConfiguration withAutoRotationController(PIDController autoRotationController) {
+    this.autoRotationController = autoRotationController;
     return this;
   }
 }
