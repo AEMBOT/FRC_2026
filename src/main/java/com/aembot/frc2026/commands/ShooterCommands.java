@@ -148,6 +148,17 @@ public final class ShooterCommands {
   }
 
   /**
+   * Function to get an amount to artifically boost flywheel speed
+   * 
+   * NOTE: currently just a static number but in future we may want to scale with distance or something
+   * 
+   * @return amount to boost flywheel speed in m/s
+   */
+  private double getFlywheelSpeedBoost() {
+    return 0.4;
+  }
+
+  /**
    * @return the current optimal speed to shoot to the goal position
    */
   private double getCurrentSpeed() {
@@ -155,7 +166,7 @@ public final class ShooterCommands {
             .getFuelInitVelocityMagnitude(
                 RobotStateYearly.get().getLatestFieldRobotPose(),
                 RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds())
-        + 0.4;
+        + getFlywheelSpeedBoost();
   }
 
   /* ---- HOOD COMMANDS ---- */
