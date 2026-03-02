@@ -40,6 +40,9 @@ public class TalonFXTurretConfiguration {
 
   public double startingRotation;
 
+  /** How far we can be off in units for auto aim to still shoot */
+  public double kAutoAimLeniance;
+
   /**
    * Create a new turret configuration
    *
@@ -103,6 +106,19 @@ public class TalonFXTurretConfiguration {
 
   public TalonFXTurretConfiguration withStartingRotation(double offet) {
     this.startingRotation = offet;
+    return this;
+  }
+
+  /**
+   * Set the amount of units that we can be off in order to still shoot
+   *
+   * <p>Counts both directions, so for example if this was 10, we could have a deviance of -10
+   * through +10
+   *
+   * @return this {@link TalonFXTurretConfiguration} for chaining
+   */
+  public TalonFXTurretConfiguration withAutoAimLeniance(double autoAimLeniance) {
+    this.kAutoAimLeniance = autoAimLeniance;
     return this;
   }
 

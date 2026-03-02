@@ -10,9 +10,12 @@ import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public final class CommandFactory {
+
   private final DriveSubsystem driveSubsystem;
   public final IntakeCommands intakeCommands;
   public final IndexerCommands indexerCommands;
@@ -34,6 +37,11 @@ public final class CommandFactory {
     this.indexerCommands =
         new IndexerCommands(spindexerSubsystem, indexerSelectorSubsystem, indexerKickerSubsystem);
     this.shooterCommands = new ShooterCommands(hoodSubsystem, turretSubsystem, flywheelSubsystem);
+  }
+
+  public Command createShootFuelCommand() {
+    return new ParallelCommandGroup(
+        indexerCommands.createFeedIndexerCommand(), shooterCommands.createShootFuelCommand());
   }
 
   public JoystickDriveCommand createDriveJoystickCmd(CommandXboxController driverController) {
