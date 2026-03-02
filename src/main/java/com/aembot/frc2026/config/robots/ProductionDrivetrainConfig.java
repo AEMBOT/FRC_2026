@@ -77,7 +77,7 @@ public class ProductionDrivetrainConfig {
     public static final PIDController AUTO_TRANSLATION_CONTROLLER =
         new PIDController(5.0, 0.0, 0.0);
 
-    public static final PIDController AUTO_ROTATION_CONTROLLER = new PIDController(5.0, 0.0, 0.0);
+    public static final PIDController AUTO_ROTATION_CONTROLLER = new PIDController(3.0, 0.0, 0.0);
 
     private static DrivetrainConfiguration makeDrivetrainConfiguration(
         String canBusName,

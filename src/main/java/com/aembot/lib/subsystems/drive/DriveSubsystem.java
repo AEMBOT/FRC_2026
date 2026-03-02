@@ -225,7 +225,7 @@ public class DriveSubsystem extends AEMSubsystem {
             sample.vy + config.autoTranslationController.calculate(inputs.Pose.getY(), sample.y),
             sample.omega
                 + config.autoRotationController.calculate(
-                    inputs.Pose.getRotation().getRadians(), sample.omega));
+                    inputs.Pose.getRotation().getRadians(), sample.heading));
 
     setRequestFromChassisSpeeds(speeds);
   }
