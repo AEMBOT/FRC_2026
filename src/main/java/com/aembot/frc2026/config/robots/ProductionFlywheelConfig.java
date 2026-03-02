@@ -40,7 +40,7 @@ public class ProductionFlywheelConfig {
 
   public static final String FLYWHEEL_SUBSYTEM_NAME = "FlywheelSubsystem";
 
-  public final double AUTO_AIM_LENCIANCY = 2;
+  public final double AUTO_AIM_LENCIANCY = 0.7;
 
   public final MotorConfiguration<TalonFXConfiguration> MOTOR_CONFIG =
       new MotorConfiguration<TalonFXConfiguration>()
