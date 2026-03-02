@@ -41,7 +41,7 @@ public class AutoHelper {
   public static void setupAutoChooser() {
 
     addAuto("EventMarkerTest");
-    addAuto("ShootingTest");
+    addAuto("MiddleDepot");
   }
 
   /**

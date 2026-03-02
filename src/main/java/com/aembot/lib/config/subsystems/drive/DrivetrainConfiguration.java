@@ -142,6 +142,7 @@ public class DrivetrainConfiguration {
    */
   public DrivetrainConfiguration withAutoRotationController(PIDController autoRotationController) {
     this.autoRotationController = autoRotationController;
+    autoRotationController.enableContinuousInput(-Math.PI, Math.PI);
     return this;
   }
 }
