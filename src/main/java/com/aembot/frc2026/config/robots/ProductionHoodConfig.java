@@ -27,7 +27,7 @@ public class ProductionHoodConfig {
 
   public final String SUBSYSTEM_NAME = "HoodSubsystem";
 
-  public final double AUTO_AIM_LENIANCY = 10;
+  public final double AUTO_AIM_LENIANCY = 2;
 
   public final Pose3d HOOD_ORIGIN_POSE =
       new Pose3d(0.134944, 0.000127, 0.083591, new Rotation3d(0, Units.degreesToRadians(20), 0));
