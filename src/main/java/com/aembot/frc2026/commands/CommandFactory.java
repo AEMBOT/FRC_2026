@@ -11,8 +11,12 @@ import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public final class CommandFactory {
 
@@ -20,6 +24,9 @@ public final class CommandFactory {
   public final IntakeCommands intakeCommands;
   public final IndexerCommands indexerCommands;
   public final ShooterCommands shooterCommands;
+
+  private boolean shootingFuel;
+  private final Trigger shootFuelTrigger;
 
   public CommandFactory(
       DriveSubsystem driveSubsystem,
@@ -37,9 +44,24 @@ public final class CommandFactory {
     this.indexerCommands =
         new IndexerCommands(spindexerSubsystem, indexerSelectorSubsystem, indexerKickerSubsystem);
     this.shooterCommands = new ShooterCommands(hoodSubsystem, turretSubsystem, flywheelSubsystem);
+
+    this.shootFuelTrigger = new Trigger(() -> shootingFuel);
+    this.shootFuelTrigger.whileTrue(createRawShootFuelCommand());
   }
 
   public Command createShootFuelCommand() {
+    return new RunCommand(() -> shootingFuel = true).finallyDo(() -> shootingFuel = false);
+  }
+
+  public Command createStartShootingFuelCommand() {
+    return new InstantCommand(() -> shootingFuel = true);
+  }
+
+  public Command createStopShootingFuelCommand() {
+    return new InstantCommand(() -> shootingFuel = false);
+  }
+
+  private Command createRawShootFuelCommand() {
     return new ParallelCommandGroup(
         indexerCommands.createFeedIndexerCommand(), shooterCommands.createShootFuelCommand());
   }
