@@ -20,9 +20,9 @@ public class ProductionTurretConfig {
 
   public final String SUBSYSTEM_NAME = "TurretSubsystem";
 
-  public final double CRUISE_VELOCITY_DEG_PER_SEC = 180;
+  public final double CRUISE_VELOCITY_DEG_PER_SEC = 720;
 
-  public final double ACCELERATION_DEG_PER_SEC = 360;
+  public final double ACCELERATION_DEG_PER_SEC = 720 * 2;
 
   public final double GEAR_RATIO = 400.0 / 13.0;
 
@@ -36,6 +36,8 @@ public class ProductionTurretConfig {
 
   public final Pose3d TURRET_ORIGIN_POSE =
       new Pose3d(-0.134944, -0.000127, 0.339133, new Rotation3d());
+
+  public final double AUTO_AIM_LENCIANCY = 10;
 
   public final AEMCANCoderConfiguration CANCODER_A_CONFIG =
       new AEMCANCoderConfiguration()
@@ -79,7 +81,7 @@ public class ProductionTurretConfig {
                               Units.degreesToRotations(CRUISE_VELOCITY_DEG_PER_SEC) * GEAR_RATIO)
                           .withMotionMagicAcceleration(
                               Units.degreesToRotations(ACCELERATION_DEG_PER_SEC) * GEAR_RATIO))
-                  .withSlot0(new Slot0Configs().withKP(.1).withKV(.1)))
+                  .withSlot0(new Slot0Configs().withKP(1).withKV(0)))
           .withCANDevice(
               new CANDeviceID(
                   MOTOR_ID, SUBSYSTEM_NAME + "Motor", SUBSYSTEM_NAME, CANDeviceType.TALON_FX))
@@ -102,5 +104,6 @@ public class ProductionTurretConfig {
           .withCANcoderBGearTeeth(CANCODER_B_GEAR_TEETH)
           .withRealMotorConfig(MOTOR_CONFIG)
           .withSimMotorConfig(SIM_MOTOR_CONFIG)
-          .withTurretOriginPose(TURRET_ORIGIN_POSE);
+          .withTurretOriginPose(TURRET_ORIGIN_POSE)
+          .withAutoAimLeniance(AUTO_AIM_LENCIANCY);
 }

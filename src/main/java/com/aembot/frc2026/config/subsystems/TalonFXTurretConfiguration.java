@@ -38,6 +38,9 @@ public class TalonFXTurretConfiguration {
   /** The origin pose of the turret for visualization in advantagescope. */
   public Pose3d kTurretOriginPose;
 
+  /** How far we can be off in units for auto aim to still shoot */
+  public double kAutoAimLeniance;
+
   /**
    * Create a new turret configuration
    *
@@ -96,6 +99,19 @@ public class TalonFXTurretConfiguration {
    */
   public TalonFXTurretConfiguration withTurretOriginPose(Pose3d turretOriginPose) {
     this.kTurretOriginPose = turretOriginPose;
+    return this;
+  }
+
+  /**
+   * Set the amount of units that we can be off in order to still shoot
+   *
+   * <p>Counts both directions, so for example if this was 10, we could have a deviance of -10
+   * through +10
+   *
+   * @return this {@link TalonFXTurretConfiguration} for chaining
+   */
+  public TalonFXTurretConfiguration withAutoAimLeniance(double autoAimLeniance) {
+    this.kAutoAimLeniance = autoAimLeniance;
     return this;
   }
 

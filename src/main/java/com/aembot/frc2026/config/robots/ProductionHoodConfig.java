@@ -21,11 +21,13 @@ public class ProductionHoodConfig {
 
   public final double GEAR_RATIO = 144;
 
-  public final double CRUISE_VELOCITY_DEG_PER_SEC = 90;
+  public final double CRUISE_VELOCITY_DEG_PER_SEC = 360;
 
-  public final double ACCELERATION_DEG_PER_SEC = 180;
+  public final double ACCELERATION_DEG_PER_SEC = 720;
 
   public final String SUBSYSTEM_NAME = "HoodSubsystem";
+
+  public final double AUTO_AIM_LENIANCY = 10;
 
   public final Pose3d HOOD_ORIGIN_POSE =
       new Pose3d(0.134944, 0.000127, 0.083591, new Rotation3d(0, Units.degreesToRadians(20), 0));
@@ -71,7 +73,8 @@ public class ProductionHoodConfig {
   public final TalonFXHoodConfiguration HOOD_CONFIG =
       new TalonFXHoodConfiguration(MOTOR_CONFIG, SUBSYSTEM_NAME)
           .withHoodOriginPose(HOOD_ORIGIN_POSE)
-          .withGamePieceExitPoint(GAMEPIECE_EXIT_POINT_FROM_TURRET);
+          .withGamePieceExitPoint(GAMEPIECE_EXIT_POINT_FROM_TURRET)
+          .withAutoAimLeniance(AUTO_AIM_LENIANCY);
 
   public final SimulatedHoodConfiguration SIMULATED_HOOD_CONFIG =
       new SimulatedHoodConfiguration(SIM_MOTOR_CONFIG, SUBSYSTEM_NAME);
