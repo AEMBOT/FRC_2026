@@ -48,7 +48,7 @@ public class ProductionIntakeConfig {
 
   public final double ROLLER_GEAR_RATIO = 1;
 
-  public final double ROLLER_VOLTAGE = 6;
+  public final double ROLLER_VOLTAGE = 8;
 
   public final NeutralMode ROLLER_NEUTRAL_MODE = NeutralMode.BRAKE;
 
