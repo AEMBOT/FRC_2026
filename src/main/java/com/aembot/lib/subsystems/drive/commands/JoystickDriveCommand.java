@@ -102,6 +102,7 @@ public class JoystickDriveCommand extends Command {
             .withDeadband(
                 driveTrainConfiguration.chassisTranslationSpeedThreshold
                     * driveTrainConfiguration.driveJoystickDeadband)
+            .withHeadingPID(5, 0, 0)
             .withDriveRequestType(SwerveModule.DriveRequestType.Velocity);
   }
 
@@ -256,6 +257,7 @@ public class JoystickDriveCommand extends Command {
   }
 
   private void driveWithHeading(double velocityX, double velocityY, Rotation2d heading) {
+    System.out.println("driveWithHeading");
     drivetrainSubsystem.setRequest(
         driveWithHeadingRequest
             .withVelocityX(velocityX)

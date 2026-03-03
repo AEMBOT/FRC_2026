@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import java.util.function.BooleanSupplier;
 
 public final class CommandFactory {
 
@@ -72,5 +73,21 @@ public final class CommandFactory {
 
     return new InstantCommand(
         () -> driveSubsystem.resetPose(new Pose2d(robotTranslation, robotRotation)));
+  }
+
+  public Command createSetHeadingFromPoseCommand(
+      CommandXboxController driverController, Trigger slowModeButton) {
+    BooleanSupplier inAllianceZone =
+        () ->
+            RobotRuntimeConstants.isBlueAlliance()
+                ? RobotStateYearly.get().getLatestFieldRobotPose().getX() < 4.02844
+                : RobotStateYearly.get().getLatestFieldRobotPose().getX() > 12.512548;
+
+    return DriveCommands.createDriveWithForwardHeadingCommand(
+            driveSubsystem, driverController.getHID(), () -> slowModeButton.getAsBoolean())
+        .onlyWhile(inAllianceZone)
+        .andThen(
+            DriveCommands.createDriveWithBackwardHeadingCommand(
+                driveSubsystem, driverController.getHID(), () -> slowModeButton.getAsBoolean()));
   }
 }
