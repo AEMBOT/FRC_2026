@@ -101,7 +101,7 @@ public class OverBumperIntakeDeploySubsystem
 
   public Command flickIntakeCommand() {
     return putIntakeUpCommand()
-        .raceWith(new WaitCommand(0.35))
+        .withTimeout(0.35)
         .andThen(
             putIntakeDownCommand()
                 .until(() -> MathUtil.isNear(getCurrentPosition(), getPositionSetpointUnits(), 2)));
