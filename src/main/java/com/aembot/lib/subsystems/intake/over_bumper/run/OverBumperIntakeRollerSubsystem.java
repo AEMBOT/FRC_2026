@@ -49,11 +49,11 @@ public class OverBumperIntakeRollerSubsystem
   }
 
   public Command runRollerCommand() {
-    return smartVelocitySetpointCommand(() -> config.kTargetSpeedUnitsPerMin);
+    return voltageCommand(() -> config.kIntakeVoltage);
   }
 
   public Command stopRollerCommand() {
-    return smartVelocitySetpointCommand(() -> 0);
+    return voltageCommand(() -> 0);
   }
 
   private void updateState() {

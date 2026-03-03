@@ -48,9 +48,9 @@ public class ProductionIntakeConfig {
 
   public final double ROLLER_GEAR_RATIO = 1;
 
-  public final double ROLLER_CRUISE_VELOCITY_ROT_PER_MIN = 200;
+  public final double ROLLER_VOLTAGE = 6;
 
-  public final double ROLLER_ACCELERATION_ROT_PER_MIN = 400;
+  public final NeutralMode ROLLER_NEUTRAL_MODE = NeutralMode.BRAKE;
 
   public final IntakeSide DEPLOY_SIDE = IntakeSide.FRONT;
 
@@ -98,14 +98,10 @@ public class ProductionIntakeConfig {
       new MotorConfiguration<TalonFXConfiguration>()
           .withMotorConfig(
               new TalonFXConfiguration()
-                  .withMotionMagic(
-                      new MotionMagicConfigs()
-                          .withMotionMagicCruiseVelocity(
-                              (ROLLER_CRUISE_VELOCITY_ROT_PER_MIN / 60) * ROLLER_GEAR_RATIO)
-                          .withMotionMagicAcceleration(
-                              (ROLLER_ACCELERATION_ROT_PER_MIN / 60) * ROLLER_GEAR_RATIO))
-                  // constants copies from hood config
-                  .withSlot0(new Slot0Configs().withKP(.1).withKV(.12)))
+                  .withMotorOutput(
+                      new MotorOutputConfigs()
+                          .withInverted(InvertedValue.Clockwise_Positive)
+                          .withNeutralMode(ROLLER_NEUTRAL_MODE.toCTRENeutralMode())))
           .withCANDevice(
               new CANDeviceID(
                   ROLLER_CAN_ID,
@@ -143,5 +139,5 @@ public class ProductionIntakeConfig {
       new TalonFXOverBumperIntakeRollerConfiguration(SUBSYSTEM_NAME + "Roller")
           .withRealMotorConfiguration(ROLLER_MOTOR_CONFIG)
           .withSimMotorConfiguration(ROLLER_SIM_MOTOR_CONFIG)
-          .withTargetSpeed(ROLLER_CRUISE_VELOCITY_ROT_PER_MIN);
+          .withIntakeVoltage(ROLLER_VOLTAGE);
 }

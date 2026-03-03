@@ -220,7 +220,7 @@ public final class ProductionIndexerConfig {
           .withMotorConfig(motorConfig)
           .withSimMotorConfig(simMotorConfig)
           .withTimeOfFlightConfig(timeOfFlightConfig)
-          .withTargetSpeedRPM(TARGET_SPEED_RPM)
+          .withRunVoltage(TARGET_SPEED_RPM)
           .withGamePieceMoveTimeSeconds(SECONDS_THRU_SELECTOR)
           .withGamePieceCapacity(GAMEPIECE_CAPACITY)
           .withGamePiecePositions(GAMEPIECE_POSITIONS)

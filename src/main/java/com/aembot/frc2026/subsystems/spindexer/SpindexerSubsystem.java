@@ -75,7 +75,7 @@ public class SpindexerSubsystem
 
   /**
    * @return Command that will set the target velocity of the spindexer to the velocity defined in
-   *     {@link #kConfig}'s {@link IndexerSelectorConfiguration#kTargetSpeedRPM}. Runs until
+   *     {@link #kConfig}'s {@link IndexerSelectorConfiguration#kRunVoltage}. Runs until
    *     termination. Note that this does not set target velocity to 0 upon termination.
    */
   public Command runSpindexerCommand() {
