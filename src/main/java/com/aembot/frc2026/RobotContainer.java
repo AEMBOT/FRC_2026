@@ -136,7 +136,7 @@ public class RobotContainer implements Loggerable {
 
     // driverController.x().whileTrue(/* UNUSED */);
 
-    // driverController.b().whileTrue(/* TODO: RUN INTAKE BACK */);
+    driverController.b().whileTrue(commandFactory.indexerCommands.createRunIntakeBackCommand());
 
     // driverController.a().onTrue(/* TODO: FLICK INTAKE */);
 

@@ -121,4 +121,10 @@ public final class IndexerCommands {
               }
             });
   }
+
+  public Command createRunIntakeBackCommand() {
+    final String NAME = "Reverse";
+
+    return new InstantCommand(() -> indexerCompoundState.commandState(IndexerRunState.REVERSE), dummySubsystem).withName(NAME);
+  }
 }
