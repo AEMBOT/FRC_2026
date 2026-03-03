@@ -93,7 +93,9 @@ public class RobotContainer implements Loggerable {
 
     /* ---- DEFAULT COMMANDS ---- */
 
-    driveSubsystem.setDefaultCommand(commandFactory.createDriveJoystickCmd(driverController));
+    // Use left bumper for slow mode
+    driveSubsystem.setDefaultCommand(
+        commandFactory.createDriveJoystickCmd(driverController, driverController.leftBumper()));
 
     hoodSubsystem.setDefaultCommand(commandFactory.shooterCommands.createHoodDownCommand());
 
@@ -123,8 +125,6 @@ public class RobotContainer implements Loggerable {
     driverController
         .leftTrigger()
         .whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
-
-    // driverController.leftBumper().whileTrue(/* TODO: SLOW MODE */);
 
     // c on the controller
     driverController.rightStick().onTrue(commandFactory.intakeCommands.createZeroDownCommand());

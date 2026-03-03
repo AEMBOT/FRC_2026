@@ -13,6 +13,7 @@ import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSu
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public final class CommandFactory {
 
@@ -51,7 +52,9 @@ public final class CommandFactory {
         shooterCommands.createSetPoseSupplierToTowerCommand());
   }
 
-  public JoystickDriveCommand createDriveJoystickCmd(CommandXboxController driverController) {
-    return DriveCommands.createDriveJoystickCmd(driveSubsystem, driverController.getHID());
+  public JoystickDriveCommand createDriveJoystickCmd(
+      CommandXboxController driverController, Trigger slowModeButton) {
+    return DriveCommands.createDriveJoystickCmd(
+        driveSubsystem, driverController.getHID(), () -> slowModeButton.getAsBoolean());
   }
 }

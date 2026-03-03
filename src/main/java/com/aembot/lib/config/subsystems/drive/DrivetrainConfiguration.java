@@ -42,6 +42,9 @@ public class DrivetrainConfiguration {
   /** Standard deviations of odometry while the robot is disabled */
   public OdometryStandardDevs disabledOdometryStandardDevs;
 
+  /** Amount to multiply speed by when in slow mode */
+  public double slowModeSpeed;
+
   public DrivetrainConfiguration() {}
 
   public DrivetrainConfiguration withName(String name) {
@@ -115,6 +118,17 @@ public class DrivetrainConfiguration {
       OdometryStandardDevs enabledStandardDevs, OdometryStandardDevs disabledStandardDevs) {
     this.enabledOdometryStandardDevs = enabledStandardDevs;
     this.disabledOdometryStandardDevs = disabledStandardDevs;
+    return this;
+  }
+
+  /**
+   * Set the factor to slow down when in slow mode
+   *
+   * @param slowModeSpeed factor to slow down
+   * @return self for chaining
+   */
+  public DrivetrainConfiguration withSlowModeSpeed(double slowModeSpeed) {
+    this.slowModeSpeed = slowModeSpeed;
     return this;
   }
 }

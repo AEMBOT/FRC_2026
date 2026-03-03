@@ -73,6 +73,8 @@ public class ProductionDrivetrainConfig {
      */
     public static final double MAX_ANGULAR_RATE = 8.2;
 
+    public static final double SLOW_MODE_SPEED = 0.4;
+
     private static DrivetrainConfiguration makeDrivetrainConfiguration(
         String canBusName,
         ProductionSwerveModuleConfigs moduleConfigs,
@@ -97,7 +99,8 @@ public class ProductionDrivetrainConfig {
                 moduleConfigs.backRightModule.getCtreModuleConstants()
               })
           .withOdometryStandardDevs(ENABLED_STANDARD_DEVS, DISABLED_STANDARD_DEVS)
-          .withJoystickDeadband(JOYSTICK_STEER_DEADBAND, JOYSTICK_TRANSLATION_DEADBAND);
+          .withJoystickDeadband(JOYSTICK_STEER_DEADBAND, JOYSTICK_TRANSLATION_DEADBAND)
+          .withSlowModeSpeed(SLOW_MODE_SPEED);
     }
   }
 
