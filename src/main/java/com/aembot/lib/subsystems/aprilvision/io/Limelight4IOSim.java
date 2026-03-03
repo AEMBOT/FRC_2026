@@ -280,4 +280,16 @@ public class Limelight4IOSim extends Limelight4IOHardware {
         estimate.timestampSeconds,
         estimate.pose);
   }
+
+  @Override
+  public void throttleForDisabled() {
+    // TODO sim impl
+    super.throttleForDisabled();
+  }
+
+  @Override
+  public void throttleForEnabled() {
+    // TODO sim impl
+    super.throttleForEnabled();
+  }
 }

@@ -214,4 +214,14 @@ public class Limelight4IOHardware implements AprilCameraIO {
   public CameraConfiguration getConfiguration() {
     return cameraConfiguration;
   }
+
+  @Override
+  public void throttleForDisabled() {
+    LimelightHelpers.SetThrottle(cameraName, (int) this.cameraConfiguration.disabledThrottleValue);
+  }
+
+  @Override
+  public void throttleForEnabled() {
+    LimelightHelpers.SetThrottle(cameraName, (int) this.cameraConfiguration.enabledThrottledValue);
+  }
 }

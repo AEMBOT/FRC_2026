@@ -54,4 +54,8 @@ public interface AprilCameraIO {
         unadjustedStandardDevs.yStdDev() * factor,
         unadjustedStandardDevs.rotStdDev() * factor);
   }
+
+  public void throttleForDisabled();
+
+  public void throttleForEnabled();
 }

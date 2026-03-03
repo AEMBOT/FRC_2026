@@ -18,4 +18,10 @@ public class AprilCameraReplayIO implements AprilCameraIO {
 
   @Override
   public void updateInputs(AprilVisionInputs inputs) {}
+
+  @Override
+  public void throttleForDisabled() {}
+
+  @Override
+  public void throttleForEnabled() {}
 }
