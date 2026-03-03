@@ -5,6 +5,8 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import choreo.trajectory.SwerveSample;
+import edu.wpi.first.wpilibj2.command.Commands;
+
 import com.aembot.frc2026.commands.CommandFactory;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
@@ -73,6 +75,8 @@ public class AutoHelper {
         .bind("RunIntake", commandFactory.intakeCommands.createRunIntakeCommand())
         .bind("StopIntake", commandFactory.intakeCommands.createStopIntakeCommand())
         .bind("StartShooting", commandFactory.createStartShootingFuelCommand())
-        .bind("StopShooting", commandFactory.createStopShootingFuelCommand());
+        .bind("StopShooting", commandFactory.createStopShootingFuelCommand())
+        .bind("StartFlickingIntake", Commands.none()) // Exists in driver-bindings branch
+        .bind("StopFlickingIntake", Commands.none()); // Exists in driver-bindings branch
   }
 }
