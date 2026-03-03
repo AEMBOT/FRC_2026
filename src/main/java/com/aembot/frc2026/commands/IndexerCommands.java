@@ -122,7 +122,7 @@ public final class IndexerCommands {
             });
   }
 
-  public Command createRunIntakeBackCommand() {
+  public Command createRunIndexerBackCommand() {
     final String NAME = "Reverse";
 
     return new InstantCommand(
