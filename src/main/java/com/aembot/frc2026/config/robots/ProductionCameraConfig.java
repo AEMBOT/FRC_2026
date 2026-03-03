@@ -18,7 +18,7 @@ public class ProductionCameraConfig {
 
   /* ---- TURRET CAM ---- */
   public final CameraConfiguration cameraConfigTurret =
-      CameraConfiguration.makeLimelight4Config("Turret")
+      CameraConfiguration.makeLimelight4Config("turret")
           .withMechanismOrigin(
               () ->
                   new Pose3d(
@@ -47,7 +47,7 @@ public class ProductionCameraConfig {
 
   /* ---- RIGHT CAM ---- */
   public final CameraConfiguration cameraConfigRight =
-      CameraConfiguration.makeLimelight4Config("Right")
+      CameraConfiguration.makeLimelight4Config("right")
           .withCameraOffset(
               new Transform3d(
                   new Translation3d(
@@ -67,7 +67,7 @@ public class ProductionCameraConfig {
 
   /* ---- LEFT CAM ---- */
   public final CameraConfiguration cameraConfigLeft =
-      CameraConfiguration.makeLimelight4Config("Left")
+      CameraConfiguration.makeLimelight4Config("left")
           .withCameraOffset(
               new Transform3d(
                   new Translation3d(
@@ -86,7 +86,7 @@ public class ProductionCameraConfig {
 
   /* ---- BACK CAM ---- */
   public final CameraConfiguration cameraConfigBack =
-      CameraConfiguration.makeLimelight4Config("Back")
+      CameraConfiguration.makeLimelight4Config("back")
           .withCameraOffset(
               new Transform3d(
                   new Translation3d(
