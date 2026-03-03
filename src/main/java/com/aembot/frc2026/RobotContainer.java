@@ -108,7 +108,8 @@ public class RobotContainer implements Loggerable {
 
     /* ---- PRIMARY DRIVER COMMANDS ---- */
 
-    // While we're pressing left trigger to intake and not right trigger or y to shoot, run indexer load
+    // While we're pressing left trigger to intake and not right trigger or y to shoot, run indexer
+    // load
     driverController
         .leftTrigger()
         .and(driverController.rightTrigger().negate())
@@ -117,11 +118,13 @@ public class RobotContainer implements Loggerable {
 
     driverController.rightTrigger().whileTrue(commandFactory.createShootFuelCommand());
 
-    //driverController.rightBumper().whileTrue(/* TODO: TOWER SHOT */);
+    driverController.rightBumper().whileTrue(commandFactory.createShootFuelTowerPosCommand());
 
-    driverController.leftTrigger().whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
+    driverController
+        .leftTrigger()
+        .whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
 
-    //driverController.leftBumper().whileTrue(/* TODO: SLOW MODE */);
+    // driverController.leftBumper().whileTrue(/* TODO: SLOW MODE */);
 
     // c on the controller
     driverController.rightStick().onTrue(commandFactory.intakeCommands.createZeroDownCommand());
@@ -131,25 +134,33 @@ public class RobotContainer implements Loggerable {
 
     driverController.y().whileTrue(commandFactory.createShootFuelCommand());
 
-    //driverController.x().whileTrue(/* UNUSED */);
+    // driverController.x().whileTrue(/* UNUSED */);
 
-    //driverController.b().whileTrue(/* TODO: RUN INTAKE BACK */);
+    // driverController.b().whileTrue(/* TODO: RUN INTAKE BACK */);
 
-    //driverController.a().onTrue(/* TODO: FLICK INTAKE */);
+    // driverController.a().onTrue(/* TODO: FLICK INTAKE */);
 
-    driverController.povLeft().onTrue(commandFactory.shooterCommands.createSetPassingPoseLeftCommand());
+    driverController
+        .povLeft()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseLeftCommand());
 
-    driverController.povUp().onTrue(commandFactory.shooterCommands.createSetPassingPoseMiddleCommand());
+    driverController
+        .povUp()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseMiddleCommand());
 
-    driverController.povRight().onTrue(commandFactory.shooterCommands.createSetPassingPoseRightCommand());
+    driverController
+        .povRight()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseRightCommand());
 
-    driverController.povDown().onTrue(commandFactory.shooterCommands.createSetPassingPoseOutpostCommand());
+    driverController
+        .povDown()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseOutpostCommand());
 
-    //driverController.start().onTrue(/* TODO: RESET FEILD CENTRIC */);
+    // driverController.start().onTrue(/* TODO: RESET FIELD CENTRIC */);
 
     /* ---- SECONDARY CONTROLLER BINDINGS ---- */
 
-    //secondaryController.leftBumper().onTrue(/* TODO: KILL VISION */);
+    // secondaryController.leftBumper().onTrue(/* TODO: KILL VISION */);
 
     // rest is unused
 

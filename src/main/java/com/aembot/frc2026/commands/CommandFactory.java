@@ -44,6 +44,13 @@ public final class CommandFactory {
         indexerCommands.createFeedIndexerCommand(), shooterCommands.createShootFuelCommand());
   }
 
+  public Command createShootFuelTowerPosCommand() {
+    return new ParallelCommandGroup(
+        indexerCommands.createFeedIndexerCommand(),
+        shooterCommands.createShootFuelCommand(),
+        shooterCommands.createSetPoseSupplierToTowerCommand());
+  }
+
   public JoystickDriveCommand createDriveJoystickCmd(CommandXboxController driverController) {
     return DriveCommands.createDriveJoystickCmd(driveSubsystem, driverController.getHID());
   }
