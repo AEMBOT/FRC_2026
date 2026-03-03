@@ -11,6 +11,7 @@ import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.aembot.lib.core.can.CANDeviceID.CANDeviceType;
 import com.aembot.lib.core.motors.interfaces.MotorIO.NeutralMode;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -181,10 +182,7 @@ public final class ProductionIndexerConfig {
                       .withSlot0(MOTOR_GAINS)
                       .withMotorOutput(
                           new MotorOutputConfigs()
-                              .withInverted(
-                                  MOTOR_INVERTED
-                                      ? InvertedValue.CounterClockwise_Positive
-                                      : InvertedValue.Clockwise_Positive)
+                              .withInverted(InvertedValue.Clockwise_Positive)
                               .withNeutralMode(MOTOR_NEUTRAL_MODE.toCTRENeutralMode())))
               .withMomentOfInertia(0.01)
               .withCANDevice(
@@ -241,7 +239,8 @@ public final class ProductionIndexerConfig {
     static final NeutralMode MOTOR_NEUTRAL_MODE = NeutralMode.BRAKE;
 
     // constants copied from hood config
-    static final Slot0Configs MOTOR_GAINS = new Slot0Configs().withKP(.1).withKV(.12);
+    // TODO: Not fully tuned
+    static final Slot0Configs MOTOR_GAINS = new Slot0Configs().withKP(0).withKV(.13).withKS(0.49);
 
     /** Target speed of the spindexer roller in RPM */
     static final double TARGET_SPEED_RPM = 200.0; // Copied from intake config
@@ -285,7 +284,8 @@ public final class ProductionIndexerConfig {
                                   MOTOR_INVERTED
                                       ? InvertedValue.CounterClockwise_Positive
                                       : InvertedValue.Clockwise_Positive)
-                              .withNeutralMode(MOTOR_NEUTRAL_MODE.toCTRENeutralMode())))
+                              .withNeutralMode(MOTOR_NEUTRAL_MODE.toCTRENeutralMode()))
+                      .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(20)))
               .withMomentOfInertia(0.01)
               .withCANDevice(
                   new CANDeviceID(
