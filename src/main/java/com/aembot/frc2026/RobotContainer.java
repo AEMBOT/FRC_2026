@@ -110,13 +110,6 @@ public class RobotContainer implements Loggerable {
 
     /* ---- PRIMARY DRIVER COMMANDS ---- */
 
-    // While we're pressing left trigger to intake and not right trigger or y to shoot, run indexer
-    // load
-    driverController
-        .leftTrigger()
-        .and(driverController.rightTrigger().negate())
-        .and(driverController.y().negate())
-        .whileTrue(commandFactory.indexerCommands.createLoadIndexerCommand());
 
     driverController.rightTrigger().whileTrue(commandFactory.createShootFuelCommand());
 
@@ -125,6 +118,14 @@ public class RobotContainer implements Loggerable {
     driverController
         .leftTrigger()
         .whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
+
+    // While we're pressing left trigger to intake and not right trigger or y to shoot, run indexer
+    // load
+    driverController
+        .leftTrigger()
+        .and(driverController.rightTrigger().negate())
+        .and(driverController.y().negate())
+        .whileTrue(commandFactory.indexerCommands.createLoadIndexerCommand());
 
     // c on the controller
     driverController.leftStick().onTrue(commandFactory.intakeCommands.createDownCommand());
