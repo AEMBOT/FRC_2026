@@ -44,7 +44,7 @@ public class DrivetrainConfiguration {
   public OdometryStandardDevs disabledOdometryStandardDevs;
 
   /** Amount to multiply speed by when in slow mode */
-  public double slowModeSpeed;
+  public double slowModeFactor;
 
   /** PID constants to use for drive heading control */
   public PIDConstants headingPID;
@@ -128,11 +128,11 @@ public class DrivetrainConfiguration {
   /**
    * Set the factor to slow down when in slow mode
    *
-   * @param slowModeSpeed factor to slow down
+   * @param slowModeFactor factor to slow down
    * @return self for chaining
    */
-  public DrivetrainConfiguration withSlowModeSpeed(double slowModeSpeed) {
-    this.slowModeSpeed = slowModeSpeed;
+  public DrivetrainConfiguration withslowModeFactor(double slowModeFactor) {
+    this.slowModeFactor = slowModeFactor;
     return this;
   }
 

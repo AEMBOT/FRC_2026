@@ -74,7 +74,7 @@ public class ProductionDrivetrainConfig {
      */
     public static final double MAX_ANGULAR_RATE = 8.2;
 
-    public static final double SLOW_MODE_SPEED = 0.4;
+    public static final double SLOW_MODE_FACTOR = 0.4;
 
     public static final PIDConstants HEADING_PID_CONSTANTS = new PIDConstants(5, 0, 0);
 
@@ -103,7 +103,7 @@ public class ProductionDrivetrainConfig {
               })
           .withOdometryStandardDevs(ENABLED_STANDARD_DEVS, DISABLED_STANDARD_DEVS)
           .withJoystickDeadband(JOYSTICK_STEER_DEADBAND, JOYSTICK_TRANSLATION_DEADBAND)
-          .withSlowModeSpeed(SLOW_MODE_SPEED)
+          .withslowModeFactor(SLOW_MODE_FACTOR)
           .withHeadingPIDConstants(HEADING_PID_CONSTANTS);
     }
   }

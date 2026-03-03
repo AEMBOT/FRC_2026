@@ -83,7 +83,7 @@ public class JoystickDriveCommand extends Command {
     this.joystickDriveDeadband = driveTrainConfiguration.driveJoystickDeadband;
 
     this.slowModeActiveSupplier = slowModeActiveSupplier;
-    this.slowModeFactor = driveTrainConfiguration.slowModeSpeed;
+    this.slowModeFactor = driveTrainConfiguration.slowModeFactor;
 
     // Field centric drive WITHOUT heading lock set
     driveWithSteerRequest =
