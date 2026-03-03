@@ -223,8 +223,6 @@ public class JoystickDriveCommand extends Command {
       steerVelocity = -this.steerVelocitySupplier.get() * this.maxAngularRate;
     }
 
-    System.out.println(slowModeActiveSupplier.getAsBoolean());
-
     xVelocity *= slowModeActiveSupplier.getAsBoolean() ? slowModeFactor : 1;
     yVelocity *= slowModeActiveSupplier.getAsBoolean() ? slowModeFactor : 1;
 
