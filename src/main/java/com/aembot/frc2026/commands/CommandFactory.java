@@ -75,7 +75,7 @@ public final class CommandFactory {
         () -> driveSubsystem.resetPose(new Pose2d(robotTranslation, robotRotation)));
   }
 
-  public Command createSetHeadingFromPoseCommand(
+  public Command createSetDriveHeadingForUnderTrenchCommand(
       CommandXboxController driverController, Trigger slowModeButton) {
     BooleanSupplier inAllianceZone =
         () ->

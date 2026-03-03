@@ -137,7 +137,7 @@ public class RobotContainer implements Loggerable {
     driverController
         .x()
         .whileTrue(
-            commandFactory.createSetHeadingFromPoseCommand(
+            commandFactory.createSetDriveHeadingForUnderTrenchCommand(
                 driverController, driverController.leftBumper()));
 
     driverController.b().whileTrue(commandFactory.indexerCommands.createRunIntakeBackCommand());
