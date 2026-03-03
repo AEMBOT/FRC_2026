@@ -4,6 +4,7 @@ import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
+import com.pathplanner.lib.config.PIDConstants;
 
 public class DrivetrainConfiguration {
   public String configurationName;
@@ -44,6 +45,9 @@ public class DrivetrainConfiguration {
 
   /** Amount to multiply speed by when in slow mode */
   public double slowModeSpeed;
+
+  /** PID constants to use for drive heading control */
+  public PIDConstants headingPID;
 
   public DrivetrainConfiguration() {}
 
@@ -129,6 +133,17 @@ public class DrivetrainConfiguration {
    */
   public DrivetrainConfiguration withSlowModeSpeed(double slowModeSpeed) {
     this.slowModeSpeed = slowModeSpeed;
+    return this;
+  }
+
+  /**
+   * Set the PID constants to use when using heading based swerve control
+   *
+   * @param headingPIDConstants PID constants to use
+   * @return self for chaining
+   */
+  public DrivetrainConfiguration withHeadingPIDConstants(PIDConstants headingPIDConstants) {
+    this.headingPID = headingPIDConstants;
     return this;
   }
 }

@@ -102,7 +102,10 @@ public class JoystickDriveCommand extends Command {
             .withDeadband(
                 driveTrainConfiguration.chassisTranslationSpeedThreshold
                     * driveTrainConfiguration.driveJoystickDeadband)
-            .withHeadingPID(5, 0, 0)
+            .withHeadingPID(
+                driveTrainConfiguration.headingPID.kP,
+                driveTrainConfiguration.headingPID.kI,
+                driveTrainConfiguration.headingPID.kD)
             .withDriveRequestType(SwerveModule.DriveRequestType.Velocity);
   }
 
