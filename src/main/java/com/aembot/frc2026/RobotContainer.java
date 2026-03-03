@@ -127,10 +127,10 @@ public class RobotContainer implements Loggerable {
         .whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
 
     // c on the controller
-    driverController.rightStick().onTrue(commandFactory.intakeCommands.createZeroDownCommand());
+    driverController.leftStick().onTrue(commandFactory.intakeCommands.createDownCommand());
 
     // z on the controller
-    driverController.leftStick().onTrue(commandFactory.intakeCommands.createUpCommand());
+    driverController.rightStick().onTrue(commandFactory.intakeCommands.createUpCommand());
 
     driverController.y().whileTrue(commandFactory.createShootFuelCommand());
 
@@ -138,7 +138,9 @@ public class RobotContainer implements Loggerable {
 
     driverController.b().whileTrue(commandFactory.indexerCommands.createRunIntakeBackCommand());
 
-    // driverController.a().onTrue(/* TODO: FLICK INTAKE */);
+    driverController
+        .a()
+        .onTrue(commandFactory.intakeCommands.createFlickIntakeCommand());
 
     driverController
         .povLeft()

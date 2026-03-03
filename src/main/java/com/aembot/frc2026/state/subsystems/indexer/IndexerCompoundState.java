@@ -29,7 +29,8 @@ public class IndexerCompoundState implements Loggable {
     /** The indexer is loading game pieces and shooting them immediately */
     FIRE(IndexerStageRunState.FORWARD, IndexerStageRunState.FORWARD, IndexerStageRunState.FORWARD),
     /** Run all indexer stages backward */
-    REVERSE(IndexerStageRunState.REVERSE, IndexerStageRunState.REVERSE, IndexerStageRunState.REVERSE),
+    REVERSE(
+        IndexerStageRunState.REVERSE, IndexerStageRunState.REVERSE, IndexerStageRunState.REVERSE),
     ;
 
     public final IndexerStageRunState SPINDEXER_DIRECTION;
