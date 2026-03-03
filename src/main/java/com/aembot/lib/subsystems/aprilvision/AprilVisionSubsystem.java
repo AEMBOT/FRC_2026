@@ -84,6 +84,9 @@ public class AprilVisionSubsystem extends AEMSubsystem {
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
+
+    Logger.recordOutput(standardPrefix + "/VisionActive", visionActive);
+
     for (Pair<AprilCameraIO, AprilVisionInputs> cameraWithInput : camerasWithInputs) {
       AprilCameraIO io = cameraWithInput.getFirst();
       AprilVisionInputs inputs = cameraWithInput.getSecond();
