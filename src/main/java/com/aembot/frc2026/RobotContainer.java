@@ -138,9 +138,7 @@ public class RobotContainer implements Loggerable {
 
     driverController.b().whileTrue(commandFactory.indexerCommands.createRunIntakeBackCommand());
 
-    driverController
-        .a()
-        .onTrue(commandFactory.intakeCommands.createFlickIntakeCommand());
+    driverController.a().onTrue(commandFactory.intakeCommands.createFlickIntakeCommand());
 
     driverController
         .povLeft()
@@ -158,7 +156,7 @@ public class RobotContainer implements Loggerable {
         .povDown()
         .onTrue(commandFactory.shooterCommands.createSetPassingPoseOutpostCommand());
 
-    // driverController.start().onTrue(/* TODO: RESET FIELD CENTRIC */);
+    driverController.start().onTrue(commandFactory.resetOdometryHeading());
 
     /* ---- SECONDARY CONTROLLER BINDINGS ---- */
 

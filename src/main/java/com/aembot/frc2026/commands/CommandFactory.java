@@ -1,5 +1,7 @@
 package com.aembot.frc2026.commands;
 
+import com.aembot.frc2026.constants.RobotRuntimeConstants;
+import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.subsystems.indexerKicker.IndexerKickerSubsystem;
 import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorSubsystem;
 import com.aembot.frc2026.subsystems.spindexer.SpindexerSubsystem;
@@ -10,7 +12,11 @@ import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -56,5 +62,15 @@ public final class CommandFactory {
       CommandXboxController driverController, Trigger slowModeButton) {
     return DriveCommands.createDriveJoystickCmd(
         driveSubsystem, driverController.getHID(), () -> slowModeButton.getAsBoolean());
+  }
+
+  public Command resetOdometryHeading() {
+    Translation2d robotTranslation =
+        RobotStateYearly.get().getLatestFieldRobotPose().getTranslation();
+    Rotation2d robotRotation =
+        RobotRuntimeConstants.isBlueAlliance() ? Rotation2d.kZero : Rotation2d.k180deg;
+
+    return new InstantCommand(
+        () -> driveSubsystem.resetPose(new Pose2d(robotTranslation, robotRotation)));
   }
 }
