@@ -48,9 +48,9 @@ public class TurretSubsystem
 
     io.getCANcoderA().updateInputs(encoderAInputs);
     io.getCANcoderB().updateInputs(encoderBInputs);
-    // setPositionFromEncoders();
+    setPositionFromEncoders();
 
-    setEncoderPosition(config.startingRotation);
+    // setEncoderPosition(config.startingRotation);
   }
 
   private void setPositionFromEncoders() {
@@ -81,13 +81,13 @@ public class TurretSubsystem
 
     // If motor has reset (e.g. brownout) then rezero
     if (io.getMotor().hasResetOccurred()) {
-      // setPositionFromEncoders();
+      setPositionFromEncoders();
       // We're kinda screwed so just disable turret
-      CommandScheduler.getInstance()
-          .schedule(
-              dutyCycleCommand(() -> 0)
-                  .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-                  .withName("DisableMotorCommand"));
+      // CommandScheduler.getInstance()
+      //     .schedule(
+      //         dutyCycleCommand(() -> 0)
+      //             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+      //             .withName("DisableMotorCommand"));
     }
 
     // setPositionFromEncoders();
@@ -111,6 +111,8 @@ public class TurretSubsystem
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
     Logger.processInputs(inputPrefix, inputs);
+    Logger.processInputs(inputPrefix, encoderAInputs);
+    Logger.processInputs(inputPrefix, encoderBInputs);
     io.updateLog(standardPrefix, inputPrefix);
     super.updateLog(standardPrefix, inputPrefix);
   }

@@ -57,7 +57,7 @@ public class ProductionTurretConfig {
                           .withMagnetOffset(CANCODER_A_MAGNET_OFFSET)
                           .withAbsoluteSensorDiscontinuityPoint(1)));
 
-  public final int CANCODER_A_GEAR_TEETH = 17;
+  public final int CANCODER_A_GEAR_TEETH = 13;
 
   public final double CANCODER_B_MAGNET_OFFSET = 0;
 
@@ -76,7 +76,7 @@ public class ProductionTurretConfig {
                           .withMagnetOffset(CANCODER_B_MAGNET_OFFSET)
                           .withAbsoluteSensorDiscontinuityPoint(1)));
 
-  public final int CANCODER_B_GEAR_TEETH = 13;
+  public final int CANCODER_B_GEAR_TEETH = 17;
 
   public final MotorConfiguration<TalonFXConfiguration> MOTOR_CONFIG =
       new MotorConfiguration<TalonFXConfiguration>()
