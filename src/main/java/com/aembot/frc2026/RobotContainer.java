@@ -160,7 +160,7 @@ public class RobotContainer implements Loggerable {
 
     /* ---- SECONDARY CONTROLLER BINDINGS ---- */
 
-    // secondaryController.leftBumper().onTrue(/* TODO: KILL VISION */);
+    secondaryController.leftBumper().onTrue(visionSubsystem.createKillVisionCommand());
 
     // rest is unused
 
