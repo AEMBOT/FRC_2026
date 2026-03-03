@@ -90,27 +90,69 @@ public class RobotContainer implements Loggerable {
 
   /** Use this method to define your controller button -> command mappings */
   private void configureBindings() {
+
+    /* ---- DEFAULT COMMANDS ---- */
+
     driveSubsystem.setDefaultCommand(commandFactory.createDriveJoystickCmd(driverController));
+
     hoodSubsystem.setDefaultCommand(commandFactory.shooterCommands.createHoodDownCommand());
+
     turretSubsystem.setDefaultCommand(
         commandFactory.shooterCommands.createTurretTowardsGoalCommand());
+
     intakeRollerSubsystem.setDefaultCommand(
         commandFactory.intakeCommands.createStopIntakeCommand());
+
     flywheelSubsystem.setDefaultCommand(
         commandFactory.shooterCommands.createFlywheelIdleSpeedCommand());
 
-    driverController.a().onTrue(commandFactory.intakeCommands.createUpCommand());
-    driverController.b().onTrue(commandFactory.intakeCommands.createDownCommand());
+    /* ---- PRIMARY DRIVER COMMANDS ---- */
 
-    driverController.x().whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
-
-    // While we're pressing x to intake and not y to shoot, run indexer load
+    // While we're pressing left trigger to intake and not right trigger or y to shoot, run indexer load
     driverController
-        .x()
+        .leftTrigger()
+        .and(driverController.rightTrigger().negate())
         .and(driverController.y().negate())
         .whileTrue(commandFactory.indexerCommands.createLoadIndexerCommand());
 
+    driverController.rightTrigger().whileTrue(commandFactory.createShootFuelCommand());
+
+    //driverController.rightBumper().whileTrue(/* TODO: TOWER SHOT */);
+
+    driverController.leftTrigger().whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
+
+    //driverController.leftBumper().whileTrue(/* TODO: SLOW MODE */);
+
+    // c on the controller
+    driverController.rightStick().onTrue(commandFactory.intakeCommands.createZeroDownCommand());
+
+    // z on the controller
+    driverController.leftStick().onTrue(commandFactory.intakeCommands.createUpCommand());
+
     driverController.y().whileTrue(commandFactory.createShootFuelCommand());
+
+    //driverController.x().whileTrue(/* UNUSED */);
+
+    //driverController.b().whileTrue(/* TODO: RUN INTAKE BACK */);
+
+    //driverController.a().onTrue(/* TODO: FLICK INTAKE */);
+
+    driverController.povLeft().onTrue(commandFactory.shooterCommands.createSetPassingPoseLeftCommand());
+
+    driverController.povUp().onTrue(commandFactory.shooterCommands.createSetPassingPoseMiddleCommand());
+
+    driverController.povRight().onTrue(commandFactory.shooterCommands.createSetPassingPoseRightCommand());
+
+    driverController.povDown().onTrue(commandFactory.shooterCommands.createSetPassingPoseOutpostCommand());
+
+    //driverController.start().onTrue(/* TODO: RESET FEILD CENTRIC */);
+
+    /* ---- SECONDARY CONTROLLER BINDINGS ---- */
+
+    //secondaryController.leftBumper().onTrue(/* TODO: KILL VISION */);
+
+    // rest is unused
+
   }
 
   /**
