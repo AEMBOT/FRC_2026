@@ -160,7 +160,8 @@ public class Limelight4IOHardware implements AprilCameraIO {
           compensateForEstimateLatency(
               estimate.pose,
               robotStateInstance.getLatestFusedFieldRelativeChassisSpeed(),
-              Timer.getFPGATimestamp() - (estimate.timestampSeconds - estimate.latency));
+              Timer.getFPGATimestamp()
+                  - (estimate.timestampSeconds - Units.millisecondsToSeconds(estimate.latency)));
 
       lastMegatag2Timestamp = estimate.timestampSeconds;
 

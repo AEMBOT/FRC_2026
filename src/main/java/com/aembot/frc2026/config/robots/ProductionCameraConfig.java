@@ -16,7 +16,7 @@ public class ProductionCameraConfig {
   private static final double SIM_CAMERA_LATENCY_STDDEV_MS = 1;
 
   public final CameraConfiguration cameraConfigTest =
-      CameraConfiguration.makeLimelight4Config("Test")
+      CameraConfiguration.makeLimelight4Config("test")
           .withCameraOffset(
               new Transform3d(
                   new Translation3d(
