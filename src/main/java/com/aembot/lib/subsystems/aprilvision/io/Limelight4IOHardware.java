@@ -74,6 +74,8 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
   private AtomicReference<double[]> limelightStdDevs = new AtomicReference<>(new double[0]);
 
+  private int cachedThrottleValue = 0;
+
   protected final Consumer<NetworkTableEvent> heartbeatCallback = this::updateNtValuesCache;
 
   public Limelight4IOHardware(
@@ -149,6 +151,8 @@ public class Limelight4IOHardware implements AprilCameraIO {
         Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getY()),
         Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getZ()));
 
+    LimelightHelpers.SetIMUMode(cameraName, 1);
+
     double robotYaw = robotStateInstance.getLatestFieldRobotPose().getRotation().getDegrees();
     LimelightHelpers.SetRobotOrientation(cameraName, robotYaw, 0, 0, 0, 0, 0);
 
@@ -195,7 +199,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
     double[] doubleArray = limelightStdDevs.get();
 
     return adjustStdDevsWithOdomPose(
-        new OdometryStandardDevs(doubleArray[0], doubleArray[1], doubleArray[5]),
+        new OdometryStandardDevs(doubleArray[0], doubleArray[1], Double.MAX_VALUE),
         estimate.timestampSeconds,
         estimate.pose);
   }
@@ -217,11 +221,19 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
   @Override
   public void throttleForDisabled() {
-    LimelightHelpers.SetThrottle(cameraName, (int) this.cameraConfiguration.disabledThrottleValue);
+    if (cachedThrottleValue != this.cameraConfiguration.disabledThrottleValue) {
+      LimelightHelpers.SetThrottle(
+          cameraName, (int) this.cameraConfiguration.disabledThrottleValue);
+      cachedThrottleValue = (int) this.cameraConfiguration.disabledThrottleValue;
+    }
   }
 
   @Override
   public void throttleForEnabled() {
-    LimelightHelpers.SetThrottle(cameraName, (int) this.cameraConfiguration.enabledThrottledValue);
+    if (cachedThrottleValue != this.cameraConfiguration.enabledThrottledValue) {
+      LimelightHelpers.SetThrottle(
+          cameraName, (int) this.cameraConfiguration.enabledThrottledValue);
+      cachedThrottleValue = (int) this.cameraConfiguration.enabledThrottledValue;
+    }
   }
 }

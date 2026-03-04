@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import org.littletonrobotics.junction.Logger;
 
 public interface AprilCameraIO {
   public CameraConfiguration getConfiguration();
@@ -49,6 +50,12 @@ public interface AprilCameraIO {
         wholeEstimatedRobotPose.minus(cameraEstimatedRobotPose).getTranslation().getNorm();
     double factor = 1 + (Math.pow(distMeters, 2) * 2); // Prolly very subject to change
 
+    Logger.recordOutput(
+        getConfiguration() + "/stdDevs",
+        new OdometryStandardDevs(
+            unadjustedStandardDevs.xStdDev() * factor,
+            unadjustedStandardDevs.yStdDev() * factor,
+            unadjustedStandardDevs.rotStdDev() * factor));
     return new OdometryStandardDevs(
         unadjustedStandardDevs.xStdDev() * factor,
         unadjustedStandardDevs.yStdDev() * factor,

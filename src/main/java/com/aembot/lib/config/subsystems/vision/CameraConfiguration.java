@@ -257,7 +257,7 @@ public class CameraConfiguration {
         .withCameraResolution(Resolution.P1280x960)
         .withCameraFOV(FOV.LIMELIGHT4)
         .withBaslineStdDev(0.02, Double.MAX_VALUE) // Values yoinked from 2481
-        .withDisabledThrottleValue(150)
+        .withDisabledThrottleValue(0) // TODO
         .withEnabledThrottleValue(0);
   }
 }

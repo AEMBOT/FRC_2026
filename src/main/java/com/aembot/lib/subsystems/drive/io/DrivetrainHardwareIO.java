@@ -194,9 +194,11 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
 
   @Override
   public void addVisionEstimation(AprilCameraOutput cameraOutput) {
-    addVisionMeasurement(
-        cameraOutput.estimatedPose().latencyCompensatedPose(),
-        Utils.fpgaToCurrentTime(cameraOutput.estimatedPose().timestampSeconds()),
-        cameraOutput.estimatedPose().stdDevs().toMatrix());
+    if (cameraOutput.estimatedPose().stdDevs().xStdDev() != Double.NaN) {
+      addVisionMeasurement(
+          cameraOutput.estimatedPose().latencyCompensatedPose(),
+          Utils.fpgaToCurrentTime(cameraOutput.estimatedPose().timestampSeconds()),
+          cameraOutput.estimatedPose().stdDevs().toMatrix());
+    }
   }
 }
