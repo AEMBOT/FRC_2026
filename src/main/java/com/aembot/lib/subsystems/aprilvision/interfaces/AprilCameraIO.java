@@ -46,20 +46,30 @@ public interface AprilCameraIO {
       OdometryStandardDevs unadjustedStandardDevs,
       Pose2d wholeEstimatedRobotPose,
       Pose2d cameraEstimatedRobotPose) {
-    double distMeters =
-        wholeEstimatedRobotPose.minus(cameraEstimatedRobotPose).getTranslation().getNorm();
+  
+    // Guard against null or NaN poses
+    if (wholeEstimatedRobotPose == null
+      || cameraEstimatedRobotPose == null
+      || Double.isNaN(wholeEstimatedRobotPose.getX())
+      || Double.isNaN(wholeEstimatedRobotPose.getY())
+      || Double.isNaN(cameraEstimatedRobotPose.getX())
+      || Double.isNaN(cameraEstimatedRobotPose.getY())) {
+
+      Logger.recordOutput(getConfiguration() + "/stdDevs", unadjustedStandardDevs);
+      return unadjustedStandardDevs;
+    }
+
+    double distMeters = wholeEstimatedRobotPose.minus(cameraEstimatedRobotPose).getTranslation().getNorm();
+
     double factor = 1 + (Math.pow(distMeters, 2) * 2); // Prolly very subject to change
 
-    Logger.recordOutput(
-        getConfiguration() + "/stdDevs",
-        new OdometryStandardDevs(
-            unadjustedStandardDevs.xStdDev() * factor,
-            unadjustedStandardDevs.yStdDev() * factor,
-            unadjustedStandardDevs.rotStdDev() * factor));
-    return new OdometryStandardDevs(
-        unadjustedStandardDevs.xStdDev() * factor,
-        unadjustedStandardDevs.yStdDev() * factor,
-        unadjustedStandardDevs.rotStdDev() * factor);
+    OdometryStandardDevs adjustedStdDevs =
+      new OdometryStandardDevs(
+          unadjustedStandardDevs.xStdDev() * factor,
+          unadjustedStandardDevs.yStdDev() * factor,
+          unadjustedStandardDevs.rotStdDev() * factor);
+    Logger.recordOutput(getConfiguration() + "/stdDevs", adjustedStdDevs);
+    return adjustedStdDevs;
   }
 
   public void throttleForDisabled();
