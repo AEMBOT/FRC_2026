@@ -17,6 +17,8 @@ import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -86,6 +88,8 @@ public class RobotContainer implements Loggerable {
             flywheelSubsystem,
             turretSubsystem);
     configureBindings();
+
+    driveSubsystem.resetPose(new Pose2d(0, 0, Rotation2d.fromDegrees(-180)));
   }
 
   /** Use this method to define your controller button -> command mappings */
