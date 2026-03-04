@@ -4,6 +4,7 @@ import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
+import com.pathplanner.lib.config.PIDConstants;
 
 public class DrivetrainConfiguration {
   public String configurationName;
@@ -41,6 +42,12 @@ public class DrivetrainConfiguration {
 
   /** Standard deviations of odometry while the robot is disabled */
   public OdometryStandardDevs disabledOdometryStandardDevs;
+
+  /** Amount to multiply speed by when in slow mode */
+  public double slowModeFactor;
+
+  /** PID constants to use for drive heading control */
+  public PIDConstants headingPID;
 
   public DrivetrainConfiguration() {}
 
@@ -115,6 +122,28 @@ public class DrivetrainConfiguration {
       OdometryStandardDevs enabledStandardDevs, OdometryStandardDevs disabledStandardDevs) {
     this.enabledOdometryStandardDevs = enabledStandardDevs;
     this.disabledOdometryStandardDevs = disabledStandardDevs;
+    return this;
+  }
+
+  /**
+   * Set the factor to slow down when in slow mode
+   *
+   * @param slowModeFactor factor to slow down
+   * @return self for chaining
+   */
+  public DrivetrainConfiguration withslowModeFactor(double slowModeFactor) {
+    this.slowModeFactor = slowModeFactor;
+    return this;
+  }
+
+  /**
+   * Set the PID constants to use when using heading based swerve control
+   *
+   * @param headingPIDConstants PID constants to use
+   * @return self for chaining
+   */
+  public DrivetrainConfiguration withHeadingPIDConstants(PIDConstants headingPIDConstants) {
+    this.headingPID = headingPIDConstants;
     return this;
   }
 }

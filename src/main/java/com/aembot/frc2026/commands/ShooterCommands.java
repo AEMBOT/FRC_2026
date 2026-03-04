@@ -8,12 +8,14 @@ import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -32,6 +34,10 @@ public final class ShooterCommands {
   private Supplier<OptimalVelocityTable> passingTableSupplier;
 
   private final BooleanSupplier inShootingZone;
+
+  private Supplier<Pose2d> robotPoseSupplier;
+
+  private final Pose2d TOWER_SHOT_POSE = new Pose2d(1.541, 3.709, Rotation2d.kZero);
 
   public ShooterCommands(HoodSubsystem hood, TurretSubsystem turret, FlywheelSubsystem flywheel) {
     this.hood = hood;
@@ -63,6 +69,8 @@ public final class ShooterCommands {
             RobotRuntimeConstants.isBlueAlliance()
                 ? RobotStateYearly.get().getLatestFieldRobotPose().getX() < 4.02844
                 : RobotStateYearly.get().getLatestFieldRobotPose().getX() > 12.512548;
+
+    robotPoseSupplier = () -> RobotStateYearly.get().getLatestFieldRobotPose();
   }
 
   /* ---- VELOCITY TABLES ---- */
@@ -73,7 +81,7 @@ public final class ShooterCommands {
   private OptimalVelocityTable getCurrentVelocityTable() {
 
     // Check if there are no robot pose measurements, mostly applicable at start of program runtime
-    if (RobotStateYearly.get().getLatestFieldRobotPose() == null) {
+    if (robotPoseSupplier.get() == null) {
       return passingTableSupplier.get();
     }
 
@@ -130,7 +138,7 @@ public final class ShooterCommands {
   private Rotation2d getCurrentYaw() {
     return getCurrentVelocityTable()
         .getFuelInitVelocityRotation3d(
-            RobotStateYearly.get().getLatestFieldRobotPose(),
+            robotPoseSupplier.get(),
             RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds())
         .toRotation2d();
   }
@@ -142,7 +150,7 @@ public final class ShooterCommands {
     return Units.radiansToDegrees(
         getCurrentVelocityTable()
             .getFuelInitVelocityRotation3d(
-                RobotStateYearly.get().getLatestFieldRobotPose(),
+                robotPoseSupplier.get(),
                 RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds())
             .getY());
   }
@@ -153,7 +161,7 @@ public final class ShooterCommands {
   private double getCurrentSpeed() {
     return getCurrentVelocityTable()
         .getFuelInitVelocityMagnitude(
-            RobotStateYearly.get().getLatestFieldRobotPose(),
+            robotPoseSupplier.get(),
             RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds());
   }
 
@@ -268,5 +276,13 @@ public final class ShooterCommands {
 
     return new ParallelCommandGroup(
         createFlywheelGoalSpeedCommand(), createHoodTowardsGoalCommand());
+  }
+
+  /* ---- SUPPLIER FUNCTIONS ---- */
+
+  public Command createSetPoseSupplierToTowerCommand() {
+    return new RunCommand(() -> robotPoseSupplier = () -> TOWER_SHOT_POSE)
+        .finallyDo(
+            () -> robotPoseSupplier = () -> RobotStateYearly.get().getLatestFieldRobotPose());
   }
 }
