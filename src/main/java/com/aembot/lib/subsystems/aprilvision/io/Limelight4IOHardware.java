@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import org.littletonrobotics.junction.Logger;
 import org.opencv.core.Point;
 
 public class Limelight4IOHardware implements AprilCameraIO {
@@ -93,6 +94,8 @@ public class Limelight4IOHardware implements AprilCameraIO {
     NetworkTableInstance.getDefault()
         .addListener(
             heartbeatEntry, EnumSet.of(NetworkTableEvent.Kind.kValueAll), heartbeatCallback);
+
+    LimelightHelpers.SetThrottle(cameraName, 2);
   }
 
   /**
@@ -158,7 +161,12 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
     PoseEstimate estimate = megatag2Estimate.get();
     // Check that there actually is an estimate, and that we haven't processed it yet
-    if (estimate.tagCount > 0 && estimate.timestampSeconds != lastMegatag2Timestamp) {
+
+    boolean garbageData = estimate.avgTagDist < 0.56;
+    Logger.recordOutput("TagDist", estimate.avgTagDist);
+    if (estimate.tagCount > 0
+        && estimate.timestampSeconds != lastMegatag2Timestamp
+        && !garbageData) {
       Pose2d latencyUncompensatedPose = estimate.pose;
       Pose2d latencyCompensatedPose =
           compensateForEstimateLatency(
