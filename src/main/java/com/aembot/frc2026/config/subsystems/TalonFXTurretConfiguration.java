@@ -4,6 +4,7 @@ import com.aembot.lib.config.encoders.AEMCANCoderConfiguration;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 
 public class TalonFXTurretConfiguration {
@@ -144,8 +145,11 @@ public class TalonFXTurretConfiguration {
       double circularDiff = Math.min(diff, kCANcoderBGearTeeth - diff);
 
       if (circularDiff < 0.3) {
-        return kRealMotorConfig.getMechanismRotationsToUnits(testPos / 100.0) // FIXME magic num
-            + this.startingRotation;
+        return MathUtil.inputModulus(
+            kRealMotorConfig.getMechanismRotationsToUnits(testPos / 100.0) // FIXME magic num
+                + this.startingRotation,
+            0.0,
+            360.0);
       }
     }
 

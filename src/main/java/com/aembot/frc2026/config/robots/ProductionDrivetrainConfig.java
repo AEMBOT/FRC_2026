@@ -8,6 +8,7 @@ import com.aembot.lib.config.subsystems.drive.simulation.DrivetrainSimConfigurat
 import com.aembot.lib.core.can.CANDeviceID;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
+import com.pathplanner.lib.config.PIDConstants;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 
@@ -73,6 +74,10 @@ public class ProductionDrivetrainConfig {
      */
     public static final double MAX_ANGULAR_RATE = 8.2;
 
+    public static final double SLOW_MODE_FACTOR = 0.4;
+
+    public static final PIDConstants HEADING_PID_CONSTANTS = new PIDConstants(5, 0, 0);
+
     private static DrivetrainConfiguration makeDrivetrainConfiguration(
         String canBusName,
         ProductionSwerveModuleConfigs moduleConfigs,
@@ -97,7 +102,9 @@ public class ProductionDrivetrainConfig {
                 moduleConfigs.backRightModule.getCtreModuleConstants()
               })
           .withOdometryStandardDevs(ENABLED_STANDARD_DEVS, DISABLED_STANDARD_DEVS)
-          .withJoystickDeadband(JOYSTICK_STEER_DEADBAND, JOYSTICK_TRANSLATION_DEADBAND);
+          .withJoystickDeadband(JOYSTICK_STEER_DEADBAND, JOYSTICK_TRANSLATION_DEADBAND)
+          .withslowModeFactor(SLOW_MODE_FACTOR)
+          .withHeadingPIDConstants(HEADING_PID_CONSTANTS);
     }
   }
 

@@ -98,8 +98,8 @@ public class TurretSubsystem
     Logger.recordOutput(
         "calculatedTurretRot",
         config.getMechanismRotationsFromEncoders(
-            io.getCANcoderA().getRawAngle() - 0.683838,
-            io.getCANcoderB().getRawAngle() - 0.654541));
+            encoderAInputs.absolutePositionRotations - 0.683838,
+            encoderAInputs.absolutePositionRotations - 0.654541));
 
     state.updateTurretYaw(Rotation2d.fromDegrees(inputs.positionUnits));
 
@@ -111,6 +111,8 @@ public class TurretSubsystem
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
     Logger.processInputs(inputPrefix, inputs);
+    Logger.processInputs(inputPrefix, encoderAInputs);
+    Logger.processInputs(inputPrefix, encoderBInputs);
     io.updateLog(standardPrefix, inputPrefix);
     super.updateLog(standardPrefix, inputPrefix);
   }

@@ -25,7 +25,7 @@ public class RuntimeConstants {
   }
 
   /** The runtime mode: real bot, simulated bot or replaying log file */
-  public static final RuntimeMode MODE = RobotBase.isReal() ? RuntimeMode.REAL : RuntimeMode.SIM;
+  public static final RuntimeMode MODE = RobotBase.isReal() ? RuntimeMode.REAL : RuntimeMode.REPLAY;
 
   // This is maybe wierd and cursed. The intent is to create a singular point for lib to access this
   // season-specific field,

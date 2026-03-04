@@ -12,14 +12,14 @@ public class TalonFXOverBumperIntakeRollerConfiguration {
 
   public SimulatedMotorConfiguration<TalonFXConfiguration> kSimMotorConfig;
 
-  public double kTargetSpeedUnitsPerMin;
+  public double kIntakeVoltage;
 
   public TalonFXOverBumperIntakeRollerConfiguration(String name) {
     this.kName = name;
   }
 
-  public TalonFXOverBumperIntakeRollerConfiguration withTargetSpeed(double targetSpeed) {
-    this.kTargetSpeedUnitsPerMin = targetSpeed;
+  public TalonFXOverBumperIntakeRollerConfiguration withIntakeVoltage(double targetSpeed) {
+    this.kIntakeVoltage = targetSpeed;
     return this;
   }
 

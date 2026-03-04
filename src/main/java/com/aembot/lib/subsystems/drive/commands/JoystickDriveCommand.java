@@ -40,6 +40,10 @@ public class JoystickDriveCommand extends Command {
 
   private final SwerveRequest.FieldCentricFacingAngle driveWithHeadingRequest;
 
+  private final BooleanSupplier slowModeActiveSupplier;
+
+  private final double slowModeFactor;
+
   /**
    * Create a {@link JoystickDriveCommand} that consumes either an angular velocity or a heading. If
    * headingSupplier is not null, the robot will be driven with that heading. Other wise
@@ -51,6 +55,7 @@ public class JoystickDriveCommand extends Command {
    * @param yVelocitySupplier Supplier for desired field-centric y velocity
    * @param steerVelocitySupplier Supplier for desired angular velocity in radians per second
    * @param headingSupplier Supplier for desired robot heading
+   * @param slowModeActiveSupplier Supplier for whether or not to use slow mode
    * @see JoystickDriveCommand#createCommandWithSteer Factory for a command that only controls with
    *     steering
    * @see JoystickDriveCommand#createCommandWithHeading Factory for a command that only controls
@@ -62,7 +67,8 @@ public class JoystickDriveCommand extends Command {
       DoubleSupplier xVelocitySupplier,
       DoubleSupplier yVelocitySupplier,
       Supplier<Double> steerVelocitySupplier,
-      Supplier<Rotation2d> headingSupplier) {
+      Supplier<Rotation2d> headingSupplier,
+      BooleanSupplier slowModeActiveSupplier) {
     this.drivetrainSubsystem = subsystem;
     addRequirements(this.drivetrainSubsystem); // Reserves the drive subsystem for this command
 
@@ -75,6 +81,9 @@ public class JoystickDriveCommand extends Command {
     this.maxAngularRate = driveTrainConfiguration.maxAngularRate;
     this.joystickSteerDeadband = driveTrainConfiguration.steerJoystickDeadband;
     this.joystickDriveDeadband = driveTrainConfiguration.driveJoystickDeadband;
+
+    this.slowModeActiveSupplier = slowModeActiveSupplier;
+    this.slowModeFactor = driveTrainConfiguration.slowModeFactor;
 
     // Field centric drive WITHOUT heading lock set
     driveWithSteerRequest =
@@ -93,6 +102,10 @@ public class JoystickDriveCommand extends Command {
             .withDeadband(
                 driveTrainConfiguration.chassisTranslationSpeedThreshold
                     * driveTrainConfiguration.driveJoystickDeadband)
+            .withHeadingPID(
+                driveTrainConfiguration.headingPID.kP,
+                driveTrainConfiguration.headingPID.kI,
+                driveTrainConfiguration.headingPID.kD)
             .withDriveRequestType(SwerveModule.DriveRequestType.Velocity);
   }
 
@@ -104,6 +117,7 @@ public class JoystickDriveCommand extends Command {
    * @param xVelocitySupplier Supplier for desired field-centric x velocity
    * @param yVelocitySupplier Supplier for desired field-centric y velocity
    * @param steerVelocitySupplier Supplier for desired angular velocity in radians per second
+   * @param slowModeActiveSupplier Supplier for whether or not to use slow mode
    */
   public static JoystickDriveCommand createCommandWithSteer(
       DriveSubsystem subsystem,
@@ -111,15 +125,16 @@ public class JoystickDriveCommand extends Command {
       DoubleSupplier xVelocitySupplier,
       DoubleSupplier yVelocitySupplier,
       DoubleSupplier
-          steerVelocitySupplier // Make user pass in a DoubleSupplier so it's not nullable
-      ) {
+          steerVelocitySupplier, // Make user pass in a DoubleSupplier so it's not nullable
+      BooleanSupplier isSlowModeSupplier) {
     return new JoystickDriveCommand(
         subsystem,
         driveTrainConfiguration,
         xVelocitySupplier,
         yVelocitySupplier,
         () -> steerVelocitySupplier.getAsDouble(),
-        () -> null);
+        () -> null,
+        isSlowModeSupplier);
   }
 
   /**
@@ -130,20 +145,23 @@ public class JoystickDriveCommand extends Command {
    * @param xVelocitySupplier Supplier for desired field-centric x velocity
    * @param yVelocitySupplier Supplier for desired field-centric y velocity
    * @param headingSupplier Supplier for the desired heading of the robot
+   * @param slowModeActiveSupplier Supplier for whether or not to use slow mode
    */
   public static JoystickDriveCommand createCommandWithHeading(
       DriveSubsystem subsystem,
       DrivetrainConfiguration driveTrainConfiguration,
       DoubleSupplier xVelocitySupplier,
       DoubleSupplier yVelocitySupplier,
-      Supplier<Rotation2d> headingSupplier) {
+      Supplier<Rotation2d> headingSupplier,
+      BooleanSupplier isSlowModeSupplier) {
     return new JoystickDriveCommand(
         subsystem,
         driveTrainConfiguration,
         xVelocitySupplier,
         yVelocitySupplier,
         () -> null,
-        headingSupplier);
+        headingSupplier,
+        isSlowModeSupplier);
   }
 
   /**
@@ -158,6 +176,7 @@ public class JoystickDriveCommand extends Command {
    * @param headingSupplier Supplier for the desired heading of the robot
    * @param lockHeading If true, the robot will face in the direction supplied by headingSupplier.
    *     Otherwise, it'll rotate according to steerVelocitySupplier.
+   * @param slowModeActiveSupplier Supplier for whether or not to use slow mode
    */
   public static JoystickDriveCommand createCommandWithRotationSwitch(
       DriveSubsystem subsystem,
@@ -166,14 +185,16 @@ public class JoystickDriveCommand extends Command {
       DoubleSupplier yVelocitySupplier,
       DoubleSupplier steerVelocitySupplier,
       Supplier<Rotation2d> headingSupplier,
-      BooleanSupplier lockHeading) {
+      BooleanSupplier lockHeading,
+      BooleanSupplier isSlowModeSupplier) {
     return new JoystickDriveCommand(
         subsystem,
         driveTrainConfiguration,
         xVelocitySupplier,
         yVelocitySupplier,
         () -> lockHeading.getAsBoolean() ? null : steerVelocitySupplier.getAsDouble(),
-        () -> lockHeading.getAsBoolean() ? headingSupplier.get() : null);
+        () -> lockHeading.getAsBoolean() ? headingSupplier.get() : null,
+        isSlowModeSupplier);
   }
 
   // Called when the command is initially scheduled.
@@ -206,6 +227,9 @@ public class JoystickDriveCommand extends Command {
       steerVelocity = -this.steerVelocitySupplier.get() * this.maxAngularRate;
     }
 
+    xVelocity *= slowModeActiveSupplier.getAsBoolean() ? slowModeFactor : 1;
+    yVelocity *= slowModeActiveSupplier.getAsBoolean() ? slowModeFactor : 1;
+
     if (heading == null) {
       driveWithSteer(xVelocity, yVelocity, steerVelocity);
     } else {
@@ -236,6 +260,7 @@ public class JoystickDriveCommand extends Command {
   }
 
   private void driveWithHeading(double velocityX, double velocityY, Rotation2d heading) {
+    System.out.println("driveWithHeading");
     drivetrainSubsystem.setRequest(
         driveWithHeadingRequest
             .withVelocityX(velocityX)

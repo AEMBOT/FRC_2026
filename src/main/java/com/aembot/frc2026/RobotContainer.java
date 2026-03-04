@@ -17,6 +17,8 @@ import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -86,31 +88,90 @@ public class RobotContainer implements Loggerable {
             flywheelSubsystem,
             turretSubsystem);
     configureBindings();
+
+    driveSubsystem.resetPose(new Pose2d(0, 0, Rotation2d.fromDegrees(-180)));
   }
 
   /** Use this method to define your controller button -> command mappings */
   private void configureBindings() {
-    driveSubsystem.setDefaultCommand(commandFactory.createDriveJoystickCmd(driverController));
+
+    /* ---- DEFAULT COMMANDS ---- */
+
+    // Use left bumper for slow mode
+    driveSubsystem.setDefaultCommand(
+        commandFactory.createDriveJoystickCmd(driverController, driverController.leftBumper()));
+
     hoodSubsystem.setDefaultCommand(commandFactory.shooterCommands.createHoodDownCommand());
+
     turretSubsystem.setDefaultCommand(
         commandFactory.shooterCommands.createTurretTowardsGoalCommand());
+
     intakeRollerSubsystem.setDefaultCommand(
         commandFactory.intakeCommands.createStopIntakeCommand());
+
     flywheelSubsystem.setDefaultCommand(
         commandFactory.shooterCommands.createFlywheelIdleSpeedCommand());
 
-    driverController.a().onTrue(commandFactory.intakeCommands.createUpCommand());
-    driverController.b().onTrue(commandFactory.intakeCommands.createDownCommand());
+    /* ---- PRIMARY DRIVER COMMANDS ---- */
 
-    driverController.x().whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
+    driverController.rightTrigger().whileTrue(commandFactory.createShootFuelCommand());
 
-    // While we're pressing x to intake and not y to shoot, run indexer load
+    driverController.rightBumper().whileTrue(commandFactory.createShootFuelTowerPosCommand());
+
     driverController
-        .x()
+        .leftTrigger()
+        .whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
+
+    // While we're pressing left trigger to intake and not right trigger or y to shoot, run indexer
+    // load
+    driverController
+        .leftTrigger()
+        .and(driverController.rightTrigger().negate())
         .and(driverController.y().negate())
         .whileTrue(commandFactory.indexerCommands.createLoadIndexerCommand());
 
+    // c on the controller
+    driverController.leftStick().onTrue(commandFactory.intakeCommands.createDownCommand());
+
+    // z on the controller
+    driverController.rightStick().onTrue(commandFactory.intakeCommands.createUpCommand());
+
     driverController.y().whileTrue(commandFactory.createShootFuelCommand());
+
+    driverController
+        .x()
+        .whileTrue(
+            commandFactory.createSetDriveHeadingForUnderTrenchCommand(
+                driverController, driverController.leftBumper()));
+
+    driverController.b().whileTrue(commandFactory.indexerCommands.createRunIndexerBackCommand());
+
+    driverController.a().onTrue(commandFactory.intakeCommands.createFlickIntakeCommand());
+
+    driverController
+        .povLeft()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseLeftCommand());
+
+    driverController
+        .povUp()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseMiddleCommand());
+
+    driverController
+        .povRight()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseRightCommand());
+
+    driverController
+        .povDown()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseOutpostCommand());
+
+    driverController.start().onTrue(commandFactory.resetOdometryHeading());
+
+    /* ---- SECONDARY CONTROLLER BINDINGS ---- */
+
+    secondaryController.leftBumper().onTrue(visionSubsystem.createKillVisionCommand());
+
+    // rest is unused
+
   }
 
   /**

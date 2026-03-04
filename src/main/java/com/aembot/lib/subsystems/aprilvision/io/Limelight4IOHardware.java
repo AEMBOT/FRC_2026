@@ -74,6 +74,8 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
   private AtomicReference<double[]> limelightStdDevs = new AtomicReference<>(new double[0]);
 
+  private int cachedThrottleValue = 0;
+
   protected final Consumer<NetworkTableEvent> heartbeatCallback = this::updateNtValuesCache;
 
   public Limelight4IOHardware(
@@ -149,6 +151,8 @@ public class Limelight4IOHardware implements AprilCameraIO {
         Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getY()),
         Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getZ()));
 
+    LimelightHelpers.SetIMUMode(cameraName, 1);
+
     double robotYaw = robotStateInstance.getLatestFieldRobotPose().getRotation().getDegrees();
     LimelightHelpers.SetRobotOrientation(cameraName, robotYaw, 0, 0, 0, 0, 0);
 
@@ -193,10 +197,14 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
   /** Get standard deviations for the given pose estimate */
   protected OdometryStandardDevs getStdDevs(PoseEstimate estimate) {
-    double[] doubleArray = limelightStdDevs.get();
+    // Yoinked from 2481
+    double stdDevFactor = Math.pow(estimate.avgTagDist, 2) / estimate.tagCount;
+
+    double translationStddev = cameraConfiguration.baselineTranslationalStdDev * stdDevFactor;
+    Double angularStddev = cameraConfiguration.baselineAngularStdDev * stdDevFactor;
 
     return adjustStdDevsWithOdomPose(
-        new OdometryStandardDevs(doubleArray[0], doubleArray[1], doubleArray[5]),
+        new OdometryStandardDevs(translationStddev, translationStddev, Double.MAX_VALUE),
         estimate.timestampSeconds,
         estimate.pose);
   }
@@ -214,5 +222,23 @@ public class Limelight4IOHardware implements AprilCameraIO {
   @Override
   public CameraConfiguration getConfiguration() {
     return cameraConfiguration;
+  }
+
+  @Override
+  public void throttleForDisabled() {
+    if (cachedThrottleValue != this.cameraConfiguration.disabledThrottleValue) {
+      LimelightHelpers.SetThrottle(
+          cameraName, (int) this.cameraConfiguration.disabledThrottleValue);
+      cachedThrottleValue = (int) this.cameraConfiguration.disabledThrottleValue;
+    }
+  }
+
+  @Override
+  public void throttleForEnabled() {
+    if (cachedThrottleValue != this.cameraConfiguration.enabledThrottledValue) {
+      LimelightHelpers.SetThrottle(
+          cameraName, (int) this.cameraConfiguration.enabledThrottledValue);
+      cachedThrottleValue = (int) this.cameraConfiguration.enabledThrottledValue;
+    }
   }
 }
