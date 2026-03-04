@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -83,11 +84,11 @@ public final class CommandFactory {
                 ? RobotStateYearly.get().getLatestFieldRobotPose().getX() < 4.02844
                 : RobotStateYearly.get().getLatestFieldRobotPose().getX() > 12.512548;
 
-    return DriveCommands.createDriveWithForwardHeadingCommand(
-            driveSubsystem, driverController.getHID(), () -> slowModeButton.getAsBoolean())
-        .onlyWhile(inAllianceZone)
-        .andThen(
-            DriveCommands.createDriveWithBackwardHeadingCommand(
-                driveSubsystem, driverController.getHID(), () -> slowModeButton.getAsBoolean()));
+    return Commands.either(
+        DriveCommands.createDriveWithForwardHeadingCommand(
+            driveSubsystem, driverController.getHID(), () -> slowModeButton.getAsBoolean()),
+        DriveCommands.createDriveWithBackwardHeadingCommand(
+            driveSubsystem, driverController.getHID(), () -> slowModeButton.getAsBoolean()),
+        inAllianceZone);
   }
 }
