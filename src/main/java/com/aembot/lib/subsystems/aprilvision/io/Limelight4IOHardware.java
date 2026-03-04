@@ -196,10 +196,14 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
   /** Get standard deviations for the given pose estimate */
   protected OdometryStandardDevs getStdDevs(PoseEstimate estimate) {
-    double[] doubleArray = limelightStdDevs.get();
+    // Yoinked from 2481
+    double stdDevFactor = Math.pow(estimate.avgTagDist, 2) / estimate.tagCount;
+
+    double translationStddev = cameraConfiguration.baselineTranslationalStdDev * stdDevFactor;
+    Double angularStddev = cameraConfiguration.baselineAngularStdDev * stdDevFactor;
 
     return adjustStdDevsWithOdomPose(
-        new OdometryStandardDevs(doubleArray[0], doubleArray[1], Double.MAX_VALUE),
+        new OdometryStandardDevs(translationStddev, translationStddev, Double.MAX_VALUE),
         estimate.timestampSeconds,
         estimate.pose);
   }
