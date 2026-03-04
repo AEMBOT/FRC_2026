@@ -44,6 +44,18 @@ public class TalonFXTurretConfiguration {
   /** How far we can be off in units for auto aim to still shoot */
   public double kAutoAimLeniance;
 
+  /** Number of teeth on the big gear that both encoder gears mesh with */
+  public int kBigGearTeeth = 100;
+
+  /** Previous position for CRT continuity tracking */
+  private Double previousPosition = null;
+
+  /** Maximum encoder match error to consider a valid CRT solution */
+  private static final double CRT_MATCH_THRESHOLD = 2.0;
+
+  /** Maximum position jump to prefer continuity over best match */
+  private static final double CONTINUITY_THRESHOLD_DEG = 50.0;
+
   /**
    * Create a new turret configuration
    *
@@ -124,35 +136,66 @@ public class TalonFXTurretConfiguration {
   }
 
   /**
-   * Get the absolute position of the mechanism from the encoder positions
+   * Get the absolute position of the mechanism from the encoder positions using CRT.
    *
-   * @param rawCANcoderAPos position in rotations of CANcoder A
-   * @param rawCANcoderBPos position in rotations of CANcoder B
-   * @return The absolute position of the mechanism in configured units. If it fails, returns -1
+   * <p>Uses the Chinese Remainder Theorem with two coprime gear teeth counts to determine absolute
+   * position within a unique range of (teethA * teethB / bigGearTeeth) rotations.
+   *
+   * @param rawCANcoderAPos position in rotations of CANcoder A (after offset subtraction)
+   * @param rawCANcoderBPos position in rotations of CANcoder B (after offset subtraction)
+   * @return The absolute position of the mechanism in degrees
    */
   public double getMechanismRotationsFromEncoders(double rawCANcoderAPos, double rawCANcoderBPos) {
+    // Wrap inputs to [0, 1) to handle negative values from offset subtraction
+    double teethA = MathUtil.inputModulus(rawCANcoderAPos, 0.0, 1.0) * kCANcoderAGearTeeth;
+    double teethB = MathUtil.inputModulus(rawCANcoderBPos, 0.0, 1.0) * kCANcoderBGearTeeth;
 
-    double encoderATeeth = rawCANcoderAPos * kCANcoderAGearTeeth;
-    double encoderBTeeth = rawCANcoderBPos * kCANcoderBGearTeeth;
+    int crtRange = kCANcoderAGearTeeth * kCANcoderBGearTeeth;
 
-    for (double testPos = encoderATeeth;
-        testPos < kCANcoderAGearTeeth * kCANcoderBGearTeeth;
-        testPos += kCANcoderAGearTeeth) {
+    double bestPosition = 0;
+    double bestScore = Double.MAX_VALUE;
+    double closestToPrev = 0;
+    double closestToPrevDist = Double.MAX_VALUE;
 
-      double encoderBTestPos = testPos % kCANcoderBGearTeeth;
+    // Search all possible CRT positions
+    for (int i = 0; i < kCANcoderBGearTeeth; i++) {
+      double testPos = teethA + i * kCANcoderAGearTeeth;
+      if (testPos >= crtRange) {
+        testPos -= crtRange;
+      }
 
-      double diff = Math.abs(encoderBTeeth - encoderBTestPos);
-      double circularDiff = Math.min(diff, kCANcoderBGearTeeth - diff);
+      // Score: how well does encoder B match at this position?
+      double expectedB = testPos % kCANcoderBGearTeeth;
+      double errorB =
+          Math.min(
+              Math.abs(teethB - expectedB), kCANcoderBGearTeeth - Math.abs(teethB - expectedB));
 
-      if (circularDiff < 0.3) {
-        return MathUtil.inputModulus(
-            kRealMotorConfig.getMechanismRotationsToUnits(testPos / 100.0) // FIXME magic num
-                + this.startingRotation,
-            0.0,
-            360.0);
+      double position = (testPos / kBigGearTeeth) * 360.0 + startingRotation;
+
+      if (errorB < bestScore) {
+        bestScore = errorB;
+        bestPosition = position;
+      }
+
+      // Track position closest to previous (for continuity)
+      if (errorB < CRT_MATCH_THRESHOLD && previousPosition != null) {
+        double dist = Math.abs(position - previousPosition);
+        if (dist < closestToPrevDist) {
+          closestToPrevDist = dist;
+          closestToPrev = position;
+        }
       }
     }
 
-    return -1;
+    // Prefer continuity if we have a valid match close to previous position
+    double result = (closestToPrevDist < CONTINUITY_THRESHOLD_DEG) ? closestToPrev : bestPosition;
+
+    previousPosition = result;
+    return result;
+  }
+
+  /** Reset CRT continuity tracking (call on robot enable or turret homing) */
+  public void resetCRTContinuity() {
+    previousPosition = null;
   }
 }

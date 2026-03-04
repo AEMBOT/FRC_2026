@@ -99,7 +99,7 @@ public class TurretSubsystem
         "calculatedTurretRot",
         config.getMechanismRotationsFromEncoders(
             encoderAInputs.absolutePositionRotations - 0.683838,
-            encoderAInputs.absolutePositionRotations - 0.654541));
+            encoderBInputs.absolutePositionRotations - 0.654541));
 
     state.updateTurretYaw(Rotation2d.fromDegrees(inputs.positionUnits));
 
