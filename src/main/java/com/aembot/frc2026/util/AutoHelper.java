@@ -51,6 +51,7 @@ public class AutoHelper {
 
     addAuto("EventMarkerTest");
     addAuto("MiddleDepot");
+    addAuto("LeftNeutralDepot");
   }
 
   /**
