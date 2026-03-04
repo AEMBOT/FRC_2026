@@ -65,6 +65,10 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
   private final StatusSignal<LinearAcceleration> accelerationX;
   private final StatusSignal<LinearAcceleration> accelerationY;
 
+  /* ----- CANCoder Absolute Position Signals ----- */
+  @SuppressWarnings("unchecked")
+  private final StatusSignal<Angle>[] absolutePositionSignals = new StatusSignal[4];
+
   /**
    * Construct the IO layer for a real drivetrain
    *
@@ -97,7 +101,11 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
 
     for (int i = 0; i < swerveModuleConfigurations.size(); i++) {
       moduleNames.add(i, swerveModuleConfigurations.get(i).moduleName);
+      absolutePositionSignals[i] = getModule(i).getEncoder().getAbsolutePosition();
     }
+
+    // Set CANCoder signals to update at 100hz
+    BaseStatusSignal.setUpdateFrequencyForAll(100, absolutePositionSignals);
 
     // Set yaw velocity to update at 250 hz; we care more about this value
     BaseStatusSignal.setUpdateFrequencyForAll(250, angularYawVelocity);
@@ -135,6 +143,12 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
         accelerationX,
         accelerationY);
 
+    // Refresh and store absolute encoder positions
+    BaseStatusSignal.refreshAll(absolutePositionSignals);
+    for (int i = 0; i < absolutePositionSignals.length; i++) {
+      inputs.absoluteEncoderPositions[i] = absolutePositionSignals[i].getValueAsDouble();
+    }
+
     inputs.kinematics = getKinematics();
     inputs.gyroYawAngle = inputs.Pose.getRotation().getDegrees();
     inputs.yawAngularVelocity = angularYawVelocity.getValueAsDouble();
@@ -152,24 +166,24 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
   }
 
   @Override
-  public void logModules(SwerveDriveState state, String prefix) {
-    if (state.ModuleStates == null) return;
+  public void logModules(DrivetrainInputs inputs, String prefix) {
+    if (inputs.ModuleStates == null) return;
     final String modulePrefix = prefix + "/Modules/";
     for (int i = 0; i < getModules().length; i++) {
       Logger.recordOutput(
           modulePrefix + moduleNames.get(i) + "/Absolute Encoder Angle",
-          getModule(i).getEncoder().getAbsolutePosition().getValueAsDouble() * 360);
+          inputs.absoluteEncoderPositions[i] * 360);
       Logger.recordOutput(
-          modulePrefix + moduleNames.get(i) + "/Steering Angle", state.ModuleStates[i].angle);
+          modulePrefix + moduleNames.get(i) + "/Steering Angle", inputs.ModuleStates[i].angle);
       Logger.recordOutput(
           modulePrefix + moduleNames.get(i) + "/Target Steering Angle",
-          state.ModuleTargets[i].angle);
+          inputs.ModuleTargets[i].angle);
       Logger.recordOutput(
           modulePrefix + moduleNames.get(i) + "/Drive Velocity",
-          state.ModuleStates[i].speedMetersPerSecond);
+          inputs.ModuleStates[i].speedMetersPerSecond);
       Logger.recordOutput(
           modulePrefix + moduleNames.get(i) + "/Target Drive Velocity",
-          state.ModuleTargets[i].speedMetersPerSecond);
+          inputs.ModuleTargets[i].speedMetersPerSecond);
     }
   }
 
