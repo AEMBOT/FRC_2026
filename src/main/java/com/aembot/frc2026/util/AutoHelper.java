@@ -9,7 +9,10 @@ import com.aembot.frc2026.commands.CommandFactory;
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 
 public class AutoHelper {
@@ -18,12 +21,16 @@ public class AutoHelper {
 
   public static AutoFactory autoFactory;
 
+  public static Consumer<Pose2d> setOdometryFunc;
+
   /**
    * Setip the auto builder
    *
    * @param driveSubsystem The drive subsystem to control
    */
   public static void setupAutoFactory(DriveSubsystem driveSubsystem) {
+
+    setOdometryFunc = (pose) -> driveSubsystem.resetPose(pose);
 
     autoFactory =
         new AutoFactory(
@@ -57,7 +64,11 @@ public class AutoHelper {
 
     AutoTrajectory traj = routine.trajectory(autoName);
 
-    routine.active().onTrue(traj.cmd());
+    routine
+        .active()
+        .onTrue(
+            new InstantCommand(() -> setOdometryFunc.accept(traj.getInitialPose().orElseThrow()))
+                .andThen(traj.cmd()));
 
     autoChooser.addRoutine(autoName, () -> routine);
   }
