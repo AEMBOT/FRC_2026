@@ -20,6 +20,7 @@ import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeplo
 import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.littletonrobotics.junction.LoggedRobot;
 
@@ -130,5 +131,16 @@ public class RobotContainer implements Loggerable {
    */
   public Command getAutonomousCommand() {
     return AutoHelper.autoChooser.selectedCommandScheduler();
+  }
+
+  /**
+   * Use this to pass the teleop init command to the main {@link Robot} class
+   *
+   * @return the command to run at the start of teleop
+   */
+  public Command getTeleopInitCommand() {
+    return new ParallelCommandGroup(
+        commandFactory.createStopShootingFuelCommand(),
+        commandFactory.intakeCommands.createStopIntakeCommand());
   }
 }
