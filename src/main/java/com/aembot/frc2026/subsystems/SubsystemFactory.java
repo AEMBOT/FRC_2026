@@ -15,7 +15,6 @@ import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
 import com.aembot.lib.subsystems.aprilvision.interfaces.AprilCameraIO;
 import com.aembot.lib.subsystems.aprilvision.io.AprilCameraReplayIO;
 import com.aembot.lib.subsystems.aprilvision.io.Limelight4IOHardware;
-import com.aembot.lib.subsystems.aprilvision.io.Limelight4IOSim;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.drive.io.DrivetrainHardwareIO;
 import com.aembot.lib.subsystems.drive.io.DrivetrainIOReplay;
@@ -163,8 +162,7 @@ public class SubsystemFactory {
       switch (RobotRuntimeConstants.MODE) {
         case SIM:
           cameraIOs[i] =
-              new Limelight4IOSim(
-                  simConfigs.get(i), fieldConstants, RobotStateYearly.get(), simCameraRegistrar);
+              new Limelight4IOHardware(configs.get(i), fieldConstants, RobotStateYearly.get());
           break;
         case REPLAY:
           cameraIOs[i] = new AprilCameraReplayIO(configs.get(i));
