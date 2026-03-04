@@ -46,6 +46,19 @@ public interface AprilCameraIO {
       OdometryStandardDevs unadjustedStandardDevs,
       Pose2d wholeEstimatedRobotPose,
       Pose2d cameraEstimatedRobotPose) {
+
+    // // Guard against null or NaN poses
+    // if (wholeEstimatedRobotPose == null
+    //     || cameraEstimatedRobotPose == null
+    //     || Double.isNaN(wholeEstimatedRobotPose.getX())
+    //     || Double.isNaN(wholeEstimatedRobotPose.getY())
+    //     || Double.isNaN(cameraEstimatedRobotPose.getX())
+    //     || Double.isNaN(cameraEstimatedRobotPose.getY())) {
+
+    //   Logger.recordOutput(getConfiguration() + "/stdDevs", unadjustedStandardDevs);
+    //   return unadjustedStandardDevs;
+    // }
+
     double distMeters =
         wholeEstimatedRobotPose.minus(cameraEstimatedRobotPose).getTranslation().getNorm();
     double factor = 1 + (Math.pow(distMeters, 2) * 2); // Prolly very subject to change
