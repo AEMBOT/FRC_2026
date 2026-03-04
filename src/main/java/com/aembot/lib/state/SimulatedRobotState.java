@@ -59,7 +59,10 @@ public abstract class SimulatedRobotState implements Loggable {
    * need to run during simulationPeriodic
    */
   public void updateState() {
-    visionSimulation.update(positionState.getLatestFieldRobotPose());
+    Pose2d pose = positionState.getLatestFieldRobotPose();
+    if (pose != null) {
+      visionSimulation.update(pose);
+    }
   }
 
   /** Add a camera to the vision simulation system and then return said {@link VisionSystemSim} */
