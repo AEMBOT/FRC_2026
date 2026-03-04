@@ -52,11 +52,11 @@ public class ProductionCameraConfig {
               new Transform3d(
                   new Translation3d(
                       Units.inchesToMeters(-3),
-                      Units.inchesToMeters(-(-13.5)), // TODO BAD!
+                      Units.inchesToMeters(-13.5),
                       Units.inchesToMeters(15.132)),
                   new Rotation3d(
                       Units.degreesToRadians(180),
-                      Units.degreesToRadians(27),
+                      Units.degreesToRadians(-27),
                       Units.degreesToRadians(-90))));
 
   public final SimulatedCameraConfiguration simConfigRight =
@@ -72,11 +72,11 @@ public class ProductionCameraConfig {
               new Transform3d(
                   new Translation3d(
                       Units.inchesToMeters(-3),
-                      Units.inchesToMeters(-(13.5)), // TODO BAD!
+                      Units.inchesToMeters(13.5),
                       Units.inchesToMeters(15.132)),
                   new Rotation3d(
                       Units.degreesToRadians(180),
-                      Units.degreesToRadians(27),
+                      Units.degreesToRadians(-27),
                       Units.degreesToRadians(90))));
   public final SimulatedCameraConfiguration simConfigLeft =
       new SimulatedCameraConfiguration(cameraConfigLeft)
@@ -95,7 +95,7 @@ public class ProductionCameraConfig {
                       Units.inchesToMeters(12.2)),
                   new Rotation3d(
                       Units.degreesToRadians(180),
-                      Units.degreesToRadians(27),
+                      Units.degreesToRadians(-27),
                       Units.degreesToRadians(180))));
 
   public final SimulatedCameraConfiguration simConfigBack =

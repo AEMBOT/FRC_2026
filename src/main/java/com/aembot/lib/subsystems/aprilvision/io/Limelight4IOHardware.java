@@ -145,10 +145,10 @@ public class Limelight4IOHardware implements AprilCameraIO {
     LimelightHelpers.setCameraPose_RobotSpace(
         cameraName,
         cameraConfiguration.getCameraPosition().getX(),
-        cameraConfiguration.getCameraPosition().getY(),
+        -cameraConfiguration.getCameraPosition().getY(),
         cameraConfiguration.getCameraPosition().getZ(),
         Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getX()),
-        Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getY()),
+        -Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getY()),
         Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getZ()));
 
     LimelightHelpers.SetIMUMode(cameraName, 1);
