@@ -7,6 +7,7 @@ package com.aembot.frc2026;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.state.SimulatedRobotStateYearly;
 import com.aembot.lib.core.can.CANStatusLogger;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -20,6 +21,9 @@ public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
+  private double lastTimestamp = 0.0;
+  private StackSampler sampler;
+  private int overruncounter = 0;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -53,11 +57,30 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+
+    sampler = new StackSampler(Thread.currentThread());
+    sampler.start();
+  }
 
   @Override
   public void disabledPeriodic() {
     CANStatusLogger.updateAllLogs();
+
+    double currentTimestamp = Timer.getFPGATimestamp();
+    double overrunAmount = currentTimestamp - lastTimestamp;
+    if (overrunAmount > .03) {
+      // Loop overrun! Dump all collected traces from other thread
+      try {
+        System.out.println("Dumping stack traces due to loop overrun " + overruncounter);
+        sampler.printLog(
+            overrunAmount); // dumpToFile("/home/lvuser/stack_traces_" + overruncounter + ".txt");
+        overruncounter += 1;
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+    lastTimestamp = currentTimestamp;
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
