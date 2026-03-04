@@ -1,6 +1,7 @@
 package com.aembot.lib.core.phoenix6;
 
 import com.aembot.lib.config.motors.MotorConfiguration;
+import com.aembot.lib.config.sensors.timeOfFlight.CANRangeTimeOfFlightConfiguration;
 import com.aembot.lib.core.motors.io.MotorIOTalonFX;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
@@ -11,6 +12,7 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.util.ArrayList;
@@ -383,6 +385,25 @@ public final class CTREUtil {
                   + "! Faults: "
                   + sb,
               false);
+        }
+      }
+    }
+
+    /** Configuration util for misc sensors */
+    public final class Sensors {
+      /** Configuration util for Time of Flight sensors */
+      public final class TimeOfFlight {
+        public static StatusCode applyConfiguration(
+            CANrange canRange, CANRangeTimeOfFlightConfiguration config) {
+          return tryUntilOk(
+              () -> canRange.getConfigurator().apply(config.kCTREConfig),
+              canRange.getDeviceID(),
+              DEFAULT_MAX_RETRIES);
+        }
+
+        public static StatusCode optimizeBusUtilization(CANrange canRange) {
+          return tryUntilOk(
+              () -> canRange.optimizeBusUtilization(), canRange.getDeviceID(), DEFAULT_MAX_RETRIES);
         }
       }
     }

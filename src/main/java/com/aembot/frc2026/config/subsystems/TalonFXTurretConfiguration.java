@@ -4,6 +4,7 @@ import com.aembot.lib.config.encoders.AEMCANCoderConfiguration;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.math.geometry.Pose3d;
 
 public class TalonFXTurretConfiguration {
 
@@ -33,6 +34,12 @@ public class TalonFXTurretConfiguration {
 
   /** Magnet offset for CANcoder B */
   public double kCANcoderBOffset;
+
+  /** The origin pose of the turret for visualization in advantagescope. */
+  public Pose3d kTurretOriginPose;
+
+  /** How far we can be off in units for auto aim to still shoot */
+  public double kAutoAimLeniance;
 
   /**
    * Create a new turret configuration
@@ -81,7 +88,30 @@ public class TalonFXTurretConfiguration {
   }
 
   public TalonFXTurretConfiguration withCANcoderBOffset(double CANcoderBOffset) {
-    this.kCANcoderAOffset = CANcoderBOffset;
+    this.kCANcoderBOffset = CANcoderBOffset;
+    return this;
+  }
+
+  /**
+   * Set the origin pose of the turret for visualization in advantagescope.
+   *
+   * @return this {@link TalonFXTurretConfiguration} for chaining
+   */
+  public TalonFXTurretConfiguration withTurretOriginPose(Pose3d turretOriginPose) {
+    this.kTurretOriginPose = turretOriginPose;
+    return this;
+  }
+
+  /**
+   * Set the amount of units that we can be off in order to still shoot
+   *
+   * <p>Counts both directions, so for example if this was 10, we could have a deviance of -10
+   * through +10
+   *
+   * @return this {@link TalonFXTurretConfiguration} for chaining
+   */
+  public TalonFXTurretConfiguration withAutoAimLeniance(double autoAimLeniance) {
+    this.kAutoAimLeniance = autoAimLeniance;
     return this;
   }
 

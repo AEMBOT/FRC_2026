@@ -29,6 +29,32 @@ deploy {
                 // getTargetTypeClass is a shortcut to get the class type using a string
 
                 frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
+                    // Cap the max heap at 100 MB. A smaller heap means less memory for the GC to
+                    // scan, so individual GC pauses are shorter and more predictable — critical
+                    // for a 20 ms control loop.
+                    jvmArgs.add("-Xmx100M")
+
+                    // Set the initial heap to 100 MB (equal to max). Fixing initial to max prevents
+                    // the JVM from repeatedly resizing the heap at runtime, which itself triggers
+                    // GC pauses and memory fragmentation.
+                    jvmArgs.add("-Xms100M")
+
+                    // GCTimeRatio=2 targets spending up to ~33% of CPU time on GC
+                    // (formula: 1/(1+N)). Default is 99 (~1%), so this makes GC run
+                    // more often in shorter bursts rather than rare, long pauses.
+                    jvmArgs.add("-XX:GCTimeRatio=2")
+
+                    // Use the Serial GC (single-threaded, stop-the-world collector). On a
+                    // resource-constrained roboRIO with only 2 cores, the overhead of parallel/
+                    // concurrent collectors (thread coordination, write barriers) costs more than
+                    // it saves.
+                    jvmArgs.add("-XX:+UseSerialGC")
+
+                    // Pre-touch (zero-fill) every page in the heap at JVM startup. Without this,
+                    // the OS lazily allocates physical memory on first access, causing
+                    // unpredictable page-fault latency during a match. The trade-off is a slightly
+                    // slower startup, which is fine since it happens before the match begins.
+                    jvmArgs.add("-XX:+AlwaysPreTouch")
                 }
 
                 // Static files artifact
@@ -51,6 +77,10 @@ wpi.java.debugJni = false
 // Set this to true to enable desktop support.
 def includeDesktopSupport = true
 
+repositories {
+    mavenCentral()
+}
+
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 5.
 dependencies {
@@ -71,6 +101,8 @@ dependencies {
     nativeRelease wpi.java.deps.wpilibJniRelease(wpi.platforms.desktop)
     nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
     simulationRelease wpi.sim.enableRelease()
+
+    implementation "com.opencsv:opencsv:5.1"
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
