@@ -7,6 +7,7 @@ import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
 import com.aembot.lib.subsystems.base.AEMSubsystem;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -29,6 +30,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
 
     for (AprilCameraIO camera : cameras) {
       camerasWithInputs.add(Pair.of(camera, new AprilVisionInputs()));
+      camera.throttleForEnabled();
     }
   }
 
@@ -41,6 +43,14 @@ public class AprilVisionSubsystem extends AEMSubsystem {
     for (Pair<AprilCameraIO, AprilVisionInputs> cameraWithInput : camerasWithInputs) {
       AprilCameraIO io = cameraWithInput.getFirst();
       AprilVisionInputs inputs = cameraWithInput.getSecond();
+
+      if (io.getConfiguration().cameraName == "turret") continue;
+
+      if (DriverStation.isEnabled()) {
+        io.throttleForEnabled();
+      } else {
+        io.throttleForDisabled();
+      }
 
       Logger.recordOutput(
           logPrefixStandard + "/" + io.getConfiguration().cameraName + "/CameraPosition",

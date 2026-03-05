@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.BooleanSupplier;
+import org.littletonrobotics.junction.Logger;
 
 public final class CommandFactory {
 
@@ -57,6 +58,11 @@ public final class CommandFactory {
     this.kickerTrigger =
         new Trigger(() -> (shootFuel && shooterCommands.isShooterNearGoal()))
             .whileTrue(indexerCommands.createFeedIndexerCommand());
+  }
+
+  public void logCommands() {
+    Logger.recordOutput("Commands/shootFuel", shootFuel);
+    Logger.recordOutput("Commands/atSetpoint", shooterCommands.isShooterNearGoal());
   }
 
   public Command createShootFuelCommand() {

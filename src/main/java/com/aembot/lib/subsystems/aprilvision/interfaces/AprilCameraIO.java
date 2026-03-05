@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import org.littletonrobotics.junction.Logger;
 
 public interface AprilCameraIO {
   public CameraConfiguration getConfiguration();
@@ -45,13 +46,36 @@ public interface AprilCameraIO {
       OdometryStandardDevs unadjustedStandardDevs,
       Pose2d wholeEstimatedRobotPose,
       Pose2d cameraEstimatedRobotPose) {
+
+    // // Guard against null or NaN poses
+    // if (wholeEstimatedRobotPose == null
+    //     || cameraEstimatedRobotPose == null
+    //     || Double.isNaN(wholeEstimatedRobotPose.getX())
+    //     || Double.isNaN(wholeEstimatedRobotPose.getY())
+    //     || Double.isNaN(cameraEstimatedRobotPose.getX())
+    //     || Double.isNaN(cameraEstimatedRobotPose.getY())) {
+
+    //   Logger.recordOutput(getConfiguration() + "/stdDevs", unadjustedStandardDevs);
+    //   return unadjustedStandardDevs;
+    // }
+
     double distMeters =
         wholeEstimatedRobotPose.minus(cameraEstimatedRobotPose).getTranslation().getNorm();
     double factor = 1 + (Math.pow(distMeters, 2) * 2); // Prolly very subject to change
 
+    Logger.recordOutput(
+        getConfiguration() + "/stdDevs",
+        new OdometryStandardDevs(
+            unadjustedStandardDevs.xStdDev() * factor,
+            unadjustedStandardDevs.yStdDev() * factor,
+            unadjustedStandardDevs.rotStdDev() * factor));
     return new OdometryStandardDevs(
         unadjustedStandardDevs.xStdDev() * factor,
         unadjustedStandardDevs.yStdDev() * factor,
         unadjustedStandardDevs.rotStdDev() * factor);
   }
+
+  public void throttleForDisabled();
+
+  public void throttleForEnabled();
 }

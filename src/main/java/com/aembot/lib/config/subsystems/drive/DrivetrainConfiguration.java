@@ -44,14 +44,14 @@ public class DrivetrainConfiguration {
   /** Standard deviations of odometry while the robot is disabled */
   public OdometryStandardDevs disabledOdometryStandardDevs;
 
-  public PIDController autoTranslationController;
-  public PIDController autoRotationController;
-
   /** Amount to multiply speed by when in slow mode */
   public double slowModeFactor;
 
   /** PID constants to use for drive heading control */
   public PIDConstants headingPID;
+
+  public PIDController autoTranslationController;
+  public PIDController autoRotationController;
 
   public DrivetrainConfiguration() {}
 
@@ -130,6 +130,17 @@ public class DrivetrainConfiguration {
   }
 
   /**
+   * Set the factor to slow down when in slow mode
+   *
+   * @param slowModeFactor factor to slow down
+   * @return self for chaining
+   */
+  public DrivetrainConfiguration withslowModeFactor(double slowModeFactor) {
+    this.slowModeFactor = slowModeFactor;
+    return this;
+  }
+
+  /*
    * set the controller to use during auto for movement
    *
    * @param autoTranslationController PID controller to use for movement in auto
@@ -142,17 +153,17 @@ public class DrivetrainConfiguration {
   }
 
   /**
-   * Set the factor to slow down when in slow mode
+   * Set the PID constants to use when using heading based swerve control
    *
-   * @param slowModeFactor factor to slow down
+   * @param headingPIDConstants PID constants to use
    * @return self for chaining
    */
-  public DrivetrainConfiguration withslowModeFactor(double slowModeFactor) {
-    this.slowModeFactor = slowModeFactor;
+  public DrivetrainConfiguration withHeadingPIDConstants(PIDConstants headingPIDConstants) {
+    this.headingPID = headingPIDConstants;
     return this;
   }
 
-  /**
+  /*
    * set the controller to use during auto for rotation
    *
    * @param autoRotationController PID controller to use for rotation in auto
@@ -161,17 +172,6 @@ public class DrivetrainConfiguration {
   public DrivetrainConfiguration withAutoRotationController(PIDController autoRotationController) {
     this.autoRotationController = autoRotationController;
     autoRotationController.enableContinuousInput(-Math.PI, Math.PI);
-    return this;
-  }
-
-  /**
-   * Set the PID constants to use when using heading based swerve control
-   *
-   * @param headingPIDConstants PID constants to use
-   * @return self for chaining
-   */
-  public DrivetrainConfiguration withHeadingPIDConstants(PIDConstants headingPIDConstants) {
-    this.headingPID = headingPIDConstants;
     return this;
   }
 }

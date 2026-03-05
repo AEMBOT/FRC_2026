@@ -16,7 +16,7 @@ import java.util.List;
  * <ul>
  *   <li>{@link #withMotorConfig(MotorConfiguration)}
  *   <li>{@link #withTimeOfFlightConfig(TimeOfFlightConfiguration)}
- *   <li>{@link #withTargetSpeedRPM(double)}
+ *   <li>{@link #withRunVoltage(double)}
  *   <li>{@link #validate()} (last)
  * </ul>
  */
@@ -27,7 +27,7 @@ public class IndexerSelectorConfiguration {
   public SimulatedMotorConfiguration<TalonFXConfiguration> kSimMotorConfig;
   public TimeOfFlightConfiguration kTimeOfFlightConfig;
 
-  public Double kTargetSpeedRPM;
+  public Double kRunVoltage;
 
   /**
    * The amount of time it takes to transport a game piece from the this indexer stage to the next.
@@ -78,13 +78,14 @@ public class IndexerSelectorConfiguration {
   }
 
   /**
-   * Set the target RPM of the selector while running
+   * Set the target voltage of the selector while running
    *
-   * @param targetSpeedRPM target RPM of the selector while running
+   * @param runVoltage target voltage of the selector while running. Will be inverted for running in
+   *     reverse
    * @return this {@link IndexerSelectorConfiguration} for chaining
    */
-  public IndexerSelectorConfiguration withTargetSpeedRPM(double targetSpeedRPM) {
-    this.kTargetSpeedRPM = targetSpeedRPM;
+  public IndexerSelectorConfiguration withRunVoltage(double runVoltage) {
+    this.kRunVoltage = runVoltage;
     return this;
   }
 
@@ -127,7 +128,7 @@ public class IndexerSelectorConfiguration {
    */
   public IndexerSelectorConfiguration validate() {
     List<String> missing = new ArrayList<>();
-    if (this.kTargetSpeedRPM == null) missing.add("kTargetSpeed");
+    if (this.kRunVoltage == null) missing.add("kTargetSpeed");
     if (this.kGamePieceMoveTime == null) missing.add("kGamePieceMoveTime");
     if (this.kGamePieceCapacity == null) missing.add("kGamePieceCapacity");
     if (this.kMotorConfig == null) missing.add("kMotorConfig");

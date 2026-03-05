@@ -18,6 +18,8 @@ import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -96,11 +98,27 @@ public class RobotContainer implements Loggerable {
 
     SmartDashboard.putData("Choose Auto Routine", AutoHelper.autoChooser);
 
+    AutoHelper.setupAutoFactory(driveSubsystem);
+
+    AutoHelper.registerAutoCommands(commandFactory);
+
+    AutoHelper.setupAutoChooser();
+
+    SmartDashboard.putData("Choose Auto Routine", AutoHelper.autoChooser);
+
     configureBindings();
+
+    driveSubsystem.resetPose(new Pose2d(0, 0, Rotation2d.fromDegrees(-180)));
   }
 
   /** Use this method to define your controller button -> command mappings */
   private void configureBindings() {
+
+    /* ---- DEFAULT COMMANDS ---- */
+
+    // Use left bumper for slow mode
+    driveSubsystem.setDefaultCommand(
+        commandFactory.createDriveJoystickCmd(driverController, driverController.leftBumper()));
 
     /* ---- DEFAULT COMMANDS ---- */
 
@@ -124,7 +142,15 @@ public class RobotContainer implements Loggerable {
     driverController.rightTrigger().whileTrue(commandFactory.createShootFuelCommand());
 
     driverController.rightBumper().whileTrue(commandFactory.createShootFuelTowerPosCommand());
+    /* ---- PRIMARY DRIVER COMMANDS ---- */
 
+    driverController.rightTrigger().whileTrue(commandFactory.createShootFuelCommand());
+
+    driverController.rightBumper().whileTrue(commandFactory.createShootFuelTowerPosCommand());
+
+    driverController
+        .leftTrigger()
+        .whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
     driverController
         .leftTrigger()
         .whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
@@ -135,15 +161,50 @@ public class RobotContainer implements Loggerable {
         .leftTrigger()
         .and(driverController.rightTrigger().negate())
         .and(driverController.y().negate())
+        .and(driverController.rightBumper().negate())
         .whileTrue(commandFactory.indexerCommands.createLoadIndexerCommand());
 
     // c on the controller
-    driverController.leftStick().onTrue(commandFactory.intakeCommands.createDownCommand());
+    driverController.leftStick().onTrue(commandFactory.intakeCommands.createZeroDownCommand());
 
     // z on the controller
     driverController.rightStick().onTrue(commandFactory.intakeCommands.createUpCommand());
 
     driverController.y().whileTrue(commandFactory.createShootFuelCommand());
+
+    driverController
+        .x()
+        .whileTrue(
+            commandFactory.createSetDriveHeadingForUnderTrenchCommand(
+                driverController, driverController.leftBumper()));
+
+    driverController.b().whileTrue(commandFactory.indexerCommands.createRunIndexerBackCommand());
+
+    driverController.a().onTrue(commandFactory.intakeCommands.createFlickIntakeCommand());
+
+    driverController
+        .povLeft()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseLeftCommand());
+
+    driverController
+        .povUp()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseMiddleCommand());
+
+    driverController
+        .povRight()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseRightCommand());
+
+    driverController
+        .povDown()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseOutpostCommand());
+
+    driverController.start().onTrue(commandFactory.resetOdometryHeading());
+
+    /* ---- SECONDARY CONTROLLER BINDINGS ---- */
+
+    secondaryController.leftBumper().onTrue(visionSubsystem.createKillVisionCommand());
+
+    // rest is unused
 
     driverController
         .x()
@@ -199,5 +260,9 @@ public class RobotContainer implements Loggerable {
     return new ParallelCommandGroup(
         commandFactory.createStopShootingFuelCommand(),
         commandFactory.intakeCommands.createStopIntakeCommand());
+  }
+
+  public void logCommands() {
+    commandFactory.logCommands();
   }
 }

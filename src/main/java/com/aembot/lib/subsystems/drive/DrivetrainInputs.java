@@ -27,6 +27,9 @@ public class DrivetrainInputs extends AEMSwerveDriveState implements LoggableInp
   public double accelX = 0.0;
   public double accelY = 0.0;
 
+  /** Absolute encoder positions for each module in rotations */
+  public double[] absoluteEncoderPositions = new double[4];
+
   public DrivetrainInputs() {
     this.Pose = Pose2d.kZero;
   }
@@ -72,6 +75,8 @@ public class DrivetrainInputs extends AEMSwerveDriveState implements LoggableInp
 
     table.put("AccelerationX", accelX);
     table.put("AccelerationY", accelY);
+
+    table.put("AbsoluteEncoderPositions", absoluteEncoderPositions);
   }
 
   @Override
@@ -97,5 +102,7 @@ public class DrivetrainInputs extends AEMSwerveDriveState implements LoggableInp
     roll = table.get("Roll", roll);
     accelX = table.get("AccelerationX", accelX);
     accelY = table.get("AccelerationY", accelY);
+
+    absoluteEncoderPositions = table.get("AbsoluteEncoderPositions", absoluteEncoderPositions);
   }
 }
