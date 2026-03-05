@@ -49,6 +49,7 @@ public class DrivetrainConfiguration {
 
   /** PID constants to use for drive heading control */
   public PIDConstants headingPID;
+
   public PIDController autoTranslationController;
   public PIDController autoRotationController;
 
@@ -138,7 +139,8 @@ public class DrivetrainConfiguration {
     this.slowModeFactor = slowModeFactor;
     return this;
   }
-/*
+
+  /*
    * set the controller to use during auto for movement
    *
    * @param autoTranslationController PID controller to use for movement in auto
@@ -160,7 +162,7 @@ public class DrivetrainConfiguration {
     this.headingPID = headingPIDConstants;
     return this;
   }
-  
+
   /*
    * set the controller to use during auto for rotation
    *

@@ -159,7 +159,9 @@ public class Limelight4IOHardware implements AprilCameraIO {
     PoseEstimate estimate = megatag2Estimate.get();
     // Check that there actually is an estimate, and that we haven't processed it yet
     boolean garbageData = estimate.avgTagDist < 0.56; // TODO MAGIC NUMBER AAAAAA
-    if (estimate.tagCount > 0 && estimate.timestampSeconds != lastMegatag2Timestamp && !garbageData) {
+    if (estimate.tagCount > 0
+        && estimate.timestampSeconds != lastMegatag2Timestamp
+        && !garbageData) {
       Pose2d latencyUncompensatedPose = estimate.pose;
       Pose2d latencyCompensatedPose =
           compensateForEstimateLatency(
