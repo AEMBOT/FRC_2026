@@ -11,7 +11,6 @@ import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorSubsystem;
 import com.aembot.frc2026.subsystems.spindexer.SpindexerSubsystem;
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.frc2026.util.AutoHelper;
-import com.aembot.frc2026.util.AutoHelper;
 import com.aembot.lib.core.logging.Loggerable;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
@@ -23,7 +22,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -100,7 +98,6 @@ public class RobotContainer implements Loggerable {
 
     SmartDashboard.putData("Choose Auto Routine", AutoHelper.autoChooser);
 
-
     AutoHelper.setupAutoFactory(driveSubsystem);
 
     AutoHelper.registerAutoCommands(commandFactory);
@@ -123,7 +120,6 @@ public class RobotContainer implements Loggerable {
     driveSubsystem.setDefaultCommand(
         commandFactory.createDriveJoystickCmd(driverController, driverController.leftBumper()));
 
-
     /* ---- DEFAULT COMMANDS ---- */
 
     // Use left bumper for slow mode
@@ -132,14 +128,11 @@ public class RobotContainer implements Loggerable {
 
     hoodSubsystem.setDefaultCommand(commandFactory.shooterCommands.createHoodDownCommand());
 
-
     turretSubsystem.setDefaultCommand(
         commandFactory.shooterCommands.createTurretTowardsGoalCommand());
 
-
     intakeRollerSubsystem.setDefaultCommand(
         commandFactory.intakeCommands.createStopIntakeCommand());
-
 
     flywheelSubsystem.setDefaultCommand(
         commandFactory.shooterCommands.createFlywheelIdleSpeedCommand());
@@ -165,8 +158,6 @@ public class RobotContainer implements Loggerable {
     // While we're pressing left trigger to intake and not right trigger or y to shoot, run indexer
     // load
     driverController
-        .leftTrigger()
-        .and(driverController.rightTrigger().negate())
         .leftTrigger()
         .and(driverController.rightTrigger().negate())
         .and(driverController.y().negate())
@@ -214,7 +205,6 @@ public class RobotContainer implements Loggerable {
     secondaryController.leftBumper().onTrue(visionSubsystem.createKillVisionCommand());
 
     // rest is unused
-
 
     driverController
         .x()
