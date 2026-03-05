@@ -103,7 +103,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
         -Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getY()),
         Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getZ()));
 
-    LimelightHelpers.SetIMUMode(cameraName, 1);
+    LimelightHelpers.SetIMUMode(cameraName, 4);
   }
 
   /**
