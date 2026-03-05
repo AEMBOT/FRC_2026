@@ -10,7 +10,6 @@ import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
@@ -49,9 +48,10 @@ public class AutoHelper {
    */
   public static void setupAutoChooser() {
 
-    addAuto("EventMarkerTest");
     addAuto("MiddleDepot");
     addAuto("LeftNeutralDepot");
+    addAuto("RightNeutralOutpost");
+    addAuto("TowerPreload");
   }
 
   /**
@@ -88,7 +88,9 @@ public class AutoHelper {
         .bind("StopIntake", commandFactory.intakeCommands.createStopIntakeCommand())
         .bind("StartShooting", commandFactory.createStartShootingFuelCommand())
         .bind("StopShooting", commandFactory.createStopShootingFuelCommand())
-        .bind("StartFlickingIntake", Commands.none()) // Exists in driver-bindings branch
-        .bind("StopFlickingIntake", Commands.none()); // Exists in driver-bindings branch
+        .bind(
+            "StartFlickingIntake",
+            commandFactory.intakeCommands.createContinuousFlickIntakeCommand())
+        .bind("StopFlickingIntake", commandFactory.intakeCommands.createDownCommand());
   }
 }
