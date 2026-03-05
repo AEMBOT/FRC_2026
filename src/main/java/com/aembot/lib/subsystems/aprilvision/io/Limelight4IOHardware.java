@@ -93,6 +93,17 @@ public class Limelight4IOHardware implements AprilCameraIO {
     NetworkTableInstance.getDefault()
         .addListener(
             heartbeatEntry, EnumSet.of(NetworkTableEvent.Kind.kValueAll), heartbeatCallback);
+
+    LimelightHelpers.setCameraPose_RobotSpace(
+        cameraName,
+        cameraConfiguration.getCameraPosition().getX(),
+        -cameraConfiguration.getCameraPosition().getY(),
+        cameraConfiguration.getCameraPosition().getZ(),
+        Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getX()),
+        -Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getY()),
+        Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getZ()));
+
+    LimelightHelpers.SetIMUMode(cameraName, 1);
   }
 
   /**
@@ -142,16 +153,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
   }
 
   private VisionPoseEstimation getMegatag2Estimate() {
-    LimelightHelpers.setCameraPose_RobotSpace(
-        cameraName,
-        cameraConfiguration.getCameraPosition().getX(),
-        -cameraConfiguration.getCameraPosition().getY(),
-        cameraConfiguration.getCameraPosition().getZ(),
-        Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getX()),
-        -Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getY()),
-        Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getZ()));
 
-    LimelightHelpers.SetIMUMode(cameraName, 1);
 
     double robotYaw = robotStateInstance.getLatestFieldRobotPose().getRotation().getDegrees();
     LimelightHelpers.SetRobotOrientation(cameraName, robotYaw, 0, 0, 0, 0, 0);
