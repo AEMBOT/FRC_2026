@@ -8,6 +8,8 @@ import com.aembot.lib.subsystems.base.AEMSubsystem;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import java.util.ArrayList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
@@ -17,6 +19,8 @@ public class AprilVisionSubsystem extends AEMSubsystem {
 
   protected final List<Pair<AprilCameraIO, AprilVisionInputs>> camerasWithInputs =
       new ArrayList<>();
+
+  private boolean visionActive = true;
 
   public AprilVisionSubsystem(RobotState robotStateInstance, AprilCameraIO... cameras) {
     super("VisionSubsystem");
@@ -48,7 +52,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
 
       io.updateInputs(inputs);
 
-      if (inputs.coprocessorEstimationLatencyCompensated != null) {
+      if (inputs.coprocessorEstimationLatencyCompensated != null && visionActive) {
         aprilTagObservations.add(
             new AprilCameraOutput(
                 io.getConfiguration().cameraName,
@@ -74,8 +78,15 @@ public class AprilVisionSubsystem extends AEMSubsystem {
         logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
   }
 
+  public Command createKillVisionCommand() {
+    return new InstantCommand(() -> visionActive = false);
+  }
+
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
+
+    Logger.recordOutput(standardPrefix + "/VisionActive", visionActive);
+
     for (Pair<AprilCameraIO, AprilVisionInputs> cameraWithInput : camerasWithInputs) {
       AprilCameraIO io = cameraWithInput.getFirst();
       AprilVisionInputs inputs = cameraWithInput.getSecond();

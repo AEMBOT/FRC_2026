@@ -98,6 +98,14 @@ public class OverBumperIntakeDeploySubsystem
     return smartPositionSetpointCommand(() -> config.kRealMotorConfig.kMinPositionUnits);
   }
 
+  public Command flickIntakeCommand() {
+    return putIntakeUpCommand()
+        .withTimeout(0.35)
+        .andThen(
+            putIntakeDownCommand()
+                .until(() -> MathUtil.isNear(getCurrentPosition(), getPositionSetpointUnits(), 2)));
+  }
+
   private void updateState() {
 
     state.deployPositionUnits = getCurrentPosition();
