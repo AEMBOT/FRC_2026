@@ -10,6 +10,7 @@ import com.aembot.frc2026.subsystems.indexerKicker.IndexerKickerSubsystem;
 import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorSubsystem;
 import com.aembot.frc2026.subsystems.spindexer.SpindexerSubsystem;
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
+import com.aembot.frc2026.util.AutoHelper;
 import com.aembot.lib.core.logging.Loggerable;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
@@ -19,8 +20,9 @@ import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeplo
 import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.littletonrobotics.junction.LoggedRobot;
 
@@ -87,6 +89,15 @@ public class RobotContainer implements Loggerable {
             indexerKickerSubsystem,
             flywheelSubsystem,
             turretSubsystem);
+
+    AutoHelper.setupAutoFactory(driveSubsystem);
+
+    AutoHelper.registerAutoCommands(commandFactory);
+
+    AutoHelper.setupAutoChooser();
+
+    SmartDashboard.putData("Choose Auto Routine", AutoHelper.autoChooser);
+
     configureBindings();
 
     driveSubsystem.resetPose(new Pose2d(0, 0, Rotation2d.fromDegrees(-180)));
@@ -180,6 +191,17 @@ public class RobotContainer implements Loggerable {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return Commands.none();
+    return AutoHelper.autoChooser.selectedCommandScheduler();
+  }
+
+  /**
+   * Use this to pass the teleop init command to the main {@link Robot} class
+   *
+   * @return the command to run at the start of teleop
+   */
+  public Command getTeleopInitCommand() {
+    return new ParallelCommandGroup(
+        commandFactory.createStopShootingFuelCommand(),
+        commandFactory.intakeCommands.createStopIntakeCommand());
   }
 }
