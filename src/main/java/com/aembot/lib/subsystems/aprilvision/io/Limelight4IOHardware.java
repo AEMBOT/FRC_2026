@@ -76,6 +76,8 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
   protected final Consumer<NetworkTableEvent> heartbeatCallback = this::updateNtValuesCache;
 
+  private double cachedRobotYaw = 0;
+
   public Limelight4IOHardware(
       CameraConfiguration config,
       YearFieldConstantable fieldConstants,
@@ -148,10 +150,22 @@ public class Limelight4IOHardware implements AprilCameraIO {
     inputs.coprocessorEstimationTimestamp = coprocessorPoseEstimation.timestampSeconds();
   }
 
-  private VisionPoseEstimation getMegatag2Estimate() {
+  private void setRobotYawNetworkTables() {
 
     double robotYaw = robotStateInstance.getLatestFieldRobotPose().getRotation().getDegrees();
-    LimelightHelpers.SetRobotOrientation(cameraName, robotYaw, 0, 0, 0, 0, 0);
+    double deltaYaw = robotYaw - cachedRobotYaw;
+
+    if (Math.abs(deltaYaw) > 0.25) {
+      LimelightHelpers.SetRobotOrientation_NoFlush(cameraName, robotYaw, 0, 0, 0, 0, 0);
+      cachedRobotYaw = robotYaw;
+    }
+  }
+
+  private VisionPoseEstimation getMegatag2Estimate() {
+
+    VisionPoseEstimation poseEstimation;
+
+    setRobotYawNetworkTables();
 
     PoseEstimate estimate = megatag2Estimate.get();
     // Check that there actually is an estimate, and that we haven't processed it yet
@@ -169,14 +183,18 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
       lastMegatag2Timestamp = estimate.timestampSeconds;
 
-      return new VisionPoseEstimation(
-          latencyUncompensatedPose,
-          latencyCompensatedPose,
-          getStdDevs(estimate),
-          estimate.timestampSeconds);
+      poseEstimation =
+          new VisionPoseEstimation(
+              latencyUncompensatedPose,
+              latencyCompensatedPose,
+              getStdDevs(estimate),
+              estimate.timestampSeconds);
     } else {
-      return new VisionPoseEstimation(null, null, null, Double.NaN);
+      poseEstimation = new VisionPoseEstimation(null, null, null, Double.NaN);
     }
+
+    LimelightHelpers.Flush();
+    return poseEstimation;
   }
 
   /**
