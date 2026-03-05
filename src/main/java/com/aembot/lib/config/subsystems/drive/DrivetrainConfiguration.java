@@ -4,8 +4,8 @@ import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-import edu.wpi.first.math.controller.PIDController;
 import com.pathplanner.lib.config.PIDConstants;
+import edu.wpi.first.math.controller.PIDController;
 
 public class DrivetrainConfiguration {
   public String configurationName;
@@ -46,6 +46,7 @@ public class DrivetrainConfiguration {
 
   public PIDController autoTranslationController;
   public PIDController autoRotationController;
+
   /** Amount to multiply speed by when in slow mode */
   public double slowModeFactor;
 
@@ -137,9 +138,9 @@ public class DrivetrainConfiguration {
   public DrivetrainConfiguration withAutoTranslationController(
       PIDController autoTranslationController) {
     this.autoTranslationController = autoTranslationController;
-    return this; 
+    return this;
   }
-  
+
   /**
    * Set the factor to slow down when in slow mode
    *
@@ -162,7 +163,7 @@ public class DrivetrainConfiguration {
     autoRotationController.enableContinuousInput(-Math.PI, Math.PI);
     return this;
   }
-  
+
   /**
    * Set the PID constants to use when using heading based swerve control
    *
