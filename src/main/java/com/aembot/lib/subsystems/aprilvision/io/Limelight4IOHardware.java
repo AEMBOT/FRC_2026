@@ -12,6 +12,7 @@ import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers;
 import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers.PoseEstimate;
 import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
@@ -94,14 +95,16 @@ public class Limelight4IOHardware implements AprilCameraIO {
         .addListener(
             heartbeatEntry, EnumSet.of(NetworkTableEvent.Kind.kValueAll), heartbeatCallback);
 
+    Pose3d cameraPosition = cameraConfiguration.getCameraPosition();
+
     LimelightHelpers.setCameraPose_RobotSpace(
         cameraName,
-        cameraConfiguration.getCameraPosition().getX(),
-        -cameraConfiguration.getCameraPosition().getY(),
-        cameraConfiguration.getCameraPosition().getZ(),
-        Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getX()),
-        -Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getY()),
-        Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getZ()));
+        cameraPosition.getX(),
+        -cameraPosition.getY(),
+        cameraPosition.getZ(),
+        Units.radiansToDegrees(cameraPosition.getRotation().getX()),
+        -Units.radiansToDegrees(cameraPosition.getRotation().getY()),
+        Units.radiansToDegrees(cameraPosition.getRotation().getZ()));
   }
 
   /**
