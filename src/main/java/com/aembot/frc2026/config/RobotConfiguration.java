@@ -1,0 +1,145 @@
+package com.aembot.frc2026.config;
+
+import com.aembot.frc2026.config.robots.ProductionConfig;
+import com.aembot.frc2026.config.subsystems.TalonFXTurretConfiguration;
+import com.aembot.frc2026.config.subsystems.indexerKicker.IndexerKickerConfiguration;
+import com.aembot.frc2026.config.subsystems.indexerSelector.IndexerSelectorConfiguration;
+import com.aembot.frc2026.config.subsystems.spindexer.SpindexerConfiguration;
+import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
+import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
+import com.aembot.lib.config.subsystems.drive.simulation.DrivetrainSimConfiguration;
+import com.aembot.lib.config.subsystems.flywheel.TalonFXFlywheelConfiguration;
+import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
+import com.aembot.lib.config.subsystems.hood.simulation.SimulatedHoodConfiguration;
+import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
+import com.aembot.lib.config.subsystems.intake.overBumper.run.TalonFXOverBumperIntakeRollerConfiguration;
+import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
+import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import java.util.List;
+
+/**
+ * Abstract class defining how a robot should be configured. Contains method to get the {@link
+ * RobotConfig} implementation for a given {@link RobotIDYearly}
+ *
+ * @see RobotConfiguration#getRobotConstants(RobotIDYearly)
+ */
+public abstract class RobotConfiguration {
+  /**
+   * Get the name of the robot has a human readable string
+   *
+   * @return Robot name as a string
+   */
+  public abstract String getRobotName();
+
+  /**
+   * Gets the list of named CAN buses that are present on this bot
+   *
+   * @return Current list of CAN buses used on this robot
+   */
+  public abstract List<String> getCANBusNames();
+
+  /**
+   * Configuration that will be passed into the drivetrain configuration
+   *
+   * @return The current robot drivetrain configuration
+   */
+  public abstract DrivetrainConfiguration getDrivetrainConfiguration();
+
+  /**
+   * Retrieve the configuration for the swerve modules on the robot
+   *
+   * @return List of SwerveModuleConfigurations in FL, FR, BL, BR order
+   */
+  public abstract List<
+          SwerveModuleConfiguration<
+              TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>>
+      getSwerveConfigurations();
+
+  /**
+   * Get the configuration of the hood
+   *
+   * @return Hood configuration
+   */
+  public abstract TalonFXHoodConfiguration getHoodConfig();
+
+  /**
+   * Get the configuration of the simulated hood
+   *
+   * @return Simulated hood configuration
+   */
+  public abstract SimulatedHoodConfiguration getSimHoodConfig();
+
+  /**
+   * Get the configuration of the intake deployment subsystem
+   *
+   * @return intake deployment configuration
+   */
+  public abstract TalonFXOverBumperIntakeDeployConfiguration getIntakeDeployConfig();
+
+  /**
+   * Get the configuration of the intake roller subsystem
+   *
+   * @return intake roller configuration
+   */
+  public abstract TalonFXOverBumperIntakeRollerConfiguration getIntakeRollerConfig();
+
+  /**
+   * Get configuration details about the drive train sim for this robot
+   *
+   * @return DrivetrainSimConfiguration of the given robot
+   */
+  public abstract DrivetrainSimConfiguration getSimulatedDrivetrainConfiguration();
+
+  /**
+   * Get configuration details of all the cameras for this robot
+   *
+   * @return List of {@link CameraConfiguration}s of the given robot
+   */
+  public abstract List<CameraConfiguration> getCameraConfigurations();
+
+  /**
+   * Get configuration details of all the simulated cameras for this robot
+   *
+   * @return List of {@link SimulatedCameraConfiguration}s of the given robot
+   */
+  public abstract List<SimulatedCameraConfiguration> getSimulatedCameraConfigurations();
+
+  /** Get configuration details for the spindexer subsystem of this robot */
+  public abstract SpindexerConfiguration getSpindexerConfiguration();
+
+  /** Get configuration details for the indexer selector subsystem of this robot */
+  public abstract IndexerSelectorConfiguration getIndexerSelectorConfiguration();
+
+  /** Get configuration details for the indexer kicker subsystem of this robot */
+  public abstract IndexerKickerConfiguration getIndexerKickerConfiguration();
+
+  /**
+   * Get config details of the flywheel for the robot
+   *
+   * @return Flywheel configuration of the given robot
+   */
+  public abstract TalonFXFlywheelConfiguration getFlywheelConfiguration();
+
+  /**
+   * retrieve the correct robot constants based on the given robot identification
+   *
+   * @param identification Robot identification representing what robot is currently in use
+   * @return The desired configuration that should be utilized with this robot
+   */
+  public static RobotConfiguration getRobotConstants(RobotIDYearly identification) {
+    switch (identification) {
+      case PRODUCTION:
+      default:
+        return new ProductionConfig();
+    }
+  }
+
+  /**
+   * Get the configuration of the turret
+   *
+   * @return the turret configuration
+   */
+  public abstract TalonFXTurretConfiguration getTurretConfig();
+}

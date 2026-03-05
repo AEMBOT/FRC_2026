@@ -1,0 +1,268 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package com.aembot.frc2026;
+
+import com.aembot.frc2026.commands.CommandFactory;
+import com.aembot.frc2026.subsystems.SubsystemFactory;
+import com.aembot.frc2026.subsystems.indexerKicker.IndexerKickerSubsystem;
+import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorSubsystem;
+import com.aembot.frc2026.subsystems.spindexer.SpindexerSubsystem;
+import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
+import com.aembot.frc2026.util.AutoHelper;
+import com.aembot.lib.core.logging.Loggerable;
+import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
+import com.aembot.lib.subsystems.drive.DriveSubsystem;
+import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
+import com.aembot.lib.subsystems.hood.HoodSubsystem;
+import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
+import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import org.littletonrobotics.junction.LoggedRobot;
+
+/**
+ * This class is where the bulk of the robot should be declared. Since Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * subsystems, commands, and trigger mappings) should be declared here.
+ */
+public class RobotContainer implements Loggerable {
+
+  // Replace with CommandPS4Controller or CommandJoystick if needed
+  private final CommandXboxController driverController = new CommandXboxController(0);
+
+  @SuppressWarnings("unused")
+  private final CommandXboxController secondaryController = new CommandXboxController(1);
+
+  /* ---- FLYWHEEL ---- */
+  private final FlywheelSubsystem flywheelSubsystem = SubsystemFactory.createFlywheelSubsystem();
+
+  /* ---- DRIVETRAIN ---- */
+  private final DriveSubsystem driveSubsystem = SubsystemFactory.createDriveSubsystem();
+
+  /* ---- INDEXER ---- */
+  private final SpindexerSubsystem spindexerSubsystem = SubsystemFactory.createSpindexerSubsystem();
+
+  private final IndexerSelectorSubsystem indexerSelectorSubsystem =
+      SubsystemFactory.createIndexerSelectorSubsystem();
+
+  private final IndexerKickerSubsystem indexerKickerSubsystem =
+      SubsystemFactory.createIndexerKickerSubsystem();
+
+  /* ---- SHOOTER ---- */
+  private final HoodSubsystem hoodSubsystem = SubsystemFactory.createHoodSubsystem();
+
+  /* ---- INTAKE ---- */
+  private final OverBumperIntakeDeploySubsystem intakeDeploySubsystem =
+      SubsystemFactory.createIntakeDeploySubsystem();
+  private final OverBumperIntakeRollerSubsystem intakeRollerSubsystem =
+      SubsystemFactory.createIntakeRollerSubsystem();
+
+  /* ---- TURRET ---- */
+  private final TurretSubsystem turretSubsystem = SubsystemFactory.createTurretSubsystem();
+
+  private final CommandFactory commandFactory;
+
+  /* ---- VISION ---- */
+  @SuppressWarnings("unused")
+  private final AprilVisionSubsystem visionSubsystem =
+      SubsystemFactory.createAprilVisionSubsystem();
+
+  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  public RobotContainer(LoggedRobot robot) {
+    setupLogger(robot);
+
+    this.commandFactory =
+        new CommandFactory(
+            driveSubsystem,
+            hoodSubsystem,
+            intakeDeploySubsystem,
+            intakeRollerSubsystem,
+            spindexerSubsystem,
+            indexerSelectorSubsystem,
+            indexerKickerSubsystem,
+            flywheelSubsystem,
+            turretSubsystem);
+
+    AutoHelper.setupAutoFactory(driveSubsystem);
+
+    AutoHelper.registerAutoCommands(commandFactory);
+
+    AutoHelper.setupAutoChooser();
+
+    SmartDashboard.putData("Choose Auto Routine", AutoHelper.autoChooser);
+
+    AutoHelper.setupAutoFactory(driveSubsystem);
+
+    AutoHelper.registerAutoCommands(commandFactory);
+
+    AutoHelper.setupAutoChooser();
+
+    SmartDashboard.putData("Choose Auto Routine", AutoHelper.autoChooser);
+
+    configureBindings();
+
+    driveSubsystem.resetPose(new Pose2d(0, 0, Rotation2d.fromDegrees(-180)));
+  }
+
+  /** Use this method to define your controller button -> command mappings */
+  private void configureBindings() {
+
+    /* ---- DEFAULT COMMANDS ---- */
+
+    // Use left bumper for slow mode
+    driveSubsystem.setDefaultCommand(
+        commandFactory.createDriveJoystickCmd(driverController, driverController.leftBumper()));
+
+    /* ---- DEFAULT COMMANDS ---- */
+
+    // Use left bumper for slow mode
+    driveSubsystem.setDefaultCommand(
+        commandFactory.createDriveJoystickCmd(driverController, driverController.leftBumper()));
+
+    hoodSubsystem.setDefaultCommand(commandFactory.shooterCommands.createHoodDownCommand());
+
+    turretSubsystem.setDefaultCommand(
+        commandFactory.shooterCommands.createTurretTowardsGoalCommand());
+
+    intakeRollerSubsystem.setDefaultCommand(
+        commandFactory.intakeCommands.createStopIntakeCommand());
+
+    flywheelSubsystem.setDefaultCommand(
+        commandFactory.shooterCommands.createFlywheelIdleSpeedCommand());
+
+    /* ---- PRIMARY DRIVER COMMANDS ---- */
+
+    driverController.rightTrigger().whileTrue(commandFactory.createShootFuelCommand());
+
+    driverController.rightBumper().whileTrue(commandFactory.createShootFuelTowerPosCommand());
+    /* ---- PRIMARY DRIVER COMMANDS ---- */
+
+    driverController.rightTrigger().whileTrue(commandFactory.createShootFuelCommand());
+
+    driverController.rightBumper().whileTrue(commandFactory.createShootFuelTowerPosCommand());
+
+    driverController
+        .leftTrigger()
+        .whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
+    driverController
+        .leftTrigger()
+        .whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
+
+    // While we're pressing left trigger to intake and not right trigger or y to shoot, run indexer
+    // load
+    driverController
+        .leftTrigger()
+        .and(driverController.rightTrigger().negate())
+        .and(driverController.y().negate())
+        .and(driverController.rightBumper().negate())
+        .whileTrue(commandFactory.indexerCommands.createLoadIndexerCommand());
+
+    // c on the controller
+    driverController.leftStick().onTrue(commandFactory.intakeCommands.createZeroDownCommand());
+
+    // z on the controller
+    driverController.rightStick().onTrue(commandFactory.intakeCommands.createUpCommand());
+
+    driverController.y().whileTrue(commandFactory.createShootFuelCommand());
+
+    driverController
+        .x()
+        .whileTrue(
+            commandFactory.createSetDriveHeadingForUnderTrenchCommand(
+                driverController, driverController.leftBumper()));
+
+    driverController.b().whileTrue(commandFactory.indexerCommands.createRunIndexerBackCommand());
+
+    driverController.a().onTrue(commandFactory.intakeCommands.createFlickIntakeCommand());
+
+    driverController
+        .povLeft()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseLeftCommand());
+
+    driverController
+        .povUp()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseMiddleCommand());
+
+    driverController
+        .povRight()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseRightCommand());
+
+    driverController
+        .povDown()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseOutpostCommand());
+
+    driverController.start().onTrue(commandFactory.resetOdometryHeading());
+
+    /* ---- SECONDARY CONTROLLER BINDINGS ---- */
+
+    secondaryController.leftBumper().onTrue(visionSubsystem.createKillVisionCommand());
+
+    // rest is unused
+
+    driverController
+        .x()
+        .whileTrue(
+            commandFactory.createSetDriveHeadingForUnderTrenchCommand(
+                driverController, driverController.leftBumper()));
+
+    driverController.b().whileTrue(commandFactory.indexerCommands.createRunIndexerBackCommand());
+
+    driverController.a().onTrue(commandFactory.intakeCommands.createFlickIntakeCommand());
+
+    driverController
+        .povLeft()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseLeftCommand());
+
+    driverController
+        .povUp()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseMiddleCommand());
+
+    driverController
+        .povRight()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseRightCommand());
+
+    driverController
+        .povDown()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseOutpostCommand());
+
+    driverController.start().onTrue(commandFactory.resetOdometryHeading());
+
+    /* ---- SECONDARY CONTROLLER BINDINGS ---- */
+
+    secondaryController.leftBumper().onTrue(visionSubsystem.createKillVisionCommand());
+
+    // rest is unused
+
+  }
+
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
+  public Command getAutonomousCommand() {
+    return AutoHelper.autoChooser.selectedCommandScheduler();
+  }
+
+  /**
+   * Use this to pass the teleop init command to the main {@link Robot} class
+   *
+   * @return the command to run at the start of teleop
+   */
+  public Command getTeleopInitCommand() {
+    return new ParallelCommandGroup(
+        commandFactory.createStopShootingFuelCommand(),
+        commandFactory.intakeCommands.createStopIntakeCommand());
+  }
+
+  public void logCommands() {
+    commandFactory.logCommands();
+  }
+}

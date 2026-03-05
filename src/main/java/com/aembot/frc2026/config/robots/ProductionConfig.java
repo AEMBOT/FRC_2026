@@ -1,0 +1,139 @@
+package com.aembot.frc2026.config.robots;
+
+import com.aembot.frc2026.config.RobotConfiguration;
+import com.aembot.frc2026.config.subsystems.TalonFXTurretConfiguration;
+import com.aembot.frc2026.config.subsystems.indexerKicker.IndexerKickerConfiguration;
+import com.aembot.frc2026.config.subsystems.indexerSelector.IndexerSelectorConfiguration;
+import com.aembot.frc2026.config.subsystems.spindexer.SpindexerConfiguration;
+import com.aembot.lib.config.robot.PhysicalConfiguration;
+import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
+import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
+import com.aembot.lib.config.subsystems.drive.simulation.DrivetrainSimConfiguration;
+import com.aembot.lib.config.subsystems.flywheel.TalonFXFlywheelConfiguration;
+import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
+import com.aembot.lib.config.subsystems.hood.simulation.SimulatedHoodConfiguration;
+import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
+import com.aembot.lib.config.subsystems.intake.overBumper.run.TalonFXOverBumperIntakeRollerConfiguration;
+import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
+import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.math.util.Units;
+import java.util.List;
+
+// TODO pretty much everything here is a placeholder
+/** {@link RobotConfiguration} for the robot Timothy */
+public class ProductionConfig extends RobotConfiguration {
+  private static final String ROBOT_NAME = "Timothy";
+
+  private static final String DRIVETRAIN_BUS_NAME = "Clyde";
+  private static final String PRIMARY_BUS_NAME = "rio";
+  private static final List<String> CAN_BUS_NAMES = List.of(DRIVETRAIN_BUS_NAME, PRIMARY_BUS_NAME);
+
+  private static final PhysicalConfiguration PHYSICAL_CONFIGURATION =
+      new PhysicalConfiguration()
+          .withRobotWeightPounds(150)
+          .withWheelBaseLengthM(Units.inchesToMeters(22.75))
+          .withWheelTrackWidthM(Units.inchesToMeters(22.75))
+          .withBumperLengthM(Units.inchesToMeters(35.625))
+          .withBumperWidthM(Units.inchesToMeters(35.625))
+          .withWheelCoefficientOfFriction(1.2);
+
+  private static final ProductionDrivetrainConfig DRIVETRAIN_CONFIG =
+      new ProductionDrivetrainConfig(PHYSICAL_CONFIGURATION, DRIVETRAIN_BUS_NAME);
+
+  private static final ProductionHoodConfig HOOD_CONFIG = new ProductionHoodConfig();
+  private static final ProductionIndexerConfig INDEXER_CONFIG =
+      new ProductionIndexerConfig(PRIMARY_BUS_NAME);
+
+  private static final ProductionIntakeConfig INTAKE_CONFIG = new ProductionIntakeConfig();
+
+  private static final ProductionFlywheelConfig FLYWHEEL_CONFIG = new ProductionFlywheelConfig();
+
+  private static final ProductionTurretConfig TURRET_CONFIG = new ProductionTurretConfig();
+
+  private static final ProductionCameraConfig CAMERA_CONFIG = new ProductionCameraConfig();
+
+  @Override
+  public String getRobotName() {
+    return ROBOT_NAME;
+  }
+
+  @Override
+  public TalonFXHoodConfiguration getHoodConfig() {
+    return HOOD_CONFIG.HOOD_CONFIG;
+  }
+
+  @Override
+  public SimulatedHoodConfiguration getSimHoodConfig() {
+    return HOOD_CONFIG.SIMULATED_HOOD_CONFIG;
+  }
+
+  @Override
+  public TalonFXOverBumperIntakeDeployConfiguration getIntakeDeployConfig() {
+    return INTAKE_CONFIG.DEPLOY_CONFIG;
+  }
+
+  @Override
+  public TalonFXOverBumperIntakeRollerConfiguration getIntakeRollerConfig() {
+    return INTAKE_CONFIG.ROLLER_CONFIG;
+  }
+
+  @Override
+  public List<String> getCANBusNames() {
+    return CAN_BUS_NAMES;
+  }
+
+  @Override
+  public DrivetrainConfiguration getDrivetrainConfiguration() {
+    return DRIVETRAIN_CONFIG.drivetrainConfiguration;
+  }
+
+  @Override
+  public List<
+          SwerveModuleConfiguration<
+              TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>>
+      getSwerveConfigurations() {
+    return DRIVETRAIN_CONFIG.moduleConfigs.configurations;
+  }
+
+  @Override
+  public DrivetrainSimConfiguration getSimulatedDrivetrainConfiguration() {
+    return DRIVETRAIN_CONFIG.simulatedDrivetrainConfiguration;
+  }
+
+  @Override
+  public List<CameraConfiguration> getCameraConfigurations() {
+    return CAMERA_CONFIG.cameraConfigurations;
+  }
+
+  @Override
+  public List<SimulatedCameraConfiguration> getSimulatedCameraConfigurations() {
+    return CAMERA_CONFIG.simConfigurations;
+  }
+
+  @Override
+  public SpindexerConfiguration getSpindexerConfiguration() {
+    return INDEXER_CONFIG.spindexerConfiguration;
+  }
+
+  @Override
+  public IndexerSelectorConfiguration getIndexerSelectorConfiguration() {
+    return INDEXER_CONFIG.selectorConfiguration;
+  }
+
+  @Override
+  public IndexerKickerConfiguration getIndexerKickerConfiguration() {
+    return INDEXER_CONFIG.kickerConfiguration;
+  }
+
+  @Override
+  public TalonFXFlywheelConfiguration getFlywheelConfiguration() {
+    return FLYWHEEL_CONFIG.CONFIG;
+  }
+
+  @Override
+  public TalonFXTurretConfiguration getTurretConfig() {
+    return TURRET_CONFIG.TURRET_CONFIG;
+  }
+}

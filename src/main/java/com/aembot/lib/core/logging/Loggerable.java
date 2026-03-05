@@ -1,0 +1,69 @@
+package com.aembot.lib.core.logging;
+
+import static com.aembot.lib.constants.RuntimeConstants.*;
+
+import com.aembot.lib.constants.RuntimeConstants;
+import com.aembot.lib.constants.generated.BuildConstants;
+import edu.wpi.first.wpilibj.DriverStation;
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
+/** Interface for a class that will set up the AKit {@link Logger} */
+public interface Loggerable {
+  public default void setupLogger(LoggedRobot robot) {
+    setupMetadata();
+
+    switch (MODE) {
+      case REAL:
+        // Log to logs file & (if not on FMS) NetworkTables
+        Logger.addDataReceiver(new WPILOGWriter("/U/logs"));
+        if (!DriverStation.isFMSAttached()) {
+          Logger.addDataReceiver(new NT4Publisher());
+        }
+        break;
+      case SIM:
+        // Log to both file & NetworkTables
+        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+      case REPLAY:
+        robot.setUseTiming(false);
+
+        String logPath = LogFileUtil.findReplayLog();
+        Logger.setReplaySource(new WPILOGReader(logPath));
+
+        // Save the outputs to a new log file with the suffix "_sim"
+        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        break;
+    }
+
+    Logger.start();
+  }
+
+  /** Add metadata such as build constants (gversion) and robot info to log */
+  public default void setupMetadata() {
+    Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+    Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+    Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+    Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+    switch (BuildConstants.DIRTY) {
+      case 0:
+        Logger.recordMetadata("GitDirty", "All changes committed");
+        break;
+      case 1:
+        Logger.recordMetadata("GitDirty", "Uncommitted changes");
+        break;
+      default:
+        Logger.recordMetadata("GitDirty", "Unknown");
+        break;
+    }
+
+    Logger.recordMetadata("RobotName", RuntimeConstants.ROBOT_ID.getName());
+    Logger.recordMetadata("MACAddress", RuntimeConstants.ROBOT_ID.getMACAddress());
+  }
+}
