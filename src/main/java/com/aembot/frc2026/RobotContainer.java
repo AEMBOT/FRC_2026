@@ -123,12 +123,6 @@ public class RobotContainer implements Loggerable {
     driveSubsystem.setDefaultCommand(
         commandFactory.createDriveJoystickCmd(driverController, driverController.leftBumper()));
 
-    /* ---- DEFAULT COMMANDS ---- */
-
-    // Use left bumper for slow mode
-    driveSubsystem.setDefaultCommand(
-        commandFactory.createDriveJoystickCmd(driverController, driverController.leftBumper()));
-
     hoodSubsystem.setDefaultCommand(commandFactory.shooterCommands.createHoodDownCommand());
 
     turretSubsystem.setDefaultCommand(
@@ -174,40 +168,6 @@ public class RobotContainer implements Loggerable {
     driverController.rightStick().onTrue(commandFactory.intakeCommands.createUpCommand());
 
     driverController.y().whileTrue(commandFactory.createShootFuelCommand());
-
-    driverController
-        .x()
-        .whileTrue(
-            commandFactory.createSetDriveHeadingForUnderTrenchCommand(
-                driverController, driverController.leftBumper()));
-
-    driverController.b().whileTrue(commandFactory.indexerCommands.createRunIndexerBackCommand());
-
-    driverController.a().onTrue(commandFactory.intakeCommands.createFlickIntakeCommand());
-
-    driverController
-        .povLeft()
-        .onTrue(commandFactory.shooterCommands.createSetPassingPoseLeftCommand());
-
-    driverController
-        .povUp()
-        .onTrue(commandFactory.shooterCommands.createSetPassingPoseMiddleCommand());
-
-    driverController
-        .povRight()
-        .onTrue(commandFactory.shooterCommands.createSetPassingPoseRightCommand());
-
-    driverController
-        .povDown()
-        .onTrue(commandFactory.shooterCommands.createSetPassingPoseOutpostCommand());
-
-    driverController.start().onTrue(commandFactory.resetOdometryHeading());
-
-    /* ---- SECONDARY CONTROLLER BINDINGS ---- */
-
-    secondaryController.leftBumper().onTrue(visionSubsystem.createKillVisionCommand());
-
-    // rest is unused
 
     driverController
         .x()
