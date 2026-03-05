@@ -193,7 +193,6 @@ public class Limelight4IOHardware implements AprilCameraIO {
       poseEstimation = new VisionPoseEstimation(null, null, null, Double.NaN);
     }
 
-    LimelightHelpers.Flush();
     return poseEstimation;
   }
 
