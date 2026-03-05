@@ -139,10 +139,11 @@ public class RobotContainer implements Loggerable {
         .leftTrigger()
         .and(driverController.rightTrigger().negate())
         .and(driverController.y().negate())
+        .and(driverController.rightBumper().negate())
         .whileTrue(commandFactory.indexerCommands.createLoadIndexerCommand());
 
     // c on the controller
-    driverController.leftStick().onTrue(commandFactory.intakeCommands.createDownCommand());
+    driverController.leftStick().onTrue(commandFactory.intakeCommands.createZeroDownCommand());
 
     // z on the controller
     driverController.rightStick().onTrue(commandFactory.intakeCommands.createUpCommand());
@@ -203,5 +204,9 @@ public class RobotContainer implements Loggerable {
     return new ParallelCommandGroup(
         commandFactory.createStopShootingFuelCommand(),
         commandFactory.intakeCommands.createStopIntakeCommand());
+  }
+
+  public void logCommands() {
+    commandFactory.logCommands();
   }
 }

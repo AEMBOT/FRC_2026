@@ -44,6 +44,8 @@ public class AprilVisionSubsystem extends AEMSubsystem {
       AprilCameraIO io = cameraWithInput.getFirst();
       AprilVisionInputs inputs = cameraWithInput.getSecond();
 
+      if (io.getConfiguration().cameraName == "turret") continue;
+
       if (DriverStation.isEnabled()) {
         io.throttleForEnabled();
       } else {

@@ -42,13 +42,13 @@ public class ProductionIntakeConfig {
 
   public final double DEPLOY_GEAR_RATIO = 18400.0 / 243.0;
 
-  public final double DEPLOY_CRUISE_VELOCITY_DEG_PER_SEC = 90;
+  public final double DEPLOY_CRUISE_VELOCITY_DEG_PER_SEC = 270;
 
   public final double DEPLOY_ACCELERATION_DEG_PER_SEC = 180;
 
   public final double ROLLER_GEAR_RATIO = 1;
 
-  public final double ROLLER_VOLTAGE = 8;
+  public final double ROLLER_VOLTAGE = 12;
 
   public final NeutralMode ROLLER_NEUTRAL_MODE = NeutralMode.BRAKE;
 
@@ -101,7 +101,8 @@ public class ProductionIntakeConfig {
                   .withMotorOutput(
                       new MotorOutputConfigs()
                           .withInverted(InvertedValue.Clockwise_Positive)
-                          .withNeutralMode(ROLLER_NEUTRAL_MODE.toCTRENeutralMode())))
+                          .withNeutralMode(ROLLER_NEUTRAL_MODE.toCTRENeutralMode()))
+                  .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(30)))
           .withCANDevice(
               new CANDeviceID(
                   ROLLER_CAN_ID,

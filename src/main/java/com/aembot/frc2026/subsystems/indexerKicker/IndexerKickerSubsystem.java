@@ -58,13 +58,16 @@ public class IndexerKickerSubsystem
     return run(() -> {
           switch (kCommandedRunStateSupplier.get()) {
             case FORWARD:
-              this.setSmartVelocitySetpointImpl(kConfig.kTargetSpeedRPM / 60);
+              // this.setSmartVelocitySetpointImpl(kConfig.kTargetSpeedRPM);
+              // TODO MAGIC NUMEROSAER
+              this.setVoltageImpl(10);
               break;
             case REVERSE:
-              this.setSmartVelocitySetpointImpl(-(kConfig.kTargetSpeedRPM / 60));
+              this.setVoltageImpl(-10);
               break;
             case RESIST:
-              this.setSmartVelocitySetpointImpl(kConfig.kResistSpeedRPM / 60);
+              // TODO RAAAAH
+              this.setSmartVelocitySetpointImpl(kConfig.kResistSpeedRPM);
               break;
             default:
             case OFF:

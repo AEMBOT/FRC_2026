@@ -183,7 +183,8 @@ public final class ProductionIndexerConfig {
                       .withMotorOutput(
                           new MotorOutputConfigs()
                               .withInverted(InvertedValue.Clockwise_Positive)
-                              .withNeutralMode(MOTOR_NEUTRAL_MODE.toCTRENeutralMode())))
+                              .withNeutralMode(MOTOR_NEUTRAL_MODE.toCTRENeutralMode()))
+                      .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(20)))
               .withMomentOfInertia(0.01)
               .withCANDevice(
                   new CANDeviceID(
@@ -230,7 +231,7 @@ public final class ProductionIndexerConfig {
   private final class KickerConstants {
     static final String SUBSYSTEM_NAME = GeneralConstants.COMPOUND_NAME + "KickerSubsystem";
 
-    static final double GEAR_RATIO = 1.0 / 1.0;
+    static final double GEAR_RATIO = 3.0 / 1.0;
 
     static final int MOTOR_CAN_ID = 56;
 
@@ -243,7 +244,7 @@ public final class ProductionIndexerConfig {
     static final Slot0Configs MOTOR_GAINS = new Slot0Configs().withKP(0).withKV(.13).withKS(0.49);
 
     /** Target speed of the spindexer roller in RPM */
-    static final double TARGET_SPEED_RPM = 200.0; // Copied from intake config
+    static final double TARGET_SPEED_RPM = 1400.0; // Copied from intake config
 
     /**
      * Speed of the kicker to resist movement of game pieces into the shooter in RPM.
@@ -253,7 +254,7 @@ public final class ProductionIndexerConfig {
     static final double RESIST_SPEED_RPM = -20.0;
 
     /** Target acceleration of the spindexer roller in RPM^2. */
-    static final double ACCELERATION_RPM = 400.0; // Copied from intake config
+    static final double ACCELERATION_RPM = 60000.0; // Copied from intake config
 
     /**
      * The amount of time it takes to transport a game piece from the kicker to the shooter. Used in
@@ -285,7 +286,7 @@ public final class ProductionIndexerConfig {
                                       ? InvertedValue.CounterClockwise_Positive
                                       : InvertedValue.Clockwise_Positive)
                               .withNeutralMode(MOTOR_NEUTRAL_MODE.toCTRENeutralMode()))
-                      .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(20)))
+                      .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(40)))
               .withMomentOfInertia(0.01)
               .withCANDevice(
                   new CANDeviceID(
@@ -296,7 +297,7 @@ public final class ProductionIndexerConfig {
                       busName))
               .withName(SUBSYSTEM_NAME + "Motor")
               .withUnitToMechanismRotationRatio(1) // Use RPM
-              .withUnitToRotorRotationRatio(1 / GEAR_RATIO);
+              .withUnitToRotorRotationRatio(GEAR_RATIO);
 
       SimulatedMotorConfiguration<TalonFXConfiguration> simMotorConfig =
           new SimulatedMotorConfiguration<TalonFXConfiguration>()

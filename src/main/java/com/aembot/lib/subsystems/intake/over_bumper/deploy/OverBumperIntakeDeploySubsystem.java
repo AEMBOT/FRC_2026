@@ -89,7 +89,7 @@ public class OverBumperIntakeDeploySubsystem
         .andThen(
             voltageCommand(() -> -config.kZeroingVoltage)
                 .until(
-                    () -> (MathUtil.isNear(0, getCurrentVelocity(), 0.5) && timer.hasElapsed(0.1)))
+                    () -> (MathUtil.isNear(0, getCurrentVelocity(), 0.5) && timer.hasElapsed(0.5)))
                 .finallyDo(
                     () -> {
                       setEncoderPosition(

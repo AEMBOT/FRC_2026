@@ -164,7 +164,7 @@ public final class ShooterCommands {
    * @return amount to boost flywheel speed in m/s
    */
   private double getFlywheelSpeedBoost() {
-    return 0.4;
+    return 4.5;
   }
 
   /**
