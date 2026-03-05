@@ -7,6 +7,7 @@ import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.aembot.lib.config.sensors.timeOfFlight.CANRangeTimeOfFlightConfiguration;
+import com.aembot.lib.config.wrappers.ConfigureSlot0Gains;
 import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.aembot.lib.core.can.CANDeviceID.CANDeviceType;
@@ -40,8 +41,10 @@ public final class ProductionIndexerConfig {
 
     static final NeutralMode MOTOR_NEUTRAL_MODE = NeutralMode.BRAKE;
 
-    // constants copied from hood config
-    static final Slot0Configs MOTOR_GAINS = new Slot0Configs().withKP(.1).withKV(.12);
+    public static final ConfigureSlot0Gains SLOT_0_CONFIGS =
+        (RobotRuntimeConstants.MODE == RuntimeMode.REAL)
+            ? new ConfigureSlot0Gains(0.1, 0.0, 0.0, 0.0, 0.0, 0.12, 0.0)
+            : new ConfigureSlot0Gains(0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
     /** Target speed of the spindexer roller in RPM */
     static final double TARGET_SPEED_RPM = 200.0; // Copied from intake config
@@ -94,7 +97,7 @@ public final class ProductionIndexerConfig {
                           new MotionMagicConfigs()
                               .withMotionMagicCruiseVelocity((TARGET_SPEED_RPM / 60) * GEAR_RATIO)
                               .withMotionMagicAcceleration((ACCELERATION_RPM / 60) * GEAR_RATIO))
-                      .withSlot0(MOTOR_GAINS)
+                      .withSlot0(SLOT_0_CONFIGS)
                       .withMotorOutput(
                           new MotorOutputConfigs()
                               .withInverted(

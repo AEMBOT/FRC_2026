@@ -156,7 +156,9 @@ public class Limelight4IOHardware implements AprilCameraIO {
   private void setRobotYawNetworkTables() {
 
     double robotYaw = robotStateInstance.getLatestFieldRobotPose().getRotation().getDegrees();
-    double robotYawRate = Units.radiansToDegrees(robotStateInstance.getLatestMeasuredFieldRelativeChassisSpeeds().omegaRadiansPerSecond);
+    double robotYawRate =
+        Units.radiansToDegrees(
+            robotStateInstance.getLatestMeasuredFieldRelativeChassisSpeeds().omegaRadiansPerSecond);
     double deltaYaw = robotYaw - cachedRobotYaw;
 
     if (Math.abs(deltaYaw) > 0.25) {

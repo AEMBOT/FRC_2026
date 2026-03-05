@@ -1,9 +1,12 @@
 package com.aembot.frc2026.config.robots;
 
+import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
 import com.aembot.lib.config.subsystems.intake.overBumper.run.TalonFXOverBumperIntakeRollerConfiguration;
+import com.aembot.lib.config.wrappers.ConfigureSlot0Gains;
+import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.aembot.lib.core.motors.interfaces.MotorIO.NeutralMode;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -60,6 +63,11 @@ public class ProductionIntakeConfig {
 
   public final Pose3d DEPLOY_PIVOT_POINT =
       new Pose3d(0.298443, 0, 0.189832, new Rotation3d(0, Math.PI / 2, 0));
+
+  public final ConfigureSlot0Gains DEPLOY_SLOT_0_CONFIGS =
+      (RobotRuntimeConstants.MODE == RuntimeMode.REAL)
+          ? new ConfigureSlot0Gains(0.1, 0.0, 0.0, 0.0, 0.375, 0.121, 0.0)
+          : new ConfigureSlot0Gains(0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
   public final MotorConfiguration<TalonFXConfiguration> DEPLOY_MOTOR_CONFIG =
       new MotorConfiguration<TalonFXConfiguration>()

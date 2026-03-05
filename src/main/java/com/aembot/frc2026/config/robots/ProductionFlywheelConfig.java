@@ -1,9 +1,11 @@
 package com.aembot.frc2026.config.robots;
 
+import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.aembot.lib.config.subsystems.flywheel.TalonFXFlywheelConfiguration;
 import com.aembot.lib.config.wrappers.ConfigureSlot0Gains;
+import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -33,7 +35,9 @@ public class ProductionFlywheelConfig {
   public static final double UNITS_TO_MECHANISM_ROTATION_RATIO = SHOOTER_WHEEL_CIRCUMFERENCE;
 
   public static final ConfigureSlot0Gains MOTOR_GAINS =
-      new ConfigureSlot0Gains(0.0, 0.0, 0.0, 0.0, 0.4, 0.132, 0.0);
+      (RobotRuntimeConstants.MODE == RuntimeMode.REAL)
+          ? new ConfigureSlot0Gains(0.0, 0.0, 0.0, 0.0, 0.4, 0.132, 0.0)
+          : new ConfigureSlot0Gains(5, 0, 0, 0, 0, 0.1, 0);
 
   public static final int MOTOR_ID = 53;
   public static final String MOTOR_NAME = "FlywheelMotor";

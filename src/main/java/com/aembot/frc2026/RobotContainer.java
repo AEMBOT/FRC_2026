@@ -111,7 +111,7 @@ public class RobotContainer implements Loggerable {
 
     configureBindings();
 
-    driveSubsystem.resetPose(new Pose2d(0, 0, Rotation2d.fromDegrees(-180)));
+    driveSubsystem.resetPose(new Pose2d(2, 4, Rotation2d.fromDegrees(-180)));
   }
 
   /** Use this method to define your controller button -> command mappings */

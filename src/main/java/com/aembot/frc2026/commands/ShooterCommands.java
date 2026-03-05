@@ -164,7 +164,7 @@ public final class ShooterCommands {
    * @return amount to boost flywheel speed in m/s
    */
   private double getFlywheelSpeedBoost() {
-    return 4.5;
+    return (RobotRuntimeConstants.MODE == RuntimeMode.REAL) ? 4.5 : 0.4;
   }
 
   /**

@@ -1,9 +1,12 @@
 package com.aembot.frc2026.config.robots;
 
 import com.aembot.frc2026.config.subsystems.TalonFXTurretConfiguration;
+import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.lib.config.encoders.AEMCANCoderConfiguration;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
+import com.aembot.lib.config.wrappers.ConfigureSlot0Gains;
+import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.aembot.lib.core.can.CANDeviceID.CANDeviceType;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -41,6 +44,11 @@ public class ProductionTurretConfig {
   public final double TURRET_START_ROT = 180;
 
   public final double AUTO_AIM_LENCIANCY = 10;
+
+  public final ConfigureSlot0Gains SLOT_0_CONFIGS =
+      (RobotRuntimeConstants.MODE == RuntimeMode.REAL)
+          ? new ConfigureSlot0Gains(0.4, 0.0, 0.0, 0.0, 0.4, 0.123, 0.0)
+          : new ConfigureSlot0Gains(0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
   public final AEMCANCoderConfiguration CANCODER_A_CONFIG =
       new AEMCANCoderConfiguration()
