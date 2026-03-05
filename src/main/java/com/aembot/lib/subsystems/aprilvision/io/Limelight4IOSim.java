@@ -282,14 +282,12 @@ public class Limelight4IOSim extends Limelight4IOHardware {
   }
 
   @Override
-  public void throttleForDisabled() {
+  public void updateNetworkTablesForDisabled() {
     // TODO sim impl
-    super.throttleForDisabled();
   }
 
   @Override
-  public void throttleForEnabled() {
+  public void updateNetworkTablesForEnabled() {
     // TODO sim impl
-    super.throttleForEnabled();
   }
 }

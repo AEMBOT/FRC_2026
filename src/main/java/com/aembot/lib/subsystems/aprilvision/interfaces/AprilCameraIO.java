@@ -75,7 +75,7 @@ public interface AprilCameraIO {
         unadjustedStandardDevs.rotStdDev() * factor);
   }
 
-  public void throttleForDisabled();
+  public void updateNetworkTablesForDisabled();
 
-  public void throttleForEnabled();
+  public void updateNetworkTablesForEnabled();
 }

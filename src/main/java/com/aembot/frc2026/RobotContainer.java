@@ -20,10 +20,12 @@ import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeplo
 import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.littletonrobotics.junction.LoggedRobot;
 
 /**
@@ -70,9 +72,10 @@ public class RobotContainer implements Loggerable {
   private final CommandFactory commandFactory;
 
   /* ---- VISION ---- */
-  @SuppressWarnings("unused")
   private final AprilVisionSubsystem visionSubsystem =
       SubsystemFactory.createAprilVisionSubsystem();
+
+  private final Trigger robotEnabled = new Trigger(() -> DriverStation.isEnabled());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer(LoggedRobot robot) {
@@ -240,6 +243,11 @@ public class RobotContainer implements Loggerable {
 
     // rest is unused
 
+    /* ---- ADDITIONAL TRIGGER BINDINGS ---- */
+
+    robotEnabled
+        .onTrue(visionSubsystem.updateNTEnabledCommand())
+        .onFalse(visionSubsystem.updateNTDisabledCommand());
   }
 
   /**

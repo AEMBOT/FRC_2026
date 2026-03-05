@@ -7,7 +7,6 @@ import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
 import com.aembot.lib.subsystems.base.AEMSubsystem;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -30,8 +29,9 @@ public class AprilVisionSubsystem extends AEMSubsystem {
 
     for (AprilCameraIO camera : cameras) {
       camerasWithInputs.add(Pair.of(camera, new AprilVisionInputs()));
-      camera.throttleForEnabled();
     }
+
+    updateNTDisabled();
   }
 
   @Override
@@ -45,12 +45,6 @@ public class AprilVisionSubsystem extends AEMSubsystem {
       AprilVisionInputs inputs = cameraWithInput.getSecond();
 
       if (io.getConfiguration().cameraName == "turret") continue;
-
-      if (DriverStation.isEnabled()) {
-        io.throttleForEnabled();
-      } else {
-        io.throttleForDisabled();
-      }
 
       Logger.recordOutput(
           logPrefixStandard + "/" + io.getConfiguration().cameraName + "/CameraPosition",
@@ -103,5 +97,37 @@ public class AprilVisionSubsystem extends AEMSubsystem {
 
       Logger.processInputs(inputPrefix + "/" + io.getConfiguration().toString(), inputs);
     }
+  }
+
+  private void updateNTDisabled() {
+    for (Pair<AprilCameraIO, AprilVisionInputs> cameraPair : camerasWithInputs) {
+      AprilCameraIO camera = cameraPair.getFirst();
+      camera.updateNetworkTablesForDisabled();
+    }
+  }
+
+  private void updateNTEnabled() {
+    for (Pair<AprilCameraIO, AprilVisionInputs> cameraPair : camerasWithInputs) {
+      AprilCameraIO camera = cameraPair.getFirst();
+      camera.updateNetworkTablesForEnabled();
+    }
+  }
+
+  /**
+   * DO NOT CALL PERIODICALLY
+   *
+   * @return A command that update network tables with values to use while disabled
+   */
+  public Command updateNTDisabledCommand() {
+    return new InstantCommand(this::updateNTDisabled);
+  }
+
+  /**
+   * DO NOT CALL PERIODICALLY
+   *
+   * @return A command that update network tables with values to use while enabled
+   */
+  public Command updateNTEnabledCommand() {
+    return new InstantCommand(this::updateNTEnabled);
   }
 }

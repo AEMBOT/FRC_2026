@@ -74,8 +74,6 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
   private AtomicReference<double[]> limelightStdDevs = new AtomicReference<>(new double[0]);
 
-  private int cachedThrottleValue = 0;
-
   protected final Consumer<NetworkTableEvent> heartbeatCallback = this::updateNtValuesCache;
 
   public Limelight4IOHardware(
@@ -154,7 +152,6 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
   private VisionPoseEstimation getMegatag2Estimate() {
 
-
     double robotYaw = robotStateInstance.getLatestFieldRobotPose().getRotation().getDegrees();
     LimelightHelpers.SetRobotOrientation(cameraName, robotYaw, 0, 0, 0, 0, 0);
 
@@ -230,20 +227,14 @@ public class Limelight4IOHardware implements AprilCameraIO {
   }
 
   @Override
-  public void throttleForDisabled() {
-    if (cachedThrottleValue != this.cameraConfiguration.disabledThrottleValue) {
-      LimelightHelpers.SetThrottle(
-          cameraName, (int) this.cameraConfiguration.disabledThrottleValue);
-      cachedThrottleValue = (int) this.cameraConfiguration.disabledThrottleValue;
-    }
+  public void updateNetworkTablesForDisabled() {
+    LimelightHelpers.SetThrottle(cameraName, this.cameraConfiguration.disabledThrottleValue);
+    LimelightHelpers.SetIMUMode(cameraName, this.cameraConfiguration.disabledIMUMode);
   }
 
   @Override
-  public void throttleForEnabled() {
-    if (cachedThrottleValue != this.cameraConfiguration.enabledThrottledValue) {
-      LimelightHelpers.SetThrottle(
-          cameraName, (int) this.cameraConfiguration.enabledThrottledValue);
-      cachedThrottleValue = (int) this.cameraConfiguration.enabledThrottledValue;
-    }
+  public void updateNetworkTablesForEnabled() {
+    LimelightHelpers.SetThrottle(cameraName, this.cameraConfiguration.enabledThrottledValue);
+    LimelightHelpers.SetIMUMode(cameraName, this.cameraConfiguration.enabledIMUMode);
   }
 }
