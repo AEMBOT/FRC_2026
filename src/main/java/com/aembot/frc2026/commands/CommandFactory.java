@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.BooleanSupplier;
@@ -29,6 +30,10 @@ public final class CommandFactory {
   public final IntakeCommands intakeCommands;
   public final IndexerCommands indexerCommands;
   public final ShooterCommands shooterCommands;
+
+  private boolean shootFuel;
+  private final Trigger aimTrigger;
+  private final Trigger kickerTrigger;
 
   public CommandFactory(
       DriveSubsystem driveSubsystem,
@@ -46,11 +51,24 @@ public final class CommandFactory {
     this.indexerCommands =
         new IndexerCommands(spindexerSubsystem, indexerSelectorSubsystem, indexerKickerSubsystem);
     this.shooterCommands = new ShooterCommands(hoodSubsystem, turretSubsystem, flywheelSubsystem);
+
+    this.aimTrigger =
+        new Trigger(() -> shootFuel).whileTrue(shooterCommands.createShootFuelCommand());
+    this.kickerTrigger =
+        new Trigger(() -> (shootFuel && shooterCommands.isShooterNearGoal()))
+            .whileTrue(indexerCommands.createFeedIndexerCommand());
   }
 
   public Command createShootFuelCommand() {
-    return new ParallelCommandGroup(
-        indexerCommands.createFeedIndexerCommand(), shooterCommands.createShootFuelCommand());
+    return new RunCommand(() -> shootFuel = true).finallyDo(() -> shootFuel = false);
+  }
+
+  public Command createStartShootingFuelCommand() {
+    return new InstantCommand(() -> shootFuel = true);
+  }
+
+  public Command createStopShootingFuelCommand() {
+    return new InstantCommand(() -> shootFuel = false);
   }
 
   public Command createShootFuelTowerPosCommand() {

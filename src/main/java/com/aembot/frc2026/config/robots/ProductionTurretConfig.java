@@ -93,7 +93,7 @@ public class ProductionTurretConfig {
   public final SimulatedMotorConfiguration<TalonFXConfiguration> SIM_MOTOR_CONFIG =
       new SimulatedMotorConfiguration<TalonFXConfiguration>()
           .withRealConfiguration(MOTOR_CONFIG)
-          .withStartingRotation(180)
+          .withStartingRotation(0)
           .withSimMotorConstants(DCMotor.getKrakenX60(1));
 
   public final TalonFXTurretConfiguration TURRET_CONFIG =

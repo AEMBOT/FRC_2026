@@ -69,6 +69,10 @@ public class SimulatedIndexerCompoundState implements Loggable {
     for (IndexerStage stage : IndexerStage.values()) {
       gamePiecesByStage.put(stage, new ArrayList<>());
     }
+
+    for (int i = 0; i < 8; ++i) {
+      addSimulatedGamePiece();
+    }
   }
 
   public void setSelectorTimeOfFlightDistanceConsumer(Consumer<Double> consumer) {

@@ -9,6 +9,7 @@ import com.aembot.lib.core.can.CANDeviceID;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.pathplanner.lib.config.PIDConstants;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 
@@ -74,6 +75,11 @@ public class ProductionDrivetrainConfig {
      */
     public static final double MAX_ANGULAR_RATE = 8.2;
 
+    public static final PIDController AUTO_TRANSLATION_CONTROLLER =
+        new PIDController(5.0, 0.0, 0.0);
+
+    public static final PIDController AUTO_ROTATION_CONTROLLER = new PIDController(3.0, 0.0, 0.0);
+
     public static final double SLOW_MODE_FACTOR = 0.4;
 
     public static final PIDConstants HEADING_PID_CONSTANTS = new PIDConstants(5, 0, 0);
@@ -103,6 +109,8 @@ public class ProductionDrivetrainConfig {
               })
           .withOdometryStandardDevs(ENABLED_STANDARD_DEVS, DISABLED_STANDARD_DEVS)
           .withJoystickDeadband(JOYSTICK_STEER_DEADBAND, JOYSTICK_TRANSLATION_DEADBAND)
+          .withAutoTranslationController(AUTO_TRANSLATION_CONTROLLER)
+          .withAutoRotationController(AUTO_ROTATION_CONTROLLER)
           .withslowModeFactor(SLOW_MODE_FACTOR)
           .withHeadingPIDConstants(HEADING_PID_CONSTANTS);
     }

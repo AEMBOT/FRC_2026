@@ -84,6 +84,8 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    CommandScheduler.getInstance().schedule(m_robotContainer.getTeleopInitCommand());
   }
 
   /** This function is called periodically during operator control. */

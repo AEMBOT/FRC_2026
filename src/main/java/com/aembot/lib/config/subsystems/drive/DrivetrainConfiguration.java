@@ -5,6 +5,7 @@ import com.aembot.lib.core.can.CANDeviceID;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.pathplanner.lib.config.PIDConstants;
+import edu.wpi.first.math.controller.PIDController;
 
 public class DrivetrainConfiguration {
   public String configurationName;
@@ -42,6 +43,9 @@ public class DrivetrainConfiguration {
 
   /** Standard deviations of odometry while the robot is disabled */
   public OdometryStandardDevs disabledOdometryStandardDevs;
+
+  public PIDController autoTranslationController;
+  public PIDController autoRotationController;
 
   /** Amount to multiply speed by when in slow mode */
   public double slowModeFactor;
@@ -126,6 +130,18 @@ public class DrivetrainConfiguration {
   }
 
   /**
+   * set the controller to use during auto for movement
+   *
+   * @param autoTranslationController PID controller to use for movement in auto
+   * @return self for chaining
+   */
+  public DrivetrainConfiguration withAutoTranslationController(
+      PIDController autoTranslationController) {
+    this.autoTranslationController = autoTranslationController;
+    return this;
+  }
+
+  /**
    * Set the factor to slow down when in slow mode
    *
    * @param slowModeFactor factor to slow down
@@ -133,6 +149,18 @@ public class DrivetrainConfiguration {
    */
   public DrivetrainConfiguration withslowModeFactor(double slowModeFactor) {
     this.slowModeFactor = slowModeFactor;
+    return this;
+  }
+
+  /**
+   * set the controller to use during auto for rotation
+   *
+   * @param autoRotationController PID controller to use for rotation in auto
+   * @return self for chaining
+   */
+  public DrivetrainConfiguration withAutoRotationController(PIDController autoRotationController) {
+    this.autoRotationController = autoRotationController;
+    autoRotationController.enableContinuousInput(-Math.PI, Math.PI);
     return this;
   }
 
