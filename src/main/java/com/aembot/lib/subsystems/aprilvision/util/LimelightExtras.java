@@ -16,4 +16,12 @@ public class LimelightExtras {
   public static double[] getStandardDeviations(String limelightName) {
     return LimelightHelpers.getLimelightNTDoubleArray(limelightName, "stddevs");
   }
+
+  public static double getCameraTemperature(String limelightName) {
+    double[] hardwareData = LimelightHelpers.getLimelightNTDoubleArray(limelightName, "hw");
+
+    if (hardwareData.length < 4) return -1;
+
+    return hardwareData[0];
+  }
 }

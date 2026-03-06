@@ -26,6 +26,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+
+import org.littletonrobotics.junction.Logger;
 import org.opencv.core.Point;
 
 public class Limelight4IOHardware implements AprilCameraIO {
@@ -151,6 +153,8 @@ public class Limelight4IOHardware implements AprilCameraIO {
         coprocessorPoseEstimation.latencyCompensatedPose();
     inputs.coprocessorEstimationStdDevs = coprocessorPoseEstimation.stdDevs();
     inputs.coprocessorEstimationTimestamp = coprocessorPoseEstimation.timestampSeconds();
+
+    Logger.recordOutput(cameraName + "/tempCelsius", LimelightExtras.getCameraTemperature(cameraName));
   }
 
   private void setRobotYawNetworkTables() {
@@ -161,10 +165,10 @@ public class Limelight4IOHardware implements AprilCameraIO {
             robotStateInstance.getLatestMeasuredFieldRelativeChassisSpeeds().omegaRadiansPerSecond);
     double deltaYaw = robotYaw - cachedRobotYaw;
 
-    if (Math.abs(deltaYaw) > 0.25) {
-      LimelightHelpers.SetRobotOrientation_NoFlush(cameraName, robotYaw, robotYawRate, 0, 0, 0, 0);
-      cachedRobotYaw = robotYaw;
-    }
+    // if (Math.abs(deltaYaw) > 0.25) {
+    LimelightHelpers.SetRobotOrientation_NoFlush(cameraName, robotYaw, robotYawRate, 0, 0, 0, 0);
+    cachedRobotYaw = robotYaw;
+    // }
   }
 
   private VisionPoseEstimation getMegatag2Estimate() {
@@ -185,7 +189,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
               estimate.pose,
               robotStateInstance.getLatestFusedFieldRelativeChassisSpeed(),
               Timer.getFPGATimestamp()
-                  - (estimate.timestampSeconds - Units.millisecondsToSeconds(estimate.latency)));
+                  - (estimate.timestampSeconds));
 
       lastMegatag2Timestamp = estimate.timestampSeconds;
 
