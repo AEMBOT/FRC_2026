@@ -13,10 +13,12 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 import java.util.concurrent.atomic.AtomicReference;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotStateYearly extends RobotState {
+  private static final double MECHANISM_POSITION_LOG_PERIOD_SECONDS = 0.1;
   // Ppl on the interwebs say this is good & thread safe
   private static final RobotStateYearly INSTANCE = new RobotStateYearly();
 
@@ -37,6 +39,8 @@ public class RobotStateYearly extends RobotState {
   public final FlywheelState shooterFlywheelState = new FlywheelState();
 
   public TurretState turretState = new TurretState();
+  private double nextMechanismPositionLogTimestampSeconds = 0.0;
+  private final Pose3d[] mechanismPoses = new Pose3d[3];
 
   public void updateIntakeDeployState(OverBumperIntakeDeployState state) {
     intakeDeployState.set(state);
@@ -62,41 +66,49 @@ public class RobotStateYearly extends RobotState {
   public void updateLog(String standardPrefix, String inputPrefix) {
     super.updateLog(standardPrefix, inputPrefix);
 
-    Pose3d turretPose =
-        RobotRuntimeConstants.ROBOT_CONFIG
-            .getTurretConfig()
-            .kTurretOriginPose
-            .plus(new Transform3d(0, 0, 0, new Rotation3d(turretState.turretYaw.get())));
+    double timestampSeconds = Timer.getFPGATimestamp();
+    if (timestampSeconds >= nextMechanismPositionLogTimestampSeconds) {
+      nextMechanismPositionLogTimestampSeconds =
+          timestampSeconds + MECHANISM_POSITION_LOG_PERIOD_SECONDS;
 
-    Pose3d intakePose =
-        RobotRuntimeConstants.ROBOT_CONFIG
-            .getIntakeDeployConfig()
-            .kPivotPoint
-            .plus(
-                new Transform3d(
-                    0,
-                    0,
-                    0,
-                    new Rotation3d(
-                        0,
-                        -Units.degreesToRadians(intakeDeployState.get().deployPositionUnits),
-                        0)));
+      Pose3d turretPose =
+          RobotRuntimeConstants.ROBOT_CONFIG
+              .getTurretConfig()
+              .kTurretOriginPose
+              .plus(new Transform3d(0, 0, 0, new Rotation3d(turretState.turretYaw.get())));
 
-    Pose3d hoodPose =
-        turretPose.transformBy(
-            PositionUtil.toTransform3d(
-                RobotRuntimeConstants.ROBOT_CONFIG
-                    .getHoodConfig()
-                    .kHoodOriginPose
-                    .plus(
-                        new Transform3d(
-                            0,
-                            0,
-                            0,
-                            new Rotation3d(0, -hoodState.getHoodAngle().getRadians(), 0)))));
+      Pose3d intakePose =
+          RobotRuntimeConstants.ROBOT_CONFIG
+              .getIntakeDeployConfig()
+              .kPivotPoint
+              .plus(
+                  new Transform3d(
+                      0,
+                      0,
+                      0,
+                      new Rotation3d(
+                          0,
+                          -Units.degreesToRadians(intakeDeployState.get().deployPositionUnits),
+                          0)));
 
-    Logger.recordOutput(
-        "SensorRobotState/MechanismPositions", new Pose3d[] {turretPose, intakePose, hoodPose});
+      Pose3d hoodPose =
+          turretPose.transformBy(
+              PositionUtil.toTransform3d(
+                  RobotRuntimeConstants.ROBOT_CONFIG
+                      .getHoodConfig()
+                      .kHoodOriginPose
+                      .plus(
+                          new Transform3d(
+                              0,
+                              0,
+                              0,
+                              new Rotation3d(0, -hoodState.getHoodAngle().getRadians(), 0)))));
+
+      mechanismPoses[0] = turretPose;
+      mechanismPoses[1] = intakePose;
+      mechanismPoses[2] = hoodPose;
+      Logger.recordOutput("SensorRobotState/MechanismPositions", mechanismPoses);
+    }
 
     indexerCompoundState.updateLog("SensorRobotState/IndexerCompound", "");
     turretState.updateLog("SensorRobotState/Turret", "");

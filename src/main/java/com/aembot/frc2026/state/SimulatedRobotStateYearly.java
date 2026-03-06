@@ -9,12 +9,15 @@ import com.aembot.lib.state.subsystems.intake.over_bumper.SimulatedOverBumperInt
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.Logger;
 
 public class SimulatedRobotStateYearly extends SimulatedRobotState {
+  private static final double FUEL_POSITION_LOG_PERIOD_SECONDS = 0.1;
+
   private SimulatedRobotStateYearly() {
     visionSimulation.addAprilTags(Field2026.get().getFieldLayout());
 
@@ -39,6 +42,7 @@ public class SimulatedRobotStateYearly extends SimulatedRobotState {
 
   public final SimulatedShooterFlywheelState simulatedShooterFlywheelState =
       new SimulatedShooterFlywheelState(RobotStateYearly.get());
+  private double nextFuelPositionLogTimestampSeconds = 0.0;
 
   @Override
   public void updateState() {
@@ -67,18 +71,23 @@ public class SimulatedRobotStateYearly extends SimulatedRobotState {
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
     super.updateLog(standardPrefix, inputPrefix);
+    double timestampSeconds = Timer.getFPGATimestamp();
+    if (timestampSeconds >= nextFuelPositionLogTimestampSeconds) {
+      nextFuelPositionLogTimestampSeconds = timestampSeconds + FUEL_POSITION_LOG_PERIOD_SECONDS;
 
-    // Get the positions of the fuel (both on the field and in the air)
-    ArrayList<Pose3d> fuelPoses =
-        new ArrayList<>(
-            Arrays.asList(SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel")));
+      // Get the positions of the fuel (both on the field and in the air)
+      ArrayList<Pose3d> fuelPoses =
+          new ArrayList<>(
+              Arrays.asList(SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel")));
 
-    for (Transform3d fuelInRobot : simulatedIndexerCompoundState.getRenderedGamePiecePositions()) {
-      fuelPoses.add(new Pose3d(this.getLatestFieldRobotPose()).plus(fuelInRobot));
+      for (Transform3d fuelInRobot :
+          simulatedIndexerCompoundState.getRenderedGamePiecePositions()) {
+        fuelPoses.add(new Pose3d(this.getLatestFieldRobotPose()).plus(fuelInRobot));
+      }
+
+      // Publish to telemetry using AdvantageKit
+      Logger.recordOutput("SimulatedRobotState/FuelPositions", fuelPoses.toArray(new Pose3d[0]));
     }
-
-    // Publish to telemetry using AdvantageKit
-    Logger.recordOutput("SimulatedRobotState/FuelPositions", fuelPoses.toArray(new Pose3d[0]));
 
     simulatedIndexerCompoundState.updateLog("SimulatedRobotState/IndexerCompound", "");
     simulatedIntakeState.updateLog("SimulatedRobotState/Intake", "");

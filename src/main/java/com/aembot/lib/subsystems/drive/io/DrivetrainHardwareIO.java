@@ -53,6 +53,17 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
   private Matrix<N3, N1> stateStdDevs = null;
 
   private ArrayList<String> moduleNames = new ArrayList<>();
+  private String[] moduleAbsoluteEncoderAngleLogKeys;
+  private String[] moduleSteeringAngleLogKeys;
+  private String[] moduleTargetSteeringAngleLogKeys;
+  private String[] moduleDriveVelocityLogKeys;
+  private String[] moduleTargetDriveVelocityLogKeys;
+  private String cachedModuleLogPrefix = null;
+  private String[] moduleAbsoluteEncoderAngleFullLogKeys;
+  private String[] moduleSteeringAngleFullLogKeys;
+  private String[] moduleTargetSteeringAngleFullLogKeys;
+  private String[] moduleDriveVelocityFullLogKeys;
+  private String[] moduleTargetDriveVelocityFullLogKeys;
 
   /* ----- Pigeon 2 Status Signals ----- */
   private final StatusSignal<AngularVelocity> angularPitchVelocity;
@@ -102,6 +113,26 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
     for (int i = 0; i < swerveModuleConfigurations.size(); i++) {
       moduleNames.add(i, swerveModuleConfigurations.get(i).moduleName);
       absolutePositionSignals[i] = getModule(i).getEncoder().getAbsolutePosition();
+    }
+
+    int moduleCount = swerveModuleConfigurations.size();
+    moduleAbsoluteEncoderAngleLogKeys = new String[moduleCount];
+    moduleSteeringAngleLogKeys = new String[moduleCount];
+    moduleTargetSteeringAngleLogKeys = new String[moduleCount];
+    moduleDriveVelocityLogKeys = new String[moduleCount];
+    moduleTargetDriveVelocityLogKeys = new String[moduleCount];
+    moduleAbsoluteEncoderAngleFullLogKeys = new String[moduleCount];
+    moduleSteeringAngleFullLogKeys = new String[moduleCount];
+    moduleTargetSteeringAngleFullLogKeys = new String[moduleCount];
+    moduleDriveVelocityFullLogKeys = new String[moduleCount];
+    moduleTargetDriveVelocityFullLogKeys = new String[moduleCount];
+    for (int i = 0; i < moduleCount; i++) {
+      String modulePrefix = "/Modules/" + moduleNames.get(i) + "/";
+      moduleAbsoluteEncoderAngleLogKeys[i] = modulePrefix + "Absolute Encoder Angle";
+      moduleSteeringAngleLogKeys[i] = modulePrefix + "Steering Angle";
+      moduleTargetSteeringAngleLogKeys[i] = modulePrefix + "Target Steering Angle";
+      moduleDriveVelocityLogKeys[i] = modulePrefix + "Drive Velocity";
+      moduleTargetDriveVelocityLogKeys[i] = modulePrefix + "Target Drive Velocity";
     }
 
     // Set CANCoder signals to update at 100hz
@@ -168,22 +199,30 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
   @Override
   public void logModules(DrivetrainInputs inputs, String prefix) {
     if (inputs.ModuleStates == null) return;
-    final String modulePrefix = prefix + "/Modules/";
+    initializeModuleLogKeysIfNeeded(prefix);
     for (int i = 0; i < getModules().length; i++) {
       Logger.recordOutput(
-          modulePrefix + moduleNames.get(i) + "/Absolute Encoder Angle",
-          inputs.absoluteEncoderPositions[i] * 360);
+          moduleAbsoluteEncoderAngleFullLogKeys[i], inputs.absoluteEncoderPositions[i] * 360);
+      Logger.recordOutput(moduleSteeringAngleFullLogKeys[i], inputs.ModuleStates[i].angle);
+      Logger.recordOutput(moduleTargetSteeringAngleFullLogKeys[i], inputs.ModuleTargets[i].angle);
       Logger.recordOutput(
-          modulePrefix + moduleNames.get(i) + "/Steering Angle", inputs.ModuleStates[i].angle);
+          moduleDriveVelocityFullLogKeys[i], inputs.ModuleStates[i].speedMetersPerSecond);
       Logger.recordOutput(
-          modulePrefix + moduleNames.get(i) + "/Target Steering Angle",
-          inputs.ModuleTargets[i].angle);
-      Logger.recordOutput(
-          modulePrefix + moduleNames.get(i) + "/Drive Velocity",
-          inputs.ModuleStates[i].speedMetersPerSecond);
-      Logger.recordOutput(
-          modulePrefix + moduleNames.get(i) + "/Target Drive Velocity",
-          inputs.ModuleTargets[i].speedMetersPerSecond);
+          moduleTargetDriveVelocityFullLogKeys[i], inputs.ModuleTargets[i].speedMetersPerSecond);
+    }
+  }
+
+  private void initializeModuleLogKeysIfNeeded(String prefix) {
+    if (prefix == null) prefix = "";
+    if (prefix.equals(cachedModuleLogPrefix)) return;
+
+    cachedModuleLogPrefix = prefix;
+    for (int i = 0; i < moduleNames.size(); i++) {
+      moduleAbsoluteEncoderAngleFullLogKeys[i] = prefix + moduleAbsoluteEncoderAngleLogKeys[i];
+      moduleSteeringAngleFullLogKeys[i] = prefix + moduleSteeringAngleLogKeys[i];
+      moduleTargetSteeringAngleFullLogKeys[i] = prefix + moduleTargetSteeringAngleLogKeys[i];
+      moduleDriveVelocityFullLogKeys[i] = prefix + moduleDriveVelocityLogKeys[i];
+      moduleTargetDriveVelocityFullLogKeys[i] = prefix + moduleTargetDriveVelocityLogKeys[i];
     }
   }
 

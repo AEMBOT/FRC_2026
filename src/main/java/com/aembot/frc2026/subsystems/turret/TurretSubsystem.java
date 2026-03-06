@@ -18,6 +18,7 @@ import org.littletonrobotics.junction.Logger;
 /** Turret subsystm implementation */
 public class TurretSubsystem
     extends MotorSubsystem<MotorInputs, MotorIO, MotorConfiguration<TalonFXConfiguration>> {
+  private static final double TURRET_DEBUG_LOG_PERIOD_SECONDS = 0.1;
 
   /** IO to use for this subsystem */
   private final TurretIO io;
@@ -30,6 +31,13 @@ public class TurretSubsystem
 
   private final CANCoderInputs encoderAInputs = new CANCoderInputs();
   private final CANCoderInputs encoderBInputs = new CANCoderInputs();
+  private final TurretInputs turretInputs = new TurretInputs();
+  private double nextTurretDebugLogTimestampSeconds = 0.0;
+  private final String turretEncoderALogKey;
+  private final String turretEncoderBLogKey;
+  private final String turretCalculatedRotLogKey;
+  private final String turretLatencyPeriodicLogKey;
+  private final String turretInputsLogKey;
 
   /**
    * Create a new turret subsystem
@@ -45,6 +53,11 @@ public class TurretSubsystem
     this.io = io;
     this.config = config;
     this.state = turretStateInstance;
+    this.turretEncoderALogKey = logPrefixStandard + "/EncoderA";
+    this.turretEncoderBLogKey = logPrefixStandard + "/EncoderB";
+    this.turretCalculatedRotLogKey = logPrefixStandard + "/CalculatedTurretRot";
+    this.turretLatencyPeriodicLogKey = logPrefixStandard + "/LatencyPeriodicMS";
+    this.turretInputsLogKey = logPrefixInput + "/TurretInputs";
 
     io.getCANcoderA().updateInputs(encoderAInputs);
     io.getCANcoderB().updateInputs(encoderBInputs);
@@ -78,6 +91,10 @@ public class TurretSubsystem
 
     io.getCANcoderA().updateInputs(encoderAInputs);
     io.getCANcoderB().updateInputs(encoderBInputs);
+    turretInputs.encoderAAbsolutePositionRotations = encoderAInputs.absolutePositionRotations;
+    turretInputs.encoderAVelocityRotationsPerSecond = encoderAInputs.velocityRotationsPerSecond;
+    turretInputs.encoderBAbsolutePositionRotations = encoderBInputs.absolutePositionRotations;
+    turretInputs.encoderBVelocityRotationsPerSecond = encoderBInputs.velocityRotationsPerSecond;
 
     // If motor has reset (e.g. brownout) then rezero
     if (io.getMotor().hasResetOccurred()) {
@@ -92,27 +109,26 @@ public class TurretSubsystem
 
     // setPositionFromEncoders();
 
-    Logger.recordOutput("encoderA", io.getCANcoderA().getRawAngle());
-    Logger.recordOutput("encoderB", io.getCANcoderB().getRawAngle());
-
-    Logger.recordOutput(
-        "calculatedTurretRot",
-        config.getMechanismRotationsFromEncoders(
-            encoderAInputs.absolutePositionRotations - 0.683838,
-            encoderBInputs.absolutePositionRotations - 0.654541));
+    if (timestamp >= nextTurretDebugLogTimestampSeconds) {
+      nextTurretDebugLogTimestampSeconds = timestamp + TURRET_DEBUG_LOG_PERIOD_SECONDS;
+      Logger.recordOutput(turretEncoderALogKey, turretInputs.encoderAAbsolutePositionRotations);
+      Logger.recordOutput(turretEncoderBLogKey, turretInputs.encoderBAbsolutePositionRotations);
+      Logger.recordOutput(
+          turretCalculatedRotLogKey,
+          config.getMechanismRotationsFromEncoders(
+              turretInputs.encoderAAbsolutePositionRotations - 0.683838,
+              turretInputs.encoderBAbsolutePositionRotations - 0.654541));
+    }
 
     state.updateTurretYaw(Rotation2d.fromDegrees(inputs.positionUnits));
 
     // Log latency with time between periodic being called and finishing
-    Logger.recordOutput(
-        logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
+    Logger.recordOutput(turretLatencyPeriodicLogKey, (Timer.getFPGATimestamp() - timestamp) * 1000);
   }
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
-    Logger.processInputs(inputPrefix, inputs);
-    Logger.processInputs(inputPrefix, encoderAInputs);
-    Logger.processInputs(inputPrefix, encoderBInputs);
+    Logger.processInputs(turretInputsLogKey, turretInputs);
     io.updateLog(standardPrefix, inputPrefix);
     super.updateLog(standardPrefix, inputPrefix);
   }

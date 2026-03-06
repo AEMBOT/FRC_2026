@@ -6,10 +6,13 @@ import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -35,6 +38,8 @@ import org.littletonrobotics.junction.Logger;
 public abstract class MotorSubsystem<
         I extends MotorInputs, M extends MotorIO, C extends MotorConfiguration<?>>
     extends AEMSubsystem {
+  private static final double CONTROL_LOG_PERIOD_SECONDS = 0.1;
+  private static final double CONTROL_LOG_EPSILON = 1e-4;
 
   /** The {@link MotorIO} object that we are commanding */
   protected final M io;
@@ -51,6 +56,26 @@ public abstract class MotorSubsystem<
   /** The current velocity setpoint in servo motor configuration units per second */
   protected double currentVelocitySetpoint = 0;
 
+  private final Map<String, Double> lastNumericControlLogValues = new HashMap<>();
+  private final Map<String, String> lastStringControlLogValues = new HashMap<>();
+  private final Map<String, Double> nextControlLogTimestamps = new HashMap<>();
+  private final String inputsLogKey;
+  private final String currentCommandLogKey;
+  private final String setNeutralModeLogKey;
+  private final String setOpenLoopDutyCycleLogKey;
+  private final String setVoltageLogKey;
+  private final String setTorqueCurrentLogKey;
+  private final String setPIDVelocitySetpointLogKey;
+  private final String setPIDPositionSetpointLogKey;
+  private final String setSmartPositionSetpointPositionLogKey;
+  private final String setSmartPositionSetpointVelocityLogKey;
+  private final String setSmartPositionSetpointAccelerationLogKey;
+  private final String setSmartPositionSetpointJerkLogKey;
+  private final String setSmartPositionSetpointFeedforwardLogKey;
+  private final String setSmartPositionSetpointSlotLogKey;
+  private final String setSmartVelocitySetpointVelocityLogKey;
+  private final String setSmartVelocitySetpointSlotLogKey;
+
   /**
    * Create new servo motor subsystem with the desired motor and motor config
    *
@@ -64,6 +89,27 @@ public abstract class MotorSubsystem<
     this.motorConfig = motorConfiguration;
     this.inputs = motorInputs;
     this.io = motor;
+    this.inputsLogKey = logPrefixInput + "/Inputs";
+    this.currentCommandLogKey = logPrefixStandard + "/CurrentCommand";
+    this.setNeutralModeLogKey = logPrefixStandard + "/SetNeutralMode";
+    this.setOpenLoopDutyCycleLogKey = logPrefixStandard + "/SetOpenLoopDutyCycle";
+    this.setVoltageLogKey = logPrefixStandard + "/SetVoltage";
+    this.setTorqueCurrentLogKey = logPrefixStandard + "/SetTorqueCurrent";
+    this.setPIDVelocitySetpointLogKey = logPrefixStandard + "/SetPIDVelocitySetpoint";
+    this.setPIDPositionSetpointLogKey = logPrefixStandard + "/SetPIDPositionSetpoint";
+    this.setSmartPositionSetpointPositionLogKey =
+        logPrefixStandard + "/SetSmartPositionSetpoint/Position";
+    this.setSmartPositionSetpointVelocityLogKey =
+        logPrefixStandard + "/SetSmartPositionSetpoint/Velocity";
+    this.setSmartPositionSetpointAccelerationLogKey =
+        logPrefixStandard + "/SetSmartPositionSetpoint/Acceleration";
+    this.setSmartPositionSetpointJerkLogKey = logPrefixStandard + "/SetSmartPositionSetpoint/Jerk";
+    this.setSmartPositionSetpointFeedforwardLogKey =
+        logPrefixStandard + "/SetSmartPositionSetpoint/Feedforward";
+    this.setSmartPositionSetpointSlotLogKey = logPrefixStandard + "/SetSmartPositionSetpoint/Slot";
+    this.setSmartVelocitySetpointVelocityLogKey =
+        logPrefixStandard + "/SetSmartVelocitySetpoint/Velocity";
+    this.setSmartVelocitySetpointSlotLogKey = logPrefixStandard + "/SetSmartVelocitySetpoint/Slot";
 
     setDefaultCommand(
         dutyCycleCommand(() -> 0.0)
@@ -92,10 +138,10 @@ public abstract class MotorSubsystem<
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
-    Logger.processInputs(inputPrefix + "/Inputs", inputs);
+    Logger.processInputs(inputsLogKey, inputs);
 
-    Logger.recordOutput(
-        standardPrefix + "/CurrentCommand",
+    recordControlValue(
+        currentCommandLogKey,
         (getCurrentCommand() == null) ? "NONE" : getCurrentCommand().getName());
   }
 
@@ -133,6 +179,56 @@ public abstract class MotorSubsystem<
     io.zeroEncoderPosition();
   }
 
+  private boolean shouldLogNumericControlValue(String key, double value, double epsilon) {
+    double now = Timer.getFPGATimestamp();
+    double nextLog = nextControlLogTimestamps.getOrDefault(key, 0.0);
+
+    Double previous = lastNumericControlLogValues.get(key);
+    boolean changed =
+        previous == null
+            || (Double.isNaN(previous) != Double.isNaN(value))
+            || (!Double.isNaN(previous) && Math.abs(previous - value) > epsilon);
+
+    if (!changed && now < nextLog) {
+      return false;
+    }
+
+    lastNumericControlLogValues.put(key, value);
+    nextControlLogTimestamps.put(key, now + CONTROL_LOG_PERIOD_SECONDS);
+    return true;
+  }
+
+  private boolean shouldLogStringControlValue(String key, String value) {
+    double now = Timer.getFPGATimestamp();
+    double nextLog = nextControlLogTimestamps.getOrDefault(key, 0.0);
+    String previous = lastStringControlLogValues.get(key);
+    boolean changed = previous == null || !previous.equals(value);
+
+    if (!changed && now < nextLog) {
+      return false;
+    }
+
+    lastStringControlLogValues.put(key, value);
+    nextControlLogTimestamps.put(key, now + CONTROL_LOG_PERIOD_SECONDS);
+    return true;
+  }
+
+  private void recordControlValue(String key, double value) {
+    if (shouldLogNumericControlValue(key, value, CONTROL_LOG_EPSILON)) {
+      Logger.recordOutput(key, value);
+    }
+  }
+
+  private void recordControlValue(String key, int value) {
+    recordControlValue(key, (double) value);
+  }
+
+  private void recordControlValue(String key, String value) {
+    if (shouldLogStringControlValue(key, value)) {
+      Logger.recordOutput(key, value);
+    }
+  }
+
   /* ---------  CONFIG --------- */
 
   protected void setSmartMotionConfigImpl(MotionMagicConfigs config) {
@@ -140,7 +236,7 @@ public abstract class MotorSubsystem<
   }
 
   protected void setNeutralModeImpl(MotorIO.NeutralMode mode) {
-    Logger.recordOutput(logPrefixStandard + "/SetNeutralMode", mode.toString());
+    recordControlValue(setNeutralModeLogKey, mode.toString());
     io.setNeutralMode(mode);
   }
 
@@ -158,21 +254,21 @@ public abstract class MotorSubsystem<
   // ---  CONTROL: Duty Cycle
 
   protected void setOpenLoopDutyCycleImpl(double dutyCycle) {
-    Logger.recordOutput(logPrefixStandard + "/SetOpenLoopDutyCycle", dutyCycle);
+    recordControlValue(setOpenLoopDutyCycleLogKey, dutyCycle);
     io.setOpenLoopDutyCycle(dutyCycle);
   }
 
   // ---  CONTROL: Voltage
 
   protected void setVoltageImpl(double voltage) {
-    Logger.recordOutput(logPrefixStandard + "/SetVoltage", voltage);
+    recordControlValue(setVoltageLogKey, voltage);
     io.setVoltageOutput(voltage);
   }
 
   // --- CONTROL: Torque
 
   protected void setTorqueCurrentImpl(double current) {
-    Logger.recordOutput(logPrefixStandard + "/SetTorqueCurrent", current);
+    recordControlValue(setTorqueCurrentLogKey, current);
     io.setTorqueCurrent(current);
   }
 
@@ -180,7 +276,7 @@ public abstract class MotorSubsystem<
 
   protected void setPIDVelocitySetpointImpl(double velocity, int slot) {
     currentVelocitySetpoint = velocity;
-    Logger.recordOutput(logPrefixStandard + "/SetPIDVelocitySetpoint", velocity);
+    recordControlValue(setPIDVelocitySetpointLogKey, velocity);
     io.setPIDVelocitySetpoint(velocity, slot);
   }
 
@@ -192,7 +288,7 @@ public abstract class MotorSubsystem<
 
   protected void setPIDPositionSetpointImpl(double position, int slot) {
     currentPositionSetpoint = position;
-    Logger.recordOutput(logPrefixStandard + "/SetPIDPositionSetpoint", position);
+    recordControlValue(setPIDPositionSetpointLogKey, position);
     io.setPIDPositionSetpoint(position, slot);
   }
 
@@ -208,8 +304,8 @@ public abstract class MotorSubsystem<
 
   protected void setSmartPositionSetpointImpl(double position, int slot) {
     currentPositionSetpoint = position;
-    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Position", position);
-    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Slot", slot);
+    recordControlValue(setSmartPositionSetpointPositionLogKey, position);
+    recordControlValue(setSmartPositionSetpointSlotLogKey, slot);
     io.setSmartPositionSetpoint(position, slot);
   }
 
@@ -245,13 +341,12 @@ public abstract class MotorSubsystem<
       double feedforward,
       int slot) {
     currentPositionSetpoint = position;
-    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Position", position);
-    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Velocity", velocity);
-    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Acceleration", acceleration);
-
-    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Jerk", jerk);
-    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Feedforward", feedforward);
-    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Slot", slot);
+    recordControlValue(setSmartPositionSetpointPositionLogKey, position);
+    recordControlValue(setSmartPositionSetpointVelocityLogKey, velocity);
+    recordControlValue(setSmartPositionSetpointAccelerationLogKey, acceleration);
+    recordControlValue(setSmartPositionSetpointJerkLogKey, jerk);
+    recordControlValue(setSmartPositionSetpointFeedforwardLogKey, feedforward);
+    recordControlValue(setSmartPositionSetpointSlotLogKey, slot);
     io.setDynamicSmartPositionSetpoint(position, velocity, acceleration, jerk, feedforward, slot);
   }
 
@@ -259,8 +354,8 @@ public abstract class MotorSubsystem<
 
   protected void setSmartVelocitySetpointImpl(double velocity, int slot) {
     currentVelocitySetpoint = velocity;
-    Logger.recordOutput(logPrefixStandard + "/SetSmartVelocitySetpoint/Velocity", velocity);
-    Logger.recordOutput(logPrefixStandard + "/SetSmartVelocitySetpoint/Slot", slot);
+    recordControlValue(setSmartVelocitySetpointVelocityLogKey, velocity);
+    recordControlValue(setSmartVelocitySetpointSlotLogKey, slot);
     io.setSmartVelocitySetpoint(velocity, slot);
   }
 

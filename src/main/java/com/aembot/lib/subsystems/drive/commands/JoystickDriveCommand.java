@@ -260,7 +260,6 @@ public class JoystickDriveCommand extends Command {
   }
 
   private void driveWithHeading(double velocityX, double velocityY, Rotation2d heading) {
-    System.out.println("driveWithHeading");
     drivetrainSubsystem.setRequest(
         driveWithHeadingRequest
             .withVelocityX(velocityX)

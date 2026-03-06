@@ -23,6 +23,9 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveSubsystem extends AEMSubsystem {
+  private static final double MODULE_DETAIL_LOG_PERIOD_SECONDS = 0.1;
+  private static final double CURRENT_COMMAND_LOG_PERIOD_SECONDS = 0.1;
+
   protected final RobotState robotStateInstance;
 
   protected DrivetrainIO io;
@@ -31,6 +34,13 @@ public class DriveSubsystem extends AEMSubsystem {
   protected final DrivetrainConfiguration config;
 
   private final SwerveVisualizer visualizer;
+  private double nextModuleDetailLogTimestampSeconds = 0.0;
+  private double nextCurrentCommandLogTimestampSeconds = 0.0;
+  private String lastLoggedCurrentCommandName = "";
+  private final String driveInputsLogKey;
+  private final String driveOdometrySpeedLogKey;
+  private final String driveLatencyPeriodicLogKey;
+  private final String driveCurrentCommandLogKey;
 
   public DriveSubsystem(
       DrivetrainConfiguration configuration,
@@ -43,6 +53,10 @@ public class DriveSubsystem extends AEMSubsystem {
     this.config = configuration;
     this.io = drivetrain;
     this.robotStateInstance = robotStateInstance;
+    this.driveInputsLogKey = logPrefixInput;
+    this.driveOdometrySpeedLogKey = logPrefixStandard + "/Odometry/SpeedMetersPerSecond";
+    this.driveLatencyPeriodicLogKey = logPrefixStandard + "/LatencyPeriodicMS";
+    this.driveCurrentCommandLogKey = logPrefixStandard + "/CurrentCommand";
 
     robotStateInstance.registerAprilCameraOutputConsumer(io::addVisionEstimation);
   }
@@ -60,7 +74,10 @@ public class DriveSubsystem extends AEMSubsystem {
 
     updateLog();
     updateRobotState();
-    io.logModules(inputs, logPrefixStandard);
+    if (timestamp >= nextModuleDetailLogTimestampSeconds) {
+      nextModuleDetailLogTimestampSeconds = timestamp + MODULE_DETAIL_LOG_PERIOD_SECONDS;
+      io.logModules(inputs, logPrefixStandard);
+    }
 
     // Update standard deviations based on enable state
     if (DriverStation.isDisabled()) {
@@ -70,12 +87,16 @@ public class DriveSubsystem extends AEMSubsystem {
     }
 
     // Log latency with time between periodic being called and finishing
-    Logger.recordOutput(
-        logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
+    Logger.recordOutput(driveLatencyPeriodicLogKey, (Timer.getFPGATimestamp() - timestamp) * 1000);
 
-    Logger.recordOutput(
-        logPrefixStandard + "/CurrentCommand",
-        (getCurrentCommand() == null) ? "Default" : getCurrentCommand().getName());
+    String currentCommandName =
+        (getCurrentCommand() == null) ? "Default" : getCurrentCommand().getName();
+    if (!currentCommandName.equals(lastLoggedCurrentCommandName)
+        || timestamp >= nextCurrentCommandLogTimestampSeconds) {
+      lastLoggedCurrentCommandName = currentCommandName;
+      nextCurrentCommandLogTimestampSeconds = timestamp + CURRENT_COMMAND_LOG_PERIOD_SECONDS;
+      Logger.recordOutput(driveCurrentCommandLogKey, currentCommandName);
+    }
   }
 
   /** Update the robot state with odometry info */
@@ -127,10 +148,10 @@ public class DriveSubsystem extends AEMSubsystem {
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
-    Logger.processInputs(inputPrefix, inputs);
+    Logger.processInputs(driveInputsLogKey, inputs);
 
     Logger.recordOutput(
-        standardPrefix + "/Odometry/SpeedMetersPerSecond",
+        driveOdometrySpeedLogKey,
         new Translation2d(inputs.Speeds.vxMetersPerSecond, inputs.Speeds.vyMetersPerSecond)
             .getNorm());
 

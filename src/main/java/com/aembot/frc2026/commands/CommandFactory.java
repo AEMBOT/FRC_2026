@@ -15,6 +15,7 @@ import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSu
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -26,6 +27,7 @@ import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public final class CommandFactory {
+  private static final double COMMAND_LOG_PERIOD_SECONDS = 0.1;
 
   private final DriveSubsystem driveSubsystem;
   public final IntakeCommands intakeCommands;
@@ -35,6 +37,7 @@ public final class CommandFactory {
   private boolean shootFuel;
   private final Trigger aimTrigger;
   private final Trigger kickerTrigger;
+  private double nextCommandLogTimestampSeconds = 0.0;
 
   public CommandFactory(
       DriveSubsystem driveSubsystem,
@@ -61,6 +64,12 @@ public final class CommandFactory {
   }
 
   public void logCommands() {
+    double timestampSeconds = Timer.getFPGATimestamp();
+    if (timestampSeconds < nextCommandLogTimestampSeconds) {
+      return;
+    }
+    nextCommandLogTimestampSeconds = timestampSeconds + COMMAND_LOG_PERIOD_SECONDS;
+
     Logger.recordOutput("Commands/shootFuel", shootFuel);
     Logger.recordOutput("Commands/atSetpoint", shooterCommands.isShooterNearGoal());
   }

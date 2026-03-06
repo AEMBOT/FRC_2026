@@ -67,6 +67,9 @@ public class SwerveVisualizer implements Loggable {
     this.maxRobotSpeed = maxSpeed;
   }
 
+  private String lastStandardPrefix = "";
+  private String driveVizLogKey = "";
+
   public void updateSwerveState(SwerveDriveState state) {
     if (state == null || state.Pose == null || state.ModuleStates == null) {
       return;
@@ -82,8 +85,12 @@ public class SwerveVisualizer implements Loggable {
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
+    if (!standardPrefix.equals(lastStandardPrefix)) {
+      lastStandardPrefix = standardPrefix;
+      driveVizLogKey = standardPrefix + "/DriveViz";
+    }
     for (LoggedMechanism2d mechanism : moduleMechanisms) {
-      Logger.recordOutput(standardPrefix + "/DriveViz", mechanism);
+      Logger.recordOutput(driveVizLogKey, mechanism);
     }
   }
 }

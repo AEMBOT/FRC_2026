@@ -5,7 +5,6 @@ import com.aembot.lib.subsystems.aprilvision.interfaces.AprilCameraIO;
 import com.aembot.lib.subsystems.aprilvision.util.AprilCameraOutput;
 import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
 import com.aembot.lib.subsystems.base.AEMSubsystem;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,20 +14,68 @@ import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
 public class AprilVisionSubsystem extends AEMSubsystem {
-  protected final RobotState robotStateInstance;
+  private static final double CAMERA_POSE_LOG_PERIOD_SECONDS = 0.1;
+  private static final double VISION_ESTIMATE_LOG_PERIOD_SECONDS = 0.1;
+  private static final double VISION_INPUT_LOG_PERIOD_SECONDS = 0.1;
 
-  protected final List<Pair<AprilCameraIO, AprilVisionInputs>> camerasWithInputs =
-      new ArrayList<>();
+  private static class CameraLogContext {
+    public final AprilCameraIO io;
+    public final AprilVisionInputs inputs;
+    public final boolean isTurretCamera;
+    public final String cameraName;
+    public final String cameraPositionLogKey;
+    public final String processInputsLogKey;
+
+    private CameraLogContext(
+        AprilCameraIO io,
+        AprilVisionInputs inputs,
+        boolean isTurretCamera,
+        String cameraName,
+        String cameraPositionLogKey,
+        String processInputsLogKey) {
+      this.io = io;
+      this.inputs = inputs;
+      this.isTurretCamera = isTurretCamera;
+      this.cameraName = cameraName;
+      this.cameraPositionLogKey = cameraPositionLogKey;
+      this.processInputsLogKey = processInputsLogKey;
+    }
+  }
+
+  protected final RobotState robotStateInstance;
+  protected final List<CameraLogContext> cameraContexts = new ArrayList<>();
+  private final List<AprilCameraOutput> aprilTagObservationsBuffer = new ArrayList<>();
+  private final String visionObservationCountLogKey;
+  private final String latestVisionEstimatedRobotPoseLogKey;
+  private final String latencyPeriodicLogKey;
+  private final String visionActiveLogKey;
 
   private boolean visionActive = true;
+  private double nextCameraPoseLogTimestampSeconds = 0.0;
+  private double nextVisionEstimateLogTimestampSeconds = 0.0;
+  private double nextVisionInputLogTimestampSeconds = 0.0;
 
   public AprilVisionSubsystem(RobotState robotStateInstance, AprilCameraIO... cameras) {
     super("VisionSubsystem");
 
     this.robotStateInstance = robotStateInstance;
+    this.visionObservationCountLogKey = logPrefixStandard + "/VisionObservationCount";
+    this.latestVisionEstimatedRobotPoseLogKey =
+        logPrefixStandard + "/LatestVisionEstimatedRobotPose";
+    this.latencyPeriodicLogKey = logPrefixStandard + "/LatencyPeriodicMS";
+    this.visionActiveLogKey = logPrefixStandard + "/VisionActive";
 
     for (AprilCameraIO camera : cameras) {
-      camerasWithInputs.add(Pair.of(camera, new AprilVisionInputs()));
+      AprilVisionInputs inputs = new AprilVisionInputs();
+      String cameraName = camera.getConfiguration().cameraName;
+      cameraContexts.add(
+          new CameraLogContext(
+              camera,
+              inputs,
+              "turret".equals(cameraName),
+              cameraName,
+              logPrefixStandard + "/" + cameraName + "/CameraPosition",
+              logPrefixInput + "/" + camera.getConfiguration().toString()));
     }
 
     updateNTDisabled();
@@ -37,49 +84,52 @@ public class AprilVisionSubsystem extends AEMSubsystem {
   @Override
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
+    boolean shouldLogCameraPose = timestamp >= nextCameraPoseLogTimestampSeconds;
+    if (shouldLogCameraPose) {
+      nextCameraPoseLogTimestampSeconds = timestamp + CAMERA_POSE_LOG_PERIOD_SECONDS;
+    }
+    aprilTagObservationsBuffer.clear();
 
-    List<AprilCameraOutput> aprilTagObservations = new ArrayList<>();
+    for (CameraLogContext context : cameraContexts) {
+      if (context.isTurretCamera) continue;
 
-    for (Pair<AprilCameraIO, AprilVisionInputs> cameraWithInput : camerasWithInputs) {
-      AprilCameraIO io = cameraWithInput.getFirst();
-      AprilVisionInputs inputs = cameraWithInput.getSecond();
+      if (shouldLogCameraPose) {
+        Logger.recordOutput(
+            context.cameraPositionLogKey,
+            new Pose3d(robotStateInstance.getLatestFieldRobotPose())
+                // Convert the camera pose into a field-space pose for visualization
+                .plus(context.io.getConfiguration().getCameraPosition().minus(Pose3d.kZero)));
+      }
 
-      if (io.getConfiguration().cameraName == "turret") continue;
+      context.io.updateInputs(context.inputs);
 
-      Logger.recordOutput(
-          logPrefixStandard + "/" + io.getConfiguration().cameraName + "/CameraPosition",
-          new Pose3d(robotStateInstance.getLatestFieldRobotPose())
-              // This is so jank. why is there no method to add two poses :sob:
-              // Convert the cam pos pose2d to a transform2d with #minus, because
-              // that returns a Transform2d for some unfathomable reason
-              .plus(io.getConfiguration().getCameraPosition().minus(Pose3d.kZero)));
-
-      io.updateInputs(inputs);
-
-      if (inputs.coprocessorEstimationLatencyCompensated != null && visionActive) {
-        aprilTagObservations.add(
+      if (context.inputs.coprocessorEstimationLatencyCompensated != null && visionActive) {
+        aprilTagObservationsBuffer.add(
             new AprilCameraOutput(
-                io.getConfiguration().cameraName,
-                inputs.tagID,
+                context.cameraName,
+                context.inputs.tagID,
                 new VisionPoseEstimation(
-                    inputs.coprocessorEstimationLatencyUncompensated,
-                    inputs.coprocessorEstimationLatencyCompensated,
-                    inputs.coprocessorEstimationStdDevs,
-                    inputs.coprocessorEstimationTimestamp)));
+                    context.inputs.coprocessorEstimationLatencyUncompensated,
+                    context.inputs.coprocessorEstimationLatencyCompensated,
+                    context.inputs.coprocessorEstimationStdDevs,
+                    context.inputs.coprocessorEstimationTimestamp)));
       }
     }
 
-    robotStateInstance.setApriltagObservations(aprilTagObservations);
+    robotStateInstance.setApriltagObservations(aprilTagObservationsBuffer);
 
     updateLog();
-    for (AprilCameraOutput observation : robotStateInstance.getAprilTagObservations()) {
+    List<AprilCameraOutput> observations = robotStateInstance.getAprilTagObservations();
+    Logger.recordOutput(visionObservationCountLogKey, observations.size());
+    if (!observations.isEmpty() && timestamp >= nextVisionEstimateLogTimestampSeconds) {
+      nextVisionEstimateLogTimestampSeconds = timestamp + VISION_ESTIMATE_LOG_PERIOD_SECONDS;
       Logger.recordOutput(
-          logPrefixStandard + "/VisionEstimatedRobotPose", observation.estimatedPose());
+          latestVisionEstimatedRobotPoseLogKey,
+          observations.get(observations.size() - 1).estimatedPose());
     }
 
     // Log latency with time between periodic being called and finishing
-    Logger.recordOutput(
-        logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
+    Logger.recordOutput(latencyPeriodicLogKey, (Timer.getFPGATimestamp() - timestamp) * 1000);
   }
 
   public Command createKillVisionCommand() {
@@ -88,28 +138,27 @@ public class AprilVisionSubsystem extends AEMSubsystem {
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
+    Logger.recordOutput(visionActiveLogKey, visionActive);
+    double timestampSeconds = Timer.getFPGATimestamp();
+    if (timestampSeconds < nextVisionInputLogTimestampSeconds) {
+      return;
+    }
+    nextVisionInputLogTimestampSeconds = timestampSeconds + VISION_INPUT_LOG_PERIOD_SECONDS;
 
-    Logger.recordOutput(standardPrefix + "/VisionActive", visionActive);
-
-    for (Pair<AprilCameraIO, AprilVisionInputs> cameraWithInput : camerasWithInputs) {
-      AprilCameraIO io = cameraWithInput.getFirst();
-      AprilVisionInputs inputs = cameraWithInput.getSecond();
-
-      Logger.processInputs(inputPrefix + "/" + io.getConfiguration().toString(), inputs);
+    for (CameraLogContext context : cameraContexts) {
+      Logger.processInputs(context.processInputsLogKey, context.inputs);
     }
   }
 
   private void updateNTDisabled() {
-    for (Pair<AprilCameraIO, AprilVisionInputs> cameraPair : camerasWithInputs) {
-      AprilCameraIO camera = cameraPair.getFirst();
-      camera.updateNetworkTablesForDisabled();
+    for (CameraLogContext context : cameraContexts) {
+      context.io.updateNetworkTablesForDisabled();
     }
   }
 
   private void updateNTEnabled() {
-    for (Pair<AprilCameraIO, AprilVisionInputs> cameraPair : camerasWithInputs) {
-      AprilCameraIO camera = cameraPair.getFirst();
-      camera.updateNetworkTablesForEnabled();
+    for (CameraLogContext context : cameraContexts) {
+      context.io.updateNetworkTablesForEnabled();
     }
   }
 
