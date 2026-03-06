@@ -91,13 +91,14 @@ public final class CommandFactory {
   }
 
   public Command resetOdometryHeading() {
-    Translation2d robotTranslation =
-        RobotStateYearly.get().getLatestFieldRobotPose().getTranslation();
-    Rotation2d robotRotation =
-        RobotRuntimeConstants.isBlueAlliance() ? Rotation2d.kZero : Rotation2d.k180deg;
-
     return new InstantCommand(
-        () -> driveSubsystem.resetPose(new Pose2d(robotTranslation, robotRotation)));
+        () -> {
+          Translation2d robotTranslation =
+              RobotStateYearly.get().getLatestFieldRobotPose().getTranslation();
+          Rotation2d robotRotation =
+              RobotRuntimeConstants.isBlueAlliance() ? Rotation2d.kZero : Rotation2d.k180deg;
+          driveSubsystem.resetPose(new Pose2d(robotTranslation, robotRotation));
+        });
   }
 
   public Command createSetDriveHeadingForUnderTrenchCommand(
