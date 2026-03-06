@@ -21,8 +21,10 @@ import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSu
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -77,6 +79,21 @@ public class RobotContainer implements Loggerable {
 
   private final Trigger robotEnabled = new Trigger(() -> DriverStation.isEnabled());
 
+  private final Trigger allianceInitialized =
+      new Trigger(() -> DriverStation.getAlliance().isPresent());
+
+  private final Trigger allianceIsRed =
+      new Trigger(
+          () ->
+              allianceInitialized.getAsBoolean()
+                  && DriverStation.getAlliance().get().equals(Alliance.Red));
+
+  private final Trigger allianceIsBlue =
+      new Trigger(
+          () ->
+              allianceInitialized.getAsBoolean()
+                  && DriverStation.getAlliance().get().equals(Alliance.Blue));
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer(LoggedRobot robot) {
     setupLogger(robot);
@@ -92,22 +109,6 @@ public class RobotContainer implements Loggerable {
             indexerKickerSubsystem,
             flywheelSubsystem,
             turretSubsystem);
-
-    AutoHelper.setupAutoFactory(driveSubsystem);
-
-    AutoHelper.registerAutoCommands(commandFactory);
-
-    AutoHelper.setupAutoChooser();
-
-    SmartDashboard.putData("Choose Auto Routine", AutoHelper.autoChooser);
-
-    AutoHelper.setupAutoFactory(driveSubsystem);
-
-    AutoHelper.registerAutoCommands(commandFactory);
-
-    AutoHelper.setupAutoChooser();
-
-    SmartDashboard.putData("Choose Auto Routine", AutoHelper.autoChooser);
 
     configureBindings();
 
@@ -200,6 +201,9 @@ public class RobotContainer implements Loggerable {
     robotEnabled
         .onTrue(visionSubsystem.updateNTEnabledCommand())
         .onFalse(visionSubsystem.updateNTDisabledCommand());
+
+    allianceIsBlue.onChange(setupAutos());
+    allianceIsRed.onChange(setupAutos());
   }
 
   /**
@@ -224,5 +228,21 @@ public class RobotContainer implements Loggerable {
 
   public void logCommands() {
     commandFactory.logCommands();
+  }
+
+  private Command setupAutos() {
+    return new InstantCommand(
+            () -> {
+              AutoHelper.setupAutoFactory(driveSubsystem);
+
+              AutoHelper.registerAutoCommands(commandFactory);
+
+              AutoHelper.setupAutoChooser();
+
+              SmartDashboard.putData("Choose Auto Routine", AutoHelper.autoChooser);
+
+              System.out.println("Setup Autos");
+            })
+        .ignoringDisable(true);
   }
 }
