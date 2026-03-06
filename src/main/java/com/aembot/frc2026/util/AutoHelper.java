@@ -10,6 +10,9 @@ import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
@@ -52,6 +55,24 @@ public class AutoHelper {
     addAuto("LeftNeutralDepot");
     addAuto("RightNeutralOutpost");
     addAuto("TowerPreload");
+
+    // TODO make clean
+    AutoRoutine doNothingRoutine = autoFactory.newRoutine("DoNothing");
+
+    doNothingRoutine
+        .active()
+        .onTrue(
+            new InstantCommand(
+                () ->
+                    setOdometryFunc.accept(
+                        new Pose2d(
+                            0,
+                            0,
+                            DriverStation.getAlliance().get() == Alliance.Blue
+                                ? new Rotation2d()
+                                : Rotation2d.k180deg))));
+
+    autoChooser.addRoutine("DoNothing", () -> doNothingRoutine);
   }
 
   /**
