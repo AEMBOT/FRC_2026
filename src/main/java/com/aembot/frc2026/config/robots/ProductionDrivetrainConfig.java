@@ -77,12 +77,12 @@ public class ProductionDrivetrainConfig {
 
     public static final double SLOW_MODE_FACTOR = 0.4;
 
-    public static final PIDConstants HEADING_PID_CONSTANTS = new PIDConstants(5, 0, 0);
+    public static final PIDConstants HEADING_PID_CONSTANTS = new PIDConstants(0.25, 0, 0);
 
     public static final PIDController AUTO_TRANSLATION_CONTROLLER =
         new PIDController(5.0, 0.0, 0.0);
 
-    public static final PIDController AUTO_ROTATION_CONTROLLER = new PIDController(3.0, 0.0, 0.0);
+    public static final PIDController AUTO_ROTATION_CONTROLLER = new PIDController(0.25, 0.0, 0.0);
 
     private static DrivetrainConfiguration makeDrivetrainConfiguration(
         String canBusName,
