@@ -3,6 +3,7 @@ package com.aembot.lib.subsystems.intake.over_bumper.deploy.io;
 import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOTalonFX;
+import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeployInputs;
 
 /** Real over the bumper intake deployment io */
@@ -32,8 +33,10 @@ public class TalonFXOverBumperIntakeDeployHardwareIO implements OverBumperIntake
   }
 
   @Override
+  @Traced
   public void updateInputs(OverBumperIntakeDeployInputs inputs) {}
 
   @Override
+  @Traced
   public void updateLog(String standardPrefix, String inputPrefix) {}
 }

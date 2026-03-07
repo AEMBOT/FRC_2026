@@ -3,6 +3,7 @@ package com.aembot.lib.subsystems.drive;
 import choreo.trajectory.SwerveSample;
 import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
+import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.base.AEMSubsystem;
 import com.aembot.lib.subsystems.drive.io.DrivetrainIO;
@@ -68,6 +69,7 @@ public class DriveSubsystem extends AEMSubsystem {
   }
 
   @Override
+  @Traced
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
     io.updateInputs(inputs);
@@ -100,6 +102,7 @@ public class DriveSubsystem extends AEMSubsystem {
   }
 
   /** Update the robot state with odometry info */
+  @Traced
   private void updateRobotState() {
     // Use the timestamp logged with the data rather than the current timestamp.
     double timestamp = inputs.timestampRIOSynchronized;
@@ -147,6 +150,7 @@ public class DriveSubsystem extends AEMSubsystem {
   }
 
   @Override
+  @Traced
   public void updateLog(String standardPrefix, String inputPrefix) {
     Logger.processInputs(driveInputsLogKey, inputs);
 
@@ -163,6 +167,7 @@ public class DriveSubsystem extends AEMSubsystem {
    * Resets the drive train odometry to the given pose. Ie. setting robot pose to auto starting
    * position. Wraps {@link DrivetrainIO#resetOdometry}.
    */
+  @Traced
   public void resetPose(Pose2d pose) {
     io.resetOdometry(pose);
   }
@@ -182,6 +187,7 @@ public class DriveSubsystem extends AEMSubsystem {
    *
    * @param request The swerve drive request to pass to the drivetrain
    */
+  @Traced
   public void setRequest(SwerveRequest request) {
     io.setRequest(request);
   }
@@ -229,6 +235,7 @@ public class DriveSubsystem extends AEMSubsystem {
    *
    * @param speeds robot relative chassis speeds
    */
+  @Traced
   public void setRequestFromChassisSpeeds(ChassisSpeeds speeds) {
     setRequest(
         new SwerveRequest.FieldCentric()
@@ -238,6 +245,7 @@ public class DriveSubsystem extends AEMSubsystem {
             .withDriveRequestType(SwerveModule.DriveRequestType.Velocity));
   }
 
+  @Traced
   public void setRequestFromSwerveSample(SwerveSample sample) {
 
     ChassisSpeeds speeds =

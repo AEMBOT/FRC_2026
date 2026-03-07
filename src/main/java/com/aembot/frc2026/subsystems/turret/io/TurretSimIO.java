@@ -6,6 +6,7 @@ import com.aembot.lib.core.encoders.interfaces.CANCoderIO;
 import com.aembot.lib.core.encoders.io.CANCoderSimIO;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOTalonFXSim;
+import com.aembot.lib.core.tracing.Traced;
 import edu.wpi.first.wpilibj.Notifier;
 
 /** Simulated IO implementation for the turret */
@@ -42,6 +43,7 @@ public class TurretSimIO implements TurretIO {
   }
 
   /** Update the state of the sim */
+  @Traced
   private void updateSim() {
     simMotor.updateSimState();
 
@@ -72,9 +74,11 @@ public class TurretSimIO implements TurretIO {
   }
 
   @Override
+  @Traced
   public void updateInputs(TurretInputs inputs) {}
 
   @Override
+  @Traced
   public void updateLog(String standardPrefix, String inputPrefix) {
     simMotor.logSim(standardPrefix, inputPrefix);
     simCANcoderA.logSim(standardPrefix, inputPrefix);

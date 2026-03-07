@@ -4,6 +4,7 @@ import com.aembot.frc2026.config.subsystems.spindexer.SpindexerConfiguration;
 import com.aembot.frc2026.subsystems.spindexer.SpindexerMechanismInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOTalonFX;
+import com.aembot.lib.core.tracing.Traced;
 
 public class SpindexerMechanismIOReal implements SpindexerMechanismIO {
   /** Motor IO to use */
@@ -27,8 +28,10 @@ public class SpindexerMechanismIOReal implements SpindexerMechanismIO {
   }
 
   @Override
+  @Traced
   public void updateInputs(SpindexerMechanismInputs inputs) {}
 
   @Override
+  @Traced
   public void updateLog(String standardPrefix, String inputs) {}
 }

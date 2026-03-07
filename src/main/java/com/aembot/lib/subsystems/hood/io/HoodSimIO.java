@@ -2,6 +2,7 @@ package com.aembot.lib.subsystems.hood.io;
 
 import com.aembot.lib.config.subsystems.hood.simulation.SimulatedHoodConfiguration;
 import com.aembot.lib.core.motors.io.MotorIOTalonFXSim;
+import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.subsystems.hood.HoodInputs;
 import edu.wpi.first.wpilibj.Notifier;
 
@@ -36,9 +37,11 @@ public class HoodSimIO implements HoodIO {
   }
 
   @Override
+  @Traced
   public void updateInputs(HoodInputs inputs) {}
 
   @Override
+  @Traced
   public void updateLog(String standardPrefix, String inputPrefix) {
     simMotor.logSim(standardPrefix, inputPrefix);
   }

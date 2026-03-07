@@ -3,6 +3,7 @@ package com.aembot.frc2026.subsystems.spindexer.io;
 import com.aembot.frc2026.config.subsystems.spindexer.SpindexerConfiguration;
 import com.aembot.frc2026.subsystems.spindexer.SpindexerMechanismInputs;
 import com.aembot.lib.core.motors.io.MotorIOTalonFXSim;
+import com.aembot.lib.core.tracing.Traced;
 import edu.wpi.first.wpilibj.Notifier;
 
 public class SpindexerMechanismIOSim implements SpindexerMechanismIO {
@@ -32,9 +33,11 @@ public class SpindexerMechanismIOSim implements SpindexerMechanismIO {
   }
 
   @Override
+  @Traced
   public void updateInputs(SpindexerMechanismInputs inputs) {}
 
   @Override
+  @Traced
   public void updateLog(String standardPrefix, String inputPrefix) {
     kSimMotor.logSim(standardPrefix, inputPrefix);
   }

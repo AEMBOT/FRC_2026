@@ -3,6 +3,7 @@ package com.aembot.frc2026.state;
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.state.subsystems.indexer.IndexerCompoundState;
 import com.aembot.frc2026.state.subsystems.turret.TurretState;
+import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.math.PositionUtil;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.state.subsystems.flywheel.FlywheelState;
@@ -63,6 +64,7 @@ public class RobotStateYearly extends RobotState {
   }
 
   @Override
+  @Traced
   public void updateLog(String standardPrefix, String inputPrefix) {
     super.updateLog(standardPrefix, inputPrefix);
 

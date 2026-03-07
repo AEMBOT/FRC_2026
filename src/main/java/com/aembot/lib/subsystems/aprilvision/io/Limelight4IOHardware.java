@@ -3,6 +3,7 @@ package com.aembot.lib.subsystems.aprilvision.io;
 import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
+import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.math.PositionUtil;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionInputs;
@@ -111,6 +112,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
    * Updates the cached values from NetworkTables. Called asynchronously as {@link
    * #heartbeatCallback} for every limelight heartbeat
    */
+  @Traced
   public void updateNtValuesCache(NetworkTableEvent event) {
     latencyMs.set(
         LimelightHelpers.getLatency_Capture(cameraName)
@@ -127,6 +129,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
   }
 
   @Override
+  @Traced
   public void updateInputs(AprilVisionInputs inputs) {
     inputs.latency = latencyMs.get();
 
@@ -167,6 +170,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
     }
   }
 
+  @Traced
   private VisionPoseEstimation getMegatag2Estimate() {
 
     VisionPoseEstimation poseEstimation;
@@ -248,12 +252,14 @@ public class Limelight4IOHardware implements AprilCameraIO {
   }
 
   @Override
+  @Traced
   public void updateNetworkTablesForDisabled() {
     LimelightHelpers.SetThrottle(cameraName, this.cameraConfiguration.disabledThrottleValue);
     LimelightHelpers.SetIMUMode(cameraName, this.cameraConfiguration.disabledIMUMode);
   }
 
   @Override
+  @Traced
   public void updateNetworkTablesForEnabled() {
     LimelightHelpers.SetThrottle(cameraName, this.cameraConfiguration.enabledThrottledValue);
     LimelightHelpers.SetIMUMode(cameraName, this.cameraConfiguration.enabledIMUMode);

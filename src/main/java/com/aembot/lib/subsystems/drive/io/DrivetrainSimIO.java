@@ -4,6 +4,7 @@ import com.aembot.frc2026.state.SimulatedRobotStateYearly;
 import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
 import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
 import com.aembot.lib.config.subsystems.drive.simulation.DrivetrainSimConfiguration;
+import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.subsystems.drive.simulation.MapleSimSwerveDrivetrain;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -64,6 +65,7 @@ public class DrivetrainSimIO extends DrivetrainHardwareIO {
   }
 
   /** Start the simulation thread for the maple sim drive train */
+  @Traced
   public void startSimThread() {
     if (simulationThread != null) { // This is _probably_ not needed, but just in case.
       DriverStation.reportWarning(
@@ -95,6 +97,7 @@ public class DrivetrainSimIO extends DrivetrainHardwareIO {
   }
 
   /** Teleports the simulated robot to the given pose. */
+  @Traced
   public void teleportRobot(Pose2d pose) {
     if (drivetrainSim != null) {
       drivetrainSim.mapleSimSwerveDrivetrain.setSimulationWorldPose(pose);
@@ -109,6 +112,7 @@ public class DrivetrainSimIO extends DrivetrainHardwareIO {
    * <p><strong>In the sim implementation, this will teleport the simulated robot to the given pose
    */
   @Override
+  @Traced
   public void resetOdometry(Pose2d pose) {
     teleportRobot(pose);
   }

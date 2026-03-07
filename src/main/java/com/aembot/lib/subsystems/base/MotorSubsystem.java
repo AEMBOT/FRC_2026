@@ -3,6 +3,7 @@ package com.aembot.lib.subsystems.base;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
+import com.aembot.lib.core.tracing.Traced;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
@@ -131,12 +132,14 @@ public abstract class MotorSubsystem<
   }
 
   @Override
+  @Traced
   public void periodic() {
     io.updateInputs(inputs);
     updateLog();
   }
 
   @Override
+  @Traced
   public void updateLog(String standardPrefix, String inputPrefix) {
     Logger.processInputs(inputsLogKey, inputs);
 

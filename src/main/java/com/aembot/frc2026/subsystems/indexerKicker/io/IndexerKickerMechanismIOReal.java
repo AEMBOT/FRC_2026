@@ -4,6 +4,7 @@ import com.aembot.frc2026.config.subsystems.indexerKicker.IndexerKickerConfigura
 import com.aembot.frc2026.subsystems.indexerKicker.IndexerKickerMechanismInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOTalonFX;
+import com.aembot.lib.core.tracing.Traced;
 
 public class IndexerKickerMechanismIOReal implements IndexerKickerMechanismIO {
   /** Motor IO to use */
@@ -27,8 +28,10 @@ public class IndexerKickerMechanismIOReal implements IndexerKickerMechanismIO {
   }
 
   @Override
+  @Traced
   public void updateInputs(IndexerKickerMechanismInputs inputs) {}
 
   @Override
+  @Traced
   public void updateLog(String standardPrefix, String inputs) {}
 }

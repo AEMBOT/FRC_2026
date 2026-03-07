@@ -3,6 +3,7 @@ package com.aembot.lib.subsystems.aprilvision.io;
 import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
+import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.math.PositionUtil;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionInputs;
@@ -137,6 +138,7 @@ public class Limelight4IOSim extends Limelight4IOHardware {
   }
 
   @Override
+  @Traced
   public void updateInputs(AprilVisionInputs inputs) {
     this.visionSystemSim.adjustCamera(
         photonCameraSim, PositionUtil.toTransform3d(this.cameraConfiguration.getCameraPosition()));
@@ -186,6 +188,7 @@ public class Limelight4IOSim extends Limelight4IOHardware {
     super.updateInputs(inputs);
   }
 
+  @Traced
   protected void updateMegatag2(PhotonPipelineResult result) {
     /* --- "Coprocessor" pose estimation --- */
     double[] orientationArr = robotOrientationEntry.getDoubleArray((double[]) null);
@@ -240,6 +243,7 @@ public class Limelight4IOSim extends Limelight4IOHardware {
     }
   }
 
+  @Traced
   public void updateFiducials(PhotonPipelineResult result) {
     List<Double> rawFiducials = new ArrayList<>();
 

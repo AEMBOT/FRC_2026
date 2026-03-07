@@ -4,6 +4,7 @@ import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
+import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.state.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeployState;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.io.OverBumperIntakeDeployIO;
@@ -120,6 +121,7 @@ public class OverBumperIntakeDeploySubsystem
                 .until(() -> MathUtil.isNear(getCurrentPosition(), getPositionSetpointUnits(), 2)));
   }
 
+  @Traced
   private void updateState() {
 
     state.deployPositionUnits = getCurrentPosition();
@@ -134,6 +136,7 @@ public class OverBumperIntakeDeploySubsystem
   }
 
   @Override
+  @Traced
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
     super.periodic();
@@ -146,6 +149,7 @@ public class OverBumperIntakeDeploySubsystem
   }
 
   @Override
+  @Traced
   public void updateLog(String standardPrefix, String inputPrefix) {
     Logger.processInputs(inputPrefix, inputs);
     io.updateLog(standardPrefix, inputPrefix);

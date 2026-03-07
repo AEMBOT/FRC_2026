@@ -3,6 +3,7 @@ package com.aembot.frc2026.subsystems.indexerKicker.io;
 import com.aembot.frc2026.config.subsystems.indexerKicker.IndexerKickerConfiguration;
 import com.aembot.frc2026.subsystems.indexerKicker.IndexerKickerMechanismInputs;
 import com.aembot.lib.core.motors.io.MotorIOTalonFXSim;
+import com.aembot.lib.core.tracing.Traced;
 import edu.wpi.first.wpilibj.Notifier;
 
 public class IndexerKickerMechanismIOSim implements IndexerKickerMechanismIO {
@@ -32,9 +33,11 @@ public class IndexerKickerMechanismIOSim implements IndexerKickerMechanismIO {
   }
 
   @Override
+  @Traced
   public void updateInputs(IndexerKickerMechanismInputs inputs) {}
 
   @Override
+  @Traced
   public void updateLog(String standardPrefix, String inputPrefix) {
     kSimMotor.logSim(standardPrefix, inputPrefix);
   }

@@ -7,6 +7,7 @@ import com.aembot.frc2026.subsystems.spindexer.io.SpindexerMechanismIO;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
+import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.wpilibj.Timer;
@@ -42,6 +43,7 @@ public class SpindexerSubsystem
   }
 
   @Override
+  @Traced
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
 
@@ -92,6 +94,7 @@ public class SpindexerSubsystem
   }
 
   @Override
+  @Traced
   public void updateLog(String standardPrefix, String inputPrefix) {
     super.updateLog(standardPrefix, inputPrefix);
 

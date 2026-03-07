@@ -3,6 +3,7 @@ package com.aembot.frc2026.state;
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.constants.field.Field2026;
 import com.aembot.frc2026.state.subsystems.indexer.SimulatedIndexerCompoundState;
+import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.state.SimulatedRobotState;
 import com.aembot.lib.state.subsystems.flywheel.SimulatedShooterFlywheelState;
 import com.aembot.lib.state.subsystems.intake.over_bumper.SimulatedOverBumperIntakeState;
@@ -45,6 +46,7 @@ public class SimulatedRobotStateYearly extends SimulatedRobotState {
   private double nextFuelPositionLogTimestampSeconds = 0.0;
 
   @Override
+  @Traced
   public void updateState() {
     super.updateState();
 
@@ -69,6 +71,7 @@ public class SimulatedRobotStateYearly extends SimulatedRobotState {
   }
 
   @Override
+  @Traced
   public void updateLog(String standardPrefix, String inputPrefix) {
     super.updateLog(standardPrefix, inputPrefix);
     double timestampSeconds = Timer.getFPGATimestamp();

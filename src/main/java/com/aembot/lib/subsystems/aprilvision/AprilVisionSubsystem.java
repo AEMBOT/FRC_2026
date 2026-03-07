@@ -1,5 +1,6 @@
 package com.aembot.lib.subsystems.aprilvision;
 
+import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.aprilvision.interfaces.AprilCameraIO;
 import com.aembot.lib.subsystems.aprilvision.util.AprilCameraOutput;
@@ -82,6 +83,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
   }
 
   @Override
+  @Traced
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
     boolean shouldLogCameraPose = timestamp >= nextCameraPoseLogTimestampSeconds;
@@ -137,6 +139,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
   }
 
   @Override
+  @Traced
   public void updateLog(String standardPrefix, String inputPrefix) {
     Logger.recordOutput(visionActiveLogKey, visionActive);
     double timestampSeconds = Timer.getFPGATimestamp();

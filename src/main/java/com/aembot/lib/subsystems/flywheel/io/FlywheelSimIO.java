@@ -3,6 +3,7 @@ package com.aembot.lib.subsystems.flywheel.io;
 import com.aembot.lib.config.subsystems.flywheel.TalonFXFlywheelConfiguration;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOTalonFXSim;
+import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.subsystems.flywheel.FlywheelInputs;
 import edu.wpi.first.wpilibj.Notifier;
 
@@ -26,6 +27,7 @@ public class FlywheelSimIO extends FlywheelHardwareIO {
    * Simulate an impulse load such as a game piece through a shooter as defined in {@link
    * TalonFXFlywheelConfiguration#kSimulateLoadImpulseFunction}
    */
+  @Traced
   public void simulateImpulseLoad() {
     simMotor.forceSetMotorVelocity(
         config.kSimulateLoadImpulseFunction.apply(simMotor.getSimState().SimVelocityUnits));
@@ -37,9 +39,11 @@ public class FlywheelSimIO extends FlywheelHardwareIO {
   }
 
   @Override
+  @Traced
   public void updateInputs(FlywheelInputs inputs) {}
 
   @Override
+  @Traced
   public void updateLog(String standardPrefix, String inputPrefix) {
     simMotor.logSim(standardPrefix, inputPrefix);
   }

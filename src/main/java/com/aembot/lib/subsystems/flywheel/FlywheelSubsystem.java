@@ -4,6 +4,7 @@ import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.subsystems.flywheel.TalonFXFlywheelConfiguration;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
+import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.state.subsystems.flywheel.FlywheelState;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.aembot.lib.subsystems.flywheel.io.FlywheelIO;
@@ -31,6 +32,7 @@ public class FlywheelSubsystem
   }
 
   @Override
+  @Traced
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
     super.periodic();
@@ -46,6 +48,7 @@ public class FlywheelSubsystem
   }
 
   @Override
+  @Traced
   public void updateLog(String standardPrefix, String inputPrefix) {
     flywheel.updateLog(standardPrefix, inputPrefix);
     super.updateLog(standardPrefix, inputPrefix);

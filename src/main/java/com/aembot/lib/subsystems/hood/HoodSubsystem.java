@@ -4,6 +4,7 @@ import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
+import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.state.subsystems.hood.HoodState;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.aembot.lib.subsystems.hood.io.HoodIO;
@@ -43,6 +44,7 @@ public class HoodSubsystem
   }
 
   @Override
+  @Traced
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
     super.periodic();
@@ -55,6 +57,7 @@ public class HoodSubsystem
   }
 
   @Override
+  @Traced
   public void updateLog(String standardPrefix, String inputPrefix) {
     Logger.processInputs(inputPrefix, inputs);
     io.updateLog(standardPrefix, inputPrefix);

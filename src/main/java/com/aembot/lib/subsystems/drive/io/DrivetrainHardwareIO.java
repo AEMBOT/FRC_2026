@@ -4,6 +4,7 @@ import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
 import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
 import com.aembot.lib.core.can.CANStatusLogger;
 import com.aembot.lib.core.phoenix6.AEMSwerveDriveState;
+import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.subsystems.aprilvision.util.AprilCameraOutput;
 import com.aembot.lib.subsystems.drive.DrivetrainInputs;
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -157,6 +158,7 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
   }
 
   @Override
+  @Traced
   public void updateInputs(DrivetrainInputs inputs) {
     // return and we will try again next loop. this could mean that CAN is not running and we are in
     // replay mode
@@ -192,11 +194,13 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
   }
 
   @Override
+  @Traced
   public void resetOdometry(Pose2d pose) {
     super.resetPose(pose);
   }
 
   @Override
+  @Traced
   public void logModules(DrivetrainInputs inputs, String prefix) {
     if (inputs.ModuleStates == null) return;
     initializeModuleLogKeysIfNeeded(prefix);
@@ -227,11 +231,13 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
   }
 
   @Override
+  @Traced
   public void setRequest(SwerveRequest request) {
     super.setControl(request);
   }
 
   @Override
+  @Traced
   public void setOdometryStdDevs(double xStd, double yStd, double rotStd) {
     // Initialize only once so we don't need to run garbage collection on it
     if (stateStdDevs == null) {
@@ -246,6 +252,7 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
   }
 
   @Override
+  @Traced
   public void addVisionEstimation(AprilCameraOutput cameraOutput) {
     if (!Double.isNaN(cameraOutput.estimatedPose().stdDevs().xStdDev())
         && !Double.isNaN(cameraOutput.estimatedPose().latencyCompensatedPose().getX())) {
