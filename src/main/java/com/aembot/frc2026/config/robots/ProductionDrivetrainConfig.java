@@ -80,7 +80,7 @@ public class ProductionDrivetrainConfig {
     public static final PIDConstants HEADING_PID_CONSTANTS = new PIDConstants(0.25, 0, 0);
 
     public static final PIDController AUTO_TRANSLATION_CONTROLLER =
-        new PIDController(5.0, 0.0, 0.0);
+        new PIDController(0.25, 0.0, 0.0);
 
     public static final PIDController AUTO_ROTATION_CONTROLLER = new PIDController(0.25, 0.0, 0.0);
 
