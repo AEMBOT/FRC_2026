@@ -6,7 +6,6 @@ import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import choreo.trajectory.SwerveSample;
 import com.aembot.frc2026.commands.CommandFactory;
-import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -39,7 +38,7 @@ public class AutoHelper {
             () -> RobotStateYearly.get().getLatestFieldRobotPose(),
             (pose) -> driveSubsystem.resetPose(pose),
             (SwerveSample sample) -> driveSubsystem.setRequestFromSwerveSample(sample),
-            RobotRuntimeConstants.isRedAlliance(),
+            true,
             driveSubsystem,
             (state, isStart) -> Logger.recordOutput("AUTO_TRAJ", state.getPoses()));
   }
