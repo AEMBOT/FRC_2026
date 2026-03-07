@@ -68,7 +68,7 @@ public class AutoHelper {
                             0,
                             0,
                             DriverStation.getAlliance().get() == Alliance.Blue
-                                ? Rotation2d.k180deg 
+                                ? Rotation2d.k180deg
                                 : Rotation2d.kZero))));
 
     autoChooser.addRoutine("DoNothing", () -> doNothingRoutine);
