@@ -126,10 +126,10 @@ public class RobotContainer implements Loggerable {
     driveSubsystem.setDefaultCommand(
         commandFactory.createDriveJoystickCmd(driverController, driverController.leftBumper()));
 
-    // hoodSubsystem.setDefaultCommand(commandFactory.shooterCommands.createHoodDownCommand());
+    hoodSubsystem.setDefaultCommand(commandFactory.shooterCommands.createHoodDownCommand());
 
-    // turretSubsystem.setDefaultCommand(
-    //     commandFactory.shooterCommands.createTurretTowardsGoalCommand());
+    turretSubsystem.setDefaultCommand(
+        commandFactory.shooterCommands.createTurretTowardsGoalCommand());
 
     intakeRollerSubsystem.setDefaultCommand(
         commandFactory.intakeCommands.createStopIntakeCommand());
