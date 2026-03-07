@@ -287,8 +287,9 @@ public final class ShooterCommands {
    */
   public Command createShootFuelCommand() {
 
-    return new ParallelCommandGroup(createFlywheelGoalSpeedCommand());
-  } // todo hOOD
+    return new ParallelCommandGroup(
+        createFlywheelGoalSpeedCommand(), createHoodTowardsGoalCommand());
+  }
 
   /* ---- SUPPLIER FUNCTIONS ---- */
 
