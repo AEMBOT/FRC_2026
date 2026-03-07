@@ -5,6 +5,7 @@
 package com.aembot.frc2026;
 
 import com.aembot.frc2026.commands.CommandFactory;
+import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.subsystems.SubsystemFactory;
 import com.aembot.frc2026.subsystems.indexerKicker.IndexerKickerSubsystem;
 import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorSubsystem;
@@ -22,6 +23,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -94,6 +96,8 @@ public class RobotContainer implements Loggerable {
           () ->
               allianceInitialized.getAsBoolean()
                   && DriverStation.getAlliance().get().equals(Alliance.Blue));
+
+    private final Field2d field = new Field2d();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer(LoggedRobot robot) {
@@ -233,6 +237,10 @@ public class RobotContainer implements Loggerable {
     if (DriverStation.getAlliance().isPresent())
       Logger.recordOutput("Alliance", DriverStation.getAlliance().get());
     Logger.recordOutput("AllianceSet", DriverStation.getAlliance().isPresent());
+
+    field.setRobotPose(RobotStateYearly.get().getLatestFieldRobotPose());
+    SmartDashboard.putData("FieldData/Field2d", field);
+
   }
 
   private Command setupAutos() {
