@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -117,6 +118,7 @@ public class RobotContainer implements Loggerable {
 
   /** Use this method to define your controller button -> command mappings */
   private void configureBindings() {
+    setupAutos().schedule();
 
     /* ---- DEFAULT COMMANDS ---- */
 
@@ -124,10 +126,10 @@ public class RobotContainer implements Loggerable {
     driveSubsystem.setDefaultCommand(
         commandFactory.createDriveJoystickCmd(driverController, driverController.leftBumper()));
 
-    hoodSubsystem.setDefaultCommand(commandFactory.shooterCommands.createHoodDownCommand());
+    // hoodSubsystem.setDefaultCommand(commandFactory.shooterCommands.createHoodDownCommand());
 
-    turretSubsystem.setDefaultCommand(
-        commandFactory.shooterCommands.createTurretTowardsGoalCommand());
+    // turretSubsystem.setDefaultCommand(
+    //     commandFactory.shooterCommands.createTurretTowardsGoalCommand());
 
     intakeRollerSubsystem.setDefaultCommand(
         commandFactory.intakeCommands.createStopIntakeCommand());
@@ -202,8 +204,8 @@ public class RobotContainer implements Loggerable {
         .onTrue(visionSubsystem.updateNTEnabledCommand())
         .onFalse(visionSubsystem.updateNTDisabledCommand());
 
-    allianceIsBlue.onChange(setupAutos());
-    allianceIsRed.onChange(setupAutos());
+    // allianceIsBlue.onChange(setupAutos());
+    // allianceIsRed.onChange(setupAutos());
   }
 
   /**
@@ -228,6 +230,9 @@ public class RobotContainer implements Loggerable {
 
   public void logCommands() {
     commandFactory.logCommands();
+    if (DriverStation.getAlliance().isPresent())
+      Logger.recordOutput("Alliance", DriverStation.getAlliance().get());
+    Logger.recordOutput("AllianceSet", DriverStation.getAlliance().isPresent());
   }
 
   private Command setupAutos() {
