@@ -97,7 +97,7 @@ public class RobotContainer implements Loggerable {
               allianceInitialized.getAsBoolean()
                   && DriverStation.getAlliance().get().equals(Alliance.Blue));
 
-    private final Field2d field = new Field2d();
+  private final Field2d field = new Field2d();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer(LoggedRobot robot) {
@@ -240,7 +240,6 @@ public class RobotContainer implements Loggerable {
 
     field.setRobotPose(RobotStateYearly.get().getLatestFieldRobotPose());
     SmartDashboard.putData("FieldData/Field2d", field);
-
   }
 
   private Command setupAutos() {

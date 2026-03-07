@@ -53,7 +53,7 @@ public class AutoHelper {
     addAuto("MiddleDepot");
     addAuto("LeftNeutralDepot");
     addAuto("RightNeutralOutpost");
-    addAuto("TowerPreload");
+    addAuto("CenterPreload");
 
     // TODO make clean
     AutoRoutine doNothingRoutine = autoFactory.newRoutine("DoNothing");
