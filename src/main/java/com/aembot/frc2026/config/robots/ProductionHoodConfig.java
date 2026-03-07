@@ -66,7 +66,7 @@ public class ProductionHoodConfig {
                                   ? InvertedValue.CounterClockwise_Positive
                                   : InvertedValue.Clockwise_Positive)
                           .withNeutralMode(MOTOR_NEUTRAL_MODE.toCTRENeutralMode()))
-                  .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(30)))
+                  .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(5)))
           .withCANDevice(
               new CANDeviceID(
                   57, SUBSYSTEM_NAME + "Motor", SUBSYSTEM_NAME, CANDeviceID.CANDeviceType.TALON_FX))
