@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-
 import org.littletonrobotics.junction.Logger;
 import org.opencv.core.Point;
 
@@ -154,7 +153,8 @@ public class Limelight4IOHardware implements AprilCameraIO {
     inputs.coprocessorEstimationStdDevs = coprocessorPoseEstimation.stdDevs();
     inputs.coprocessorEstimationTimestamp = coprocessorPoseEstimation.timestampSeconds();
 
-    Logger.recordOutput(cameraName + "/tempCelsius", LimelightExtras.getCameraTemperature(cameraName));
+    Logger.recordOutput(
+        cameraName + "/tempCelsius", LimelightExtras.getCameraTemperature(cameraName));
   }
 
   private void setRobotYawNetworkTables() {
@@ -188,8 +188,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
           compensateForEstimateLatency(
               estimate.pose,
               robotStateInstance.getLatestFusedFieldRelativeChassisSpeed(),
-              Timer.getFPGATimestamp()
-                  - (estimate.timestampSeconds));
+              Timer.getFPGATimestamp() - (estimate.timestampSeconds));
 
       lastMegatag2Timestamp = estimate.timestampSeconds;
 
