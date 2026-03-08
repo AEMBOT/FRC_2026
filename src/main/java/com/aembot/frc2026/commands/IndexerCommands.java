@@ -131,6 +131,16 @@ public final class IndexerCommands {
 
     return new RunCommand(
             () -> indexerCompoundState.commandState(IndexerRunState.REVERSE), dummySubsystem)
-        .withName(NAME);
+        .withName(NAME)
+        .finallyDo(
+            () -> {
+              // Check that we're not interrupting another command.
+              var cmd = CommandScheduler.getInstance().requiring(dummySubsystem);
+              // Often, the "Feed" cmd will still be technically requiring the subsystem atp, so
+              // check against that;
+              if (cmd == null || cmd.getName().equals(NAME)) {
+                CommandScheduler.getInstance().schedule(createDisableIndexerCommand());
+              }
+            });
   }
 }

@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public final class ShooterCommands {
 
@@ -279,7 +280,9 @@ public final class ShooterCommands {
    *     values
    */
   public boolean isShooterNearGoal() {
-    return isFlywheelNearGoal() && isHoodNearGoal() && isTurretNearGoal();
+    boolean yes = isFlywheelNearGoal() && isHoodNearGoal() && isTurretNearGoal();
+    Logger.recordOutput("IsShooterNearGoal", yes);
+    return yes;
   }
 
   /**

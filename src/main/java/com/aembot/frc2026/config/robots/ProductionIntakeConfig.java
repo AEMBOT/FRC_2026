@@ -39,19 +39,19 @@ public class ProductionIntakeConfig {
 
   public final NeutralMode DEPLOY_NEUTRAL_MODE = NeutralMode.BRAKE;
 
-  public final double ZEROING_VOLTAGE = 2.0;
+  public final double ZEROING_VOLTAGE = 4.0;
 
   public final String SUBSYSTEM_NAME = "IntakeSubsystem";
 
   public final double DEPLOY_GEAR_RATIO = 18400.0 / 243.0;
 
-  //   public final double DEPLOY_CRUISE_VELOCITY_DEG_PER_SEC = 1.5 * 360;
+  public final double DEPLOY_CRUISE_VELOCITY_DEG_PER_SEC = 1.5 * 360;
 
-  //   public final double DEPLOY_ACCELERATION_DEG_PER_SEC = 2 * 360;
+  public final double DEPLOY_ACCELERATION_DEG_PER_SEC = 2 * 360;
 
-  public final double DEPLOY_CRUISE_VELOCITY_DEG_PER_SEC = 270;
+  //   public final double DEPLOY_CRUISE_VELOCITY_DEG_PER_SEC = 270;
 
-  public final double DEPLOY_ACCELERATION_DEG_PER_SEC = 180;
+  //   public final double DEPLOY_ACCELERATION_DEG_PER_SEC = 180;
 
   public final double ROLLER_GEAR_RATIO = 1;
 
