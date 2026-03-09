@@ -43,7 +43,7 @@ public class TurretSimIO implements TurretIO {
   }
 
   /** Update the state of the sim */
-  @Traced
+  @Traced(category = "Turret")
   private void updateSim() {
     simMotor.updateSimState();
 
@@ -74,11 +74,11 @@ public class TurretSimIO implements TurretIO {
   }
 
   @Override
-  @Traced
+  @Traced(category = "Turret")
   public void updateInputs(TurretInputs inputs) {}
 
   @Override
-  @Traced
+  @Traced(category = "Turret")
   public void updateLog(String standardPrefix, String inputPrefix) {
     simMotor.logSim(standardPrefix, inputPrefix);
     simCANcoderA.logSim(standardPrefix, inputPrefix);

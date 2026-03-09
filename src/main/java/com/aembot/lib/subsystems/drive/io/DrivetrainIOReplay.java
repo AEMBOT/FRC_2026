@@ -9,26 +9,26 @@ import edu.wpi.first.math.geometry.Pose2d;
 /** No-op implementation of {@link DrivetrainIO} for replay */
 public class DrivetrainIOReplay implements DrivetrainIO {
   @Override
-  @Traced
+  @Traced(category = "Drivetrain")
   public void updateInputs(DrivetrainInputs inputs) {}
 
   @Override
-  @Traced
+  @Traced(category = "Drivetrain")
   public void logModules(DrivetrainInputs inputs, String prefix) {}
 
   @Override
-  @Traced
+  @Traced(category = "Drivetrain")
   public void resetOdometry(Pose2d pose) {}
 
   @Override
-  @Traced
+  @Traced(category = "Drivetrain")
   public void setRequest(SwerveRequest request) {}
 
   @Override
-  @Traced
+  @Traced(category = "Drivetrain")
   public void setOdometryStdDevs(double xStd, double yStd, double rotStd) {}
 
   @Override
-  @Traced
+  @Traced(category = "Drivetrain")
   public void addVisionEstimation(AprilCameraOutput cameraOutput) {}
 }

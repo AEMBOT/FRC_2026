@@ -83,7 +83,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
   }
 
   @Override
-  @Traced
+  @Traced(category = "Vision")
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
     boolean shouldLogCameraPose = timestamp >= nextCameraPoseLogTimestampSeconds;
@@ -139,7 +139,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
   }
 
   @Override
-  @Traced
+  @Traced(category = "Vision")
   public void updateLog(String standardPrefix, String inputPrefix) {
     Logger.recordOutput(visionActiveLogKey, visionActive);
     double timestampSeconds = Timer.getFPGATimestamp();

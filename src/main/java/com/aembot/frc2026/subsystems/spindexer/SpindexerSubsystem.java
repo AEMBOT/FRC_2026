@@ -43,7 +43,7 @@ public class SpindexerSubsystem
   }
 
   @Override
-  @Traced
+  @Traced(category = "Spindexer")
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
 
@@ -94,7 +94,7 @@ public class SpindexerSubsystem
   }
 
   @Override
-  @Traced
+  @Traced(category = "Spindexer")
   public void updateLog(String standardPrefix, String inputPrefix) {
     super.updateLog(standardPrefix, inputPrefix);
 

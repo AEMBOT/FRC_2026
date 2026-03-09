@@ -176,7 +176,7 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
   }
 
   @Override
-  @Traced
+  @Traced(category = "Drivetrain")
   public void updateInputs(DrivetrainInputs inputs) {
     // return and we will try again next loop. this could mean that CAN is not running and we are in
     // replay mode
@@ -217,13 +217,13 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
   }
 
   @Override
-  @Traced
+  @Traced(category = "Drivetrain")
   public void resetOdometry(Pose2d pose) {
     super.resetPose(pose);
   }
 
   @Override
-  @Traced
+  @Traced(category = "Drivetrain")
   public void logModules(DrivetrainInputs inputs, String prefix) {
     if (inputs.ModuleStates == null) return;
     initializeModuleLogKeysIfNeeded(prefix);
@@ -254,13 +254,13 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
   }
 
   @Override
-  @Traced
+  @Traced(category = "Drivetrain")
   public void setRequest(SwerveRequest request) {
     super.setControl(request);
   }
 
   @Override
-  @Traced
+  @Traced(category = "Drivetrain")
   public void setOdometryStdDevs(double xStd, double yStd, double rotStd) {
     // Initialize only once so we don't need to run garbage collection on it
     if (stateStdDevs == null) {
@@ -275,7 +275,7 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
   }
 
   @Override
-  @Traced
+  @Traced(category = "Drivetrain")
   public void addVisionEstimation(AprilCameraOutput cameraOutput) {
     if (!Double.isNaN(cameraOutput.estimatedPose().stdDevs().xStdDev())
         && !Double.isNaN(cameraOutput.estimatedPose().latencyCompensatedPose().getX())) {

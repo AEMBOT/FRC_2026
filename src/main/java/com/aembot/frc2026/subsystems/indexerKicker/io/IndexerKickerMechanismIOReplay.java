@@ -14,10 +14,10 @@ public class IndexerKickerMechanismIOReplay implements IndexerKickerMechanismIO 
   }
 
   @Override
-  @Traced
+  @Traced(category = "Indexer")
   public void updateInputs(IndexerKickerMechanismInputs inputs) {}
 
   @Override
-  @Traced
+  @Traced(category = "Indexer")
   public void updateLog(String standardPrefix, String inputPrefix) {}
 }

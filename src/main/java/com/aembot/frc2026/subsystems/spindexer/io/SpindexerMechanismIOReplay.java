@@ -14,10 +14,10 @@ public class SpindexerMechanismIOReplay implements SpindexerMechanismIO {
   }
 
   @Override
-  @Traced
+  @Traced(category = "Spindexer")
   public void updateInputs(SpindexerMechanismInputs inputs) {}
 
   @Override
-  @Traced
+  @Traced(category = "Spindexer")
   public void updateLog(String standardPrefix, String inputPrefix) {}
 }

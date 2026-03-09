@@ -133,14 +133,14 @@ public abstract class MotorSubsystem<
   }
 
   @Override
-  @Traced
+  @Traced(category = "Subsystem")
   public void periodic() {
     io.updateInputs(inputs);
     updateLog();
   }
 
   @Override
-  @Traced
+  @Traced(category = "Subsystem")
   public void updateLog(String standardPrefix, String inputPrefix) {
     Logger.processInputs(inputsLogKey, inputs);
 

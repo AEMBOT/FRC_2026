@@ -65,7 +65,7 @@ public class DrivetrainSimIO extends DrivetrainHardwareIO {
   }
 
   /** Start the simulation thread for the maple sim drive train */
-  @Traced
+  @Traced(category = "Drivetrain")
   public void startSimThread() {
     if (simulationThread != null) { // This is _probably_ not needed, but just in case.
       DriverStation.reportWarning(
@@ -97,7 +97,7 @@ public class DrivetrainSimIO extends DrivetrainHardwareIO {
   }
 
   /** Teleports the simulated robot to the given pose. */
-  @Traced
+  @Traced(category = "Drivetrain")
   public void teleportRobot(Pose2d pose) {
     if (drivetrainSim != null) {
       drivetrainSim.mapleSimSwerveDrivetrain.setSimulationWorldPose(pose);
@@ -112,7 +112,7 @@ public class DrivetrainSimIO extends DrivetrainHardwareIO {
    * <p><strong>In the sim implementation, this will teleport the simulated robot to the given pose
    */
   @Override
-  @Traced
+  @Traced(category = "Drivetrain")
   public void resetOdometry(Pose2d pose) {
     teleportRobot(pose);
   }

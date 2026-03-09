@@ -79,6 +79,7 @@ def includeDesktopSupport = true
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
@@ -103,6 +104,9 @@ dependencies {
     simulationRelease wpi.sim.enableRelease()
 
     implementation "com.opencsv:opencsv:5.1"
+
+    // AEMTracer for annotation-based tracing (includes ByteBuddy transitively)
+    implementation 'com.aembot.lib:AEMTracer:1.0.0'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

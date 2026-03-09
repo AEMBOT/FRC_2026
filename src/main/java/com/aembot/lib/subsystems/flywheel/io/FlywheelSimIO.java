@@ -27,7 +27,7 @@ public class FlywheelSimIO extends FlywheelHardwareIO {
    * Simulate an impulse load such as a game piece through a shooter as defined in {@link
    * TalonFXFlywheelConfiguration#kSimulateLoadImpulseFunction}
    */
-  @Traced
+  @Traced(category = "Flywheel")
   public void simulateImpulseLoad() {
     simMotor.forceSetMotorVelocity(
         config.kSimulateLoadImpulseFunction.apply(simMotor.getSimState().SimVelocityUnits));
@@ -39,11 +39,11 @@ public class FlywheelSimIO extends FlywheelHardwareIO {
   }
 
   @Override
-  @Traced
+  @Traced(category = "Flywheel")
   public void updateInputs(FlywheelInputs inputs) {}
 
   @Override
-  @Traced
+  @Traced(category = "Flywheel")
   public void updateLog(String standardPrefix, String inputPrefix) {
     simMotor.logSim(standardPrefix, inputPrefix);
   }

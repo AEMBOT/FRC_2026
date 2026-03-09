@@ -18,14 +18,14 @@ public class AprilCameraReplayIO implements AprilCameraIO {
   }
 
   @Override
-  @Traced
+  @Traced(category = "Vision")
   public void updateInputs(AprilVisionInputs inputs) {}
 
   @Override
-  @Traced
+  @Traced(category = "Vision")
   public void updateNetworkTablesForDisabled() {}
 
   @Override
-  @Traced
+  @Traced(category = "Vision")
   public void updateNetworkTablesForEnabled() {}
 }

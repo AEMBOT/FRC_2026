@@ -64,7 +64,7 @@ public class RobotStateYearly extends RobotState {
   }
 
   @Override
-  @Traced
+  @Traced(category = "State")
   public void updateLog(String standardPrefix, String inputPrefix) {
     super.updateLog(standardPrefix, inputPrefix);
 

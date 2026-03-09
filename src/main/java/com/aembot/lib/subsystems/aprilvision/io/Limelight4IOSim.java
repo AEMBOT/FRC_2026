@@ -138,7 +138,7 @@ public class Limelight4IOSim extends Limelight4IOHardware {
   }
 
   @Override
-  @Traced
+  @Traced(category = "Vision")
   public void updateInputs(AprilVisionInputs inputs) {
     this.visionSystemSim.adjustCamera(
         photonCameraSim, PositionUtil.toTransform3d(this.cameraConfiguration.getCameraPosition()));
@@ -188,7 +188,7 @@ public class Limelight4IOSim extends Limelight4IOHardware {
     super.updateInputs(inputs);
   }
 
-  @Traced
+  @Traced(category = "Vision")
   protected void updateMegatag2(PhotonPipelineResult result) {
     /* --- "Coprocessor" pose estimation --- */
     double[] orientationArr = robotOrientationEntry.getDoubleArray((double[]) null);
@@ -243,7 +243,7 @@ public class Limelight4IOSim extends Limelight4IOHardware {
     }
   }
 
-  @Traced
+  @Traced(category = "Vision")
   public void updateFiducials(PhotonPipelineResult result) {
     List<Double> rawFiducials = new ArrayList<>();
 

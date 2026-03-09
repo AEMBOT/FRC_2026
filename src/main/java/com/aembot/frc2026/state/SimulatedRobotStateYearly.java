@@ -46,7 +46,7 @@ public class SimulatedRobotStateYearly extends SimulatedRobotState {
   private double nextFuelPositionLogTimestampSeconds = 0.0;
 
   @Override
-  @Traced
+  @Traced(category = "State")
   public void updateState() {
     super.updateState();
 
@@ -71,7 +71,7 @@ public class SimulatedRobotStateYearly extends SimulatedRobotState {
   }
 
   @Override
-  @Traced
+  @Traced(category = "State")
   public void updateLog(String standardPrefix, String inputPrefix) {
     super.updateLog(standardPrefix, inputPrefix);
     double timestampSeconds = Timer.getFPGATimestamp();

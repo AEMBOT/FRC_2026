@@ -14,10 +14,10 @@ public class IndexerSelectorMechanismIOReplay implements IndexerSelectorMechanis
   }
 
   @Override
-  @Traced
+  @Traced(category = "Indexer")
   public void updateInputs(IndexerSelectorMechanismInputs inputs) {}
 
   @Override
-  @Traced
+  @Traced(category = "Indexer")
   public void updateLog(String standardPrefix, String inputPrefix) {}
 }

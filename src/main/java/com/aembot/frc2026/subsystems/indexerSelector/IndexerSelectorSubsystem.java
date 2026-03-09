@@ -55,7 +55,7 @@ public class IndexerSelectorSubsystem
   }
 
   @Override
-  @Traced
+  @Traced(category = "Indexer")
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
 
@@ -112,7 +112,7 @@ public class IndexerSelectorSubsystem
   }
 
   @Override
-  @Traced
+  @Traced(category = "Indexer")
   public void updateLog(String standardPrefix, String inputPrefix) {
     super.updateLog(standardPrefix, inputPrefix);
 

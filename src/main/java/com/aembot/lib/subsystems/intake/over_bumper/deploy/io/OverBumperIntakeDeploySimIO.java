@@ -39,11 +39,11 @@ public class OverBumperIntakeDeploySimIO implements OverBumperIntakeDeployIO {
   }
 
   @Override
-  @Traced
+  @Traced(category = "Intake")
   public void updateInputs(OverBumperIntakeDeployInputs inputs) {}
 
   @Override
-  @Traced
+  @Traced(category = "Intake")
   public void updateLog(String standardPrefix, String inputPrefix) {
     simMotor.logSim(standardPrefix, inputPrefix);
   }

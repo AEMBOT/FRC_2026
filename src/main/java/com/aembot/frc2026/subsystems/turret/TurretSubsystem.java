@@ -88,7 +88,7 @@ public class TurretSubsystem
   }
 
   @Override
-  @Traced
+  @Traced(category = "Turret")
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
 
@@ -135,7 +135,7 @@ public class TurretSubsystem
   }
 
   @Override
-  @Traced
+  @Traced(category = "Turret")
   public void updateLog(String standardPrefix, String inputPrefix) {
     Logger.processInputs(turretInputsLogKey, turretInputs);
     io.updateLog(standardPrefix, inputPrefix);

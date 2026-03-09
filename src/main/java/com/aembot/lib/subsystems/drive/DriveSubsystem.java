@@ -69,7 +69,7 @@ public class DriveSubsystem extends AEMSubsystem {
   }
 
   @Override
-  @Traced
+  @Traced(category = "Drivetrain")
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
     io.updateInputs(inputs);
@@ -102,7 +102,7 @@ public class DriveSubsystem extends AEMSubsystem {
   }
 
   /** Update the robot state with odometry info */
-  @Traced
+  @Traced(category = "Drivetrain")
   private void updateRobotState() {
     // Use the timestamp logged with the data rather than the current timestamp.
     double timestamp = inputs.timestampRIOSynchronized;
@@ -150,7 +150,7 @@ public class DriveSubsystem extends AEMSubsystem {
   }
 
   @Override
-  @Traced
+  @Traced(category = "Drivetrain")
   public void updateLog(String standardPrefix, String inputPrefix) {
     Logger.processInputs(driveInputsLogKey, inputs);
 
@@ -167,7 +167,7 @@ public class DriveSubsystem extends AEMSubsystem {
    * Resets the drive train odometry to the given pose. Ie. setting robot pose to auto starting
    * position. Wraps {@link DrivetrainIO#resetOdometry}.
    */
-  @Traced
+  @Traced(category = "Drivetrain")
   public void resetPose(Pose2d pose) {
     io.resetOdometry(pose);
   }
@@ -187,7 +187,7 @@ public class DriveSubsystem extends AEMSubsystem {
    *
    * @param request The swerve drive request to pass to the drivetrain
    */
-  @Traced
+  @Traced(category = "Drivetrain")
   public void setRequest(SwerveRequest request) {
     io.setRequest(request);
   }
@@ -235,7 +235,7 @@ public class DriveSubsystem extends AEMSubsystem {
    *
    * @param speeds robot relative chassis speeds
    */
-  @Traced
+  @Traced(category = "Drivetrain")
   public void setRequestFromChassisSpeeds(ChassisSpeeds speeds) {
     setRequest(
         new SwerveRequest.FieldCentric()
@@ -245,7 +245,7 @@ public class DriveSubsystem extends AEMSubsystem {
             .withDriveRequestType(SwerveModule.DriveRequestType.Velocity));
   }
 
-  @Traced
+  @Traced(category = "Drivetrain")
   public void setRequestFromSwerveSample(SwerveSample sample) {
 
     ChassisSpeeds speeds =

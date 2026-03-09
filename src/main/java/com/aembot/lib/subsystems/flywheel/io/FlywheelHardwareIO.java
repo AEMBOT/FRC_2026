@@ -17,13 +17,13 @@ public class FlywheelHardwareIO implements FlywheelIO {
   }
 
   @Override
-  @Traced
+  @Traced(category = "Flywheel")
   public void updateInputs(FlywheelInputs inputs) {
     updateLog();
   }
 
   @Override
-  @Traced
+  @Traced(category = "Flywheel")
   public void updateLog(String standardPrefix, String inputPrefix) {}
 
   @Override

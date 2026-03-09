@@ -13,10 +13,10 @@ public class FlywheelReplayIO implements FlywheelIO {
   }
 
   @Override
-  @Traced
+  @Traced(category = "Flywheel")
   public void updateInputs(FlywheelInputs inputs) {}
 
   @Override
-  @Traced
+  @Traced(category = "Flywheel")
   public void updateLog(String standardPrefix, String inputPrefix) {}
 }

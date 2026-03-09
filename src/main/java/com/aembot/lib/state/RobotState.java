@@ -107,7 +107,7 @@ public abstract class RobotState implements Loggable {
 
   private List<Consumer<AprilCameraOutput>> aprilCameraOutputConsumers = new ArrayList<>();
 
-  @Traced
+  @Traced(category = "State")
   public void addOdometryMeasurement(double timestamp, Pose2d pose) {
     odometryState.timeInterpolatableEstimatedRobotPose.addSample(timestamp, pose);
   }
@@ -117,7 +117,7 @@ public abstract class RobotState implements Loggable {
    *
    * @param observations a list consisting of all the observations for this periodic loop
    */
-  @Traced
+  @Traced(category = "State")
   public void setApriltagObservations(List<AprilCameraOutput> observations) {
     aprilTagObservations.clear();
 
@@ -188,7 +188,7 @@ public abstract class RobotState implements Loggable {
    * @param gyroFusedChassisSpeeds The actual measurement of robot speeds relative to the field
    *     using gyro rotation rates instead of modules
    */
-  @Traced
+  @Traced(category = "State")
   public void addChassisMotionMeasurements(
       double timestamp,
       double angularRollRadPerS,
@@ -249,7 +249,7 @@ public abstract class RobotState implements Loggable {
 
   // --- Loggable Implementation ---
   @Override
-  @Traced
+  @Traced(category = "State")
   public void updateLog(String standardPrefix, String inputPrefix) {
     RobotState.Odometry.logTimeInterpolatedPose(
         "SensorRobotState/RobotPose2d", odometryState.timeInterpolatableEstimatedRobotPose);

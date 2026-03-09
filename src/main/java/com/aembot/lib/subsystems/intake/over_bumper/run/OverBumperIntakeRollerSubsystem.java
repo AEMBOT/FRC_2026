@@ -57,7 +57,7 @@ public class OverBumperIntakeRollerSubsystem
     return voltageCommand(() -> 0);
   }
 
-  @Traced
+  @Traced(category = "Intake")
   private void updateState() {
 
     state.angularVelocityUnitsPerMin = getCurrentVelocity();
@@ -69,7 +69,7 @@ public class OverBumperIntakeRollerSubsystem
   }
 
   @Override
-  @Traced
+  @Traced(category = "Intake")
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
 
@@ -82,7 +82,7 @@ public class OverBumperIntakeRollerSubsystem
   }
 
   @Override
-  @Traced
+  @Traced(category = "Intake")
   public void updateLog(String standardPrefix, String inputPrefix) {
     Logger.processInputs(inputPrefix, inputs);
     io.updateLog(standardPrefix, inputPrefix);

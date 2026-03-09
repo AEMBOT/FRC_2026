@@ -113,7 +113,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
    * Updates the cached values from NetworkTables. Called asynchronously as {@link
    * #heartbeatCallback} for every limelight heartbeat
    */
-  @Traced
+  @Traced(category = "Vision")
   public void updateNtValuesCache(NetworkTableEvent event) {
     latencyMs.set(
         LimelightHelpers.getLatency_Capture(cameraName)
@@ -130,7 +130,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
   }
 
   @Override
-  @Traced
+  @Traced(category = "Vision")
   public void updateInputs(AprilVisionInputs inputs) {
     inputs.latency = latencyMs.get();
 
@@ -174,7 +174,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
     // }
   }
 
-  @Traced
+  @Traced(category = "Vision")
   private VisionPoseEstimation getMegatag2Estimate() {
 
     VisionPoseEstimation poseEstimation;
@@ -255,14 +255,14 @@ public class Limelight4IOHardware implements AprilCameraIO {
   }
 
   @Override
-  @Traced
+  @Traced(category = "Vision")
   public void updateNetworkTablesForDisabled() {
     LimelightHelpers.SetThrottle(cameraName, this.cameraConfiguration.disabledThrottleValue);
     LimelightHelpers.SetIMUMode(cameraName, this.cameraConfiguration.disabledIMUMode);
   }
 
   @Override
-  @Traced
+  @Traced(category = "Vision")
   public void updateNetworkTablesForEnabled() {
     LimelightHelpers.SetThrottle(cameraName, this.cameraConfiguration.enabledThrottledValue);
     LimelightHelpers.SetIMUMode(cameraName, this.cameraConfiguration.enabledIMUMode);

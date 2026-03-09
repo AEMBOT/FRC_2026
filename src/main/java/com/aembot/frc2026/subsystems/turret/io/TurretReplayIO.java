@@ -30,10 +30,10 @@ public class TurretReplayIO implements TurretIO {
   }
 
   @Override
-  @Traced
+  @Traced(category = "Turret")
   public void updateLog(String standardPrefix, String inputPrefix) {}
 
   @Override
-  @Traced
+  @Traced(category = "Turret")
   public void updateInputs(TurretInputs inputs) {}
 }

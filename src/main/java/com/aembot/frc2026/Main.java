@@ -23,6 +23,7 @@ public final class Main {
   public static void main(String... args) {
     // Install @Traced annotation support before any robot classes are loaded
     TracingBootstrap.install();
+    TracingBootstrap.installCommandTracing();
 
     RobotBase.startRobot(Robot::new);
   }

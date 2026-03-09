@@ -39,11 +39,11 @@ public class OverBumperIntakeRollerSimIO implements OverBumperIntakeRollerIO {
   }
 
   @Override
-  @Traced
+  @Traced(category = "Intake")
   public void updateInputs(OverBumperIntakeRollerInputs inputs) {}
 
   @Override
-  @Traced
+  @Traced(category = "Intake")
   public void updateLog(String standardPrefix, String inputPrefix) {
     simMotor.logSim(standardPrefix, inputPrefix);
   }

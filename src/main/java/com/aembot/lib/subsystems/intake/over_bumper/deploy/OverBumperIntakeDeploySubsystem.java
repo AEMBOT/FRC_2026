@@ -121,7 +121,7 @@ public class OverBumperIntakeDeploySubsystem
                 .until(() -> MathUtil.isNear(getCurrentPosition(), getPositionSetpointUnits(), 2)));
   }
 
-  @Traced
+  @Traced(category = "Intake")
   private void updateState() {
 
     state.deployPositionUnits = getCurrentPosition();
@@ -136,7 +136,7 @@ public class OverBumperIntakeDeploySubsystem
   }
 
   @Override
-  @Traced
+  @Traced(category = "Intake")
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
     super.periodic();
@@ -149,7 +149,7 @@ public class OverBumperIntakeDeploySubsystem
   }
 
   @Override
-  @Traced
+  @Traced(category = "Intake")
   public void updateLog(String standardPrefix, String inputPrefix) {
     Logger.processInputs(inputPrefix, inputs);
     io.updateLog(standardPrefix, inputPrefix);

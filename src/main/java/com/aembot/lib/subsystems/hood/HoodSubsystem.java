@@ -47,7 +47,7 @@ public class HoodSubsystem
   }
 
   @Override
-  @Traced
+  @Traced(category = "Hood")
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
     super.periodic();
@@ -62,7 +62,7 @@ public class HoodSubsystem
   }
 
   @Override
-  @Traced
+  @Traced(category = "Hood")
   public void updateLog(String standardPrefix, String inputPrefix) {
     Logger.processInputs(inputPrefix, inputs);
     io.updateLog(standardPrefix, inputPrefix);

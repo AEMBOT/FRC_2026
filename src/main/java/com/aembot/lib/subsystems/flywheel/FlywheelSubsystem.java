@@ -34,7 +34,7 @@ public class FlywheelSubsystem
   }
 
   @Override
-  @Traced
+  @Traced(category = "Flywheel")
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
     super.periodic();
@@ -52,7 +52,7 @@ public class FlywheelSubsystem
   }
 
   @Override
-  @Traced
+  @Traced(category = "Flywheel")
   public void updateLog(String standardPrefix, String inputPrefix) {
     flywheel.updateLog(standardPrefix, inputPrefix);
     super.updateLog(standardPrefix, inputPrefix);

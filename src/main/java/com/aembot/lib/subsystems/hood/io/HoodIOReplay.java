@@ -14,10 +14,10 @@ public class HoodIOReplay implements HoodIO {
   }
 
   @Override
-  @Traced
+  @Traced(category = "Hood")
   public void updateInputs(HoodInputs inputs) {}
 
   @Override
-  @Traced
+  @Traced(category = "Hood")
   public void updateLog(String standardPrefix, String inputPrefix) {}
 }

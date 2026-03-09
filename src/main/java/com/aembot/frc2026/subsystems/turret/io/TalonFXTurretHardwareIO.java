@@ -52,10 +52,10 @@ public class TalonFXTurretHardwareIO implements TurretIO {
   }
 
   @Override
-  @Traced
+  @Traced(category = "Turret")
   public void updateInputs(TurretInputs inputs) {}
 
   @Override
-  @Traced
+  @Traced(category = "Turret")
   public void updateLog(String standardPrefix, String inputPrefix) {}
 }
