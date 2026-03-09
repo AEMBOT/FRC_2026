@@ -7,7 +7,7 @@ package com.aembot.frc2026;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.state.SimulatedRobotStateYearly;
 import com.aembot.lib.core.can.CANStatusLogger;
-import com.aembot.lib.core.tracing.Tracer;
+import com.aembot.lib.tracing.Tracer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -61,7 +61,16 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledInit() {
     // Export trace data when robot is disabled
-    Tracer.exportToJson("/U/logs/trace_" + System.currentTimeMillis() + ".json");
+    // Use different paths for robot vs simulation
+    String path;
+    if (isReal()) {
+      path = "/U/logs/trace_" + System.currentTimeMillis() + ".json";
+    } else {
+      path = "trace_" + System.currentTimeMillis() + ".json";
+    }
+    System.out.println("[Tracer] Exporting traces to: " + path);
+    System.out.println("[Tracer] Total frames: " + Tracer.getTotalFrameCount());
+    Tracer.exportToJson(path);
   }
 
   @Override

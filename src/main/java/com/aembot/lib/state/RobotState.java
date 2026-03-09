@@ -2,9 +2,9 @@ package com.aembot.lib.state;
 
 import com.aembot.lib.constants.RobotStateConstants;
 import com.aembot.lib.core.logging.Loggable;
-import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.math.ConcurrentTimeInterpolatableBuffer;
 import com.aembot.lib.subsystems.aprilvision.util.AprilCameraOutput;
+import com.aembot.lib.tracing.Traced;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import java.util.ArrayList;

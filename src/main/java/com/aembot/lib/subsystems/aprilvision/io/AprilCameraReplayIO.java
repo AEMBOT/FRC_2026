@@ -1,9 +1,9 @@
 package com.aembot.lib.subsystems.aprilvision.io;
 
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
-import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionInputs;
 import com.aembot.lib.subsystems.aprilvision.interfaces.AprilCameraIO;
+import com.aembot.lib.tracing.Traced;
 
 public class AprilCameraReplayIO implements AprilCameraIO {
   private CameraConfiguration config;

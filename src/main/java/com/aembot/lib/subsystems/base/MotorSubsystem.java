@@ -3,7 +3,7 @@ package com.aembot.lib.subsystems.base;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
-import com.aembot.lib.core.tracing.Traced;
+import com.aembot.lib.tracing.Traced;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
@@ -57,6 +57,7 @@ public abstract class MotorSubsystem<
   /** The current velocity setpoint in servo motor configuration units per second */
   protected double currentVelocitySetpoint = 0;
 
+  protected boolean motorEnabled = true;
   private final Map<String, Double> lastNumericControlLogValues = new HashMap<>();
   private final Map<String, String> lastStringControlLogValues = new HashMap<>();
   private final Map<String, Double> nextControlLogTimestamps = new HashMap<>();
@@ -257,30 +258,46 @@ public abstract class MotorSubsystem<
   // ---  CONTROL: Duty Cycle
 
   protected void setOpenLoopDutyCycleImpl(double dutyCycle) {
-    recordControlValue(setOpenLoopDutyCycleLogKey, dutyCycle);
-    io.setOpenLoopDutyCycle(dutyCycle);
+    Logger.recordOutput(logPrefixStandard + "/SetOpenLoopDutyCycle", dutyCycle);
+    if (motorEnabled) {
+      io.setOpenLoopDutyCycle(dutyCycle);
+    } else {
+      io.setVoltageOutput(0);
+    }
   }
 
   // ---  CONTROL: Voltage
 
   protected void setVoltageImpl(double voltage) {
-    recordControlValue(setVoltageLogKey, voltage);
-    io.setVoltageOutput(voltage);
+    Logger.recordOutput(logPrefixStandard + "/SetVoltage", voltage);
+    if (motorEnabled) {
+      io.setVoltageOutput(voltage);
+    } else {
+      io.setVoltageOutput(0);
+    }
   }
 
   // --- CONTROL: Torque
 
   protected void setTorqueCurrentImpl(double current) {
-    recordControlValue(setTorqueCurrentLogKey, current);
-    io.setTorqueCurrent(current);
+    Logger.recordOutput(logPrefixStandard + "/SetTorqueCurrent", current);
+    if (motorEnabled) {
+      io.setTorqueCurrent(current);
+    } else {
+      io.setVoltageOutput(0);
+    }
   }
 
   // --- CONTROL: PID Velocity
 
   protected void setPIDVelocitySetpointImpl(double velocity, int slot) {
     currentVelocitySetpoint = velocity;
-    recordControlValue(setPIDVelocitySetpointLogKey, velocity);
-    io.setPIDVelocitySetpoint(velocity, slot);
+    Logger.recordOutput(logPrefixStandard + "/SetPIDVelocitySetpoint", velocity);
+    if (motorEnabled) {
+      io.setPIDVelocitySetpoint(velocity, slot);
+    } else {
+      io.setVoltageOutput(0);
+    }
   }
 
   protected void setPIDVelocitySetpointImpl(double velocity) {
@@ -291,8 +308,12 @@ public abstract class MotorSubsystem<
 
   protected void setPIDPositionSetpointImpl(double position, int slot) {
     currentPositionSetpoint = position;
-    recordControlValue(setPIDPositionSetpointLogKey, position);
-    io.setPIDPositionSetpoint(position, slot);
+    Logger.recordOutput(logPrefixStandard + "/SetPIDPositionSetpoint", position);
+    if (motorEnabled) {
+      io.setPIDPositionSetpoint(position, slot);
+    } else {
+      io.setVoltageOutput(0);
+    }
   }
 
   protected void setPIDPositionSetpointImpl(double position) {
@@ -307,9 +328,13 @@ public abstract class MotorSubsystem<
 
   protected void setSmartPositionSetpointImpl(double position, int slot) {
     currentPositionSetpoint = position;
-    recordControlValue(setSmartPositionSetpointPositionLogKey, position);
-    recordControlValue(setSmartPositionSetpointSlotLogKey, slot);
-    io.setSmartPositionSetpoint(position, slot);
+    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Position", position);
+    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Slot", slot);
+    if (motorEnabled) {
+      io.setSmartPositionSetpoint(position, slot);
+    } else {
+      io.setVoltageOutput(0);
+    }
   }
 
   // --- CONTROL: Dynamic Smart Positioning
@@ -344,22 +369,31 @@ public abstract class MotorSubsystem<
       double feedforward,
       int slot) {
     currentPositionSetpoint = position;
-    recordControlValue(setSmartPositionSetpointPositionLogKey, position);
-    recordControlValue(setSmartPositionSetpointVelocityLogKey, velocity);
-    recordControlValue(setSmartPositionSetpointAccelerationLogKey, acceleration);
-    recordControlValue(setSmartPositionSetpointJerkLogKey, jerk);
-    recordControlValue(setSmartPositionSetpointFeedforwardLogKey, feedforward);
-    recordControlValue(setSmartPositionSetpointSlotLogKey, slot);
-    io.setDynamicSmartPositionSetpoint(position, velocity, acceleration, jerk, feedforward, slot);
+    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Position", position);
+    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Velocity", velocity);
+    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Acceleration", acceleration);
+
+    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Jerk", jerk);
+    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Feedforward", feedforward);
+    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Slot", slot);
+    if (motorEnabled) {
+      io.setDynamicSmartPositionSetpoint(position, velocity, acceleration, jerk, feedforward, slot);
+    } else {
+      io.setVoltageOutput(0);
+    }
   }
 
   // --- CONTROL: Dynamic Smart Velocity
 
   protected void setSmartVelocitySetpointImpl(double velocity, int slot) {
     currentVelocitySetpoint = velocity;
-    recordControlValue(setSmartVelocitySetpointVelocityLogKey, velocity);
-    recordControlValue(setSmartVelocitySetpointSlotLogKey, slot);
-    io.setSmartVelocitySetpoint(velocity, slot);
+    Logger.recordOutput(logPrefixStandard + "/SetSmartVelocitySetpoint/Velocity", velocity);
+    Logger.recordOutput(logPrefixStandard + "/SetSmartVelocitySetpoint/Slot", slot);
+    if (motorEnabled) {
+      io.setSmartVelocitySetpoint(velocity, slot);
+    } else {
+      io.setVoltageOutput(0);
+    }
   }
 
   protected void setSmartVelocitySetpointImpl(double velocity) {

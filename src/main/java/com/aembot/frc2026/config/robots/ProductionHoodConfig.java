@@ -9,6 +9,7 @@ import com.aembot.lib.config.wrappers.ConfigureSlot0Gains;
 import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.aembot.lib.core.motors.interfaces.MotorIO.NeutralMode;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -44,8 +45,8 @@ public class ProductionHoodConfig {
 
   public final ConfigureSlot0Gains SLOT_0_CONFIGS =
       (RobotRuntimeConstants.MODE == RuntimeMode.REAL)
-          ? new ConfigureSlot0Gains(0.0, 0.0, 0.0, 0.0, 0.4, 0.98, 0.0)
-          : new ConfigureSlot0Gains(0.05, 0.0, 0.0, 0.0, 0.0, 0.12, 0.0);
+          ? new ConfigureSlot0Gains(0.05, 0.0, 0.0, 0.0, 0.0, 0.12, 0.0)
+          : new ConfigureSlot0Gains(0.0, 0.0, 0.0, 0.0, 0.4, 0.98, 0.0);
 
   public final MotorConfiguration<TalonFXConfiguration> MOTOR_CONFIG =
       new MotorConfiguration<TalonFXConfiguration>()
@@ -64,7 +65,8 @@ public class ProductionHoodConfig {
                               MOTOR_INVERTED
                                   ? InvertedValue.CounterClockwise_Positive
                                   : InvertedValue.Clockwise_Positive)
-                          .withNeutralMode(MOTOR_NEUTRAL_MODE.toCTRENeutralMode())))
+                          .withNeutralMode(MOTOR_NEUTRAL_MODE.toCTRENeutralMode()))
+                  .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(30)))
           .withCANDevice(
               new CANDeviceID(
                   57, SUBSYSTEM_NAME + "Motor", SUBSYSTEM_NAME, CANDeviceID.CANDeviceType.TALON_FX))

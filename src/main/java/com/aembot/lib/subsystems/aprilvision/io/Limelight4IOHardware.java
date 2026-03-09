@@ -3,7 +3,6 @@ package com.aembot.lib.subsystems.aprilvision.io;
 import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
-import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.math.PositionUtil;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionInputs;
@@ -12,6 +11,7 @@ import com.aembot.lib.subsystems.aprilvision.util.LimelightExtras;
 import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers;
 import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers.PoseEstimate;
 import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
+import com.aembot.lib.tracing.Traced;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import org.littletonrobotics.junction.Logger;
 import org.opencv.core.Point;
 
 public class Limelight4IOHardware implements AprilCameraIO {
@@ -154,6 +155,9 @@ public class Limelight4IOHardware implements AprilCameraIO {
         coprocessorPoseEstimation.latencyCompensatedPose();
     inputs.coprocessorEstimationStdDevs = coprocessorPoseEstimation.stdDevs();
     inputs.coprocessorEstimationTimestamp = coprocessorPoseEstimation.timestampSeconds();
+
+    Logger.recordOutput(
+        cameraName + "/tempCelsius", LimelightExtras.getCameraTemperature(cameraName));
   }
 
   private void setRobotYawNetworkTables() {
@@ -164,10 +168,10 @@ public class Limelight4IOHardware implements AprilCameraIO {
             robotStateInstance.getLatestMeasuredFieldRelativeChassisSpeeds().omegaRadiansPerSecond);
     double deltaYaw = robotYaw - cachedRobotYaw;
 
-    if (Math.abs(deltaYaw) > 0.25) {
-      LimelightHelpers.SetRobotOrientation_NoFlush(cameraName, robotYaw, robotYawRate, 0, 0, 0, 0);
-      cachedRobotYaw = robotYaw;
-    }
+    // if (Math.abs(deltaYaw) > 0.25) {
+    LimelightHelpers.SetRobotOrientation_NoFlush(cameraName, robotYaw, robotYawRate, 0, 0, 0, 0);
+    cachedRobotYaw = robotYaw;
+    // }
   }
 
   @Traced
@@ -188,8 +192,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
           compensateForEstimateLatency(
               estimate.pose,
               robotStateInstance.getLatestFusedFieldRelativeChassisSpeed(),
-              Timer.getFPGATimestamp()
-                  - (estimate.timestampSeconds - Units.millisecondsToSeconds(estimate.latency)));
+              Timer.getFPGATimestamp() - (estimate.timestampSeconds));
 
       lastMegatag2Timestamp = estimate.timestampSeconds;
 

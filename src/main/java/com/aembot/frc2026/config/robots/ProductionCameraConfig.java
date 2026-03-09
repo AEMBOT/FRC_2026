@@ -20,9 +20,9 @@ public class ProductionCameraConfig {
 
   private static final int ENABLED_THROTTLE = 1;
 
-  private static final int DISABLED_IMU_MODE = 1;
+  private static final int DISABLED_IMU_MODE = 0;
 
-  private static final int ENABLED_IMU_MODE = 4;
+  private static final int ENABLED_IMU_MODE = 0;
 
   /* ---- TURRET CAM ---- */
   public final CameraConfiguration cameraConfigTurret =

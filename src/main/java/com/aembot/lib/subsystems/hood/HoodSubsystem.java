@@ -4,14 +4,15 @@ import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
-import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.state.subsystems.hood.HoodState;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.aembot.lib.subsystems.hood.io.HoodIO;
+import com.aembot.lib.tracing.Traced;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.littletonrobotics.junction.Logger;
 
 /** Extension of the motor subsystem to add hood functionality */
@@ -41,6 +42,8 @@ public class HoodSubsystem
     this.state = state;
 
     this.setEncoderPosition(config.upwardsHardStopUnits);
+
+    SmartDashboard.putBoolean("Hood Enabled", motorEnabled);
   }
 
   @Override
@@ -54,6 +57,8 @@ public class HoodSubsystem
     // Log latency with time between periodic being called and finishing
     Logger.recordOutput(
         logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
+
+    motorEnabled = SmartDashboard.getBoolean("Hood Enabled", true);
   }
 
   @Override

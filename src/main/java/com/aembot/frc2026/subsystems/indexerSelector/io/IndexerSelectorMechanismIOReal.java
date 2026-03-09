@@ -4,7 +4,7 @@ import com.aembot.frc2026.config.subsystems.indexerSelector.IndexerSelectorConfi
 import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorMechanismInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOTalonFX;
-import com.aembot.lib.core.tracing.Traced;
+import com.aembot.lib.tracing.Traced;
 
 public class IndexerSelectorMechanismIOReal implements IndexerSelectorMechanismIO {
   /** Motor IO to use */

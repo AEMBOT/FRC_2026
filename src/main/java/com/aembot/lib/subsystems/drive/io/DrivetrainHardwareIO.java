@@ -4,9 +4,9 @@ import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
 import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
 import com.aembot.lib.core.can.CANStatusLogger;
 import com.aembot.lib.core.phoenix6.AEMSwerveDriveState;
-import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.subsystems.aprilvision.util.AprilCameraOutput;
 import com.aembot.lib.subsystems.drive.DrivetrainInputs;
+import com.aembot.lib.tracing.Traced;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
@@ -23,6 +23,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
@@ -81,6 +82,18 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
   @SuppressWarnings("unchecked")
   private final StatusSignal<Angle>[] absolutePositionSignals = new StatusSignal[4];
 
+  @SuppressWarnings("unchecked")
+  private final StatusSignal<Current>[] driveMotorSupplyCurrents = new StatusSignal[4];
+
+  @SuppressWarnings("unchecked")
+  private final StatusSignal<Current>[] driveMotorStatorCurrents = new StatusSignal[4];
+
+  @SuppressWarnings("unchecked")
+  private final StatusSignal<Current>[] steerMotorSupplyCurrents = new StatusSignal[4];
+
+  @SuppressWarnings("unchecked")
+  private final StatusSignal<Current>[] steerMotorStatorCurrents = new StatusSignal[4];
+
   /**
    * Construct the IO layer for a real drivetrain
    *
@@ -114,6 +127,11 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
     for (int i = 0; i < swerveModuleConfigurations.size(); i++) {
       moduleNames.add(i, swerveModuleConfigurations.get(i).moduleName);
       absolutePositionSignals[i] = getModule(i).getEncoder().getAbsolutePosition();
+
+      driveMotorStatorCurrents[i] = getModule(i).getDriveMotor().getStatorCurrent();
+      driveMotorSupplyCurrents[i] = getModule(i).getDriveMotor().getSupplyCurrent();
+      steerMotorStatorCurrents[i] = getModule(i).getSteerMotor().getStatorCurrent();
+      steerMotorSupplyCurrents[i] = getModule(i).getSteerMotor().getSupplyCurrent();
     }
 
     int moduleCount = swerveModuleConfigurations.size();
@@ -178,6 +196,11 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
 
     // Refresh and store absolute encoder positions
     BaseStatusSignal.refreshAll(absolutePositionSignals);
+
+    BaseStatusSignal.refreshAll(driveMotorStatorCurrents);
+    BaseStatusSignal.refreshAll(driveMotorSupplyCurrents);
+    BaseStatusSignal.refreshAll(steerMotorStatorCurrents);
+    BaseStatusSignal.refreshAll(steerMotorSupplyCurrents);
     for (int i = 0; i < absolutePositionSignals.length; i++) {
       inputs.absoluteEncoderPositions[i] = absolutePositionSignals[i].getValueAsDouble();
     }

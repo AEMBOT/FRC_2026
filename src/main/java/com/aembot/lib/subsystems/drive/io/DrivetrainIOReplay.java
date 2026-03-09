@@ -1,8 +1,8 @@
 package com.aembot.lib.subsystems.drive.io;
 
-import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.subsystems.aprilvision.util.AprilCameraOutput;
 import com.aembot.lib.subsystems.drive.DrivetrainInputs;
+import com.aembot.lib.tracing.Traced;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Pose2d;
 

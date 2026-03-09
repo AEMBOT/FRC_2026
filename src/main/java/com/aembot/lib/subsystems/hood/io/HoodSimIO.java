@@ -2,8 +2,8 @@ package com.aembot.lib.subsystems.hood.io;
 
 import com.aembot.lib.config.subsystems.hood.simulation.SimulatedHoodConfiguration;
 import com.aembot.lib.core.motors.io.MotorIOTalonFXSim;
-import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.subsystems.hood.HoodInputs;
+import com.aembot.lib.tracing.Traced;
 import edu.wpi.first.wpilibj.Notifier;
 
 /** Simulated Hood IO */

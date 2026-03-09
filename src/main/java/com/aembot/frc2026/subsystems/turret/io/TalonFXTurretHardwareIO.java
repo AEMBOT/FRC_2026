@@ -6,7 +6,7 @@ import com.aembot.lib.core.encoders.interfaces.CANCoderIO;
 import com.aembot.lib.core.encoders.io.CANCoderIOHardware;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOTalonFX;
-import com.aembot.lib.core.tracing.Traced;
+import com.aembot.lib.tracing.Traced;
 
 /** Hardware implementation for turret io */
 public class TalonFXTurretHardwareIO implements TurretIO {

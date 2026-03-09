@@ -4,12 +4,13 @@ import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.subsystems.flywheel.TalonFXFlywheelConfiguration;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
-import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.state.subsystems.flywheel.FlywheelState;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.aembot.lib.subsystems.flywheel.io.FlywheelIO;
+import com.aembot.lib.tracing.Traced;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.littletonrobotics.junction.Logger;
 
 public class FlywheelSubsystem
@@ -29,6 +30,7 @@ public class FlywheelSubsystem
     this.state = stateInstance;
 
     zeroEncoderPosition();
+    SmartDashboard.putBoolean("Flywheel Enabled", motorEnabled);
   }
 
   @Override
@@ -45,6 +47,8 @@ public class FlywheelSubsystem
     // Log latency with time between periodic being called and finishing
     Logger.recordOutput(
         logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
+
+    motorEnabled = SmartDashboard.getBoolean("Flywheel Enabled", true);
   }
 
   @Override

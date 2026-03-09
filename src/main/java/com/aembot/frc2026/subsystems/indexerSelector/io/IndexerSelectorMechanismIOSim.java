@@ -3,7 +3,7 @@ package com.aembot.frc2026.subsystems.indexerSelector.io;
 import com.aembot.frc2026.config.subsystems.indexerSelector.IndexerSelectorConfiguration;
 import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorMechanismInputs;
 import com.aembot.lib.core.motors.io.MotorIOTalonFXSim;
-import com.aembot.lib.core.tracing.Traced;
+import com.aembot.lib.tracing.Traced;
 import edu.wpi.first.wpilibj.Notifier;
 
 public class IndexerSelectorMechanismIOSim implements IndexerSelectorMechanismIO {

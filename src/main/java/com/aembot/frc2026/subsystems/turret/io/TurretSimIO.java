@@ -6,7 +6,7 @@ import com.aembot.lib.core.encoders.interfaces.CANCoderIO;
 import com.aembot.lib.core.encoders.io.CANCoderSimIO;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOTalonFXSim;
-import com.aembot.lib.core.tracing.Traced;
+import com.aembot.lib.tracing.Traced;
 import edu.wpi.first.wpilibj.Notifier;
 
 /** Simulated IO implementation for the turret */

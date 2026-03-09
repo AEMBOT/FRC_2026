@@ -4,6 +4,7 @@
 
 package com.aembot.frc2026;
 
+import com.aembot.lib.tracing.TracingBootstrap;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -20,6 +21,9 @@ public final class Main {
    * <p>If you change your main robot class, change the parameter type.
    */
   public static void main(String... args) {
+    // Install @Traced annotation support before any robot classes are loaded
+    TracingBootstrap.install();
+
     RobotBase.startRobot(Robot::new);
   }
 }

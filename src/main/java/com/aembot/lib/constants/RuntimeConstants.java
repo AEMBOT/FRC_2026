@@ -30,7 +30,7 @@ public class RuntimeConstants {
   // This is maybe wierd and cursed. The intent is to create a singular point for lib to access this
   // season-specific field,
   // to make porting between years a bit easier and less spaghettiful. TODO have other humans check
-  // this
+  // thi
   public static final RobotID ROBOT_ID = RobotRuntimeConstants.ROBOT_ID;
 
   /**

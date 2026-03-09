@@ -5,6 +5,7 @@
 package com.aembot.frc2026;
 
 import com.aembot.frc2026.commands.CommandFactory;
+import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.subsystems.SubsystemFactory;
 import com.aembot.frc2026.subsystems.indexerKicker.IndexerKickerSubsystem;
 import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorSubsystem;
@@ -21,12 +22,16 @@ import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSu
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -77,6 +82,23 @@ public class RobotContainer implements Loggerable {
 
   private final Trigger robotEnabled = new Trigger(() -> DriverStation.isEnabled());
 
+  private final Trigger allianceInitialized =
+      new Trigger(() -> DriverStation.getAlliance().isPresent());
+
+  private final Trigger allianceIsRed =
+      new Trigger(
+          () ->
+              allianceInitialized.getAsBoolean()
+                  && DriverStation.getAlliance().get().equals(Alliance.Red));
+
+  private final Trigger allianceIsBlue =
+      new Trigger(
+          () ->
+              allianceInitialized.getAsBoolean()
+                  && DriverStation.getAlliance().get().equals(Alliance.Blue));
+
+  private final Field2d field = new Field2d();
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer(LoggedRobot robot) {
     setupLogger(robot);
@@ -93,22 +115,6 @@ public class RobotContainer implements Loggerable {
             flywheelSubsystem,
             turretSubsystem);
 
-    AutoHelper.setupAutoFactory(driveSubsystem);
-
-    AutoHelper.registerAutoCommands(commandFactory);
-
-    AutoHelper.setupAutoChooser();
-
-    SmartDashboard.putData("Choose Auto Routine", AutoHelper.autoChooser);
-
-    AutoHelper.setupAutoFactory(driveSubsystem);
-
-    AutoHelper.registerAutoCommands(commandFactory);
-
-    AutoHelper.setupAutoChooser();
-
-    SmartDashboard.putData("Choose Auto Routine", AutoHelper.autoChooser);
-
     configureBindings();
 
     driveSubsystem.resetPose(new Pose2d(2, 4, Rotation2d.fromDegrees(-180)));
@@ -116,6 +122,7 @@ public class RobotContainer implements Loggerable {
 
   /** Use this method to define your controller button -> command mappings */
   private void configureBindings() {
+    setupAutos().schedule();
 
     /* ---- DEFAULT COMMANDS ---- */
 
@@ -200,6 +207,9 @@ public class RobotContainer implements Loggerable {
     robotEnabled
         .onTrue(visionSubsystem.updateNTEnabledCommand())
         .onFalse(visionSubsystem.updateNTDisabledCommand());
+
+    // allianceIsBlue.onChange(setupAutos());
+    // allianceIsRed.onChange(setupAutos());
   }
 
   /**
@@ -224,5 +234,27 @@ public class RobotContainer implements Loggerable {
 
   public void logCommands() {
     commandFactory.logCommands();
+    if (DriverStation.getAlliance().isPresent())
+      Logger.recordOutput("Alliance", DriverStation.getAlliance().get());
+    Logger.recordOutput("AllianceSet", DriverStation.getAlliance().isPresent());
+
+    field.setRobotPose(RobotStateYearly.get().getLatestFieldRobotPose());
+    SmartDashboard.putData("FieldData/Field2d", field);
+  }
+
+  private Command setupAutos() {
+    return new InstantCommand(
+            () -> {
+              AutoHelper.setupAutoFactory(driveSubsystem);
+
+              AutoHelper.registerAutoCommands(commandFactory);
+
+              AutoHelper.setupAutoChooser();
+
+              SmartDashboard.putData("Choose Auto Routine", AutoHelper.autoChooser);
+
+              System.out.println("Setup Autos");
+            })
+        .ignoringDisable(true);
   }
 }

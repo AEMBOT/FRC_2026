@@ -7,11 +7,12 @@ import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.core.encoders.CANCoderInputs;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
-import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
+import com.aembot.lib.tracing.Traced;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.Logger;
@@ -65,6 +66,8 @@ public class TurretSubsystem
     // setPositionFromEncoders();
 
     setEncoderPosition(config.startingRotation);
+
+    SmartDashboard.putBoolean("Turret Enabled", motorEnabled);
   }
 
   private void setPositionFromEncoders() {
@@ -125,7 +128,10 @@ public class TurretSubsystem
     state.updateTurretYaw(Rotation2d.fromDegrees(inputs.positionUnits));
 
     // Log latency with time between periodic being called and finishing
-    Logger.recordOutput(turretLatencyPeriodicLogKey, (Timer.getFPGATimestamp() - timestamp) * 1000);
+    Logger.recordOutput(
+        logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
+
+    motorEnabled = SmartDashboard.getBoolean("Turret Enabled", motorEnabled);
   }
 
   @Override

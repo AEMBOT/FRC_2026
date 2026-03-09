@@ -2,8 +2,8 @@ package com.aembot.lib.subsystems.hood.io;
 
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOReplay;
-import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.subsystems.hood.HoodInputs;
+import com.aembot.lib.tracing.Traced;
 
 /** Base IO layer for the hood subsystem */
 public class HoodIOReplay implements HoodIO {

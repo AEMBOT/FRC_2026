@@ -15,6 +15,7 @@ import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSu
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -57,9 +58,14 @@ public final class CommandFactory {
     this.shooterCommands = new ShooterCommands(hoodSubsystem, turretSubsystem, flywheelSubsystem);
 
     this.aimTrigger =
-        new Trigger(() -> shootFuel).whileTrue(shooterCommands.createShootFuelCommand());
+        new Trigger(() -> shootFuel && DriverStation.isAutonomousEnabled())
+            .whileTrue(shooterCommands.createShootFuelCommand());
     this.kickerTrigger =
-        new Trigger(() -> (shootFuel && shooterCommands.isShooterNearGoal()))
+        new Trigger(
+                () ->
+                    (shootFuel
+                        && shooterCommands.isShooterNearGoal()
+                        && DriverStation.isAutonomousEnabled()))
             .whileTrue(indexerCommands.createFeedIndexerCommand());
   }
 
@@ -100,13 +106,14 @@ public final class CommandFactory {
   }
 
   public Command resetOdometryHeading() {
-    Translation2d robotTranslation =
-        RobotStateYearly.get().getLatestFieldRobotPose().getTranslation();
-    Rotation2d robotRotation =
-        RobotRuntimeConstants.isBlueAlliance() ? Rotation2d.kZero : Rotation2d.k180deg;
-
     return new InstantCommand(
-        () -> driveSubsystem.resetPose(new Pose2d(robotTranslation, robotRotation)));
+        () -> {
+          Translation2d robotTranslation =
+              RobotStateYearly.get().getLatestFieldRobotPose().getTranslation();
+          Rotation2d robotRotation =
+              RobotRuntimeConstants.isBlueAlliance() ? Rotation2d.kZero : Rotation2d.k180deg;
+          driveSubsystem.resetPose(new Pose2d(robotTranslation, robotRotation));
+        });
   }
 
   public Command createSetDriveHeadingForUnderTrenchCommand(

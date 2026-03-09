@@ -311,7 +311,7 @@ public final class ProductionIndexerConfig {
       return new IndexerKickerConfiguration(SUBSYSTEM_NAME)
           .withMotorConfig(motorConfig)
           .withSimMotorConfig(simMotorConfig)
-          .withTargetSpeedRPM(TARGET_SPEED_RPM)
+          .withTargetSpeedRPM(8)
           .withResistSpeedRPM(RESIST_SPEED_RPM)
           .withGamePieceMoveTimeSeconds(SECONDS_THRU_KICKER)
           .withGamePieceCapacity(GAMEPIECE_CAPACITY)

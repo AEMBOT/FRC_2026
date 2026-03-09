@@ -4,7 +4,7 @@ import com.aembot.frc2026.config.subsystems.indexerKicker.IndexerKickerConfigura
 import com.aembot.frc2026.subsystems.indexerKicker.IndexerKickerMechanismInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOTalonFX;
-import com.aembot.lib.core.tracing.Traced;
+import com.aembot.lib.tracing.Traced;
 
 public class IndexerKickerMechanismIOReal implements IndexerKickerMechanismIO {
   /** Motor IO to use */

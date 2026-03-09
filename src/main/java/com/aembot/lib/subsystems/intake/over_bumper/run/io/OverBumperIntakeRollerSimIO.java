@@ -3,8 +3,8 @@ package com.aembot.lib.subsystems.intake.over_bumper.run.io;
 import com.aembot.lib.config.subsystems.intake.overBumper.run.TalonFXOverBumperIntakeRollerConfiguration;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOTalonFXSimFlywheel;
-import com.aembot.lib.core.tracing.Traced;
 import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerInputs;
+import com.aembot.lib.tracing.Traced;
 import edu.wpi.first.wpilibj.Notifier;
 
 /** simulated implementation for over the bumper intake roller io */

@@ -3,7 +3,7 @@ package com.aembot.frc2026.subsystems.indexerSelector.io;
 import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorMechanismInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOReplay;
-import com.aembot.lib.core.tracing.Traced;
+import com.aembot.lib.tracing.Traced;
 
 public class IndexerSelectorMechanismIOReplay implements IndexerSelectorMechanismIO {
   private final MotorIO io = new MotorIOReplay();
