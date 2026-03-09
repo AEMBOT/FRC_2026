@@ -41,7 +41,7 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void robotPeriodic() {
-    Tracer.beginFrame();
+    Tracer.beginLoop();
 
     CommandScheduler.getInstance().run();
 
@@ -49,7 +49,7 @@ public class Robot extends LoggedRobot {
     RobotStateYearly.get().updateLog();
     m_robotContainer.logCommands();
 
-    Tracer.endFrame();
+    Tracer.endLoop();
   }
 
   @Override
@@ -69,7 +69,7 @@ public class Robot extends LoggedRobot {
       path = "trace_" + System.currentTimeMillis() + ".json";
     }
     System.out.println("[Tracer] Exporting traces to: " + path);
-    System.out.println("[Tracer] Total frames: " + Tracer.getTotalFrameCount());
+    System.out.println("[Tracer] Total loops: " + Tracer.getTotalLoopCount());
     Tracer.exportToJson(path);
   }
 
