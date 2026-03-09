@@ -2,25 +2,30 @@ package com.aembot.frc2026.subsystems.turret.io;
 
 import com.aembot.frc2026.subsystems.turret.TurretInputs;
 import com.aembot.lib.core.encoders.interfaces.CANCoderIO;
+import com.aembot.lib.core.encoders.io.CANCoderReplayIO;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOReplay;
 
 /** Replay implementation for turret IO */
 public class TurretReplayIO implements TurretIO {
 
+  private final MotorIOReplay motor = new MotorIOReplay();
+  private final CANCoderReplayIO cancoderA = new CANCoderReplayIO();
+  private final CANCoderReplayIO cancoderB = new CANCoderReplayIO();
+
   @Override
   public MotorIO getMotor() {
-    return new MotorIOReplay();
+    return motor;
   }
 
   @Override
   public CANCoderIO getCANcoderA() {
-    return null;
+    return cancoderA;
   }
 
   @Override
   public CANCoderIO getCANcoderB() {
-    return null;
+    return cancoderB;
   }
 
   @Override

@@ -6,9 +6,9 @@ import com.aembot.lib.subsystems.aprilvision.util.AprilCameraOutput;
 import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
 import com.aembot.lib.subsystems.base.AEMSubsystem;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import java.util.ArrayList;
@@ -33,8 +33,6 @@ public class AprilVisionSubsystem extends AEMSubsystem {
     }
 
     updateNTDisabled();
-
-    SmartDashboard.putBoolean("Vision Enabled", visionActive);
   }
 
   @Override
@@ -59,6 +57,30 @@ public class AprilVisionSubsystem extends AEMSubsystem {
 
       io.updateInputs(inputs);
 
+      // Log corrected pose - only X correction needed for left/right cameras
+      if (inputs.coprocessorEstimationLatencyCompensated != null) {
+        double cameraX = io.getConfiguration().getCameraPosition().getX();
+        double cameraY = io.getConfiguration().getCameraPosition().getY();
+        double heading = inputs.coprocessorEstimationLatencyCompensated.getRotation().getRadians();
+
+        // Only apply X correction to cameras with Y offset (left/right, not back)
+        double correctionRobotX = (Math.abs(cameraY) > 0.01) ? -2.0 * cameraX : 0.0;
+
+        // Convert robot-frame X correction to field-frame
+        double correctionFieldX = correctionRobotX * Math.cos(heading);
+        double correctionFieldY = correctionRobotX * Math.sin(heading);
+
+        Pose2d correctedPose =
+            new Pose2d(
+                inputs.coprocessorEstimationLatencyCompensated.getX() + correctionFieldX,
+                inputs.coprocessorEstimationLatencyCompensated.getY() + correctionFieldY,
+                inputs.coprocessorEstimationLatencyCompensated.getRotation());
+
+        Logger.recordOutput(
+            logPrefixStandard + "/" + io.getConfiguration().cameraName + "/CorrectedPoseEstimate",
+            correctedPose);
+      }
+
       if (inputs.coprocessorEstimationLatencyCompensated != null && visionActive) {
         aprilTagObservations.add(
             new AprilCameraOutput(
@@ -70,8 +92,6 @@ public class AprilVisionSubsystem extends AEMSubsystem {
                     inputs.coprocessorEstimationStdDevs,
                     inputs.coprocessorEstimationTimestamp)));
       }
-
-      visionActive = SmartDashboard.getBoolean("Vision Enabled", true);
     }
 
     robotStateInstance.setApriltagObservations(aprilTagObservations);

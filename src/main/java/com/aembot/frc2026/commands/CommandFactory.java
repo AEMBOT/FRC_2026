@@ -55,9 +55,14 @@ public final class CommandFactory {
     this.shooterCommands = new ShooterCommands(hoodSubsystem, turretSubsystem, flywheelSubsystem);
 
     this.aimTrigger =
-        new Trigger(() -> shootFuel && DriverStation.isAutonomousEnabled()).whileTrue(shooterCommands.createShootFuelCommand());
+        new Trigger(() -> shootFuel && DriverStation.isAutonomousEnabled())
+            .whileTrue(shooterCommands.createShootFuelCommand());
     this.kickerTrigger =
-        new Trigger(() -> (shootFuel && shooterCommands.isShooterNearGoal() && DriverStation.isAutonomousEnabled()))
+        new Trigger(
+                () ->
+                    (shootFuel
+                        && shooterCommands.isShooterNearGoal()
+                        && DriverStation.isAutonomousEnabled()))
             .whileTrue(indexerCommands.createFeedIndexerCommand());
   }
 

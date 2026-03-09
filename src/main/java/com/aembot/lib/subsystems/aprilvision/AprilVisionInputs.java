@@ -16,7 +16,7 @@ public class AprilVisionInputs implements LoggableInputs {
   public Pose3d tagPosition = PositionUtil.NaN.POSE3D;
 
   /** Horizontal rotation from the camera's center to the detected tag's center */
-  public Rotation2d horizontalAngleToTag;
+  public Rotation2d horizontalAngleToTag = Rotation2d.kZero;
 
   /** Corner positions of the april tag */
   public List<Point> tagCornerPositions;
@@ -31,15 +31,15 @@ public class AprilVisionInputs implements LoggableInputs {
    * The estimated pose of the robot from the vision coprocessor. Ie. Limelight's MegaTag 2. Not
    * latency compensated.
    */
-  public Pose2d coprocessorEstimationLatencyUncompensated;
+  public Pose2d coprocessorEstimationLatencyUncompensated = Pose2d.kZero;
 
   /**
    * The estimated pose of the robot from the vision coprocessor. Ie. Limelight's MegaTag 2. Latency
    * compensated.
    */
-  public Pose2d coprocessorEstimationLatencyCompensated;
+  public Pose2d coprocessorEstimationLatencyCompensated = Pose2d.kZero;
 
-  public OdometryStandardDevs coprocessorEstimationStdDevs;
+  public OdometryStandardDevs coprocessorEstimationStdDevs = new OdometryStandardDevs(0, 0, 0);
 
   public double coprocessorPoseEstimationAmbiguity;
 
