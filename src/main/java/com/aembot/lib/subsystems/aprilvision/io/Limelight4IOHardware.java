@@ -46,6 +46,21 @@ public class Limelight4IOHardware implements AprilCameraIO {
   /** Max rotation rate (rad/s) before rejecting all estimates entirely */
   private static final double MAX_OMEGA_FOR_ANY_TAG = Units.degreesToRadians(360);
 
+  // Tag area thresholds (percentage of image) for quality scoring
+  /** Below this area, tag is too far / detection unreliable - reject or heavy penalty */
+  private static final double TAG_AREA_REJECT_THRESHOLD = 0.05;
+
+  /** Below this area, tag is far but usable - reduced trust */
+  private static final double TAG_AREA_FAR_THRESHOLD = 0.1;
+
+  /** Below this area, tag is at medium range - normal trust */
+  private static final double TAG_AREA_MEDIUM_THRESHOLD = 1.0;
+
+  /** Below this area, tag is at good range - high trust */
+  private static final double TAG_AREA_GOOD_THRESHOLD = 5.0;
+
+  // Above GOOD_THRESHOLD = very close, highest trust
+
   protected final CameraConfiguration cameraConfiguration;
   protected final YearFieldConstantable fieldConstants;
 
@@ -283,16 +298,39 @@ public class Limelight4IOHardware implements AprilCameraIO {
       yStdDev = xStdDev;
     }
 
-    // Calculate quality score (similar to Team 254's approach)
-    // Multi-tag = high quality, single tag = quality based on tag area
+    // Calculate quality score based on tag area ranges
+    // avgTagArea is percentage of image, typical values 0.05% - 10%+
     double quality;
-    if (estimate.tagCount > 1) {
-      quality = 1.0;
+    double avgArea = estimate.avgTagArea;
+
+    if (avgArea < TAG_AREA_REJECT_THRESHOLD) {
+      // Too far / unreliable detection - very low quality
+      quality = 0.05;
+    } else if (avgArea < TAG_AREA_FAR_THRESHOLD) {
+      // Far but usable (0.05% - 0.1%) - low quality, interpolate 0.1 to 0.3
+      double t = (avgArea - TAG_AREA_REJECT_THRESHOLD) / (TAG_AREA_FAR_THRESHOLD - TAG_AREA_REJECT_THRESHOLD);
+      quality = 0.1 + (t * 0.2);
+    } else if (avgArea < TAG_AREA_MEDIUM_THRESHOLD) {
+      // Medium range (0.1% - 1%) - moderate quality, interpolate 0.3 to 0.6
+      double t = (avgArea - TAG_AREA_FAR_THRESHOLD) / (TAG_AREA_MEDIUM_THRESHOLD - TAG_AREA_FAR_THRESHOLD);
+      quality = 0.3 + (t * 0.3);
+    } else if (avgArea < TAG_AREA_GOOD_THRESHOLD) {
+      // Good range (1% - 5%) - high quality, interpolate 0.6 to 0.9
+      double t = (avgArea - TAG_AREA_MEDIUM_THRESHOLD) / (TAG_AREA_GOOD_THRESHOLD - TAG_AREA_MEDIUM_THRESHOLD);
+      quality = 0.6 + (t * 0.3);
     } else {
-      // Single tag: quality scales with tag area (larger = closer = better)
-      // avgTagArea is percentage of image, typical values 0.1 - 10%
-      quality = Math.min(1.0, Math.max(0.1, estimate.avgTagArea / 5.0));
+      // Very close (>5%) - excellent quality
+      quality = 1.0;
     }
+
+    // Multi-tag bonus: boost quality when multiple tags visible
+    if (estimate.tagCount > 1) {
+      // Scale up quality, but cap at 1.0
+      quality = Math.min(1.0, quality * 1.5);
+    }
+
+    // Log area for debugging
+    Logger.recordOutput(cameraName + "/Vision/avgTagArea", avgArea);
 
     // Scale stddevs by inverse quality (lower quality = higher stddev = less trust)
     double qualityScaleFactor = 1.0 / quality;
