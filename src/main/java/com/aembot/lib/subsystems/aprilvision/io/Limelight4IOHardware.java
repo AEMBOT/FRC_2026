@@ -198,9 +198,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
     // Get current rotation rate for filtering
     double omegaRadPerSec =
         Math.abs(
-            robotStateInstance
-                .getLatestMeasuredFieldRelativeChassisSpeeds()
-                .omegaRadiansPerSecond);
+            robotStateInstance.getLatestMeasuredFieldRelativeChassisSpeeds().omegaRadiansPerSecond);
 
     // === FILTERING CHECKS ===
 
