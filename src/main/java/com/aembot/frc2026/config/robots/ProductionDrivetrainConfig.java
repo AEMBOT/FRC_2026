@@ -67,7 +67,7 @@ public class ProductionDrivetrainConfig {
      * The max horizontal speed the drivetrain will drive at in m/s. Not necessarily the physical
      * limit.
      */
-    public static final double MAX_DRIVE_SPEED = 5;
+    public static final double MAX_DRIVE_SPEED = 4;
 
     /**
      * The max angular speed the drivetrain will drive at in rads/s. Not necessarily the physical
