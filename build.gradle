@@ -82,7 +82,7 @@ def includeDesktopSupport = true
 
 repositories {
     mavenCentral()
-    mavenLocal()
+    flatDir { dirs 'libs' }
 }
 
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
@@ -108,8 +108,8 @@ dependencies {
 
     implementation "com.opencsv:opencsv:5.1"
 
-    // AEMTracer for annotation-based tracing (includes ByteBuddy transitively)
-    implementation 'com.aembot.lib:AEMTracer:1.0.0'
+    // AEMTracer for annotation-based tracing
+    implementation name: 'AEMTracer-1.0.0'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -140,10 +140,15 @@ jar {
 
 // Copy AEMTracer jar to deploy directory for javaagent
 task copyTracerJar(type: Copy) {
-    from configurations.runtimeClasspath.filter { it.name.contains('AEMTracer') }
+    from 'libs/AEMTracer-1.0.0.jar'
     into 'src/main/deploy'
 }
 deploy.targets.roborio.artifacts.frcStaticFileDeploy.dependsOn copyTracerJar
+
+// Ensure Spotless tasks run after copyTracerJar to avoid implicit dependency conflicts
+tasks.matching { it.name.startsWith('spotless') }.configureEach {
+    mustRunAfter copyTracerJar
+}
 
 // Configure jar and deploy tasks
 deployArtifact.jarTask = jar
