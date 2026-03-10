@@ -1,8 +1,10 @@
 package com.aembot.frc2026.config.robots;
 
+import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -28,17 +30,16 @@ public class ProductionCameraConfig {
   public final CameraConfiguration cameraConfigTurret =
       CameraConfiguration.makeLimelight4Config("turret")
           .withMechanismOrigin(
-              () ->
-                  new Pose3d(
-                      new Translation3d(
-                          Units.inchesToMeters(-5.3125),
-                          Units.inchesToMeters(0),
-                          Units.inchesToMeters(0)),
-                      new Rotation3d(
-                          0,
-                          0,
-                          Units.degreesToRadians(
-                              0)))) // TODO grab actual turret rot from robot state
+              () -> {
+                Rotation2d turretYaw = RobotStateYearly.get().turretState.turretYaw.get();
+                double yawRads = turretYaw != null ? turretYaw.getRadians() : 0.0;
+                return new Pose3d(
+                    new Translation3d(
+                        Units.inchesToMeters(-5.3125),
+                        Units.inchesToMeters(0),
+                        Units.inchesToMeters(0)),
+                    new Rotation3d(0, 0, yawRads));
+              })
           .withCameraOffset(
               new Transform3d(
                   new Translation3d(

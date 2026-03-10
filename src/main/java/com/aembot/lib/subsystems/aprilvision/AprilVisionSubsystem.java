@@ -73,7 +73,6 @@ public class AprilVisionSubsystem extends AEMSubsystem {
                   inputs.tagID,
                   new VisionPoseEstimation(
                       inputs.coprocessorEstimationLatencyUncompensated,
-                      inputs.coprocessorEstimationLatencyCompensated,
                       inputs.coprocessorEstimationStdDevs,
                       inputs.coprocessorEstimationTimestamp)));
         }
@@ -184,7 +183,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
         new AprilCameraOutput(
             "fused",
             -1, // No single tag ID for fused
-            new VisionPoseEstimation(fusedPose, fusedPose, fusedStdDevs, latestTimestamp)));
+            new VisionPoseEstimation(fusedPose, fusedStdDevs, latestTimestamp)));
   }
 
   public Command createKillVisionCommand() {

@@ -33,12 +33,6 @@ public class AprilVisionInputs implements LoggableInputs {
    */
   public Pose2d coprocessorEstimationLatencyUncompensated;
 
-  /**
-   * The estimated pose of the robot from the vision coprocessor. Ie. Limelight's MegaTag 2. Latency
-   * compensated.
-   */
-  public Pose2d coprocessorEstimationLatencyCompensated;
-
   public OdometryStandardDevs coprocessorEstimationStdDevs;
 
   public double coprocessorPoseEstimationAmbiguity;
@@ -53,7 +47,6 @@ public class AprilVisionInputs implements LoggableInputs {
     table.put("TagID", tagID);
     table.put(
         "CoprocessorEstimationLatencyUncompensated", coprocessorEstimationLatencyUncompensated);
-    table.put("CoprocessorEstimationLatencyCompensated", coprocessorEstimationLatencyCompensated);
     table.put("CoprocessorEstimationStdDevs", coprocessorEstimationStdDevs);
     table.put("CoprocessorPoseEstimationAmbiguity", coprocessorPoseEstimationAmbiguity);
     table.put("CoprocessorEstimationTimestamp", coprocessorEstimationTimestamp);
@@ -68,9 +61,6 @@ public class AprilVisionInputs implements LoggableInputs {
     coprocessorEstimationLatencyUncompensated =
         table.get(
             "CoprocessorEstimationLatencyUncompensated", coprocessorEstimationLatencyUncompensated);
-    coprocessorEstimationLatencyCompensated =
-        table.get(
-            "CoprocessorEstimationLatencyCompensated", coprocessorEstimationLatencyCompensated);
     coprocessorEstimationStdDevs =
         table.get("CoprocessorEstimationStdDevs", coprocessorEstimationStdDevs);
     coprocessorPoseEstimationAmbiguity =

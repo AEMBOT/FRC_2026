@@ -14,13 +14,11 @@ import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.Timer;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -109,8 +107,6 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
   protected final Consumer<NetworkTableEvent> heartbeatCallback = this::updateNtValuesCache;
 
-  protected Transform2d horizontalCameraOffset;
-
   public Limelight4IOHardware(
       CameraConfiguration config,
       YearFieldConstantable fieldConstants,
@@ -128,9 +124,6 @@ public class Limelight4IOHardware implements AprilCameraIO {
             heartbeatEntry, EnumSet.of(NetworkTableEvent.Kind.kValueAll), heartbeatCallback);
 
     Pose3d cameraPosition = cameraConfiguration.getCameraPosition();
-
-    horizontalCameraOffset =
-        new Transform2d(-cameraPosition.getX(), -cameraPosition.getY(), Rotation2d.kZero);
 
     LimelightHelpers.setCameraPose_RobotSpace(
         cameraName,
@@ -182,8 +175,6 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
     inputs.coprocessorEstimationLatencyUncompensated =
         coprocessorPoseEstimation.latencyUncompensatedPose();
-    inputs.coprocessorEstimationLatencyCompensated =
-        coprocessorPoseEstimation.latencyCompensatedPose();
     inputs.coprocessorEstimationStdDevs = coprocessorPoseEstimation.stdDevs();
     inputs.coprocessorEstimationTimestamp = coprocessorPoseEstimation.timestampSeconds();
 
@@ -197,7 +188,12 @@ public class Limelight4IOHardware implements AprilCameraIO {
         Units.radiansToDegrees(
             robotStateInstance.getLatestMeasuredFieldRelativeChassisSpeeds().omegaRadiansPerSecond);
 
-    LimelightHelpers.SetRobotOrientation_NoFlush(cameraName, robotYaw, robotYawRate, 0, 0, 0, 0);
+    // Add mechanism origin yaw (e.g., turret rotation) so the LL knows its actual field orientation
+    double mechanismYawDegrees =
+        Units.radiansToDegrees(cameraConfiguration.mechanismOrigin.get().getRotation().getZ());
+
+    LimelightHelpers.SetRobotOrientation_NoFlush(
+        cameraName, robotYaw + mechanismYawDegrees, robotYawRate, 0, 0, 0, 0);
   }
 
   private VisionPoseEstimation getMegatag2Estimate() {
@@ -207,7 +203,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
     // Early exit if no valid estimate or already processed
     if (estimate.tagCount <= 0 || estimate.timestampSeconds == lastMegatag2Timestamp) {
-      return new VisionPoseEstimation(null, null, null, Double.NaN);
+      return new VisionPoseEstimation(null, null, Double.NaN);
     }
 
     // Get current rotation rate for filtering
@@ -234,25 +230,40 @@ public class Limelight4IOHardware implements AprilCameraIO {
     Logger.recordOutput(cameraName + "/Vision/rejectedRotation", rotatingTooFast);
 
     if (tooClose || rotatingTooFast) {
-      return new VisionPoseEstimation(null, null, null, Double.NaN);
+      return new VisionPoseEstimation(null, null, Double.NaN);
     }
 
     // === POSE PROCESSING ===
 
-    Pose2d latencyUncompensatedPose = estimate.pose.plus(horizontalCameraOffset);
-    Pose2d latencyCompensatedPose =
-        compensateForEstimateLatency(
-            latencyUncompensatedPose,
-            robotStateInstance.getLatestFusedFieldRelativeChassisSpeed(),
-            Timer.getFPGATimestamp() - estimate.timestampSeconds);
+    // Get mechanism yaw (e.g., turret rotation) - this was added to robot yaw when we told LL
+    Rotation2d mechanismYaw =
+        Rotation2d.fromRadians(cameraConfiguration.mechanismOrigin.get().getRotation().getZ());
+
+    // LL returned pose has rotation = robotYaw + mechanismYaw, so subtract to get robot yaw
+    Rotation2d robotYaw = estimate.pose.getRotation().minus(mechanismYaw);
+
+    // Get current camera position (accounts for mechanism rotation in robot frame)
+    Pose3d cameraPosition = cameraConfiguration.getCameraPosition();
+
+    // Camera offset in robot frame - need to transform to field frame using robot yaw
+    // robot_xy = camera_xy - offset.rotateBy(robotYaw)
+    double offsetX = cameraPosition.getX();
+    double offsetY = cameraPosition.getY();
+    double cosYaw = robotYaw.getCos();
+    double sinYaw = robotYaw.getSin();
+    double fieldOffsetX = offsetX * cosYaw - offsetY * sinYaw;
+    double fieldOffsetY = offsetX * sinYaw + offsetY * cosYaw;
+
+    Pose2d latencyUncompensatedPose =
+        new Pose2d(
+            estimate.pose.getX() - fieldOffsetX,
+            estimate.pose.getY() - fieldOffsetY,
+            robotYaw);
 
     lastMegatag2Timestamp = estimate.timestampSeconds;
 
     return new VisionPoseEstimation(
-        latencyUncompensatedPose,
-        latencyCompensatedPose,
-        getStdDevs(estimate),
-        estimate.timestampSeconds);
+        latencyUncompensatedPose, getStdDevs(estimate), estimate.timestampSeconds);
   }
 
   /**
