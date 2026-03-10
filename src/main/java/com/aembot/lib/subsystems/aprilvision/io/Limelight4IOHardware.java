@@ -193,8 +193,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
     double yawRate =
         mechanismYawDegrees == 0
             ? Units.radiansToDegrees(
-                robotStateInstance
-                    .getLatestMeasuredFieldRelativeChassisSpeeds()
+                robotStateInstance.getLatestMeasuredFieldRelativeChassisSpeeds()
                     .omegaRadiansPerSecond)
             : 0;
 
