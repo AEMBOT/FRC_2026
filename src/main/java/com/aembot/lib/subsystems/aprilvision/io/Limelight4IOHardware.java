@@ -31,6 +31,21 @@ import org.littletonrobotics.junction.Logger;
 import org.opencv.core.Point;
 
 public class Limelight4IOHardware implements AprilCameraIO {
+  // MegaTag2 stddev indices in Limelight's 12-element stddevs array
+  private static final int MEGATAG2_X_STDDEV_INDEX = 6;
+  private static final int MEGATAG2_Y_STDDEV_INDEX = 7;
+  private static final int EXPECTED_STDDEV_ARRAY_LENGTH = 12;
+
+  // Fallback stddev when Limelight doesn't provide valid data
+  private static final double FALLBACK_TRANSLATION_STDDEV = 0.5;
+
+  // Filtering thresholds for MegaTag2 best practices
+  /** Max rotation rate (rad/s) before rejecting single-tag estimates entirely */
+  private static final double MAX_OMEGA_FOR_SINGLE_TAG = Units.degreesToRadians(150);
+
+  /** Max rotation rate (rad/s) before rejecting all estimates entirely */
+  private static final double MAX_OMEGA_FOR_ANY_TAG = Units.degreesToRadians(360);
+
   protected final CameraConfiguration cameraConfiguration;
   protected final YearFieldConstantable fieldConstants;
 
@@ -78,8 +93,6 @@ public class Limelight4IOHardware implements AprilCameraIO {
   private AtomicReference<double[]> limelightStdDevs = new AtomicReference<>(new double[0]);
 
   protected final Consumer<NetworkTableEvent> heartbeatCallback = this::updateNtValuesCache;
-
-  private double cachedRobotYaw = 0;
 
   protected Transform2d horizontalCameraOffset;
 
@@ -164,51 +177,69 @@ public class Limelight4IOHardware implements AprilCameraIO {
   }
 
   private void setRobotYawNetworkTables() {
-
     double robotYaw = robotStateInstance.getLatestFieldRobotPose().getRotation().getDegrees();
     double robotYawRate =
         Units.radiansToDegrees(
             robotStateInstance.getLatestMeasuredFieldRelativeChassisSpeeds().omegaRadiansPerSecond);
-    double deltaYaw = robotYaw - cachedRobotYaw;
 
-    // if (Math.abs(deltaYaw) > 0.25) {
     LimelightHelpers.SetRobotOrientation_NoFlush(cameraName, robotYaw, robotYawRate, 0, 0, 0, 0);
-    cachedRobotYaw = robotYaw;
-    // }
   }
 
   private VisionPoseEstimation getMegatag2Estimate() {
-
-    VisionPoseEstimation poseEstimation;
-
     setRobotYawNetworkTables();
 
     PoseEstimate estimate = megatag2Estimate.get();
-    // Check that there actually is an estimate, and that we haven't processed it yet
-    boolean garbageData = estimate.avgTagDist < 0.56; // TODO MAGIC NUMBER AAAAAA
-    if (estimate.tagCount > 0
-        && estimate.timestampSeconds != lastMegatag2Timestamp
-        && !garbageData) {
-      Pose2d latencyUncompensatedPose = estimate.pose.plus(horizontalCameraOffset);
-      Pose2d latencyCompensatedPose =
-          compensateForEstimateLatency(
-              latencyUncompensatedPose,
-              robotStateInstance.getLatestFusedFieldRelativeChassisSpeed(),
-              Timer.getFPGATimestamp() - (estimate.timestampSeconds));
 
-      lastMegatag2Timestamp = estimate.timestampSeconds;
-
-      poseEstimation =
-          new VisionPoseEstimation(
-              latencyUncompensatedPose,
-              latencyCompensatedPose,
-              getStdDevs(estimate),
-              estimate.timestampSeconds);
-    } else {
-      poseEstimation = new VisionPoseEstimation(null, null, null, Double.NaN);
+    // Early exit if no valid estimate or already processed
+    if (estimate.tagCount <= 0 || estimate.timestampSeconds == lastMegatag2Timestamp) {
+      return new VisionPoseEstimation(null, null, null, Double.NaN);
     }
 
-    return poseEstimation;
+    // Get current rotation rate for filtering
+    double omegaRadPerSec =
+        Math.abs(
+            robotStateInstance
+                .getLatestMeasuredFieldRelativeChassisSpeeds()
+                .omegaRadiansPerSecond);
+
+    // === FILTERING CHECKS ===
+
+    // 1. Reject if too close (garbage data from being inside tag)
+    boolean tooClose = estimate.avgTagDist < 0.56;
+
+    // 2. Rotation rate filtering - stricter for single tag
+    boolean rotatingTooFast;
+    if (estimate.tagCount == 1) {
+      rotatingTooFast = omegaRadPerSec > MAX_OMEGA_FOR_SINGLE_TAG;
+    } else {
+      rotatingTooFast = omegaRadPerSec > MAX_OMEGA_FOR_ANY_TAG;
+    }
+
+    // Log rejection reasons for debugging
+    Logger.recordOutput(cameraName + "/Vision/omegaRadPerSec", omegaRadPerSec);
+    Logger.recordOutput(cameraName + "/Vision/rejectedTooClose", tooClose);
+    Logger.recordOutput(cameraName + "/Vision/rejectedRotation", rotatingTooFast);
+
+    if (tooClose || rotatingTooFast) {
+      return new VisionPoseEstimation(null, null, null, Double.NaN);
+    }
+
+    // === POSE PROCESSING ===
+
+    Pose2d latencyUncompensatedPose = estimate.pose.plus(horizontalCameraOffset);
+    Pose2d latencyCompensatedPose =
+        compensateForEstimateLatency(
+            latencyUncompensatedPose,
+            robotStateInstance.getLatestFusedFieldRelativeChassisSpeed(),
+            Timer.getFPGATimestamp() - estimate.timestampSeconds);
+
+    lastMegatag2Timestamp = estimate.timestampSeconds;
+
+    return new VisionPoseEstimation(
+        latencyUncompensatedPose,
+        latencyCompensatedPose,
+        getStdDevs(estimate),
+        estimate.timestampSeconds);
   }
 
   /**
@@ -227,16 +258,80 @@ public class Limelight4IOHardware implements AprilCameraIO {
     }
   }
 
-  /** Get standard deviations for the given pose estimate */
+  /**
+   * Get standard deviations for the given pose estimate using Limelight-provided stddevs with
+   * quality scaling. Implements best practices from top FRC teams for MegaTag2.
+   */
   protected OdometryStandardDevs getStdDevs(PoseEstimate estimate) {
-    // Yoinked from 2481
-    double stdDevFactor = Math.pow(estimate.avgTagDist, 2) / estimate.tagCount;
+    double[] stdDevArray = limelightStdDevs.get();
 
-    double translationStddev = cameraConfiguration.baselineTranslationalStdDev * stdDevFactor;
-    Double angularStddev = cameraConfiguration.baselineAngularStdDev * stdDevFactor;
+    double xStdDev;
+    double yStdDev;
 
+    // Use Limelight-provided stddevs if available, otherwise fall back to calculated
+    if (stdDevArray.length >= EXPECTED_STDDEV_ARRAY_LENGTH) {
+      xStdDev = stdDevArray[MEGATAG2_X_STDDEV_INDEX];
+      yStdDev = stdDevArray[MEGATAG2_Y_STDDEV_INDEX];
+
+      // Sanity check - if Limelight returns 0 or negative, use fallback
+      if (xStdDev <= 0 || yStdDev <= 0) {
+        xStdDev = FALLBACK_TRANSLATION_STDDEV;
+        yStdDev = FALLBACK_TRANSLATION_STDDEV;
+      }
+    } else {
+      // Fallback: calculate stddev using distance and tag count (original method)
+      double stdDevFactor = Math.pow(estimate.avgTagDist, 2) / estimate.tagCount;
+      xStdDev = cameraConfiguration.baselineTranslationalStdDev * stdDevFactor;
+      yStdDev = xStdDev;
+    }
+
+    // Calculate quality score (similar to Team 254's approach)
+    // Multi-tag = high quality, single tag = quality based on tag area
+    double quality;
+    if (estimate.tagCount > 1) {
+      quality = 1.0;
+    } else {
+      // Single tag: quality scales with tag area (larger = closer = better)
+      // avgTagArea is percentage of image, typical values 0.1 - 10%
+      quality = Math.min(1.0, Math.max(0.1, estimate.avgTagArea / 5.0));
+    }
+
+    // Scale stddevs by inverse quality (lower quality = higher stddev = less trust)
+    double qualityScaleFactor = 1.0 / quality;
+    xStdDev *= qualityScaleFactor;
+    yStdDev *= qualityScaleFactor;
+
+    // Get chassis speeds for motion penalties
+    var chassisSpeeds = robotStateInstance.getLatestMeasuredFieldRelativeChassisSpeeds();
+
+    // Apply rotation rate penalty - MegaTag2 becomes less reliable when rotating
+    double omegaRadPerSec = Math.abs(chassisSpeeds.omegaRadiansPerSecond);
+    // Linear penalty: at 1 rad/s (~57°/s), stddev is doubled
+    double rotationPenalty = 1.0 + omegaRadPerSec;
+    xStdDev *= rotationPenalty;
+    yStdDev *= rotationPenalty;
+
+    // Apply translational velocity penalty - motion blur degrades vision
+    double translationalVelocity =
+        Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+    // Gentle penalty: at 2 m/s, stddev increases by 50%
+    double translationPenalty = 1.0 + (translationalVelocity * 0.25);
+    xStdDev *= translationPenalty;
+    yStdDev *= translationPenalty;
+
+    // Use the larger of the two for a conservative estimate
+    double xyStdDev = Math.max(xStdDev, yStdDev);
+
+    // Log for debugging
+    Logger.recordOutput(cameraName + "/Vision/quality", quality);
+    Logger.recordOutput(cameraName + "/Vision/qualityScaleFactor", qualityScaleFactor);
+    Logger.recordOutput(cameraName + "/Vision/rotationPenalty", rotationPenalty);
+    Logger.recordOutput(cameraName + "/Vision/translationPenalty", translationPenalty);
+    Logger.recordOutput(cameraName + "/Vision/xyStdDevPreOdomAdjust", xyStdDev);
+
+    // Apply final adjustment based on odometry vs vision pose divergence
     return adjustStdDevsWithOdomPose(
-        new OdometryStandardDevs(translationStddev, translationStddev, Double.MAX_VALUE),
+        new OdometryStandardDevs(xyStdDev, xyStdDev, Double.MAX_VALUE),
         estimate.timestampSeconds,
         estimate.pose);
   }
