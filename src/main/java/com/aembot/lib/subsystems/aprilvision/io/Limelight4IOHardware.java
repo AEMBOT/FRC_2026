@@ -256,9 +256,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
     Pose2d latencyUncompensatedPose =
         new Pose2d(
-            estimate.pose.getX() - fieldOffsetX,
-            estimate.pose.getY() - fieldOffsetY,
-            robotYaw);
+            estimate.pose.getX() - fieldOffsetX, estimate.pose.getY() - fieldOffsetY, robotYaw);
 
     lastMegatag2Timestamp = estimate.timestampSeconds;
 
@@ -319,15 +317,20 @@ public class Limelight4IOHardware implements AprilCameraIO {
       quality = 0.05;
     } else if (avgArea < TAG_AREA_FAR_THRESHOLD) {
       // Far but usable (0.05% - 0.1%) - low quality, interpolate 0.1 to 0.3
-      double t = (avgArea - TAG_AREA_REJECT_THRESHOLD) / (TAG_AREA_FAR_THRESHOLD - TAG_AREA_REJECT_THRESHOLD);
+      double t =
+          (avgArea - TAG_AREA_REJECT_THRESHOLD)
+              / (TAG_AREA_FAR_THRESHOLD - TAG_AREA_REJECT_THRESHOLD);
       quality = 0.1 + (t * 0.2);
     } else if (avgArea < TAG_AREA_MEDIUM_THRESHOLD) {
       // Medium range (0.1% - 1%) - moderate quality, interpolate 0.3 to 0.6
-      double t = (avgArea - TAG_AREA_FAR_THRESHOLD) / (TAG_AREA_MEDIUM_THRESHOLD - TAG_AREA_FAR_THRESHOLD);
+      double t =
+          (avgArea - TAG_AREA_FAR_THRESHOLD) / (TAG_AREA_MEDIUM_THRESHOLD - TAG_AREA_FAR_THRESHOLD);
       quality = 0.3 + (t * 0.3);
     } else if (avgArea < TAG_AREA_GOOD_THRESHOLD) {
       // Good range (1% - 5%) - high quality, interpolate 0.6 to 0.9
-      double t = (avgArea - TAG_AREA_MEDIUM_THRESHOLD) / (TAG_AREA_GOOD_THRESHOLD - TAG_AREA_MEDIUM_THRESHOLD);
+      double t =
+          (avgArea - TAG_AREA_MEDIUM_THRESHOLD)
+              / (TAG_AREA_GOOD_THRESHOLD - TAG_AREA_MEDIUM_THRESHOLD);
       quality = 0.6 + (t * 0.3);
     } else {
       // Very close (>5%) - excellent quality
