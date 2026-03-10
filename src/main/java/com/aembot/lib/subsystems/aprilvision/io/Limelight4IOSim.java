@@ -1,12 +1,10 @@
 package com.aembot.lib.subsystems.aprilvision.io;
 
-import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
 import com.aembot.lib.math.PositionUtil;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionInputs;
-import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers.PoseEstimate;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -16,6 +14,7 @@ import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.function.BiFunction;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -80,6 +79,12 @@ public class Limelight4IOSim extends Limelight4IOHardware {
    */
   protected final NetworkTableEntry rawFiducialsEntry;
 
+  /**
+   * double[] NT entry for standard deviations. In format: [MT1x, MT1y, MT1z, MT1roll, MT1pitch,
+   * MT1yaw, MT2x, MT2y, MT2z, MT2roll, MT2pitch, MT2yaw]
+   */
+  protected final NetworkTableEntry stddevsEntry;
+
   /* ---- END NETWORK TABLES ENTRIES ---- */
 
   private final VisionSystemSim visionSystemSim;
@@ -90,6 +95,9 @@ public class Limelight4IOSim extends Limelight4IOHardware {
   private final PhotonCameraSim photonCameraSim;
 
   private final PhotonPoseEstimator photonPoseEstimator;
+
+  /** Random number generator for simulation noise */
+  private final Random random = new Random();
 
   /** Heartbeat value of the simulated limelight. Resets at 2 billion */
   private int heartbeat = 0;
@@ -134,6 +142,7 @@ public class Limelight4IOSim extends Limelight4IOHardware {
     robotOrientationEntry = networkTable.getEntry("robot_orientation_set");
     megatag2PoseEstimateEntry = networkTable.getEntry("botpose_orb_wpiblue");
     rawFiducialsEntry = networkTable.getEntry("rawfiducials");
+    stddevsEntry = networkTable.getEntry("stddevs");
   }
 
   @Override
@@ -212,6 +221,36 @@ public class Limelight4IOSim extends Limelight4IOHardware {
         avgDistance /= data.targetsUsed.size();
         avgTagArea /= data.targetsUsed.size();
 
+        // PhotonPoseEstimator returns robot center pose, but hardware LL returns
+        // pose at camera XY location (since we set X=0, Y=0 to LL in hardware).
+        // Add camera XY offset to match hardware behavior so that
+        // transformPoseForMechanism() works correctly for both paths.
+        Pose3d cameraPosition = cameraConfiguration.getCameraPosition();
+        double robotYaw = estimatedPose.getRotation().getZ();
+        double cosYaw = Math.cos(robotYaw);
+        double sinYaw = Math.sin(robotYaw);
+        double fieldOffsetX = cameraPosition.getX() * cosYaw - cameraPosition.getY() * sinYaw;
+        double fieldOffsetY = cameraPosition.getX() * sinYaw + cameraPosition.getY() * cosYaw;
+
+        // Apply pose noise scaled by distance squared (more noise when farther)
+        double distanceScale = Math.max(1.0, avgDistance * avgDistance);
+        double noiseX = 0;
+        double noiseY = 0;
+        double noiseYaw = 0;
+        if (simConfig.poseNoiseTranslationStdDev > 0) {
+          noiseX = random.nextGaussian() * simConfig.poseNoiseTranslationStdDev * distanceScale;
+          noiseY = random.nextGaussian() * simConfig.poseNoiseTranslationStdDev * distanceScale;
+        }
+        if (simConfig.poseNoiseRotationStdDev > 0) {
+          noiseYaw = random.nextGaussian() * simConfig.poseNoiseRotationStdDev * distanceScale;
+        }
+
+        // Apply latency variation
+        double latencyVariation = 0;
+        if (simConfig.latencyVariationMs > 0) {
+          latencyVariation = Math.abs(random.nextGaussian() * simConfig.latencyVariationMs);
+        }
+
         /*
          * Array to be published to NT4. In format: Translation (X,Y,Z) in meters
          * Rotation(Roll,Pitch,Yaw) in degrees, total latency (cl+tl), tag count, tag span, average
@@ -219,13 +258,13 @@ public class Limelight4IOSim extends Limelight4IOHardware {
          */
         megatag2PoseEstimateEntry.setDoubleArray(
             new Double[] {
-              estimatedPose.getX(),
-              estimatedPose.getY(),
+              estimatedPose.getX() + fieldOffsetX + noiseX,
+              estimatedPose.getY() + fieldOffsetY + noiseY,
               estimatedPose.getZ(),
               Units.radiansToDegrees(estimatedPose.getRotation().getX()),
               Units.radiansToDegrees(estimatedPose.getRotation().getY()),
-              Units.radiansToDegrees(estimatedPose.getRotation().getZ()),
-              captureLatencyEntry.getDouble(0),
+              Units.radiansToDegrees(estimatedPose.getRotation().getZ() + noiseYaw),
+              captureLatencyEntry.getDouble(0) + latencyVariation,
               (double) data.targetsUsed.size(),
               0.0, // I'm not entirely sure what span is or how to get it, so... hopefully it's
               // not
@@ -233,9 +272,36 @@ public class Limelight4IOSim extends Limelight4IOHardware {
               avgDistance,
               avgTagArea
             });
+
+        // Publish simulated standard deviations based on tag count and distance
+        // Format: [MT1x, MT1y, MT1z, MT1roll, MT1pitch, MT1yaw, MT2x, MT2y, MT2z, MT2roll,
+        // MT2pitch,
+        // MT2yaw]
+        double stdDevFactor = Math.pow(avgDistance, 2) / data.targetsUsed.size();
+        double translationStdDev = cameraConfiguration.baselineTranslationalStdDev * stdDevFactor;
+        double rotationStdDev = cameraConfiguration.baselineAngularStdDev * stdDevFactor;
+
+        stddevsEntry.setDoubleArray(
+            new double[] {
+              // MT1 (not used since we simulate MegaTag2, but fill with same values)
+              translationStdDev, // MT1x
+              translationStdDev, // MT1y
+              translationStdDev, // MT1z
+              rotationStdDev, // MT1roll
+              rotationStdDev, // MT1pitch
+              rotationStdDev, // MT1yaw
+              // MT2 (MegaTag2 values)
+              translationStdDev, // MT2x
+              translationStdDev, // MT2y
+              translationStdDev, // MT2z
+              rotationStdDev, // MT2roll
+              rotationStdDev, // MT2pitch
+              rotationStdDev // MT2yaw
+            });
       } else {
         // LimelightHelpers will correctly read this as no data
         megatag2PoseEstimateEntry.setDoubleArray(new Double[0]);
+        stddevsEntry.setDoubleArray(new double[0]);
       }
     }
   }
@@ -265,20 +331,6 @@ public class Limelight4IOSim extends Limelight4IOHardware {
     }
 
     rawFiducialsEntry.setDoubleArray(rawFiducials.toArray(new Double[rawFiducials.size() / 7]));
-  }
-
-  @Override
-  public OdometryStandardDevs getStdDevs(PoseEstimate estimate) {
-    // Yoinked from 2481
-    double stdDevFactor = Math.pow(estimate.avgTagDist, 2) / estimate.tagCount;
-
-    double translationStddev = cameraConfiguration.baselineTranslationalStdDev * stdDevFactor;
-    Double angularStddev = cameraConfiguration.baselineAngularStdDev * stdDevFactor;
-
-    return adjustStdDevsWithOdomPose(
-        new OdometryStandardDevs(translationStddev, translationStddev, angularStddev),
-        estimate.timestampSeconds,
-        estimate.pose);
   }
 
   @Override

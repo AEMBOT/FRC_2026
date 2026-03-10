@@ -13,6 +13,24 @@ public class SimulatedCameraConfiguration {
   /** The photonvision pose estimation strategy to be used in sim. */
   public PoseStrategy estimationStrategy = PoseStrategy.CONSTRAINED_SOLVEPNP;
 
+  /**
+   * Standard deviation of translational noise (meters) to add to pose estimates at 1 meter
+   * distance. Scales with distance squared. Set to 0 to disable.
+   */
+  public double poseNoiseTranslationStdDev = 0.0;
+
+  /**
+   * Standard deviation of rotational noise (radians) to add to pose estimates at 1 meter distance.
+   * Scales with distance squared. Set to 0 to disable.
+   */
+  public double poseNoiseRotationStdDev = 0.0;
+
+  /**
+   * Additional random latency variation (milliseconds) to add on top of PhotonVision's latency.
+   * This simulates frame-to-frame processing time variation.
+   */
+  public double latencyVariationMs = 0.0;
+
   public SimulatedCameraConfiguration(CameraConfiguration cameraConfiguration) {
     this.cameraConfiguration = cameraConfiguration;
 
@@ -92,6 +110,31 @@ public class SimulatedCameraConfiguration {
    */
   public SimulatedCameraConfiguration withPoseEstimationStrategy(PoseStrategy strategy) {
     this.estimationStrategy = strategy;
+    return this;
+  }
+
+  /**
+   * Set Gaussian noise to add to pose estimates. Noise scales with distance squared.
+   *
+   * @param translationStdDevMeters Standard deviation of XY noise (meters) at 1 meter distance
+   * @param rotationStdDevRadians Standard deviation of yaw noise (radians) at 1 meter distance
+   * @return This {@link SimulatedCameraConfiguration} for chaining
+   */
+  public SimulatedCameraConfiguration withPoseNoise(
+      double translationStdDevMeters, double rotationStdDevRadians) {
+    this.poseNoiseTranslationStdDev = translationStdDevMeters;
+    this.poseNoiseRotationStdDev = rotationStdDevRadians;
+    return this;
+  }
+
+  /**
+   * Set additional latency variation to simulate frame-to-frame processing time differences.
+   *
+   * @param stdDevMs Standard deviation of latency variation in milliseconds
+   * @return This {@link SimulatedCameraConfiguration} for chaining
+   */
+  public SimulatedCameraConfiguration withLatencyVariation(double stdDevMs) {
+    this.latencyVariationMs = stdDevMs;
     return this;
   }
 
