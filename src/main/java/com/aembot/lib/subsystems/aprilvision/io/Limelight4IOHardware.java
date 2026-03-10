@@ -184,16 +184,22 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
   private void setRobotYawNetworkTables() {
     double robotYaw = robotStateInstance.getLatestFieldRobotPose().getRotation().getDegrees();
-    double robotYawRate =
-        Units.radiansToDegrees(
-            robotStateInstance.getLatestMeasuredFieldRelativeChassisSpeeds().omegaRadiansPerSecond);
 
     // Add mechanism origin yaw (e.g., turret rotation) so the LL knows its actual field orientation
     double mechanismYawDegrees =
         Units.radiansToDegrees(cameraConfiguration.mechanismOrigin.get().getRotation().getZ());
 
+    // For mechanism-mounted cameras, set yaw rate to 0 since we don't have mechanism velocity
+    double yawRate =
+        mechanismYawDegrees == 0
+            ? Units.radiansToDegrees(
+                robotStateInstance
+                    .getLatestMeasuredFieldRelativeChassisSpeeds()
+                    .omegaRadiansPerSecond)
+            : 0;
+
     LimelightHelpers.SetRobotOrientation_NoFlush(
-        cameraName, robotYaw + mechanismYawDegrees, robotYawRate, 0, 0, 0, 0);
+        cameraName, robotYaw + mechanismYawDegrees, yawRate, 0, 0, 0, 0);
   }
 
   private VisionPoseEstimation getMegatag2Estimate() {
