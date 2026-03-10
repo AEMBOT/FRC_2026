@@ -55,6 +55,9 @@ deploy {
                     // unpredictable page-fault latency during a match. The trade-off is a slightly
                     // slower startup, which is fine since it happens before the match begins.
                     jvmArgs.add("-XX:+AlwaysPreTouch")
+
+                    // AEMTracer Java agent for annotation-based tracing
+                    jvmArgs.add("-javaagent:/home/lvuser/deploy/AEMTracer-1.0.0.jar")
                 }
 
                 // Static files artifact
@@ -134,6 +137,13 @@ jar {
     manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
+
+// Copy AEMTracer jar to deploy directory for javaagent
+task copyTracerJar(type: Copy) {
+    from configurations.runtimeClasspath.filter { it.name.contains('AEMTracer') }
+    into 'src/main/deploy'
+}
+deploy.targets.roborio.artifacts.frcStaticFileDeploy.dependsOn copyTracerJar
 
 // Configure jar and deploy tasks
 deployArtifact.jarTask = jar

@@ -24,6 +24,7 @@ public final class Main {
     // Install @Traced annotation support before any robot classes are loaded
     TracingBootstrap.install();
     TracingBootstrap.installCommandTracing();
+    TracingBootstrap.installLoggerTracing();
 
     RobotBase.startRobot(Robot::new);
   }
