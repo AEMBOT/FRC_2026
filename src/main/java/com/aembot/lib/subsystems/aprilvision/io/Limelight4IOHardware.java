@@ -183,12 +183,17 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
     setRobotYawNetworkTables();
 
+    double robotYawRate =
+        Units.radiansToDegrees(
+            robotStateInstance.getLatestMeasuredFieldRelativeChassisSpeeds().omegaRadiansPerSecond);
+
     PoseEstimate estimate = megatag2Estimate.get();
     // Check that there actually is an estimate, and that we haven't processed it yet
     boolean garbageData = estimate.avgTagDist < 0.56; // TODO MAGIC NUMBER AAAAAA
     if (estimate.tagCount > 0
         && estimate.timestampSeconds != lastMegatag2Timestamp
-        && !garbageData) {
+        && !garbageData
+        && robotYawRate < 50) { // TODO magic number
       Pose2d latencyUncompensatedPose = estimate.pose.plus(horizontalCameraOffset);
       Pose2d latencyCompensatedPose =
           compensateForEstimateLatency(
