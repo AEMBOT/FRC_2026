@@ -12,6 +12,7 @@ import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers;
 import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers.PoseEstimate;
 import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
@@ -25,6 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import org.littletonrobotics.junction.Logger;
 import org.opencv.core.Point;
 
 public class Limelight4IOHardware implements AprilCameraIO {
@@ -74,9 +76,9 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
   private AtomicReference<double[]> limelightStdDevs = new AtomicReference<>(new double[0]);
 
-  private int cachedThrottleValue = 0;
-
   protected final Consumer<NetworkTableEvent> heartbeatCallback = this::updateNtValuesCache;
+
+  private double cachedRobotYaw = 0;
 
   public Limelight4IOHardware(
       CameraConfiguration config,
@@ -93,6 +95,17 @@ public class Limelight4IOHardware implements AprilCameraIO {
     NetworkTableInstance.getDefault()
         .addListener(
             heartbeatEntry, EnumSet.of(NetworkTableEvent.Kind.kValueAll), heartbeatCallback);
+
+    Pose3d cameraPosition = cameraConfiguration.getCameraPosition();
+
+    LimelightHelpers.setCameraPose_RobotSpace(
+        cameraName,
+        cameraPosition.getX(),
+        -cameraPosition.getY(),
+        cameraPosition.getZ(),
+        Units.radiansToDegrees(cameraPosition.getRotation().getX()),
+        -Units.radiansToDegrees(cameraPosition.getRotation().getY()),
+        Units.radiansToDegrees(cameraPosition.getRotation().getZ()));
   }
 
   /**
@@ -139,22 +152,30 @@ public class Limelight4IOHardware implements AprilCameraIO {
         coprocessorPoseEstimation.latencyCompensatedPose();
     inputs.coprocessorEstimationStdDevs = coprocessorPoseEstimation.stdDevs();
     inputs.coprocessorEstimationTimestamp = coprocessorPoseEstimation.timestampSeconds();
+
+    Logger.recordOutput(
+        cameraName + "/tempCelsius", LimelightExtras.getCameraTemperature(cameraName));
+  }
+
+  private void setRobotYawNetworkTables() {
+
+    double robotYaw = robotStateInstance.getLatestFieldRobotPose().getRotation().getDegrees();
+    double robotYawRate =
+        Units.radiansToDegrees(
+            robotStateInstance.getLatestMeasuredFieldRelativeChassisSpeeds().omegaRadiansPerSecond);
+    double deltaYaw = robotYaw - cachedRobotYaw;
+
+    // if (Math.abs(deltaYaw) > 0.25) {
+    LimelightHelpers.SetRobotOrientation_NoFlush(cameraName, robotYaw, robotYawRate, 0, 0, 0, 0);
+    cachedRobotYaw = robotYaw;
+    // }
   }
 
   private VisionPoseEstimation getMegatag2Estimate() {
-    LimelightHelpers.setCameraPose_RobotSpace(
-        cameraName,
-        cameraConfiguration.getCameraPosition().getX(),
-        -cameraConfiguration.getCameraPosition().getY(),
-        cameraConfiguration.getCameraPosition().getZ(),
-        Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getX()),
-        -Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getY()),
-        Units.radiansToDegrees(cameraConfiguration.getCameraPosition().getRotation().getZ()));
 
-    LimelightHelpers.SetIMUMode(cameraName, 1);
+    VisionPoseEstimation poseEstimation;
 
-    double robotYaw = robotStateInstance.getLatestFieldRobotPose().getRotation().getDegrees();
-    LimelightHelpers.SetRobotOrientation(cameraName, robotYaw, 0, 0, 0, 0, 0);
+    setRobotYawNetworkTables();
 
     PoseEstimate estimate = megatag2Estimate.get();
     // Check that there actually is an estimate, and that we haven't processed it yet
@@ -167,19 +188,21 @@ public class Limelight4IOHardware implements AprilCameraIO {
           compensateForEstimateLatency(
               estimate.pose,
               robotStateInstance.getLatestFusedFieldRelativeChassisSpeed(),
-              Timer.getFPGATimestamp()
-                  - (estimate.timestampSeconds - Units.millisecondsToSeconds(estimate.latency)));
+              Timer.getFPGATimestamp() - (estimate.timestampSeconds));
 
       lastMegatag2Timestamp = estimate.timestampSeconds;
 
-      return new VisionPoseEstimation(
-          latencyUncompensatedPose,
-          latencyCompensatedPose,
-          getStdDevs(estimate),
-          estimate.timestampSeconds);
+      poseEstimation =
+          new VisionPoseEstimation(
+              latencyUncompensatedPose,
+              latencyCompensatedPose,
+              getStdDevs(estimate),
+              estimate.timestampSeconds);
     } else {
-      return new VisionPoseEstimation(null, null, null, Double.NaN);
+      poseEstimation = new VisionPoseEstimation(null, null, null, Double.NaN);
     }
+
+    return poseEstimation;
   }
 
   /**
@@ -228,20 +251,14 @@ public class Limelight4IOHardware implements AprilCameraIO {
   }
 
   @Override
-  public void throttleForDisabled() {
-    if (cachedThrottleValue != this.cameraConfiguration.disabledThrottleValue) {
-      LimelightHelpers.SetThrottle(
-          cameraName, (int) this.cameraConfiguration.disabledThrottleValue);
-      cachedThrottleValue = (int) this.cameraConfiguration.disabledThrottleValue;
-    }
+  public void updateNetworkTablesForDisabled() {
+    LimelightHelpers.SetThrottle(cameraName, this.cameraConfiguration.disabledThrottleValue);
+    LimelightHelpers.SetIMUMode(cameraName, this.cameraConfiguration.disabledIMUMode);
   }
 
   @Override
-  public void throttleForEnabled() {
-    if (cachedThrottleValue != this.cameraConfiguration.enabledThrottledValue) {
-      LimelightHelpers.SetThrottle(
-          cameraName, (int) this.cameraConfiguration.enabledThrottledValue);
-      cachedThrottleValue = (int) this.cameraConfiguration.enabledThrottledValue;
-    }
+  public void updateNetworkTablesForEnabled() {
+    LimelightHelpers.SetThrottle(cameraName, this.cameraConfiguration.enabledThrottledValue);
+    LimelightHelpers.SetIMUMode(cameraName, this.cameraConfiguration.enabledIMUMode);
   }
 }

@@ -16,6 +16,14 @@ public class ProductionCameraConfig {
 
   private static final double SIM_CAMERA_LATENCY_STDDEV_MS = 1;
 
+  private static final int DISABLED_THROTTLE = 100;
+
+  private static final int ENABLED_THROTTLE = 1;
+
+  private static final int DISABLED_IMU_MODE = 0;
+
+  private static final int ENABLED_IMU_MODE = 0;
+
   /* ---- TURRET CAM ---- */
   public final CameraConfiguration cameraConfigTurret =
       CameraConfiguration.makeLimelight4Config("turret")
@@ -37,7 +45,11 @@ public class ProductionCameraConfig {
                       Units.inchesToMeters(6.0625),
                       Units.inchesToMeters(0),
                       Units.inchesToMeters(18.75)),
-                  new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(27), 0.0)));
+                  new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(27), 0.0)))
+          .withDisabledThrottleValue(DISABLED_THROTTLE)
+          .withEnabledThrottleValue(ENABLED_THROTTLE)
+          .withDisabledIMUMode(DISABLED_IMU_MODE)
+          .withEnabledIMUMode(ENABLED_IMU_MODE);
 
   public final SimulatedCameraConfiguration simConfigTurret =
       new SimulatedCameraConfiguration(cameraConfigTurret)
@@ -57,7 +69,11 @@ public class ProductionCameraConfig {
                   new Rotation3d(
                       Units.degreesToRadians(180),
                       Units.degreesToRadians(-27),
-                      Units.degreesToRadians(-90))));
+                      Units.degreesToRadians(-90))))
+          .withDisabledThrottleValue(DISABLED_THROTTLE)
+          .withEnabledThrottleValue(ENABLED_THROTTLE)
+          .withDisabledIMUMode(DISABLED_IMU_MODE)
+          .withEnabledIMUMode(ENABLED_IMU_MODE);
 
   public final SimulatedCameraConfiguration simConfigRight =
       new SimulatedCameraConfiguration(cameraConfigRight)
@@ -77,7 +93,12 @@ public class ProductionCameraConfig {
                   new Rotation3d(
                       Units.degreesToRadians(180),
                       Units.degreesToRadians(-27),
-                      Units.degreesToRadians(90))));
+                      Units.degreesToRadians(90))))
+          .withDisabledThrottleValue(DISABLED_THROTTLE)
+          .withEnabledThrottleValue(ENABLED_THROTTLE)
+          .withDisabledIMUMode(DISABLED_IMU_MODE)
+          .withEnabledIMUMode(ENABLED_IMU_MODE);
+
   public final SimulatedCameraConfiguration simConfigLeft =
       new SimulatedCameraConfiguration(cameraConfigLeft)
           .withFramerate(SIM_CAMERA_FPS)
@@ -96,7 +117,11 @@ public class ProductionCameraConfig {
                   new Rotation3d(
                       Units.degreesToRadians(180),
                       Units.degreesToRadians(-27),
-                      Units.degreesToRadians(180))));
+                      Units.degreesToRadians(180))))
+          .withDisabledThrottleValue(DISABLED_THROTTLE)
+          .withEnabledThrottleValue(ENABLED_THROTTLE)
+          .withDisabledIMUMode(DISABLED_IMU_MODE)
+          .withEnabledIMUMode(ENABLED_IMU_MODE);
 
   public final SimulatedCameraConfiguration simConfigBack =
       new SimulatedCameraConfiguration(cameraConfigBack)

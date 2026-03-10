@@ -1,9 +1,12 @@
 package com.aembot.frc2026.config.robots;
 
+import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
 import com.aembot.lib.config.subsystems.intake.overBumper.run.TalonFXOverBumperIntakeRollerConfiguration;
+import com.aembot.lib.config.wrappers.ConfigureSlot0Gains;
+import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.aembot.lib.core.motors.interfaces.MotorIO.NeutralMode;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -24,7 +27,7 @@ public class ProductionIntakeConfig {
 
   public final int ROLLER_CAN_ID = 50;
 
-  public final double UP_DEPLOY_ANGLE = 92.897821;
+  public final double UP_DEPLOY_ANGLE = 140;
 
   public final double DOWN_DEPLOY_ANGLE = 8.206357; // Less temporary
 
@@ -36,15 +39,19 @@ public class ProductionIntakeConfig {
 
   public final NeutralMode DEPLOY_NEUTRAL_MODE = NeutralMode.BRAKE;
 
-  public final double ZEROING_VOLTAGE = 2.0;
+  public final double ZEROING_VOLTAGE = 4.0;
 
   public final String SUBSYSTEM_NAME = "IntakeSubsystem";
 
   public final double DEPLOY_GEAR_RATIO = 18400.0 / 243.0;
 
-  public final double DEPLOY_CRUISE_VELOCITY_DEG_PER_SEC = 270;
+  public final double DEPLOY_CRUISE_VELOCITY_DEG_PER_SEC = 1.5 * 360;
 
-  public final double DEPLOY_ACCELERATION_DEG_PER_SEC = 180;
+  public final double DEPLOY_ACCELERATION_DEG_PER_SEC = 2 * 360;
+
+  //   public final double DEPLOY_CRUISE_VELOCITY_DEG_PER_SEC = 270;
+
+  //   public final double DEPLOY_ACCELERATION_DEG_PER_SEC = 180;
 
   public final double ROLLER_GEAR_RATIO = 1;
 
@@ -60,6 +67,11 @@ public class ProductionIntakeConfig {
 
   public final Pose3d DEPLOY_PIVOT_POINT =
       new Pose3d(0.298443, 0, 0.189832, new Rotation3d(0, Math.PI / 2, 0));
+
+  public final ConfigureSlot0Gains DEPLOY_SLOT_0_CONFIGS =
+      (RobotRuntimeConstants.MODE == RuntimeMode.REAL)
+          ? new ConfigureSlot0Gains(0.1, 0.0, 0.0, 0.0, 0.375, 0.121, 0.0)
+          : new ConfigureSlot0Gains(0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
   public final MotorConfiguration<TalonFXConfiguration> DEPLOY_MOTOR_CONFIG =
       new MotorConfiguration<TalonFXConfiguration>()

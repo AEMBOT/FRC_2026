@@ -108,13 +108,19 @@ public class CameraConfiguration {
    * The throttle value when the camera is disabled. What this represents is
    * implementation-specific. On LL, this is the number of frames skipped
    */
-  public double disabledThrottleValue = 0;
+  public int disabledThrottleValue = 0;
 
   /**
    * The throttle value when the camera is enabled. What this represents is implementation-specific.
    * On LL, this is the number of frames skipped
    */
-  public double enabledThrottledValue = 0;
+  public int enabledThrottledValue = 0;
+
+  /** IMUMode to use for pose estimation while disabled */
+  public int disabledIMUMode = 1;
+
+  /** IMUMode to use for pose estimation while enabled */
+  public int enabledIMUMode = 1;
 
   public CameraConfiguration(String name, Type type) {
     this.cameraName = name;
@@ -230,7 +236,7 @@ public class CameraConfiguration {
    *
    * @return this {@link CameraConfiguration} for chaining
    */
-  public CameraConfiguration withDisabledThrottleValue(double disabledThrottleValue) {
+  public CameraConfiguration withDisabledThrottleValue(int disabledThrottleValue) {
     this.disabledThrottleValue = disabledThrottleValue;
     return this;
   }
@@ -241,8 +247,28 @@ public class CameraConfiguration {
    *
    * @return this {@link CameraConfiguration} for chaining
    */
-  public CameraConfiguration withEnabledThrottleValue(double enabledThrottledValue) {
+  public CameraConfiguration withEnabledThrottleValue(int enabledThrottledValue) {
     this.enabledThrottledValue = enabledThrottledValue;
+    return this;
+  }
+
+  /**
+   * Set the IMU mode to use while disabled
+   *
+   * @return
+   */
+  public CameraConfiguration withDisabledIMUMode(int disabledIMUMode) {
+    this.disabledIMUMode = disabledIMUMode;
+    return this;
+  }
+
+  /**
+   * Set the IMU mode to use while enabled
+   *
+   * @return
+   */
+  public CameraConfiguration withEnabledIMUMode(int enabledIMUMode) {
+    this.enabledIMUMode = enabledIMUMode;
     return this;
   }
 

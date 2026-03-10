@@ -11,6 +11,7 @@ import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.Logger;
@@ -51,6 +52,8 @@ public class TurretSubsystem
     // setPositionFromEncoders();
 
     setEncoderPosition(config.startingRotation);
+
+    SmartDashboard.putBoolean("Turret Enabled", motorEnabled);
   }
 
   private void setPositionFromEncoders() {
@@ -106,6 +109,8 @@ public class TurretSubsystem
     // Log latency with time between periodic being called and finishing
     Logger.recordOutput(
         logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
+
+    motorEnabled = SmartDashboard.getBoolean("Turret Enabled", motorEnabled);
   }
 
   @Override

@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public final class ShooterCommands {
 
@@ -164,7 +165,7 @@ public final class ShooterCommands {
    * @return amount to boost flywheel speed in m/s
    */
   private double getFlywheelSpeedBoost() {
-    return 4.5;
+    return (RobotRuntimeConstants.MODE == RuntimeMode.REAL) ? 4.5 : 0.4;
   }
 
   /**
@@ -279,7 +280,9 @@ public final class ShooterCommands {
    *     values
    */
   public boolean isShooterNearGoal() {
-    return isFlywheelNearGoal() && isHoodNearGoal() && isTurretNearGoal();
+    boolean yes = isFlywheelNearGoal() && isHoodNearGoal() && isTurretNearGoal();
+    Logger.recordOutput("IsShooterNearGoal", yes);
+    return yes;
   }
 
   /**
