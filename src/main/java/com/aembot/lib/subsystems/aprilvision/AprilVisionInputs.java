@@ -4,6 +4,7 @@ import com.aembot.lib.math.PositionUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import java.util.ArrayList;
 import java.util.List;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
@@ -15,10 +16,10 @@ public class AprilVisionInputs implements LoggableInputs {
   public Pose3d tagPosition = PositionUtil.NaN.POSE3D;
 
   /** Horizontal rotation from the camera's center to the detected tag's center */
-  public Rotation2d horizontalAngleToTag;
+  public Rotation2d horizontalAngleToTag = PositionUtil.NaN.ROTATION2D;
 
   /** Corner positions of the april tag */
-  public List<Point> tagCornerPositions;
+  public List<Point> tagCornerPositions = new ArrayList<>();
 
   /**
    * Ms between the end of the exposure of the middle row of the sensor to the data being published
@@ -32,7 +33,7 @@ public class AprilVisionInputs implements LoggableInputs {
    * Raw pose estimate from the vision coprocessor (e.g., Limelight MegaTag2). This is the
    * unprocessed pose before any RIO-side transformations.
    */
-  public Pose2d rawCoprocessorPose;
+  public Pose2d rawCoprocessorPose = PositionUtil.NaN.POSE2D;
 
   /** Raw standard deviations array from the coprocessor (12-element array for Limelight) */
   public double[] rawStdDevsArray = new double[0];

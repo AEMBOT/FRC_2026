@@ -377,19 +377,12 @@ public class AprilVisionSubsystem extends AEMSubsystem {
     return quality;
   }
 
-  /** Apply rotation and translation velocity penalties to std dev. */
+  /**
+   * Apply motion penalties to std dev. Currently disabled - Limelight's MegaTag2 already increases
+   * its stddev during motion, and high rotation rates are handled by rejecting estimates above
+   * MAX_OMEGA thresholds (150°/s for single tag, 360°/s for multi-tag) in passesFilters().
+   */
   private double applyMotionPenalties(double stdDev, double omegaRadPerSec) {
-    // Rotation penalty: at 1 rad/s (~57°/s), stddev is doubled
-    double rotationPenalty = 1.0 + omegaRadPerSec;
-    stdDev *= rotationPenalty;
-
-    // Translation penalty: at 2 m/s, stddev increases by 50%
-    var chassisSpeeds = robotStateInstance.getLatestMeasuredFieldRelativeChassisSpeeds();
-    double translationalVelocity =
-        Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
-    double translationPenalty = 1.0 + (translationalVelocity * 0.25);
-    stdDev *= translationPenalty;
-
     return stdDev;
   }
 

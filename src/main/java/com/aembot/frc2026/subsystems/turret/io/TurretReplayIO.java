@@ -2,6 +2,7 @@ package com.aembot.frc2026.subsystems.turret.io;
 
 import com.aembot.frc2026.subsystems.turret.TurretInputs;
 import com.aembot.lib.core.encoders.interfaces.CANCoderIO;
+import com.aembot.lib.core.encoders.io.CANCoderIOReplay;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOReplay;
 
@@ -15,12 +16,12 @@ public class TurretReplayIO implements TurretIO {
 
   @Override
   public CANCoderIO getCANcoderA() {
-    return null;
+    return new CANCoderIOReplay();
   }
 
   @Override
   public CANCoderIO getCANcoderB() {
-    return null;
+    return new CANCoderIOReplay();
   }
 
   @Override
