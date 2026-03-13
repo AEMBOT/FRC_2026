@@ -386,22 +386,27 @@ public class AprilVisionSubsystem extends AEMSubsystem {
     return stdDev;
   }
 
-  /** Adjust std devs based on divergence between vision and odometry estimates. */
+  /**
+   * Adjust std devs based on divergence between vision and odometry estimates. Currently disabled -
+   * the penalty could be preveting correcting from wrong initial positions and 254 doesn't use this
+   * approach. Limelight's stddev + rotation rejection provide sufficient protection.
+   */
   private OdometryStandardDevs adjustStdDevsWithOdomPose(
       OdometryStandardDevs unadjustedStdDevs, double timestampSeconds, Pose2d visionPose) {
-    Pose2d odomPose = robotStateInstance.getFieldRobotPoseForTimestamp(timestampSeconds);
+//    Pose2d odomPose = robotStateInstance.getFieldRobotPoseForTimestamp(timestampSeconds);
 
-    if (odomPose == null || visionPose == null) {
-      return unadjustedStdDevs;
-    }
+//    if (odomPose == null || visionPose == null) {
+//      return unadjustedStdDevs;
+//    }
 
-    double distMeters = odomPose.minus(visionPose).getTranslation().getNorm();
-    double factor = 1 + (Math.pow(distMeters, 2) * 2);
+//    double distMeters = odomPose.minus(visionPose).getTranslation().getNorm();
+//    double factor = 1 + (Math.pow(distMeters, 2) * 2);
 
-    return new OdometryStandardDevs(
-        unadjustedStdDevs.xStdDev() * factor,
-        unadjustedStdDevs.yStdDev() * factor,
-        unadjustedStdDevs.rotStdDev() * factor);
+//    return new OdometryStandardDevs(
+//        unadjustedStdDevs.xStdDev() * factor,
+//        unadjustedStdDevs.yStdDev() * factor,
+//        unadjustedStdDevs.rotStdDev() * factor);
+        return unadjustedStdDevs;
   }
 
   @Override
