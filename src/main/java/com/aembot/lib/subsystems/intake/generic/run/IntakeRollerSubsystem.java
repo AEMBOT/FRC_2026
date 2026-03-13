@@ -61,7 +61,8 @@ public class IntakeRollerSubsystem
     state.angularVelocityUnitsPerMin.set(getCurrentVelocity());
 
     state.isActive.set(
-        state.angularVelocityUnitsPerMin.get() > config.kRealMotorConfig.getMechanismRotationsToUnits(1));
+        state.angularVelocityUnitsPerMin.get()
+            > config.kRealMotorConfig.getMechanismRotationsToUnits(1));
 
     stateConsumer.accept(state);
   }

@@ -64,16 +64,21 @@ public class MultiTalonFXIntakeRollerConfig {
 
     String lowerErrors = "";
     if (this.kMotorConfigs != null) {
-        try {
-            this.kMotorConfigs.validate();
-        } catch (VerifyError e) {
-            lowerErrors += e.getMessage() + "\n";
-        }
+      try {
+        this.kMotorConfigs.validate();
+      } catch (VerifyError e) {
+        lowerErrors += e.getMessage() + "\n";
+      }
     }
-    
+
     if (missing.size() != 0 || !lowerErrors.isEmpty()) {
       throw new VerifyError(
-          "Config for " + kName + " does not have a set " + String.join(",", missing) + "\n" + lowerErrors);
+          "Config for "
+              + kName
+              + " does not have a set "
+              + String.join(",", missing)
+              + "\n"
+              + lowerErrors);
     }
 
     return this;
