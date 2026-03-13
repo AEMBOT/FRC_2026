@@ -378,11 +378,26 @@ public class AprilVisionSubsystem extends AEMSubsystem {
   }
 
   /**
-   * Apply motion penalties to std dev. Currently disabled - Limelight's MegaTag2 already increases
-   * its stddev during motion, and high rotation rates are handled by rejecting estimates above
-   * MAX_OMEGA thresholds (150°/s for single tag, 360°/s for multi-tag) in passesFilters().
+   * Apply translation velocity penalty to std dev. During fast translation, vision measurements are
+   * delayed by 100-240ms. At 1.5 m/s with 200ms latency, the robot moves 0.3m. Without sufficient
+   * stddev scaling, the pose estimator over-trusts stale vision data, causing the estimate to lag
+   * behind the actual robot position and "snap" when stopped.
+   *
+   * <p>Uses exponential scaling so vision stddev grows faster than linear with speed, ensuring
+   * odometry dominates during fast motion while vision still provides drift correction at low
+   * speeds.
    */
   private double applyMotionPenalties(double stdDev, double omegaRadPerSec) {
+    // Get current translation velocity
+    var chassisSpeeds = robotStateInstance.getLatestMeasuredFieldRelativeChassisSpeeds();
+    double translationalVelocity =
+        Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+
+    // Exponential scaling: at 1 m/s -> 2x, at 1.5 m/s -> 2.8x, at 2 m/s -> 4x
+    // This reduces vision weight from ~40% to ~7% at 1.5 m/s (with odom stddev of 0.3)
+    double translationPenalty = Math.pow(2, translationalVelocity);
+    stdDev *= translationPenalty;
+
     return stdDev;
   }
 

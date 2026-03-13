@@ -232,8 +232,8 @@ public class Limelight4IOSim extends Limelight4IOHardware {
         double fieldOffsetX = cameraPosition.getX() * cosYaw - cameraPosition.getY() * sinYaw;
         double fieldOffsetY = cameraPosition.getX() * sinYaw + cameraPosition.getY() * cosYaw;
 
-        // Apply pose noise scaled by distance squared (more noise when farther)
-        double distanceScale = Math.max(1.0, avgDistance * avgDistance);
+        // Apply pose noise scaled by square root of distance (gentler scaling than squared)
+        double distanceScale = Math.max(1.0, Math.sqrt(avgDistance));
         double noiseX = 0;
         double noiseY = 0;
         double noiseYaw = 0;
