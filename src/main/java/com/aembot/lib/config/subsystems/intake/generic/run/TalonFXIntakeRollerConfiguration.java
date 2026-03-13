@@ -1,10 +1,10 @@
-package com.aembot.lib.config.subsystems.intake.overBumper.run;
+package com.aembot.lib.config.subsystems.intake.generic.run;
 
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
-public class TalonFXOverBumperIntakeRollerConfiguration {
+public class TalonFXIntakeRollerConfiguration {
 
   public final String kName;
 
@@ -14,22 +14,22 @@ public class TalonFXOverBumperIntakeRollerConfiguration {
 
   public double kIntakeVoltage;
 
-  public TalonFXOverBumperIntakeRollerConfiguration(String name) {
+  public TalonFXIntakeRollerConfiguration(String name) {
     this.kName = name;
   }
 
-  public TalonFXOverBumperIntakeRollerConfiguration withIntakeVoltage(double targetSpeed) {
+  public TalonFXIntakeRollerConfiguration withIntakeVoltage(double targetSpeed) {
     this.kIntakeVoltage = targetSpeed;
     return this;
   }
 
-  public TalonFXOverBumperIntakeRollerConfiguration withRealMotorConfiguration(
+  public TalonFXIntakeRollerConfiguration withRealMotorConfiguration(
       MotorConfiguration<TalonFXConfiguration> realMotorConfig) {
     this.kRealMotorConfig = realMotorConfig;
     return this;
   }
 
-  public TalonFXOverBumperIntakeRollerConfiguration withSimMotorConfiguration(
+  public TalonFXIntakeRollerConfiguration withSimMotorConfiguration(
       SimulatedMotorConfiguration<TalonFXConfiguration> simMotorConfig) {
     this.kSimMotorConfig = simMotorConfig;
     return this;

@@ -10,8 +10,8 @@ import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.drive.commands.JoystickDriveCommand;
 import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
+import com.aembot.lib.subsystems.intake.generic.run.IntakeRollerSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
-import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -41,7 +41,7 @@ public final class CommandFactory {
       DriveSubsystem driveSubsystem,
       HoodSubsystem hoodSubsystem,
       OverBumperIntakeDeploySubsystem intakeDeploySubsystem,
-      OverBumperIntakeRollerSubsystem intakeRollerSubsystem,
+      IntakeRollerSubsystem intakeRollerSubsystem,
       SpindexerSubsystem spindexerSubsystem,
       IndexerSelectorSubsystem indexerSelectorSubsystem,
       IndexerKickerSubsystem indexerKickerSubsystem,

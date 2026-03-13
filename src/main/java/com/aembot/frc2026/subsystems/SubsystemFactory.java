@@ -41,14 +41,14 @@ import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import com.aembot.lib.subsystems.hood.io.HoodIOReplay;
 import com.aembot.lib.subsystems.hood.io.HoodSimIO;
 import com.aembot.lib.subsystems.hood.io.TalonFXHoodHardwareIO;
+import com.aembot.lib.subsystems.intake.generic.run.IntakeRollerSubsystem;
+import com.aembot.lib.subsystems.intake.generic.run.io.IntakeRollerReplayIO;
+import com.aembot.lib.subsystems.intake.generic.run.io.IntakeRollerSimIO;
+import com.aembot.lib.subsystems.intake.generic.run.io.TalonFXIntakeRollerHardwareIO;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.io.OverBumperIntakeDeployReplayIO;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.io.OverBumperIntakeDeploySimIO;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.io.TalonFXOverBumperIntakeDeployHardwareIO;
-import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
-import com.aembot.lib.subsystems.intake.over_bumper.run.io.OverBumperIntakeRollerReplayIO;
-import com.aembot.lib.subsystems.intake.over_bumper.run.io.OverBumperIntakeRollerSimIO;
-import com.aembot.lib.subsystems.intake.over_bumper.run.io.TalonFXOverBumperIntakeRollerHardwareIO;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -225,25 +225,24 @@ public class SubsystemFactory {
     }
   }
 
-  public static OverBumperIntakeRollerSubsystem createIntakeRollerSubsystem() {
+  public static IntakeRollerSubsystem createIntakeRollerSubsystem() {
     switch (RobotRuntimeConstants.MODE) {
       case SIM:
-        return new OverBumperIntakeRollerSubsystem(
+        return new IntakeRollerSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig(),
-            new OverBumperIntakeRollerSimIO(
-                RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig()),
+            new IntakeRollerSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig()),
             (state) -> RobotStateYearly.get().updateIntakeRollerState(state));
       case REPLAY:
-        return new OverBumperIntakeRollerSubsystem(
+        return new IntakeRollerSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig(),
-            new OverBumperIntakeRollerReplayIO(),
+            new IntakeRollerReplayIO(),
             (state) -> RobotStateYearly.get().updateIntakeRollerState(state));
       case REAL:
 
       default:
-        return new OverBumperIntakeRollerSubsystem(
+        return new IntakeRollerSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig(),
-            new TalonFXOverBumperIntakeRollerHardwareIO(
+            new TalonFXIntakeRollerHardwareIO(
                 RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig()),
             (state) -> RobotStateYearly.get().updateIntakeRollerState(state));
     }

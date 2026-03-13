@@ -1,20 +1,20 @@
-package com.aembot.lib.subsystems.intake.over_bumper.run.io;
+package com.aembot.lib.subsystems.intake.generic.run.io;
 
-import com.aembot.lib.config.subsystems.intake.overBumper.run.TalonFXOverBumperIntakeRollerConfiguration;
+import com.aembot.lib.config.subsystems.intake.generic.run.TalonFXIntakeRollerConfiguration;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOTalonFXSimFlywheel;
-import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerInputs;
+import com.aembot.lib.subsystems.intake.generic.run.IntakeRollerInputs;
 import edu.wpi.first.wpilibj.Notifier;
 
 /** simulated implementation for over the bumper intake roller io */
-public class OverBumperIntakeRollerSimIO implements OverBumperIntakeRollerIO {
+public class IntakeRollerSimIO implements IntakeRollerIO {
 
   /** Internal motor to use */
   private final MotorIOTalonFXSimFlywheel simMotor;
 
   /** Configuration to use */
   @SuppressWarnings("unused") // Currently unused but that may change in the future
-  private final TalonFXOverBumperIntakeRollerConfiguration config;
+  private final TalonFXIntakeRollerConfiguration config;
 
   /** Notifier to run the sim */
   private final Notifier simNotifier;
@@ -24,7 +24,7 @@ public class OverBumperIntakeRollerSimIO implements OverBumperIntakeRollerIO {
    *
    * @param config The configuration to use for this io
    */
-  public OverBumperIntakeRollerSimIO(TalonFXOverBumperIntakeRollerConfiguration config) {
+  public IntakeRollerSimIO(TalonFXIntakeRollerConfiguration config) {
     this.config = config;
     this.simMotor = new MotorIOTalonFXSimFlywheel(config.kSimMotorConfig);
     this.simNotifier = new Notifier(() -> simMotor.updateSimState());
@@ -38,7 +38,7 @@ public class OverBumperIntakeRollerSimIO implements OverBumperIntakeRollerIO {
   }
 
   @Override
-  public void updateInputs(OverBumperIntakeRollerInputs inputs) {}
+  public void updateInputs(IntakeRollerInputs inputs) {}
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
