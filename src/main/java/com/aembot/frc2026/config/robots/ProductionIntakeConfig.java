@@ -3,8 +3,8 @@ package com.aembot.frc2026.config.robots;
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
+import com.aembot.lib.config.subsystems.intake.generic.run.TalonFXIntakeRollerConfiguration;
 import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
-import com.aembot.lib.config.subsystems.intake.overBumper.run.TalonFXOverBumperIntakeRollerConfiguration;
 import com.aembot.lib.config.wrappers.ConfigureSlot0Gains;
 import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import com.aembot.lib.core.can.CANDeviceID;
@@ -148,8 +148,8 @@ public class ProductionIntakeConfig {
           .withInitialAngleDeg(STARTING_ANGLE_DEG)
           .withDownwardsZeroAngleDeg(ZERO_ANGLE_DEG);
 
-  public final TalonFXOverBumperIntakeRollerConfiguration ROLLER_CONFIG =
-      new TalonFXOverBumperIntakeRollerConfiguration(SUBSYSTEM_NAME + "Roller")
+  public final TalonFXIntakeRollerConfiguration ROLLER_CONFIG =
+      new TalonFXIntakeRollerConfiguration(SUBSYSTEM_NAME + "Roller")
           .withRealMotorConfiguration(ROLLER_MOTOR_CONFIG)
           .withSimMotorConfiguration(ROLLER_SIM_MOTOR_CONFIG)
           .withIntakeVoltage(ROLLER_VOLTAGE);

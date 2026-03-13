@@ -4,8 +4,8 @@ import static edu.wpi.first.units.Units.Meters;
 
 import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
 import com.aembot.lib.core.logging.Loggable;
+import com.aembot.lib.state.subsystems.intake.generic.run.IntakeRollerState;
 import com.aembot.lib.state.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeployState;
-import com.aembot.lib.state.subsystems.intake.over_bumper.run.OverBumperIntakeRollerState;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import org.ironmaple.simulation.IntakeSimulation;
@@ -14,7 +14,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class SimulatedOverBumperIntakeState implements Loggable {
   private final Supplier<OverBumperIntakeDeployState> kDeployStateSupplier;
-  private final Supplier<OverBumperIntakeRollerState> kRollerStateSupplier;
+  private final Supplier<IntakeRollerState> kRollerStateSupplier;
 
   /** The config of the deploy subsystem. Fields used to initialize intake sim */
   private final TalonFXOverBumperIntakeDeployConfiguration deployConfig;
@@ -26,7 +26,7 @@ public class SimulatedOverBumperIntakeState implements Loggable {
 
   public SimulatedOverBumperIntakeState(
       Supplier<OverBumperIntakeDeployState> deployStateSupplier,
-      Supplier<OverBumperIntakeRollerState> rollerStateSupplier,
+      Supplier<IntakeRollerState> rollerStateSupplier,
       TalonFXOverBumperIntakeDeployConfiguration deployConfig) {
     this.kDeployStateSupplier = deployStateSupplier;
     this.kRollerStateSupplier = rollerStateSupplier;
@@ -49,8 +49,8 @@ public class SimulatedOverBumperIntakeState implements Loggable {
           .get()
           .setCustomIntakeCondition(
               (_gamePiece) -> {
-                OverBumperIntakeRollerState rollerState = kRollerStateSupplier.get();
-                return rollerState != null && rollerState.isActive;
+                IntakeRollerState rollerState = kRollerStateSupplier.get();
+                return rollerState != null && rollerState.isActive.get();
               });
     }
   }

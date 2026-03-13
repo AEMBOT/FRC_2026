@@ -1,12 +1,12 @@
-package com.aembot.lib.subsystems.intake.over_bumper.run;
+package com.aembot.lib.subsystems.intake.generic.run;
 
 import com.aembot.lib.config.motors.MotorConfiguration;
-import com.aembot.lib.config.subsystems.intake.overBumper.run.TalonFXOverBumperIntakeRollerConfiguration;
+import com.aembot.lib.config.subsystems.intake.generic.run.TalonFXIntakeRollerConfiguration;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
-import com.aembot.lib.state.subsystems.intake.over_bumper.run.OverBumperIntakeRollerState;
+import com.aembot.lib.state.subsystems.intake.generic.run.IntakeRollerState;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
-import com.aembot.lib.subsystems.intake.over_bumper.run.io.OverBumperIntakeRollerIO;
+import com.aembot.lib.subsystems.intake.generic.run.io.IntakeRollerIO;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,20 +14,20 @@ import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 
 /** Extension of the motor subsystem to add over the bumper intake roller functionality */
-public class OverBumperIntakeRollerSubsystem
+public class IntakeRollerSubsystem
     extends MotorSubsystem<MotorInputs, MotorIO, MotorConfiguration<TalonFXConfiguration>> {
 
   /** IO layer to use for this subsystem */
-  private final OverBumperIntakeRollerIO io;
+  private final IntakeRollerIO io;
 
   /** State of this subsystem */
-  private final OverBumperIntakeRollerState state;
+  private final IntakeRollerState state;
 
   /** Configuration to use for this subsystem */
-  private final TalonFXOverBumperIntakeRollerConfiguration config;
+  private final TalonFXIntakeRollerConfiguration config;
 
   /** consumer in order to update values in robot state */
-  private final Consumer<OverBumperIntakeRollerState> stateConsumer;
+  private final Consumer<IntakeRollerState> stateConsumer;
 
   /**
    * Construct a new over the bumper intake roller subsystem
@@ -37,14 +37,14 @@ public class OverBumperIntakeRollerSubsystem
    * @param stateConsumer State consumer in order to update the state of this subsystem in
    *     RobotState
    */
-  public OverBumperIntakeRollerSubsystem(
-      TalonFXOverBumperIntakeRollerConfiguration config,
-      OverBumperIntakeRollerIO io,
-      Consumer<OverBumperIntakeRollerState> stateConsumer) {
+  public IntakeRollerSubsystem(
+      TalonFXIntakeRollerConfiguration config,
+      IntakeRollerIO io,
+      Consumer<IntakeRollerState> stateConsumer) {
     super(config.kName, new MotorInputs(), io.getMotor(), config.kRealMotorConfig);
     this.io = io;
     this.config = config;
-    this.state = new OverBumperIntakeRollerState();
+    this.state = new IntakeRollerState();
     this.stateConsumer = stateConsumer;
   }
 
@@ -58,10 +58,10 @@ public class OverBumperIntakeRollerSubsystem
 
   private void updateState() {
 
-    state.angularVelocityUnitsPerMin = getCurrentVelocity();
+    state.angularVelocityUnitsPerMin.set(getCurrentVelocity());
 
-    state.isActive =
-        state.angularVelocityUnitsPerMin > config.kRealMotorConfig.getMechanismRotationsToUnits(1);
+    state.isActive.set(
+        state.angularVelocityUnitsPerMin.get() > config.kRealMotorConfig.getMechanismRotationsToUnits(1));
 
     stateConsumer.accept(state);
   }

@@ -17,8 +17,8 @@ import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
+import com.aembot.lib.subsystems.intake.generic.run.IntakeRollerSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
-import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -68,7 +68,7 @@ public class RobotContainer implements Loggerable {
   /* ---- INTAKE ---- */
   private final OverBumperIntakeDeploySubsystem intakeDeploySubsystem =
       SubsystemFactory.createIntakeDeploySubsystem();
-  private final OverBumperIntakeRollerSubsystem intakeRollerSubsystem =
+  private final IntakeRollerSubsystem intakeRollerSubsystem =
       SubsystemFactory.createIntakeRollerSubsystem();
 
   /* ---- TURRET ---- */
