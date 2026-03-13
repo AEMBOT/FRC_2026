@@ -7,16 +7,15 @@ import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.state.subsystems.intake.generic.run.IntakeRollerState;
 import com.aembot.lib.subsystems.base.MotorFollowerSubsystem;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-
-import java.util.function.Consumer;
 import java.util.stream.Stream;
-
 import org.littletonrobotics.junction.Logger;
 
-/** Extension of the motor follower subsystem to add over the bumper intake roller functionality. Good for Texas Toast. */
+/**
+ * Extension of the motor follower subsystem to add over the bumper intake roller functionality.
+ * Good for Texas Toast.
+ */
 public class IntakeRollerMultiMotorSubsystem
     extends MotorFollowerSubsystem<
         MotorInputs, MotorIO, MotorFollowersConfiguration<TalonFXConfiguration>> {
@@ -29,13 +28,10 @@ public class IntakeRollerMultiMotorSubsystem
    *
    * @param config configuration to use for this subsystem
    * @param io IO layer to use for this subsystem
-   * @param state State consumer in order to update the state of this subsystem in
-   *     RobotState
+   * @param state State consumer in order to update the state of this subsystem in RobotState
    */
   public IntakeRollerMultiMotorSubsystem(
-      MultiTalonFXIntakeRollerConfig config,
-      IntakeRollerState state,
-      MotorIO... motors) {
+      MultiTalonFXIntakeRollerConfig config, IntakeRollerState state, MotorIO... motors) {
     super(
         new MotorInputs(),
         motors[0],
@@ -60,7 +56,8 @@ public class IntakeRollerMultiMotorSubsystem
   private void updateState() {
     kState.angularVelocityUnitsPerMin.set(getCurrentVelocity());
     kState.isActive.set(
-        kState.angularVelocityUnitsPerMin.get() > kConfig.kMotorConfigs.getMechanismRotationsToUnits(1));
+        kState.angularVelocityUnitsPerMin.get()
+            > kConfig.kMotorConfigs.getMechanismRotationsToUnits(1));
   }
 
   @Override
