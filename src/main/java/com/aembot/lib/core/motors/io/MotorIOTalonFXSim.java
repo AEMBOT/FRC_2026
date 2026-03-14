@@ -14,6 +14,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
@@ -23,7 +24,6 @@ import org.littletonrobotics.junction.Logger;
 
 /** IO implementation for a simulated TalonFX */
 public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorController {
-
   /** Helper class for simulated talon fx data */
   public class SimulatedTalonFXState {
     public double SupplyVoltage;
@@ -38,6 +38,8 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
 
   /** Sim state of the talonfx */
   protected final TalonFXSimState simState;
+
+  public final Notifier notifer = new Notifier(this::updateSimState);
 
   /** Inputs to the simulated talonfx */
   protected SimulatedTalonFXState inputs = new SimulatedTalonFXState();

@@ -7,9 +7,9 @@ import org.littletonrobotics.junction.Logger;
 
 public class IntakeRollerState implements Loggable {
 
-  public AtomicReference<Double> angularVelocityUnitsPerMin;
+  public AtomicReference<Double> angularVelocityUnitsPerMin = new AtomicReference<>(0.0);
 
-  public AtomicBoolean isActive;
+  public AtomicBoolean isActive = new AtomicBoolean(false);
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {

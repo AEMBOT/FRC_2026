@@ -124,7 +124,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
    * @return A command that update network tables with values to use while disabled
    */
   public Command updateNTDisabledCommand() {
-    return new InstantCommand(this::updateNTDisabled);
+    return new InstantCommand(this::updateNTDisabled).ignoringDisable(true);
   }
 
   /**
@@ -133,6 +133,6 @@ public class AprilVisionSubsystem extends AEMSubsystem {
    * @return A command that update network tables with values to use while enabled
    */
   public Command updateNTEnabledCommand() {
-    return new InstantCommand(this::updateNTEnabled);
+    return new InstantCommand(this::updateNTEnabled).ignoringDisable(true);
   }
 }

@@ -11,7 +11,7 @@ import com.aembot.lib.config.subsystems.drive.simulation.DrivetrainSimConfigurat
 import com.aembot.lib.config.subsystems.flywheel.TalonFXFlywheelConfiguration;
 import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
 import com.aembot.lib.config.subsystems.hood.simulation.SimulatedHoodConfiguration;
-import com.aembot.lib.config.subsystems.intake.generic.run.TalonFXIntakeRollerConfiguration;
+import com.aembot.lib.config.subsystems.intake.generic.run.MultiTalonFXIntakeRollerConfig;
 import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
@@ -83,7 +83,7 @@ public abstract class RobotConfiguration {
    *
    * @return intake roller configuration
    */
-  public abstract TalonFXIntakeRollerConfiguration getIntakeRollerConfig();
+  public abstract MultiTalonFXIntakeRollerConfig getIntakeRollerConfig();
 
   /**
    * Get configuration details about the drive train sim for this robot

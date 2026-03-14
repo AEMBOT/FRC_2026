@@ -1,6 +1,5 @@
 package com.aembot.lib.config.motors;
 
-import com.aembot.lib.config.motors.MotorFollowersConfiguration.FollowerConfiguration;
 import com.aembot.lib.core.motors.interfaces.MotorIO.FollowDirection;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +14,7 @@ import java.util.List;
  * @param <C> The type of the underlying configuration object used for each motor. Ex:
  *     TalonFXConfiguration
  */
-public class MotorFollowersConfiguration<C> extends MotorConfiguration<C> {
+public class MotorFollowersConfiguration<C> {
   /**
    * Defines how an individual follower motor is configured relative to a leader motor.
    *
@@ -91,13 +90,41 @@ public class MotorFollowersConfiguration<C> extends MotorConfiguration<C> {
     }
   }
 
+  public MotorConfiguration<C> leaderConfig;
+  public SimulatedMotorConfiguration<C> leaderSimConfig;
+
   public List<FollowerConfiguration<C>> followerConfigurations = List.of();
 
-  public MotorFollowersConfiguration(C config) {
-    super.withMotorConfig(config);
+  public MotorFollowersConfiguration() {}
+
+  public MotorFollowersConfiguration(
+      MotorConfiguration<C> leaderConfig, SimulatedMotorConfiguration<C> leaderSimConfig) {
+    this();
+    this.leaderConfig = leaderConfig;
+    this.leaderSimConfig = leaderSimConfig;
   }
 
-  public MotorFollowersConfiguration() {}
+  /**
+   * Sets the leader motor configuration for the leader servo motor.
+   *
+   * @param config The {@link MotorConfiguration} object containing the leader's settings.
+   * @return This {@link MotorFollowerConfiguration} instance, for chaining.
+   */
+  public MotorFollowersConfiguration<C> withLeaderConfig(MotorConfiguration<C> config) {
+    this.leaderConfig = config;
+    return this;
+  }
+
+  /**
+   * Sets the leader motor configuration for the leader servo motor.
+   *
+   * @param config The {@link SimulatedMotorConfiguration} object containing the leader's settings.
+   * @return This {@link MotorFollowerConfiguration} instance, for chaining.
+   */
+  public MotorFollowersConfiguration<C> withLeaderSimConfig(SimulatedMotorConfiguration<C> config) {
+    this.leaderSimConfig = config;
+    return this;
+  }
 
   /**
    * Sets the follower motor configurations for the follower servo motors.
@@ -120,6 +147,8 @@ public class MotorFollowersConfiguration<C> extends MotorConfiguration<C> {
    */
   public MotorFollowersConfiguration<C> validate() {
     List<String> missing = new ArrayList<>();
+    if (this.leaderConfig == null) missing.add("leaderConfig");
+    if (this.leaderSimConfig == null) missing.add("leaderSimConfig");
 
     String followerErrors = "";
     for (FollowerConfiguration<C> follower : followerConfigurations) {
@@ -132,12 +161,13 @@ public class MotorFollowersConfiguration<C> extends MotorConfiguration<C> {
 
     if (missing.size() != 0 || !followerErrors.isEmpty()) {
       throw new VerifyError(
-          "Config for "
-              + kConfigurationName
-              + " does not have a set "
-              + String.join(",", missing)
-              + "\n"
-              + followerErrors);
+          "Config for " + leaderConfig != null
+              ? leaderConfig.kConfigurationName
+              : "UNNAMED"
+                  + " does not have a set "
+                  + String.join(",", missing)
+                  + "\n"
+                  + followerErrors);
     }
 
     return this;

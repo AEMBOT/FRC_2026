@@ -1,9 +1,9 @@
 package com.aembot.lib.subsystems.intake.generic.multimotor;
 
-import com.aembot.lib.config.motors.MotorFollowersConfiguration;
 import com.aembot.lib.config.subsystems.intake.generic.run.MultiTalonFXIntakeRollerConfig;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
+import com.aembot.lib.core.motors.io.containers.CompoundMotorIO;
 import com.aembot.lib.state.subsystems.intake.generic.run.IntakeRollerState;
 import com.aembot.lib.subsystems.base.MotorFollowerSubsystem;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -17,8 +17,7 @@ import org.littletonrobotics.junction.Logger;
  * Good for Texas Toast.
  */
 public class IntakeRollerMultiMotorSubsystem
-    extends MotorFollowerSubsystem<
-        MotorInputs, MotorIO, MotorFollowersConfiguration<TalonFXConfiguration>> {
+    extends MotorFollowerSubsystem<MotorInputs, MotorIO, TalonFXConfiguration> {
 
   private final MultiTalonFXIntakeRollerConfig kConfig;
   private final IntakeRollerState kState;
@@ -31,14 +30,22 @@ public class IntakeRollerMultiMotorSubsystem
    * @param state State consumer in order to update the state of this subsystem in RobotState
    */
   public IntakeRollerMultiMotorSubsystem(
-      MultiTalonFXIntakeRollerConfig config, IntakeRollerState state, MotorIO... motors) {
+      MultiTalonFXIntakeRollerConfig config,
+      IntakeRollerState state,
+      CompoundMotorIO<MotorIO> motorIOContainer) {
+    // super(
+    //     new MotorInputs(),
+    //     motors[0],
+    //     Stream.generate(MotorInputs::new)
+    //         .limit(config.validate().kMotorConfigs.followerConfigurations.size())
+    //         .toArray(MotorInputs[]::new),
+    //     Arrays.copyOfRange(motors, 1, motors.length),
+    //     config.kMotorConfigs);
     super(
-        new MotorInputs(),
-        motors[0],
         Stream.generate(MotorInputs::new)
-            .limit(config.validate().kMotorConfigs.followerConfigurations.size())
+            .limit(motorIOContainer.kMotors.size())
             .toArray(MotorInputs[]::new),
-        motors,
+        motorIOContainer,
         config.kMotorConfigs);
 
     this.kConfig = config;
@@ -57,7 +64,7 @@ public class IntakeRollerMultiMotorSubsystem
     kState.angularVelocityUnitsPerMin.set(getCurrentVelocity());
     kState.isActive.set(
         kState.angularVelocityUnitsPerMin.get()
-            > kConfig.kMotorConfigs.getMechanismRotationsToUnits(1));
+            > kConfig.kMotorConfigs.leaderConfig.getMechanismRotationsToUnits(1));
   }
 
   @Override

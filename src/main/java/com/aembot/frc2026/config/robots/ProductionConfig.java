@@ -12,7 +12,7 @@ import com.aembot.lib.config.subsystems.drive.simulation.DrivetrainSimConfigurat
 import com.aembot.lib.config.subsystems.flywheel.TalonFXFlywheelConfiguration;
 import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
 import com.aembot.lib.config.subsystems.hood.simulation.SimulatedHoodConfiguration;
-import com.aembot.lib.config.subsystems.intake.generic.run.TalonFXIntakeRollerConfiguration;
+import com.aembot.lib.config.subsystems.intake.generic.run.MultiTalonFXIntakeRollerConfig;
 import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
@@ -75,7 +75,7 @@ public class ProductionConfig extends RobotConfiguration {
   }
 
   @Override
-  public TalonFXIntakeRollerConfiguration getIntakeRollerConfig() {
+  public MultiTalonFXIntakeRollerConfig getIntakeRollerConfig() {
     return INTAKE_CONFIG.ROLLER_CONFIG;
   }
 

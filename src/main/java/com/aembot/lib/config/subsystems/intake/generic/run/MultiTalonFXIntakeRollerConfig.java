@@ -1,7 +1,6 @@
 package com.aembot.lib.config.subsystems.intake.generic.run;
 
 import com.aembot.lib.config.motors.MotorFollowersConfiguration;
-import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +10,6 @@ public class MultiTalonFXIntakeRollerConfig {
   public final String kName;
 
   public MotorFollowersConfiguration<TalonFXConfiguration> kMotorConfigs;
-
-  public SimulatedMotorConfiguration<TalonFXConfiguration> kMainSimConfig;
 
   public Double kIntakeVoltage;
 
@@ -33,17 +30,6 @@ public class MultiTalonFXIntakeRollerConfig {
     return this;
   }
 
-  /**
-   * Sets the simulated config for the main motor in this subsystem.
-   *
-   * @return This {@link MultiTalonFXIntakeRollerConfig} instance for chaining.
-   */
-  public MultiTalonFXIntakeRollerConfig withMainSimConfig(
-      SimulatedMotorConfiguration<TalonFXConfiguration> mainSimConfig) {
-    this.kMainSimConfig = mainSimConfig;
-    return this;
-  }
-
   public MultiTalonFXIntakeRollerConfig withIntakeVoltage(double intakeVoltage) {
     this.kIntakeVoltage = intakeVoltage;
     return this;
@@ -59,7 +45,6 @@ public class MultiTalonFXIntakeRollerConfig {
   public MultiTalonFXIntakeRollerConfig validate() {
     List<String> missing = new ArrayList<>();
     if (this.kMotorConfigs == null) missing.add("kMotorConfigs");
-    if (this.kMainSimConfig == null) missing.add("kMainSimConfig");
     if (this.kIntakeVoltage == null) missing.add("kIntakeVoltage");
 
     String lowerErrors = "";

@@ -31,7 +31,7 @@ public class SimulatedRobotStateYearly extends SimulatedRobotState {
   public final SimulatedOverBumperIntakeState simulatedIntakeState =
       new SimulatedOverBumperIntakeState(
           () -> RobotStateYearly.get().intakeDeployState.get(),
-          () -> RobotStateYearly.get().intakeRollerState.get(),
+          RobotStateYearly.get().intakeRollerState,
           RobotRuntimeConstants.ROBOT_CONFIG.getIntakeDeployConfig());
 
   public final SimulatedIndexerCompoundState simulatedIndexerCompoundState =
