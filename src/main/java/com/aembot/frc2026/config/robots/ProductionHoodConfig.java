@@ -45,8 +45,8 @@ public class ProductionHoodConfig {
 
   public final ConfigureSlot0Gains SLOT_0_CONFIGS =
       (RobotRuntimeConstants.MODE == RuntimeMode.REAL)
-          ? new ConfigureSlot0Gains(0.05, 0.0, 0.0, 0.0, 0.0, 0.12, 0.0)
-          : new ConfigureSlot0Gains(0.0, 0.0, 0.0, 0.0, 0.4, 0.98, 0.0);
+          ? new ConfigureSlot0Gains(0.0, 0.0, 0.0, 0.0, 0.4, 0.098, 0.0)
+          : new ConfigureSlot0Gains(0.05, 0.0, 0.0, 0.0, 0.0, 0.12, 0.0);
 
   public final MotorConfiguration<TalonFXConfiguration> MOTOR_CONFIG =
       new MotorConfiguration<TalonFXConfiguration>()
