@@ -22,8 +22,8 @@ public class RobotStateYearly extends RobotState {
 
   public final AtomicReference<OverBumperIntakeDeployState> intakeDeployState =
       new AtomicReference<OverBumperIntakeDeployState>();
-  public final AtomicReference<IntakeRollerState> intakeRollerState =
-      new AtomicReference<IntakeRollerState>();
+
+  public final IntakeRollerState intakeRollerState = new IntakeRollerState();
 
   // note: this doesn't need to be atomic because all of its fields should be thread-safe.
   public final IndexerCompoundState indexerCompoundState =
@@ -46,12 +46,8 @@ public class RobotStateYearly extends RobotState {
     return intakeDeployState.get();
   }
 
-  public void updateIntakeRollerState(IntakeRollerState state) {
-    intakeRollerState.set(state);
-  }
-
   public IntakeRollerState getIntakeRollerState() {
-    return intakeRollerState.get();
+    return intakeRollerState;
   }
 
   public static RobotStateYearly get() {

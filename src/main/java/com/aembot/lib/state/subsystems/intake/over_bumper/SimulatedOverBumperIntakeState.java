@@ -14,7 +14,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class SimulatedOverBumperIntakeState implements Loggable {
   private final Supplier<OverBumperIntakeDeployState> kDeployStateSupplier;
-  private final Supplier<IntakeRollerState> kRollerStateSupplier;
+  private final IntakeRollerState kRollerState;
 
   /** The config of the deploy subsystem. Fields used to initialize intake sim */
   private final TalonFXOverBumperIntakeDeployConfiguration deployConfig;
@@ -26,10 +26,10 @@ public class SimulatedOverBumperIntakeState implements Loggable {
 
   public SimulatedOverBumperIntakeState(
       Supplier<OverBumperIntakeDeployState> deployStateSupplier,
-      Supplier<IntakeRollerState> rollerStateSupplier,
+      IntakeRollerState rollerStateSupplier,
       TalonFXOverBumperIntakeDeployConfiguration deployConfig) {
     this.kDeployStateSupplier = deployStateSupplier;
-    this.kRollerStateSupplier = rollerStateSupplier;
+    this.kRollerState = rollerStateSupplier;
     this.deployConfig = deployConfig;
   }
 
@@ -49,7 +49,7 @@ public class SimulatedOverBumperIntakeState implements Loggable {
           .get()
           .setCustomIntakeCondition(
               (_gamePiece) -> {
-                IntakeRollerState rollerState = kRollerStateSupplier.get();
+                IntakeRollerState rollerState = kRollerState;
                 return rollerState != null && rollerState.isActive.get();
               });
     }

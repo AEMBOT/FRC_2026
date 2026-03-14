@@ -18,9 +18,18 @@ import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.frc2026.subsystems.turret.io.TalonFXTurretHardwareIO;
 import com.aembot.frc2026.subsystems.turret.io.TurretReplayIO;
 import com.aembot.frc2026.subsystems.turret.io.TurretSimIO;
+import com.aembot.lib.config.motors.MotorFollowersConfiguration;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
+import com.aembot.lib.core.motors.interfaces.MotorIO;
+import com.aembot.lib.core.motors.io.MotorIOReplay;
+import com.aembot.lib.core.motors.io.MotorIOTalonFX;
+import com.aembot.lib.core.motors.io.MotorIOTalonFXSimFlywheel;
+import com.aembot.lib.core.motors.io.containers.CompoundMotorIO;
+import com.aembot.lib.core.motors.io.containers.CompoundMotorIOReal;
+import com.aembot.lib.core.motors.io.containers.CompoundMotorIOReplay;
+import com.aembot.lib.core.motors.io.containers.CompoundMotorIOSim;
 import com.aembot.lib.core.sensors.timeOfFlight.io.TimeOfFlightIOCANRange;
 import com.aembot.lib.core.sensors.timeOfFlight.io.TimeOfFlightIOReplay;
 import com.aembot.lib.core.sensors.timeOfFlight.io.TimeOfFlightSimIOCanRange;
@@ -41,17 +50,16 @@ import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import com.aembot.lib.subsystems.hood.io.HoodIOReplay;
 import com.aembot.lib.subsystems.hood.io.HoodSimIO;
 import com.aembot.lib.subsystems.hood.io.TalonFXHoodHardwareIO;
-import com.aembot.lib.subsystems.intake.generic.run.IntakeRollerSubsystem;
-import com.aembot.lib.subsystems.intake.generic.run.io.IntakeRollerReplayIO;
-import com.aembot.lib.subsystems.intake.generic.run.io.IntakeRollerSimIO;
-import com.aembot.lib.subsystems.intake.generic.run.io.TalonFXIntakeRollerHardwareIO;
+import com.aembot.lib.subsystems.intake.generic.multimotor.IntakeRollerMultiMotorSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.io.OverBumperIntakeDeployReplayIO;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.io.OverBumperIntakeDeploySimIO;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.io.TalonFXOverBumperIntakeDeployHardwareIO;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 import org.photonvision.simulation.PhotonCameraSim;
@@ -225,27 +233,82 @@ public class SubsystemFactory {
     }
   }
 
-  public static IntakeRollerSubsystem createIntakeRollerSubsystem() {
+  public static IntakeRollerMultiMotorSubsystem createIntakeRollerSubsystem() {
+    // switch (RobotRuntimeConstants.MODE) {
+    //   case SIM:
+    //     return new IntakeRollerMultiMotorSubsystem(
+    //         RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig(),
+    //         new IntakeRollerSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig()),
+    //         (state) -> RobotStateYearly.get().updateIntakeRollerState(state));
+    //   case REPLAY:
+    //     return new IntakeRollerMultiMotorSubsystem(
+    //         RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig(),
+    //         new IntakeRollerReplayIO(),
+    //         (state) -> RobotStateYearly.get().updateIntakeRollerState(state));
+    //   case REAL:
+
+    //   default:
+    //     return new IntakeRollerMultiMotorSubsystem(
+    //         RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig(),
+    //         new TalonFXIntakeRollerHardwareIO(
+    //             RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig()),
+    //         (state) -> RobotStateYearly.get().updateIntakeRollerState(state));
+    // }
+    ArrayList<MotorIO> motorIOs = new ArrayList<>();
+
+    /* -- ADD FOLLOWER(S) -- */
+    for (MotorFollowersConfiguration.FollowerConfiguration<TalonFXConfiguration> conf :
+        RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig()
+            .kMotorConfigs
+            .followerConfigurations) {
+      switch (RobotRuntimeConstants.MODE) {
+        case SIM:
+          motorIOs.add(new MotorIOTalonFXSimFlywheel(conf.simConfig));
+          break;
+        case REPLAY:
+          motorIOs.add(new MotorIOReplay());
+          break;
+        default:
+        case REAL:
+          motorIOs.add(new MotorIOTalonFX(conf.config));
+          break;
+      }
+    }
+
+    CompoundMotorIO<MotorIO> ioContainer;
+
+    /* -- ADD LEADER & BUILD IO CONTAINER -- */
     switch (RobotRuntimeConstants.MODE) {
       case SIM:
-        return new IntakeRollerSubsystem(
-            RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig(),
-            new IntakeRollerSimIO(RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig()),
-            (state) -> RobotStateYearly.get().updateIntakeRollerState(state));
+        motorIOs.add(
+            0,
+            new MotorIOTalonFXSimFlywheel(
+                RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig()
+                    .kMotorConfigs
+                    .leaderSimConfig));
+        ioContainer = new CompoundMotorIOSim<>(motorIOs);
+        break;
       case REPLAY:
-        return new IntakeRollerSubsystem(
-            RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig(),
-            new IntakeRollerReplayIO(),
-            (state) -> RobotStateYearly.get().updateIntakeRollerState(state));
-      case REAL:
-
+        motorIOs.add(0, new MotorIOReplay());
+        ioContainer = new CompoundMotorIOReplay<>(motorIOs);
+        break;
       default:
-        return new IntakeRollerSubsystem(
-            RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig(),
-            new TalonFXIntakeRollerHardwareIO(
-                RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig()),
-            (state) -> RobotStateYearly.get().updateIntakeRollerState(state));
+      case REAL:
+        motorIOs.add(
+            0,
+            new MotorIOTalonFX(
+                RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig()
+                    .kMotorConfigs
+                    .leaderConfig));
+        ioContainer = new CompoundMotorIOReal<>(motorIOs);
+        break;
     }
+
+    /* -- MAKE ACTUAL SUBSYSTEM -- */
+    return new IntakeRollerMultiMotorSubsystem(
+        RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig(),
+        RobotStateYearly.get().intakeRollerState,
+        ioContainer);
   }
 
   public static AprilVisionSubsystem createAprilVisionSubsystem() {
