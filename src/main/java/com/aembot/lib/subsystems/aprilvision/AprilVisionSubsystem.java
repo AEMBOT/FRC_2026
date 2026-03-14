@@ -11,6 +11,7 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -132,6 +133,9 @@ public class AprilVisionSubsystem extends AEMSubsystem {
    * Fuse multiple camera estimates into a single estimate using inverse-variance weighting. This
    * prevents camera "fighting" where multiple cameras with different estimates cause pose
    * oscillation.
+   *
+   * <p>Before fusing, older estimates are "previewed" forward to the latest timestamp using
+   * odometry, so all estimates are effectively at the same point in time (254's approach).
    */
   private List<AprilCameraOutput> fuseMultiCameraEstimates(List<AprilCameraOutput> rawOutputs) {
     if (rawOutputs.isEmpty()) {
@@ -142,22 +146,43 @@ public class AprilVisionSubsystem extends AEMSubsystem {
       return rawOutputs; // No fusion needed
     }
 
-    // Group estimates by similar timestamps (within 50ms)
-    // For now, fuse all estimates into one since they're from the same periodic cycle
+    // Find the latest timestamp among all estimates
+    double latestTimestamp = 0;
+    for (AprilCameraOutput output : rawOutputs) {
+      latestTimestamp = Math.max(latestTimestamp, output.estimatedPose().timestampSeconds());
+    }
+
+    // Get odometry pose at the latest timestamp (target time for all estimates)
+    Pose2d odomAtLatest = robotStateInstance.getFieldRobotPoseForTimestamp(latestTimestamp);
+    if (odomAtLatest == null) {
+      // Can't preview without odometry, fall back to simple fusion
+      Logger.recordOutput(logPrefixStandard + "/FusePreviewFailed", true);
+      return rawOutputs;
+    }
 
     double weightedX = 0;
     double weightedY = 0;
     double totalWeightX = 0;
     double totalWeightY = 0;
-    double latestTimestamp = 0;
-    double minXStdDev = Double.MAX_VALUE;
-    double minYStdDev = Double.MAX_VALUE;
 
     for (AprilCameraOutput output : rawOutputs) {
       Pose2d pose = output.estimatedPose().latencyUncompensatedPose();
       OdometryStandardDevs stdDevs = output.estimatedPose().stdDevs();
+      double timestamp = output.estimatedPose().timestampSeconds();
 
       if (pose == null || stdDevs == null) continue;
+
+      // Preview this estimate forward to the latest timestamp using odometry
+      Pose2d previewedPose = pose;
+      if (timestamp < latestTimestamp) {
+        Pose2d odomAtThis = robotStateInstance.getFieldRobotPoseForTimestamp(timestamp);
+        if (odomAtThis != null) {
+          // Compute transform from this timestamp to latest: how did the robot move?
+          Transform2d odomDelta = odomAtLatest.minus(odomAtThis);
+          // Apply that motion to the vision estimate
+          previewedPose = pose.transformBy(odomDelta);
+        }
+      }
 
       // Inverse variance weighting: weight = 1 / variance = 1 / stddev^2
       double xVariance = stdDevs.xStdDev() * stdDevs.xStdDev();
@@ -170,17 +195,10 @@ public class AprilVisionSubsystem extends AEMSubsystem {
       double weightX = 1.0 / xVariance;
       double weightY = 1.0 / yVariance;
 
-      weightedX += pose.getX() * weightX;
-      weightedY += pose.getY() * weightY;
+      weightedX += previewedPose.getX() * weightX;
+      weightedY += previewedPose.getY() * weightY;
       totalWeightX += weightX;
       totalWeightY += weightY;
-
-      // Track minimum stddevs for fused estimate
-      minXStdDev = Math.min(minXStdDev, stdDevs.xStdDev());
-      minYStdDev = Math.min(minYStdDev, stdDevs.yStdDev());
-
-      // Use latest timestamp
-      latestTimestamp = Math.max(latestTimestamp, output.estimatedPose().timestampSeconds());
     }
 
     if (totalWeightX < 1e-6 || totalWeightY < 1e-6) {
@@ -206,8 +224,9 @@ public class AprilVisionSubsystem extends AEMSubsystem {
     Logger.recordOutput(logPrefixStandard + "/FusedPose", fusedPose);
     Logger.recordOutput(logPrefixStandard + "/FusedXStdDev", fusedXStdDev);
     Logger.recordOutput(logPrefixStandard + "/FusedYStdDev", fusedYStdDev);
+    Logger.recordOutput(logPrefixStandard + "/FusePreviewFailed", false);
 
-    // Return single fused estimate
+    // Return single fused estimate at the latest timestamp
     return List.of(
         new AprilCameraOutput(
             "fused",
