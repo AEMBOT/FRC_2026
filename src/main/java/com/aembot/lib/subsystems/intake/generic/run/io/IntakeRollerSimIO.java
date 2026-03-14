@@ -27,7 +27,7 @@ public class IntakeRollerSimIO implements IntakeRollerIO {
   public IntakeRollerSimIO(TalonFXIntakeRollerConfiguration config) {
     this.config = config;
     this.simMotor = new MotorIOTalonFXSimFlywheel(config.kSimMotorConfig);
-    this.simNotifier = simMotor.notifer;
+    this.simNotifier = new Notifier(simMotor::updateSimState);
     simNotifier.setName(config.kName + "Notifier");
     simNotifier.startPeriodic(0.005);
   }

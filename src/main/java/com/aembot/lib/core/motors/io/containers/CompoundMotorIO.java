@@ -16,21 +16,16 @@ public abstract class CompoundMotorIO<M extends MotorIO> {
 
   protected CompoundMotorIO() {
     this.kMotors = List.of();
-    implementationSetup();
   }
 
   protected CompoundMotorIO(List<M> motors) {
     this.kMotors = List.copyOf(motors);
-    implementationSetup();
   }
 
   @SafeVarargs
   protected CompoundMotorIO(M... motors) {
     this.kMotors = List.of(motors);
-    implementationSetup();
   }
-
-  protected void implementationSetup() {}
 
   /** Returns the motor at the specified index, or null if the index is out of bounds. */
   public M getMotor(int i) {
