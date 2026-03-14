@@ -12,15 +12,18 @@ public class CompoundMotorIOSim<M extends MotorIO> extends CompoundMotorIO<M> {
 
   public CompoundMotorIOSim() {
     super();
+    simSetup();
   }
 
   public CompoundMotorIOSim(List<M> motors) {
     super(motors);
+    simSetup();
   }
 
   @SafeVarargs
   public CompoundMotorIOSim(M... motors) {
     super(motors);
+    simSetup();
   }
 
   public CompoundMotorIOSim(double periodicSeconds) {
@@ -39,8 +42,7 @@ public class CompoundMotorIOSim<M extends MotorIO> extends CompoundMotorIO<M> {
     this.kPeriodicSeconds = periodicSeconds;
   }
 
-  @Override
-  public void implementationSetup() {
+  public void simSetup() {
     if (kMotors.size() > 0) {
       List<Runnable> updaters = new ArrayList<>();
       for (MotorIO motor : kMotors) {
