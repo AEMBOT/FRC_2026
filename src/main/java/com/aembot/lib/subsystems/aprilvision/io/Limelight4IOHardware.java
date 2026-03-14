@@ -10,20 +10,17 @@ import com.aembot.lib.subsystems.aprilvision.util.LimelightExtras;
 import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers;
 import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers.PoseEstimate;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
-import org.opencv.core.Point;
 
 public class Limelight4IOHardware implements AprilCameraIO {
   protected final CameraConfiguration cameraConfiguration;
@@ -44,9 +41,6 @@ public class Limelight4IOHardware implements AprilCameraIO {
    */
   protected final NetworkTableEntry heartbeatEntry;
 
-  protected final List<Point> tagCorners =
-      List.of(new Point(), new Point(), new Point(), new Point());
-
   protected final RobotState robotStateInstance;
 
   /**
@@ -61,11 +55,6 @@ public class Limelight4IOHardware implements AprilCameraIO {
   private AtomicBoolean hasTag = new AtomicBoolean(false);
 
   private AtomicInteger tagID = new AtomicInteger(-1);
-
-  private AtomicReference<Rotation2d> horizontalAngleToTagRadians =
-      new AtomicReference<>(PositionUtil.NaN.ROTATION2D);
-
-  private AtomicReference<double[]> tagCornerPositionsRaw = new AtomicReference<>(new double[0]);
 
   private AtomicReference<PoseEstimate> megatag2Estimate =
       new AtomicReference<>(new PoseEstimate());
@@ -113,8 +102,6 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
     hasTag.set(LimelightHelpers.getTV(cameraName));
     tagID.set((int) LimelightHelpers.getFiducialID(cameraName));
-    horizontalAngleToTagRadians.set(Rotation2d.fromDegrees(LimelightHelpers.getTX(cameraName)));
-    tagCornerPositionsRaw.set(LimelightHelpers.getCornerCoordinates(cameraName));
 
     megatag2Estimate.set(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName));
 
@@ -130,10 +117,6 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
     inputs.hasTag = hasTag.get();
     inputs.tagID = tagID.get();
-    inputs.horizontalAngleToTag = horizontalAngleToTagRadians.get();
-
-    updateCornerPositions();
-    inputs.tagCornerPositions = this.tagCorners;
 
     if (inputs.hasTag && inputs.tagID >= 1 && inputs.tagID <= fieldConstants.getNumTags()) {
       inputs.tagPosition = fieldConstants.getAprilTagPose3d(inputs.tagID);
@@ -179,22 +162,6 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
     LimelightHelpers.SetRobotOrientation_NoFlush(
         cameraName, robotYaw + mechanismYawDegrees, yawRate, 0, 0, 0, 0);
-  }
-
-  /**
-   * Convert the Limelight-provided double[] of corner coordinates into a list of Vector2s
-   * representing the corner positions in pixels
-   */
-  private void updateCornerPositions() {
-    double[] cornerPositions = tagCornerPositionsRaw.get();
-
-    if (cornerPositions.length >= 8) {
-      // 4 iterations bcuz we process 2 at a time
-      for (int i = 0; i < 4; i++) {
-        tagCorners.get(i).x = cornerPositions[i * 2];
-        tagCorners.get(i).y = cornerPositions[i * 2 + 1];
-      }
-    }
   }
 
   @Override
