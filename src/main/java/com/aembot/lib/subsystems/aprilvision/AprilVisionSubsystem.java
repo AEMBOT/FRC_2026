@@ -6,6 +6,7 @@ import com.aembot.lib.subsystems.aprilvision.util.AprilCameraOutput;
 import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
 import com.aembot.lib.subsystems.base.AEMSubsystem;
 import com.aembot.lib.tracing.Traced;
+import com.aembot.lib.tracing.Tracer;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -96,38 +97,50 @@ public class AprilVisionSubsystem extends AEMSubsystem {
       if (context.isTurretCamera) continue;
 
       if (shouldLogCameraPose) {
-        Logger.recordOutput(
-            context.cameraPositionLogKey,
-            new Pose3d(robotStateInstance.getLatestFieldRobotPose())
-                // Convert the camera pose into a field-space pose for visualization
-                .plus(context.io.getConfiguration().getCameraPosition().minus(Pose3d.kZero)));
+        try (var ignored = Tracer.trace("Vision.logCameraPose." + context.cameraName, "Vision")) {
+          Logger.recordOutput(
+              context.cameraPositionLogKey,
+              new Pose3d(robotStateInstance.getLatestFieldRobotPose())
+                  // Convert the camera pose into a field-space pose for visualization
+                  .plus(context.io.getConfiguration().getCameraPosition().minus(Pose3d.kZero)));
+        }
       }
 
-      context.io.updateInputs(context.inputs);
+      try (var ignored = Tracer.trace("Vision.updateInputs." + context.cameraName, "Vision")) {
+        context.io.updateInputs(context.inputs);
+      }
 
       if (context.inputs.coprocessorEstimationLatencyCompensated != null && visionActive) {
-        aprilTagObservationsBuffer.add(
-            new AprilCameraOutput(
-                context.cameraName,
-                context.inputs.tagID,
-                new VisionPoseEstimation(
-                    context.inputs.coprocessorEstimationLatencyUncompensated,
-                    context.inputs.coprocessorEstimationLatencyCompensated,
-                    context.inputs.coprocessorEstimationStdDevs,
-                    context.inputs.coprocessorEstimationTimestamp)));
+        try (var ignored =
+            Tracer.trace("Vision.buildObservation." + context.cameraName, "Vision")) {
+          aprilTagObservationsBuffer.add(
+              new AprilCameraOutput(
+                  context.cameraName,
+                  context.inputs.tagID,
+                  new VisionPoseEstimation(
+                      context.inputs.coprocessorEstimationLatencyUncompensated,
+                      context.inputs.coprocessorEstimationLatencyCompensated,
+                      context.inputs.coprocessorEstimationStdDevs,
+                      context.inputs.coprocessorEstimationTimestamp)));
+        }
       }
     }
 
-    robotStateInstance.setApriltagObservations(aprilTagObservationsBuffer);
+    try (var ignored = Tracer.trace("Vision.setApriltagObservations", "Vision")) {
+      robotStateInstance.setApriltagObservations(aprilTagObservationsBuffer);
+    }
 
     updateLog();
-    List<AprilCameraOutput> observations = robotStateInstance.getAprilTagObservations();
-    Logger.recordOutput(visionObservationCountLogKey, observations.size());
-    if (!observations.isEmpty() && timestamp >= nextVisionEstimateLogTimestampSeconds) {
-      nextVisionEstimateLogTimestampSeconds = timestamp + VISION_ESTIMATE_LOG_PERIOD_SECONDS;
-      Logger.recordOutput(
-          latestVisionEstimatedRobotPoseLogKey,
-          observations.get(observations.size() - 1).estimatedPose());
+
+    try (var ignored = Tracer.trace("Vision.logObservations", "Vision")) {
+      List<AprilCameraOutput> observations = robotStateInstance.getAprilTagObservations();
+      Logger.recordOutput(visionObservationCountLogKey, observations.size());
+      if (!observations.isEmpty() && timestamp >= nextVisionEstimateLogTimestampSeconds) {
+        nextVisionEstimateLogTimestampSeconds = timestamp + VISION_ESTIMATE_LOG_PERIOD_SECONDS;
+        Logger.recordOutput(
+            latestVisionEstimatedRobotPoseLogKey,
+            observations.get(observations.size() - 1).estimatedPose());
+      }
     }
 
     // Log latency with time between periodic being called and finishing

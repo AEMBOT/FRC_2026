@@ -50,11 +50,17 @@ public class DrivetrainInputs extends AEMSwerveDriveState implements LoggableInp
     this.timestampRIOSynchronized = stateIn.timestampRIOSynchronized;
   }
 
+  private boolean hasLoggedKinematics = false;
+
   @Override
   public void toLog(LogTable table) {
     table.put("UpdateTimestamp", timestampRIOSynchronized);
 
-    table.put("SwerveDriveKinematics", kinematics);
+    // Log kinematics only once since it's static configuration
+    if (!hasLoggedKinematics) {
+      table.put("SwerveDriveKinematics", kinematics);
+      hasLoggedKinematics = true;
+    }
 
     table.put("RobotYawAngle", gyroYawAngle);
     table.put("Pose", Pose);

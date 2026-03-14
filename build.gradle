@@ -111,6 +111,10 @@ dependencies {
     // AEMTracer for annotation-based tracing
     implementation name: 'AEMTracer-1.0.0'
 
+    // ByteBuddy (required by AEMTracer for annotation-based tracing)
+    implementation 'net.bytebuddy:byte-buddy:1.14.12'
+    implementation 'net.bytebuddy:byte-buddy-agent:1.14.12'
+
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

@@ -10,6 +10,7 @@ import com.aembot.lib.subsystems.drive.io.DrivetrainSimIO;
 import com.aembot.lib.subsystems.drive.simulation.MapleSimSwerveDrivetrain;
 import com.aembot.lib.subsystems.drive.visualizations.SwerveVisualizer;
 import com.aembot.lib.tracing.Traced;
+import com.aembot.lib.tracing.Tracer;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -152,15 +153,21 @@ public class DriveSubsystem extends AEMSubsystem {
   @Override
   @Traced(category = "Drivetrain")
   public void updateLog(String standardPrefix, String inputPrefix) {
-    Logger.processInputs(driveInputsLogKey, inputs);
+    try (var ignored = Tracer.trace("Drive.processInputs", "Drivetrain")) {
+      Logger.processInputs(driveInputsLogKey, inputs);
+    }
 
-    Logger.recordOutput(
-        driveOdometrySpeedLogKey,
-        new Translation2d(inputs.Speeds.vxMetersPerSecond, inputs.Speeds.vyMetersPerSecond)
-            .getNorm());
+    try (var ignored = Tracer.trace("Drive.logOdometrySpeed", "Drivetrain")) {
+      Logger.recordOutput(
+          driveOdometrySpeedLogKey,
+          new Translation2d(inputs.Speeds.vxMetersPerSecond, inputs.Speeds.vyMetersPerSecond)
+              .getNorm());
+    }
 
-    // Update the swerve module states
-    visualizer.updateSwerveState(inputs);
+    try (var ignored = Tracer.trace("Drive.updateVisualizer", "Drivetrain")) {
+      // Update the swerve module states
+      visualizer.updateSwerveState(inputs);
+    }
   }
 
   /**
