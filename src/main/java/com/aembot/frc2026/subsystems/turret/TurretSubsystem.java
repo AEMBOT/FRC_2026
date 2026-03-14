@@ -9,6 +9,7 @@ import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -59,7 +60,11 @@ public class TurretSubsystem
   private void setPositionFromEncoders() {
     double absolutePosition =
         config.getMechanismRotationsFromEncoders(
-            io.getCANcoderA().getRawAngle() - 0.683838, io.getCANcoderB().getRawAngle() - 0.654541);
+            MathUtil.inputModulus(io.getCANcoderA().getRawAngle() - 0.683838, 0, 1),
+            MathUtil.inputModulus(io.getCANcoderB().getRawAngle() - 0.654541, 0, 1),
+            config.kCANcoderAGearTeeth,
+            config.kCANcoderBGearTeeth,
+            config.kMechanismTeeth);
 
     if (absolutePosition == -1) {
       CommandScheduler.getInstance()
@@ -102,7 +107,10 @@ public class TurretSubsystem
         "calculatedTurretRot",
         config.getMechanismRotationsFromEncoders(
             encoderAInputs.absolutePositionRotations - 0.683838,
-            encoderBInputs.absolutePositionRotations - 0.654541));
+            encoderBInputs.absolutePositionRotations - 0.654541,
+            config.kCANcoderAGearTeeth,
+            config.kCANcoderBGearTeeth,
+            config.kMechanismTeeth));
 
     state.updateTurretYaw(Rotation2d.fromDegrees(inputs.positionUnits));
 
