@@ -30,38 +30,38 @@ int main() {
 	auto start = chrono::high_resolution_clock::now();
 
 	ofstream hubFileReal("../src/main/deploy/initial-velocities/real/Shooting_Hub_Initial_Velocities.csv");
-	ofstream leftFileReal("../src/main/deploy/initial-velocities/real/Passing_Left_Initial_Velocities.csv");
-	ofstream midFileReal("../src/main/deploy/initial-velocities/real/Passing_Middle_Initial_Velocities.csv");
-	ofstream rightFileReal("../src/main/deploy/initial-velocities/real/Passing_Right_Initial_Velocities.csv");
-	ofstream outpostFileReal("../src/main/deploy/initial-velocities/real/Passing_Outpost_Initial_Velocities.csv");
+	ofstream cornerLeftFileReal("../src/main/deploy/initial-velocities/real/Passing_Left_Corner_Initial_Velocities.csv");
+	ofstream cornerRightFileReal("../src/main/deploy/initial-velocities/real/Passing_Right_Corner_Initial_Velocities.csv");
+	ofstream centerLeftFileReal("../src/main/deploy/initial-velocities/real/Passing_Left_Center_Initial_Velocities.csv");
+	ofstream centerRightFileReal("../src/main/deploy/initial-velocities/real/Passing_Right_Center_Initial_Velocities.csv");
 
 	ofstream hubFileSim("../src/main/deploy/initial-velocities/sim/Shooting_Hub_Initial_Velocities.csv");
-	ofstream leftFileSim("../src/main/deploy/initial-velocities/sim/Passing_Left_Initial_Velocities.csv");
-	ofstream midFileSim("../src/main/deploy/initial-velocities/sim/Passing_Middle_Initial_Velocities.csv");
-	ofstream rightFileSim("../src/main/deploy/initial-velocities/sim/Passing_Right_Initial_Velocities.csv");
-	ofstream outpostFileSim("../src/main/deploy/initial-velocities/sim/Passing_Outpost_Initial_Velocities.csv");
+	ofstream cornerLeftFileSim("../src/main/deploy/initial-velocities/sim/Passing_Left_Corner_Initial_Velocities.csv");
+	ofstream cornerRightFileSim("../src/main/deploy/initial-velocities/sim/Passing_Right_Corner_Initial_Velocities.csv");
+	ofstream centerLeftFileSim("../src/main/deploy/initial-velocities/sim/Passing_Left_Center_Initial_Velocities.csv");
+	ofstream centerRightFileSim("../src/main/deploy/initial-velocities/sim/Passing_Right_Center_Initial_Velocities.csv");
 
 	if (!hubFileReal.is_open()) {
 		cout << "error opening hub file (real)" << endl;
 		return 1;
 	}
 
-	if (!leftFileReal.is_open()) {
+	if (!cornerLeftFileReal.is_open()) {
 		cout << "error opening left file (real)" << endl;
 		return 1;
 	}
 	
-	if (!midFileReal.is_open()) {
+	if (!cornerRightFileReal.is_open()) {
 		cout << "error opening mid file (real)" << endl;
 		return 1;
 	}
 
-	if (!rightFileReal.is_open()) {
+	if (!centerLeftFileReal.is_open()) {
 		cout << "error opening right file (real)" << endl;
 		return 1;
 	}
 
-	if (!outpostFileReal.is_open()) {
+	if (!centerRightFileReal.is_open()) {
 		cout << "error opening outpost file (real)" << endl;
 		return 1;
 	}
@@ -71,22 +71,22 @@ int main() {
 		return 1;
 	}
 
-	if (!leftFileSim.is_open()) {
+	if (!cornerLeftFileSim.is_open()) {
 		cout << "error opening left file (sim)" << endl;
 		return 1;
 	}
 	
-	if (!midFileSim.is_open()) {
+	if (!cornerRightFileSim.is_open()) {
 		cout << "error opening mid file (sim)" << endl;
 		return 1;
 	}
 
-	if (!rightFileSim.is_open()) {
+	if (!centerLeftFileSim.is_open()) {
 		cout << "error opening right file (sim)" << endl;
 		return 1;
 	}
 
-	if (!outpostFileSim.is_open()) {
+	if (!centerRightFileSim.is_open()) {
 		cout << "error opening outpost file (sim)" << endl;
 		return 1;
 	}
@@ -94,15 +94,15 @@ int main() {
 	const char* header = "X Position, Y Position, Z Position, X Velocity, Y Velocity, Z Velocity";
 
 	hubFileReal << header << endl;
-	leftFileReal << header << endl;
-	midFileReal << header << endl;
-	rightFileReal << header << endl;
-	outpostFileReal << header << endl;
+	cornerLeftFileReal << header << endl;
+	cornerRightFileReal << header << endl;
+	centerLeftFileReal << header << endl;
+	centerRightFileReal << header << endl;
 	hubFileSim << header << endl;
-	leftFileSim << header << endl;
-	midFileSim << header << endl;
-	rightFileSim << header << endl;
-	outpostFileSim << header << endl;
+	cornerLeftFileSim << header << endl;
+	cornerRightFileSim << header << endl;
+	centerLeftFileSim << header << endl;
+	centerRightFileSim << header << endl;
 
 	int totalIter = ceil((FIELD_SIZE.x / 0.25)) * ceil((FIELD_SIZE.y / 0.25));
 
@@ -126,23 +126,23 @@ int main() {
 			}
 
 			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 0), PASSING, true);
-			if (point.error <= 0.5) {
-				leftFileReal << robotPos << ", " << point.initVel << endl;
+			if (point.error <= 5) {
+				cornerLeftFileReal << robotPos << ", " << point.initVel << endl;
 			}
 
 			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 1), PASSING, true);
-			if (point.error <= 0.5) {
-				midFileReal << robotPos << ", " << point.initVel << endl;
+			if (point.error <= 5) {
+				cornerRightFileReal << robotPos << ", " << point.initVel << endl;
 			}
 
 			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 2), PASSING, true);
-			if (point.error <= 0.5) {
-				rightFileReal << robotPos << ", " << point.initVel << endl;
+			if (point.error <= 5) {
+				centerLeftFileReal << robotPos << ", " << point.initVel << endl;
 			}
 
 			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 3), PASSING, true);
-			if (point.error <= 0.5) {
-				outpostFileReal << robotPos << ", " << point.initVel << endl;
+			if (point.error <= 5) {
+				centerRightFileReal << robotPos << ", " << point.initVel << endl;
 			}
 			
 			point = OptimizeTest(robotPos, GetTargetPositionsShoot(robotPos), SHOOTING, false);
@@ -151,23 +151,23 @@ int main() {
 			}
 
 			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 0), PASSING, false);
-			if (point.error <= 0.5) {
-				leftFileSim << robotPos << ", " << point.initVel << endl;
+			if (point.error <= 5) {
+				cornerLeftFileSim << robotPos << ", " << point.initVel << endl;
 			}
 
 			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 1), PASSING, false);
-			if (point.error <= 0.5) {
-				midFileSim << robotPos << ", " << point.initVel << endl;
+			if (point.error <= 5) {
+				cornerRightFileSim << robotPos << ", " << point.initVel << endl;
 			}
 
 			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 2), PASSING, false);
-			if (point.error <= 0.5) {
-				rightFileSim << robotPos << ", " << point.initVel << endl;
+			if (point.error <= 5) {
+				centerLeftFileSim << robotPos << ", " << point.initVel << endl;
 			}
 
 			point = OptimizeTest(robotPos, GetTargetPositionsPass(robotPos, 3), PASSING, false);
-			if (point.error <= 0.5) {
-				outpostFileSim << robotPos << ", " << point.initVel << endl;
+			if (point.error <= 5) {
+				centerRightFileSim << robotPos << ", " << point.initVel << endl;
 			}
 
 		
@@ -181,15 +181,15 @@ int main() {
 
 
 	hubFileReal.close();
-	leftFileReal.close();
-	midFileReal.close();
-	rightFileReal.close();
-	outpostFileReal.close();
+	cornerLeftFileReal.close();
+	cornerRightFileReal.close();
+	centerLeftFileReal.close();
+	centerRightFileReal.close();
 	hubFileSim.close();
-	leftFileSim.close();
-	midFileSim.close();
-	rightFileSim.close();
-	outpostFileSim.close();
+	cornerLeftFileSim.close();
+	cornerRightFileSim.close();
+	centerLeftFileSim.close();
+	centerRightFileSim.close();
 
 	auto end = chrono::high_resolution_clock::now();
 
