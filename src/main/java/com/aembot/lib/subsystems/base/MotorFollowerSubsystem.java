@@ -115,43 +115,41 @@ public class MotorFollowerSubsystem<I extends MotorInputs, M extends MotorIO, C>
   }
 
   /**
-   * Get the position of the lead motor
+   * Computes the average current position across the leader and all followers.
    *
-   * @return The position of the lead motor
+   * @return The average position in user-defined units.
    */
   @Override
   public double getCurrentPosition() {
-    // double uninvertedPositionSum = inputs.positionUnits;
-    // for (int i = 0; i < followerMotorInputs.length; i++) {
-    //   double followerPosition = followerMotorInputs[i].positionUnits;
-    //   // If follower is inverted, negate its position to align with leader
-    //   if (mainConfig.followerConfigurations.get(i).followDirection == FollowDirection.INVERT) {
-    //     followerPosition = -followerPosition;
-    //   }
-    //   uninvertedPositionSum += followerPosition;
-    // }
-    // return uninvertedPositionSum / (mainConfig.followerConfigurations.size() + 1);
-    return inputs.positionUnits;
+    double uninvertedPositionSum = inputs.positionUnits;
+    for (int i = 0; i < followerMotorInputs.length; i++) {
+      double followerPosition = followerMotorInputs[i].positionUnits;
+      // If follower is inverted, negate its position to align with leader
+      if (mainConfig.followerConfigurations.get(i).followDirection == FollowDirection.INVERT) {
+        followerPosition = -followerPosition;
+      }
+      uninvertedPositionSum += followerPosition;
+    }
+    return uninvertedPositionSum / (mainConfig.followerConfigurations.size() + 1);
   }
 
   /**
-   * Get the current velocity of the lead motor
+   * Computes the average current velocity across the leader and all followers.
    *
-   * @return The velocity in user-defined units per second.
+   * @return The average velocity in user-defined units per second.
    */
   @Override
   public double getCurrentVelocity() {
-    // double uninvertedVelocitySum = inputs.velocityUnitsPerSecond;
-    // for (int i = 0; i < followerMotorInputs.length; i++) {
-    //   double followerVelocity = followerMotorInputs[i].velocityUnitsPerSecond;
-    //   // If follower is inverted, negate its velocity to align with leader
-    //   if (mainConfig.followerConfigurations.get(i).followDirection == FollowDirection.INVERT) {
-    //     followerVelocity = -followerVelocity;
-    //   }
-    //   uninvertedVelocitySum += followerVelocity;
-    // }
-    // return uninvertedVelocitySum / (mainConfig.followerConfigurations.size() + 1);
-    return inputs.velocityUnitsPerSecond;
+    double uninvertedVelocitySum = inputs.velocityUnitsPerSecond;
+    for (int i = 0; i < followerMotorInputs.length; i++) {
+      double followerVelocity = followerMotorInputs[i].velocityUnitsPerSecond;
+      // If follower is inverted, negate its velocity to align with leader
+      if (mainConfig.followerConfigurations.get(i).followDirection == FollowDirection.INVERT) {
+        followerVelocity = -followerVelocity;
+      }
+      uninvertedVelocitySum += followerVelocity;
+    }
+    return uninvertedVelocitySum / (mainConfig.followerConfigurations.size() + 1);
   }
 
   /**
