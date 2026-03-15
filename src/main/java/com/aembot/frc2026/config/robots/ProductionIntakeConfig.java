@@ -59,7 +59,7 @@ public class ProductionIntakeConfig {
 
   public final double ROLLER_GEAR_RATIO = 1;
 
-  public final double ROLLER_VOLTAGE = 12;
+  public final double ROLLER_VOLTAGE = 9;
 
   public final CurrentLimitsConfigs ROLLER_CURRENT_LIMITS =
       new CurrentLimitsConfigs().withSupplyCurrentLimit(30);
@@ -129,7 +129,8 @@ public class ProductionIntakeConfig {
                   SUBSYSTEM_NAME + "Roller",
                   CANDeviceID.CANDeviceType.TALON_FX))
           .withName(SUBSYSTEM_NAME + "RollerMotorLead")
-          .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / ROLLER_GEAR_RATIO));
+          .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / ROLLER_GEAR_RATIO))
+          .withMomentOfInertia(0.00025);
 
   public final MotorConfiguration<TalonFXConfiguration> ROLLER_FOLLOW_MOTOR_CONFIG =
       new MotorConfiguration<TalonFXConfiguration>()
