@@ -51,7 +51,7 @@ public class MotorConfiguration<T> {
    * Moment of Inertia (KgMetersSquared) (how resistant a motor's rotor is to changs in its
    * rotational speed)
    */
-  public double kMomentOfInertia = 0.5;
+  public double kMomentOfInertia = 0.05;
 
   /**
    * Convert the current rotor rotations to the real-world units specified scaled by the
