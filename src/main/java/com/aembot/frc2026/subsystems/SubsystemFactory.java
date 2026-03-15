@@ -25,7 +25,7 @@ import com.aembot.lib.constants.fields.YearFieldConstantable;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.MotorIOReplay;
 import com.aembot.lib.core.motors.io.MotorIOTalonFX;
-import com.aembot.lib.core.motors.io.MotorIOTalonFXSimFlywheel;
+import com.aembot.lib.core.motors.io.MotorIOTalonFXSim;
 import com.aembot.lib.core.motors.io.containers.CompoundMotorIO;
 import com.aembot.lib.core.motors.io.containers.CompoundMotorIOReal;
 import com.aembot.lib.core.motors.io.containers.CompoundMotorIOReplay;
@@ -263,7 +263,7 @@ public class SubsystemFactory {
             .followerConfigurations) {
       switch (RobotRuntimeConstants.MODE) {
         case SIM:
-          motorIOs.add(new MotorIOTalonFXSimFlywheel(conf.simConfig));
+          motorIOs.add(new MotorIOTalonFXSim(conf.simConfig));
           break;
         case REPLAY:
           motorIOs.add(new MotorIOReplay());
@@ -282,7 +282,7 @@ public class SubsystemFactory {
       case SIM:
         motorIOs.add(
             0,
-            new MotorIOTalonFXSimFlywheel(
+            new MotorIOTalonFXSim(
                 RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig()
                     .kMotorConfigs
                     .leaderSimConfig));

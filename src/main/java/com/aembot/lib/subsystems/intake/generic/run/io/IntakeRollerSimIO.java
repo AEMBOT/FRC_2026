@@ -2,7 +2,7 @@ package com.aembot.lib.subsystems.intake.generic.run.io;
 
 import com.aembot.lib.config.subsystems.intake.generic.run.TalonFXIntakeRollerConfiguration;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
-import com.aembot.lib.core.motors.io.MotorIOTalonFXSimFlywheel;
+import com.aembot.lib.core.motors.io.MotorIOTalonFXSim;
 import com.aembot.lib.subsystems.intake.generic.run.IntakeRollerInputs;
 import edu.wpi.first.wpilibj.Notifier;
 
@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.Notifier;
 public class IntakeRollerSimIO implements IntakeRollerIO {
 
   /** Internal motor to use */
-  private final MotorIOTalonFXSimFlywheel simMotor;
+  private final MotorIOTalonFXSim simMotor;
 
   /** Configuration to use */
   @SuppressWarnings("unused") // Currently unused but that may change in the future
@@ -26,7 +26,7 @@ public class IntakeRollerSimIO implements IntakeRollerIO {
    */
   public IntakeRollerSimIO(TalonFXIntakeRollerConfiguration config) {
     this.config = config;
-    this.simMotor = new MotorIOTalonFXSimFlywheel(config.kSimMotorConfig);
+    this.simMotor = new MotorIOTalonFXSim(config.kSimMotorConfig);
     this.simNotifier = new Notifier(simMotor::updateSimState);
     simNotifier.setName(config.kName + "Notifier");
     simNotifier.startPeriodic(0.005);
