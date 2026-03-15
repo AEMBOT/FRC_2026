@@ -77,7 +77,19 @@ public class MotorFollowerSubsystem<I extends MotorInputs, M extends MotorIO, C>
               + "/Followers/"
               + mainConfig.followerConfigurations.get(i).config.kConfigurationName,
           followerMotorInputs[i]);
+
+      followerIO.follow(
+          mainConfig.leaderConfig.kCANDevice,
+          mainConfig.followerConfigurations.get(i).followDirection);
     }
+
+    // Configure each follower to follow the leader according to their configuration
+    // for (int i = 0; i < mainConfig.followerConfigurations.size(); i++) {
+    //   M motor = this.followerMotorIOs.get(i);
+    //   motor.follow(
+    //       mainConfig.leaderConfig.kCANDevice,
+    //       mainConfig.followerConfigurations.get(i).followDirection);
+    // }
   }
 
   /**
