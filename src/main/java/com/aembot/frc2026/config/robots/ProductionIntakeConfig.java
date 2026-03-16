@@ -29,7 +29,10 @@ public class ProductionIntakeConfig {
   public final int DEPLOY_CAN_ID = 51;
 
   public final int ROLLER_LEAD_CAN_ID = 50;
-  public final int ROLLER_FOLLOWER_CAN_ID = 28; // FIXME get real can id
+  public final int ROLLER_FOLLOWER_CAN_ID = 51; // FIXME get real can id
+
+  public final int LEFT_WHEEL_CAN_ID = 55;
+  public final int RIGHT_WHEEL_CAN_ID = 56;
 
   public final double UP_DEPLOY_ANGLE = 140;
 
@@ -59,10 +62,18 @@ public class ProductionIntakeConfig {
 
   public final double ROLLER_GEAR_RATIO = 1;
 
+  public final double LEFT_WHEEL_GEAR_RATIO = 1;
+
+  public final double RIGHT_WHEEL_GEAR_RATIO = 1;
+
   public final double ROLLER_VOLTAGE = 9;
+
+  public final double WHEEL_VOLTAGE = 2;
 
   public final CurrentLimitsConfigs ROLLER_CURRENT_LIMITS =
       new CurrentLimitsConfigs().withSupplyCurrentLimit(30);
+
+  public final CurrentLimitsConfigs WHEEL_CURRENT_LIMITS = new CurrentLimitsConfigs().withSupplyCurrentLimit(30);
 
   public final NeutralMode ROLLER_NEUTRAL_MODE = NeutralMode.BRAKE;
 
@@ -209,14 +220,60 @@ public class ProductionIntakeConfig {
                       new MotorOutputConfigs()
                           .withInverted(InvertedValue.Clockwise_Positive)
                           .withNeutralMode(ROLLER_NEUTRAL_MODE.toCTRENeutralMode()))
-                  .withCurrentLimits(ROLLER_CURRENT_LIMITS))
+                  .withCurrentLimits(WHEEL_CURRENT_LIMITS))
           .withCANDevice(
               new CANDeviceID(
-                  ROLLER_LEAD_CAN_ID,
+                  LEFT_WHEEL_CAN_ID,
                   SUBSYSTEM_NAME + "LeftWheelMotor",
                   SUBSYSTEM_NAME + "Wheels",
                   CANDeviceID.CANDeviceType.TALON_FX))
           .withName(SUBSYSTEM_NAME + "LeftWheelMotor")
-          .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / ROLLER_GEAR_RATIO))
+          .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / LEFT_WHEEL_GEAR_RATIO))
           .withMomentOfInertia(0.00025);
+    
+    public final MotorConfiguration<TalonFXConfiguration> RIGHT_WHEEL_MOTOR_CONFIG =
+      new MotorConfiguration<TalonFXConfiguration>()
+          .withMotorConfig(
+              new TalonFXConfiguration()
+                  .withMotorOutput(
+                      new MotorOutputConfigs()
+                          .withInverted(InvertedValue.Clockwise_Positive)
+                          .withNeutralMode(ROLLER_NEUTRAL_MODE.toCTRENeutralMode()))
+                  .withCurrentLimits(WHEEL_CURRENT_LIMITS))
+          .withCANDevice(
+              new CANDeviceID(
+                  RIGHT_WHEEL_CAN_ID,
+                  SUBSYSTEM_NAME + "LeftWheelMotor",
+                  SUBSYSTEM_NAME + "Wheels",
+                  CANDeviceID.CANDeviceType.TALON_FX))
+          .withName(SUBSYSTEM_NAME + "LeftWheelMotor")
+          .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / RIGHT_WHEEL_GEAR_RATIO))
+          .withMomentOfInertia(0.00025);
+    
+    public final SimulatedMotorConfiguration<TalonFXConfiguration> LEFT_WHEEL_SIM_MOTOR_CONFIG =
+      new SimulatedMotorConfiguration<TalonFXConfiguration>()
+          .withRealConfiguration(LEFT_WHEEL_MOTOR_CONFIG)
+          .withStartingRotation(0)
+          .withSimMotorConstants(DCMotor.getKrakenX60(1));
+
+    public final SimulatedMotorConfiguration<TalonFXConfiguration> RIGHT_WHEEL_SIM_MOTOR_CONFIG =
+      new SimulatedMotorConfiguration<TalonFXConfiguration>()
+          .withRealConfiguration(RIGHT_WHEEL_MOTOR_CONFIG)
+          .withStartingRotation(0)
+          .withSimMotorConstants(DCMotor.getKrakenX60(1));
+
+    public final BinaryVoltageMotorFollowerConfig WHEEL_CONFIG =
+      new BinaryVoltageMotorFollowerConfig(SUBSYSTEM_NAME + "Wheels")
+          .withMotorConfigs(
+              new MotorFollowersConfiguration<TalonFXConfiguration>()
+                  .withLeaderConfig(LEFT_WHEEL_MOTOR_CONFIG)
+                  .withLeaderSimConfig(LEFT_WHEEL_SIM_MOTOR_CONFIG)
+                  .withFollowerConfigs(
+                      List.of(
+                          new MotorFollowersConfiguration.FollowerConfiguration<>(
+                                  RIGHT_WHEEL_MOTOR_CONFIG)
+                              .withSimConfig(RIGHT_WHEEL_SIM_MOTOR_CONFIG)
+                              .withFollowDirection(FollowDirection.INVERT))))
+          .withIntakeVoltage(WHEEL_VOLTAGE)
+          .validate();
 }
