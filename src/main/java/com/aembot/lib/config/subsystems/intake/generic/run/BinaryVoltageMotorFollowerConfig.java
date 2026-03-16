@@ -5,15 +5,15 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Config for a intake roller subsystem with multiple motors. Works well for Texas Toast. */
-public class MultiTalonFXIntakeRollerConfig {
+/** Config for subsystem with multiple motors that turns on and off with a preconfigured voltage. Works well for Texas Toast. */
+public class BinaryVoltageMotorFollowerConfig {
   public final String kName;
 
   public MotorFollowersConfiguration<TalonFXConfiguration> kMotorConfigs;
 
-  public Double kIntakeVoltage;
+  public Double kRunVoltage;
 
-  public MultiTalonFXIntakeRollerConfig(String name) {
+  public BinaryVoltageMotorFollowerConfig(String name) {
     this.kName = name;
   }
 
@@ -22,16 +22,16 @@ public class MultiTalonFXIntakeRollerConfig {
    * also be called to set the simulated config for the main motor in order for the simulation to
    * work properly.
    *
-   * @return This {@link MultiTalonFXIntakeRollerConfig} instance for chaining.
+   * @return This {@link BinaryVoltageMotorFollowerConfig} instance for chaining.
    */
-  public MultiTalonFXIntakeRollerConfig withMotorConfigs(
+  public BinaryVoltageMotorFollowerConfig withMotorConfigs(
       MotorFollowersConfiguration<TalonFXConfiguration> motorConfigs) {
     this.kMotorConfigs = motorConfigs;
     return this;
   }
 
-  public MultiTalonFXIntakeRollerConfig withIntakeVoltage(double intakeVoltage) {
-    this.kIntakeVoltage = intakeVoltage;
+  public BinaryVoltageMotorFollowerConfig withIntakeVoltage(double intakeVoltage) {
+    this.kRunVoltage = intakeVoltage;
     return this;
   }
 
@@ -40,12 +40,12 @@ public class MultiTalonFXIntakeRollerConfig {
    * config. If they are not, throw a {@link VerifyError}. Intended to be called at the end of an
    * initialization chain.
    *
-   * @return this {@link MultiTalonFXIntakeRollerConfig} for chaining
+   * @return this {@link BinaryVoltageMotorFollowerConfig} for chaining
    */
-  public MultiTalonFXIntakeRollerConfig validate() {
+  public BinaryVoltageMotorFollowerConfig validate() {
     List<String> missing = new ArrayList<>();
     if (this.kMotorConfigs == null) missing.add("kMotorConfigs");
-    if (this.kIntakeVoltage == null) missing.add("kIntakeVoltage");
+    if (this.kRunVoltage == null) missing.add("kIntakeVoltage");
 
     String lowerErrors = "";
     if (this.kMotorConfigs != null) {
