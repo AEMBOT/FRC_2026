@@ -4,7 +4,7 @@ import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.MotorFollowersConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
-import com.aembot.lib.config.subsystems.intake.generic.run.MultiTalonFXIntakeRollerConfig;
+import com.aembot.lib.config.subsystems.intake.generic.run.BinaryVoltageMotorFollowerConfig;
 import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
 import com.aembot.lib.config.wrappers.ConfigureSlot0Gains;
 import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
@@ -186,8 +186,8 @@ public class ProductionIntakeConfig {
   //           .withRealMotorConfiguration(ROLLER_LEAD_MOTOR_CONFIG)
   //           .withSimMotorConfiguration(ROLLER_LEAD_SIM_MOTOR_CONFIG)
   //           .withIntakeVoltage(ROLLER_VOLTAGE);
-  public final MultiTalonFXIntakeRollerConfig ROLLER_CONFIG =
-      new MultiTalonFXIntakeRollerConfig(SUBSYSTEM_NAME + "Roller")
+  public final BinaryVoltageMotorFollowerConfig ROLLER_CONFIG =
+      new BinaryVoltageMotorFollowerConfig(SUBSYSTEM_NAME + "Roller")
           .withMotorConfigs(
               new MotorFollowersConfiguration<TalonFXConfiguration>()
                   .withLeaderConfig(ROLLER_LEAD_MOTOR_CONFIG)
@@ -200,4 +200,23 @@ public class ProductionIntakeConfig {
                               .withFollowDirection(FollowDirection.SAME))))
           .withIntakeVoltage(ROLLER_VOLTAGE)
           .validate();
+
+    public final MotorConfiguration<TalonFXConfiguration> LEFT_WHEEL_MOTOR_CONFIG =
+      new MotorConfiguration<TalonFXConfiguration>()
+          .withMotorConfig(
+              new TalonFXConfiguration()
+                  .withMotorOutput(
+                      new MotorOutputConfigs()
+                          .withInverted(InvertedValue.Clockwise_Positive)
+                          .withNeutralMode(ROLLER_NEUTRAL_MODE.toCTRENeutralMode()))
+                  .withCurrentLimits(ROLLER_CURRENT_LIMITS))
+          .withCANDevice(
+              new CANDeviceID(
+                  ROLLER_LEAD_CAN_ID,
+                  SUBSYSTEM_NAME + "LeftWheelMotor",
+                  SUBSYSTEM_NAME + "Wheels",
+                  CANDeviceID.CANDeviceType.TALON_FX))
+          .withName(SUBSYSTEM_NAME + "LeftWheelMotor")
+          .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / ROLLER_GEAR_RATIO))
+          .withMomentOfInertia(0.00025);
 }
