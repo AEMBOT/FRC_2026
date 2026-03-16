@@ -157,10 +157,6 @@ public class SubsystemFactory {
       case SIM:
         var timeOfFlightIO = new TimeOfFlightSimIOCanRange(selectorConfig.kTimeOfFlightConfig);
 
-        SimulatedRobotStateYearly.get()
-            .simulatedIndexerCompoundState
-            .setSelectorTimeOfFlightDistanceConsumer(timeOfFlightIO::setSimulatedDistance);
-
         return new IndexerSelectorSubsystem(
             selectorConfig,
             new IndexerSelectorMechanismIOSim(selectorConfig),
