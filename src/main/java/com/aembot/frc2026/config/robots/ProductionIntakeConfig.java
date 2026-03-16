@@ -29,7 +29,7 @@ public class ProductionIntakeConfig {
   public final int DEPLOY_CAN_ID = 51;
 
   public final int ROLLER_LEAD_CAN_ID = 50;
-  public final int ROLLER_FOLLOWER_CAN_ID = 99; // FIXME get real can id
+  public final int ROLLER_FOLLOWER_CAN_ID = 28; // FIXME get real can id
 
   public final double UP_DEPLOY_ANGLE = 140;
 
@@ -148,7 +148,8 @@ public class ProductionIntakeConfig {
                   SUBSYSTEM_NAME + "Roller",
                   CANDeviceID.CANDeviceType.TALON_FX))
           .withName(SUBSYSTEM_NAME + "RollerMotorFollower")
-          .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / ROLLER_GEAR_RATIO));
+          .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / ROLLER_GEAR_RATIO))
+          .withMomentOfInertia(0.00025);
 
   public final SimulatedMotorConfiguration<TalonFXConfiguration> DEPLOY_SIM_MOTOR_CONFIG =
       new SimulatedMotorConfiguration<TalonFXConfiguration>()
