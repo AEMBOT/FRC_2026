@@ -104,6 +104,24 @@ public class CameraConfiguration {
    */
   public double baselineAngularStdDev = Double.MAX_VALUE;
 
+  /**
+   * The throttle value when the camera is disabled. What this represents is
+   * implementation-specific. On LL, this is the number of frames skipped
+   */
+  public int disabledThrottleValue = 0;
+
+  /**
+   * The throttle value when the camera is enabled. What this represents is implementation-specific.
+   * On LL, this is the number of frames skipped
+   */
+  public int enabledThrottledValue = 0;
+
+  /** IMUMode to use for pose estimation while disabled */
+  public int disabledIMUMode = 1;
+
+  /** IMUMode to use for pose estimation while enabled */
+  public int enabledIMUMode = 1;
+
   public CameraConfiguration(String name, Type type) {
     this.cameraName = name;
     this.cameraType = type;
@@ -212,6 +230,48 @@ public class CameraConfiguration {
         .withBaselineAngularStdDev(baselineAngularStdDev);
   }
 
+  /**
+   * Set the throttle value when the camera is disabled. What this represents is
+   * implementation-specific. On LL, this is the number of frames skipped
+   *
+   * @return this {@link CameraConfiguration} for chaining
+   */
+  public CameraConfiguration withDisabledThrottleValue(int disabledThrottleValue) {
+    this.disabledThrottleValue = disabledThrottleValue;
+    return this;
+  }
+
+  /**
+   * Set the throttle value when the camera is enabled. What this represents is
+   * implementation-specific. On LL, this is the number of frames skipped
+   *
+   * @return this {@link CameraConfiguration} for chaining
+   */
+  public CameraConfiguration withEnabledThrottleValue(int enabledThrottledValue) {
+    this.enabledThrottledValue = enabledThrottledValue;
+    return this;
+  }
+
+  /**
+   * Set the IMU mode to use while disabled
+   *
+   * @return
+   */
+  public CameraConfiguration withDisabledIMUMode(int disabledIMUMode) {
+    this.disabledIMUMode = disabledIMUMode;
+    return this;
+  }
+
+  /**
+   * Set the IMU mode to use while enabled
+   *
+   * @return
+   */
+  public CameraConfiguration withEnabledIMUMode(int enabledIMUMode) {
+    this.enabledIMUMode = enabledIMUMode;
+    return this;
+  }
+
   @Override
   public String toString() {
     return cameraName + "_" + cameraType.typeName;
@@ -222,6 +282,8 @@ public class CameraConfiguration {
     return new CameraConfiguration(name, Type.LIMELIGHT)
         .withCameraResolution(Resolution.P1280x960)
         .withCameraFOV(FOV.LIMELIGHT4)
-        .withBaslineStdDev(0.02, Double.MAX_VALUE); // Values yoinked from 2481
+        .withBaslineStdDev(0.02, Double.MAX_VALUE) // Values yoinked from 2481
+        .withDisabledThrottleValue(2) // TODO
+        .withEnabledThrottleValue(2);
   }
 }

@@ -13,9 +13,7 @@ import com.aembot.frc2026.subsystems.indexerSelector.io.IndexerSelectorMechanism
 import com.aembot.frc2026.subsystems.indexerSelector.io.IndexerSelectorMechanismIOReplay;
 import com.aembot.frc2026.subsystems.indexerSelector.io.IndexerSelectorMechanismIOSim;
 import com.aembot.frc2026.subsystems.spindexer.SpindexerSubsystem;
-import com.aembot.frc2026.subsystems.spindexer.io.SpindexerMechanismIOReal;
 import com.aembot.frc2026.subsystems.spindexer.io.SpindexerMechanismIOReplay;
-import com.aembot.frc2026.subsystems.spindexer.io.SpindexerMechanismIOSim;
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.frc2026.subsystems.turret.io.TalonFXTurretHardwareIO;
 import com.aembot.frc2026.subsystems.turret.io.TurretReplayIO;
@@ -127,7 +125,7 @@ public class SubsystemFactory {
       case SIM:
         return new SpindexerSubsystem(
             spindexerConfig,
-            new SpindexerMechanismIOSim(spindexerConfig),
+            new SpindexerMechanismIOReplay(), // TODO remove spindexer more cleanly
             indexerCompoundState::getSpindexerCommandedState);
       case REPLAY:
         return new SpindexerSubsystem(
@@ -138,7 +136,7 @@ public class SubsystemFactory {
       default:
         return new SpindexerSubsystem(
             spindexerConfig,
-            new SpindexerMechanismIOReal(spindexerConfig),
+            new SpindexerMechanismIOReplay(),
             indexerCompoundState::getSpindexerCommandedState);
     }
   }

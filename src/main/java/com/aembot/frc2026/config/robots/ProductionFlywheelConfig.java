@@ -1,14 +1,17 @@
 package com.aembot.frc2026.config.robots;
 
+import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.aembot.lib.config.subsystems.flywheel.TalonFXFlywheelConfiguration;
 import com.aembot.lib.config.wrappers.ConfigureSlot0Gains;
+import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -32,11 +35,13 @@ public class ProductionFlywheelConfig {
   public static final double UNITS_TO_MECHANISM_ROTATION_RATIO = SHOOTER_WHEEL_CIRCUMFERENCE;
 
   public static final ConfigureSlot0Gains MOTOR_GAINS =
-      new ConfigureSlot0Gains(1.0, 0.0, 0.0, 0.0, 0.0, 0.1222, 0.0);
+      (RobotRuntimeConstants.MODE == RuntimeMode.REAL)
+          ? new ConfigureSlot0Gains(0.0, 0.0, 0.0, 0.0, 0.4, 0.132, 0.0)
+          : new ConfigureSlot0Gains(5, 0, 0, 0, 0, 0.1, 0);
 
   public static final int MOTOR_ID = 53;
   public static final String MOTOR_NAME = "FlywheelMotor";
-  public static final double MOTOR_CURRENT_LIMIT = 50.0;
+  public static final double MOTOR_CURRENT_LIMIT = 40.0;
 
   public static final String FLYWHEEL_SUBSYTEM_NAME = "FlywheelSubsystem";
 
@@ -46,11 +51,14 @@ public class ProductionFlywheelConfig {
       new MotorConfiguration<TalonFXConfiguration>()
           .withMotorConfig(
               new TalonFXConfiguration()
-                  .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast))
+                  .withMotorOutput(
+                      new MotorOutputConfigs()
+                          .withNeutralMode(NeutralModeValue.Coast)
+                          .withInverted(InvertedValue.Clockwise_Positive))
                   .withCurrentLimits(
                       new CurrentLimitsConfigs()
-                          .withStatorCurrentLimit(MOTOR_CURRENT_LIMIT)
-                          .withStatorCurrentLimitEnable(true))
+                          .withSupplyCurrentLimit(MOTOR_CURRENT_LIMIT)
+                          .withSupplyCurrentLimitEnable(true))
                   .withSlot0(MOTOR_GAINS)
                   .withMotionMagic(
                       new MotionMagicConfigs()

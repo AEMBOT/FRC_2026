@@ -280,4 +280,14 @@ public class Limelight4IOSim extends Limelight4IOHardware {
         estimate.timestampSeconds,
         estimate.pose);
   }
+
+  @Override
+  public void updateNetworkTablesForDisabled() {
+    // TODO sim impl
+  }
+
+  @Override
+  public void updateNetworkTablesForEnabled() {
+    // TODO sim impl
+  }
 }

@@ -73,15 +73,15 @@ public class IndexerSelectorSubsystem
     return run(() -> {
           switch (kCommandedRunStateSupplier.get()) {
             case FORWARD:
-              this.setSmartVelocitySetpointImpl(kConfig.kTargetSpeedRPM / 60);
+              this.setVoltageImpl(kConfig.kRunVoltage);
               break;
             case REVERSE:
-              this.setSmartVelocitySetpointImpl(-(kConfig.kTargetSpeedRPM / 60));
+              this.setVoltageImpl(-kConfig.kRunVoltage);
               break;
             default:
             case RESIST:
             case OFF:
-              this.setSmartVelocitySetpointImpl(0);
+              this.setVoltageImpl(0);
               break;
           }
         })
@@ -90,11 +90,11 @@ public class IndexerSelectorSubsystem
 
   /**
    * @return Command that will set the target velocity of the spindexer to the velocity defined in
-   *     {@link #kConfig}'s {@link IndexerSelectorConfiguration#kTargetSpeedRPM}. Runs until
+   *     {@link #kConfig}'s {@link IndexerSelectorConfiguration#kRunVoltage}. Runs until
    *     termination. Note that this does not set target velocity to 0 upon termination.
    */
   public Command runSelectorCommand() {
-    return this.smartVelocitySetpointCommand(() -> kConfig.kTargetSpeedRPM / 60);
+    return this.smartVelocitySetpointCommand(() -> kConfig.kRunVoltage / 60);
   }
 
   /**

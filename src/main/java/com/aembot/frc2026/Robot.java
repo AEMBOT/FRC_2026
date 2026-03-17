@@ -44,6 +44,7 @@ public class Robot extends LoggedRobot {
 
     // Update the robot state
     RobotStateYearly.get().updateLog();
+    m_robotContainer.logCommands();
   }
 
   @Override

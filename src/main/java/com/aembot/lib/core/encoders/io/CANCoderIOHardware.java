@@ -1,8 +1,5 @@
 package com.aembot.lib.core.encoders.io;
 
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-
 import com.aembot.lib.config.encoders.AEMCANCoderConfiguration;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.aembot.lib.core.can.interfaces.CANable;
@@ -61,8 +58,8 @@ public class CANCoderIOHardware implements CANCoderIO, CANable {
       return false;
     }
 
-    inputs.absolutePositionRotations = positionSignal.getValue().in(Rotations);
-    inputs.velocityRotationsPerSecond = velocitySignal.getValue().in(RotationsPerSecond);
+    inputs.absolutePositionRotations = positionSignal.getValueAsDouble();
+    inputs.velocityRotationsPerSecond = velocitySignal.getValueAsDouble();
     return true;
   }
 

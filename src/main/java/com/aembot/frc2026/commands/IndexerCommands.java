@@ -117,7 +117,11 @@ public final class IndexerCommands {
               // Often, the "Feed" cmd will still be technically requiring the subsystem atp, so
               // check against that;
               if (cmd == null || cmd.getName().equals(NAME)) {
-                CommandScheduler.getInstance().schedule(createLoadIndexerUntilTimeoutCommand());
+                if (indexerCompoundState.getGamePieceInSelector()) {
+                  CommandScheduler.getInstance().schedule(createDisableIndexerCommand());
+                } else {
+                  CommandScheduler.getInstance().schedule(createLoadIndexerUntilTimeoutCommand());
+                }
               }
             });
   }
@@ -125,8 +129,18 @@ public final class IndexerCommands {
   public Command createRunIndexerBackCommand() {
     final String NAME = "Reverse";
 
-    return new InstantCommand(
+    return new RunCommand(
             () -> indexerCompoundState.commandState(IndexerRunState.REVERSE), dummySubsystem)
-        .withName(NAME);
+        .withName(NAME)
+        .finallyDo(
+            () -> {
+              // Check that we're not interrupting another command.
+              var cmd = CommandScheduler.getInstance().requiring(dummySubsystem);
+              // Often, the "Feed" cmd will still be technically requiring the subsystem atp, so
+              // check against that;
+              if (cmd == null || cmd.getName().equals(NAME)) {
+                CommandScheduler.getInstance().schedule(createDisableIndexerCommand());
+              }
+            });
   }
 }
