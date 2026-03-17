@@ -2,6 +2,7 @@ package com.aembot.lib.subsystems.aprilvision;
 
 import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
+import com.aembot.lib.math.PositionUtil;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.aprilvision.interfaces.AprilCameraIO;
 import com.aembot.lib.subsystems.aprilvision.util.AprilCameraOutput;
@@ -62,7 +63,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
       Logger.recordOutput(
           logPrefixStandard + "/" + config.cameraName + "/CameraPosition",
           new Pose3d(robotStateInstance.getLatestFieldRobotPose())
-              .plus(config.getCameraPosition().minus(Pose3d.kZero)));
+              .plus(PositionUtil.toTransform3d(config.getCameraPosition())));
 
       io.updateInputs(inputs);
 
@@ -240,7 +241,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
     }
 
     // Apply any mechanism relative offsets to this estimated pose
-    Pose2d transformedPose = transformPoseForMechanism(inputs.rawCoprocessorPose, config);
+    Pose2d transformedPose = transformCameraPoseToRobotCenter(inputs.rawCoprocessorPose, config);
 
     // Compute standard deviations
     OdometryStandardDevs stdDevs =
@@ -257,7 +258,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
       String cameraName,
       double omegaRadPerSec) {
     // Reject if too close (garbage data from being inside tag)
-    boolean tooClose = inputs.avgTagDist < 0.56;
+    boolean tooClose = inputs.avgTagDist < config.minTagDistanceMeters;
 
     // Rotation rate filtering - stricter for single tag
     boolean rotatingTooFast;
@@ -277,10 +278,11 @@ public class AprilVisionSubsystem extends AEMSubsystem {
   }
 
   /**
-   * Transform the raw coprocessor pose to account for mechanism-mounted cameras (e.g., turret).
-   * Only yaw is corrected here since pitch/roll don't affect the 2D heading.
+   * Transform the raw coprocessor pose (at camera XY location) to robot center pose. This handles:
+   * - Subtracting the camera XY offset to get robot center position
+   * - Subtracting any mechanism yaw (e.g., turret rotation) to get true robot heading
    */
-  private Pose2d transformPoseForMechanism(Pose2d rawPose, CameraConfiguration config) {
+  private Pose2d transformCameraPoseToRobotCenter(Pose2d rawPose, CameraConfiguration config) {
     // Get mechanism yaw (e.g., turret rotation) - pitch/roll handled by LL via SetRobotOrientation
     Rotation2d mechanismYaw =
         Rotation2d.fromRadians(config.mechanismOrigin.get().getRotation().getZ());
