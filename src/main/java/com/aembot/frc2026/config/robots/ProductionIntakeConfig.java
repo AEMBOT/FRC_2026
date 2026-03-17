@@ -73,7 +73,8 @@ public class ProductionIntakeConfig {
   public final CurrentLimitsConfigs ROLLER_CURRENT_LIMITS =
       new CurrentLimitsConfigs().withSupplyCurrentLimit(30);
 
-  public final CurrentLimitsConfigs WHEEL_CURRENT_LIMITS = new CurrentLimitsConfigs().withSupplyCurrentLimit(30);
+  public final CurrentLimitsConfigs WHEEL_CURRENT_LIMITS =
+      new CurrentLimitsConfigs().withSupplyCurrentLimit(30);
 
   public final NeutralMode ROLLER_NEUTRAL_MODE = NeutralMode.BRAKE;
 
@@ -208,11 +209,11 @@ public class ProductionIntakeConfig {
                           new MotorFollowersConfiguration.FollowerConfiguration<>(
                                   ROLLER_FOLLOW_MOTOR_CONFIG)
                               .withSimConfig(ROLLER_FOLLOW_SIM_MOTOR_CONFIG)
-                              .withFollowDirection(FollowDirection.SAME))))
+                              .withFollowDirection(FollowDirection.INVERT))))
           .withIntakeVoltage(ROLLER_VOLTAGE)
           .validate();
 
-    public final MotorConfiguration<TalonFXConfiguration> LEFT_WHEEL_MOTOR_CONFIG =
+  public final MotorConfiguration<TalonFXConfiguration> LEFT_WHEEL_MOTOR_CONFIG =
       new MotorConfiguration<TalonFXConfiguration>()
           .withMotorConfig(
               new TalonFXConfiguration()
@@ -230,8 +231,8 @@ public class ProductionIntakeConfig {
           .withName(SUBSYSTEM_NAME + "LeftWheelMotor")
           .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / LEFT_WHEEL_GEAR_RATIO))
           .withMomentOfInertia(0.00025);
-    
-    public final MotorConfiguration<TalonFXConfiguration> RIGHT_WHEEL_MOTOR_CONFIG =
+
+  public final MotorConfiguration<TalonFXConfiguration> RIGHT_WHEEL_MOTOR_CONFIG =
       new MotorConfiguration<TalonFXConfiguration>()
           .withMotorConfig(
               new TalonFXConfiguration()
@@ -249,20 +250,20 @@ public class ProductionIntakeConfig {
           .withName(SUBSYSTEM_NAME + "LeftWheelMotor")
           .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / RIGHT_WHEEL_GEAR_RATIO))
           .withMomentOfInertia(0.00025);
-    
-    public final SimulatedMotorConfiguration<TalonFXConfiguration> LEFT_WHEEL_SIM_MOTOR_CONFIG =
+
+  public final SimulatedMotorConfiguration<TalonFXConfiguration> LEFT_WHEEL_SIM_MOTOR_CONFIG =
       new SimulatedMotorConfiguration<TalonFXConfiguration>()
           .withRealConfiguration(LEFT_WHEEL_MOTOR_CONFIG)
           .withStartingRotation(0)
           .withSimMotorConstants(DCMotor.getKrakenX60(1));
 
-    public final SimulatedMotorConfiguration<TalonFXConfiguration> RIGHT_WHEEL_SIM_MOTOR_CONFIG =
+  public final SimulatedMotorConfiguration<TalonFXConfiguration> RIGHT_WHEEL_SIM_MOTOR_CONFIG =
       new SimulatedMotorConfiguration<TalonFXConfiguration>()
           .withRealConfiguration(RIGHT_WHEEL_MOTOR_CONFIG)
           .withStartingRotation(0)
           .withSimMotorConstants(DCMotor.getKrakenX60(1));
 
-    public final BinaryVoltageMotorFollowerConfig WHEEL_CONFIG =
+  public final BinaryVoltageMotorFollowerConfig WHEEL_CONFIG =
       new BinaryVoltageMotorFollowerConfig(SUBSYSTEM_NAME + "Wheels")
           .withMotorConfigs(
               new MotorFollowersConfiguration<TalonFXConfiguration>()

@@ -5,7 +5,10 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Config for subsystem with multiple motors that turns on and off with a preconfigured voltage. Works well for Texas Toast. */
+/**
+ * Config for subsystem with multiple motors that turns on and off with a preconfigured voltage.
+ * Works well for Texas Toast.
+ */
 public class BinaryVoltageMotorFollowerConfig {
   public final String kName;
 

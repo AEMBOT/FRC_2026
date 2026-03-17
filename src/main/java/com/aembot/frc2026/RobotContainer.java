@@ -16,6 +16,7 @@ import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import com.aembot.lib.subsystems.intake.generic.multimotor.IntakeRollerMultiMotorSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
+import com.aembot.lib.subsystems.premades.BinaryVoltageMotorFollowerSubsytem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -58,6 +59,8 @@ public class RobotContainer implements Loggerable {
       SubsystemFactory.createIntakeDeploySubsystem();
   private final IntakeRollerMultiMotorSubsystem intakeRollerSubsystem =
       SubsystemFactory.createIntakeRollerSubsystem();
+  private final BinaryVoltageMotorFollowerSubsytem intakeWheelsSubsystem =
+      SubsystemFactory.createIntakeWheelsSubsystem();
 
   /* ---- TURRET ---- */
   private final TurretSubsystem turretSubsystem = SubsystemFactory.createTurretSubsystem();
@@ -97,6 +100,7 @@ public class RobotContainer implements Loggerable {
             hoodSubsystem,
             intakeDeploySubsystem,
             intakeRollerSubsystem,
+            intakeWheelsSubsystem,
             flywheelSubsystem,
             turretSubsystem);
 
