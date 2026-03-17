@@ -29,7 +29,7 @@ public class ProductionIntakeConfig {
   public final int DEPLOY_CAN_ID = 52;
 
   public final int ROLLER_LEAD_CAN_ID = 50;
-  public final int ROLLER_FOLLOWER_CAN_ID = 51; // FIXME get real can id
+  public final int ROLLER_FOLLOWER_CAN_ID = 51;
 
   public final int LEFT_WHEEL_CAN_ID = 55;
   public final int RIGHT_WHEEL_CAN_ID = 56;
