@@ -17,6 +17,7 @@ import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.pathplanner.lib.config.RobotConfig;
 import java.util.List;
 
 /**
@@ -84,6 +85,13 @@ public abstract class RobotConfiguration {
    * @return intake roller configuration
    */
   public abstract BinaryVoltageMotorFollowerConfig getIntakeRollerConfig();
+
+  /**
+   * Get the configuration of the intake wheels subsystem
+   *
+   * @return intake wheels configuration
+   */
+  public abstract BinaryVoltageMotorFollowerConfig getIntakeWheelsConfig();
 
   /**
    * Get configuration details about the drive train sim for this robot

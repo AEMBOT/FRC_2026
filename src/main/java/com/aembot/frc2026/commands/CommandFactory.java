@@ -9,6 +9,7 @@ import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import com.aembot.lib.subsystems.intake.generic.multimotor.IntakeRollerMultiMotorSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
+import com.aembot.lib.subsystems.premades.BinaryVoltageMotorFollowerSubsytem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -37,11 +38,13 @@ public final class CommandFactory {
       HoodSubsystem hoodSubsystem,
       OverBumperIntakeDeploySubsystem intakeDeploySubsystem,
       IntakeRollerMultiMotorSubsystem intakeRollerSubsystem,
+      BinaryVoltageMotorFollowerSubsytem intakeWheelsSubsystem,
       FlywheelSubsystem flywheelSubsystem,
       TurretSubsystem turretSubsystem) {
 
     this.driveSubsystem = driveSubsystem;
-    this.intakeCommands = new IntakeCommands(intakeDeploySubsystem, intakeRollerSubsystem);
+    this.intakeCommands =
+        new IntakeCommands(intakeDeploySubsystem, intakeRollerSubsystem, intakeWheelsSubsystem);
     this.shooterCommands = new ShooterCommands(hoodSubsystem, turretSubsystem, flywheelSubsystem);
 
     this.aimTrigger =

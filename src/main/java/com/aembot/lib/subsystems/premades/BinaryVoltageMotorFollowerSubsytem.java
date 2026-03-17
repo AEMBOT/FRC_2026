@@ -1,18 +1,15 @@
 package com.aembot.lib.subsystems.premades;
 
-import java.util.stream.Stream;
-
-import org.littletonrobotics.junction.Logger;
-
 import com.aembot.lib.config.subsystems.intake.generic.run.BinaryVoltageMotorFollowerConfig;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.io.containers.CompoundMotorIO;
 import com.aembot.lib.subsystems.base.MotorFollowerSubsystem;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import java.util.stream.Stream;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Extension of the motor follower subsystem to add over the bumper intake roller functionality.
@@ -31,8 +28,7 @@ public class BinaryVoltageMotorFollowerSubsytem
    * @param state State consumer in order to update the state of this subsystem in RobotState
    */
   public BinaryVoltageMotorFollowerSubsytem(
-      BinaryVoltageMotorFollowerConfig config,
-      CompoundMotorIO<MotorIO> motorIOContainer) {
+      BinaryVoltageMotorFollowerConfig config, CompoundMotorIO<MotorIO> motorIOContainer) {
     // super(
     //     new MotorInputs(),
     //     motors[0],

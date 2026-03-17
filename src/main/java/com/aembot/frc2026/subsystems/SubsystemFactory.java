@@ -55,6 +55,7 @@ import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeplo
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.io.OverBumperIntakeDeployReplayIO;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.io.OverBumperIntakeDeploySimIO;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.io.TalonFXOverBumperIntakeDeployHardwareIO;
+import com.aembot.lib.subsystems.premades.BinaryVoltageMotorFollowerSubsytem;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -305,6 +306,62 @@ public class SubsystemFactory {
         RobotRuntimeConstants.ROBOT_CONFIG.getIntakeRollerConfig(),
         RobotStateYearly.get().intakeRollerState,
         ioContainer);
+  }
+
+  public static BinaryVoltageMotorFollowerSubsytem createIntakeWheelsSubsystem() {
+    ArrayList<MotorIO> motorIOs = new ArrayList<>();
+
+    /* -- ADD FOLLOWER(S) -- */
+    for (MotorFollowersConfiguration.FollowerConfiguration<TalonFXConfiguration> conf :
+        RobotRuntimeConstants.ROBOT_CONFIG.getIntakeWheelsConfig()
+            .kMotorConfigs
+            .followerConfigurations) {
+      switch (RobotRuntimeConstants.MODE) {
+        case SIM:
+          motorIOs.add(new MotorIOTalonFXSim(conf.simConfig));
+          break;
+        case REPLAY:
+          motorIOs.add(new MotorIOReplay());
+          break;
+        default:
+        case REAL:
+          motorIOs.add(new MotorIOTalonFX(conf.config));
+          break;
+      }
+    }
+
+    CompoundMotorIO<MotorIO> ioContainer;
+
+    /* -- ADD LEADER & BUILD IO CONTAINER -- */
+    switch (RobotRuntimeConstants.MODE) {
+      case SIM:
+        motorIOs.add(
+            0,
+            new MotorIOTalonFXSim(
+                RobotRuntimeConstants.ROBOT_CONFIG.getIntakeWheelsConfig()
+                    .kMotorConfigs
+                    .leaderSimConfig));
+        ioContainer = new CompoundMotorIOSim<>(motorIOs);
+        break;
+      case REPLAY:
+        motorIOs.add(0, new MotorIOReplay());
+        ioContainer = new CompoundMotorIOReplay<>(motorIOs);
+        break;
+      default:
+      case REAL:
+        motorIOs.add(
+            0,
+            new MotorIOTalonFX(
+                RobotRuntimeConstants.ROBOT_CONFIG.getIntakeWheelsConfig()
+                    .kMotorConfigs
+                    .leaderConfig));
+        ioContainer = new CompoundMotorIOReal<>(motorIOs);
+        break;
+    }
+
+    /* -- MAKE ACTUAL SUBSYSTEM -- */
+    return new BinaryVoltageMotorFollowerSubsytem(
+        RobotRuntimeConstants.ROBOT_CONFIG.getIntakeWheelsConfig(), ioContainer);
   }
 
   public static AprilVisionSubsystem createAprilVisionSubsystem() {

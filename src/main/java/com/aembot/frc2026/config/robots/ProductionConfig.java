@@ -80,6 +80,11 @@ public class ProductionConfig extends RobotConfiguration {
   }
 
   @Override
+  public BinaryVoltageMotorFollowerConfig getIntakeWheelsConfig() {
+    return INTAKE_CONFIG.WHEEL_CONFIG;
+  }
+
+  @Override
   public List<String> getCANBusNames() {
     return CAN_BUS_NAMES;
   }
