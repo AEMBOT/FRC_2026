@@ -122,6 +122,31 @@ public class CameraConfiguration {
   /** IMUMode to use for pose estimation while enabled */
   public int enabledIMUMode = 1;
 
+  // ===== VISION FILTERING PARAMETERS =====
+
+  /** Maximum age (seconds) for a vision estimate to be considered valid */
+  public double maxEstimateAgeSeconds = 0.5;
+
+  /** Max rotation rate (rad/s) before rejecting single-tag estimates */
+  public double maxOmegaForSingleTagRadians = Math.toRadians(150);
+
+  /** Max rotation rate (rad/s) before rejecting all estimates */
+  public double maxOmegaForAnyTagRadians = Math.toRadians(360);
+
+  // ===== TAG AREA THRESHOLDS (percentage of image) =====
+
+  /** Tag area below this threshold is rejected */
+  public double tagAreaRejectThreshold = 0.05;
+
+  /** Tag area threshold for "far" quality tier */
+  public double tagAreaFarThreshold = 0.1;
+
+  /** Tag area threshold for "medium" quality tier */
+  public double tagAreaMediumThreshold = 1.0;
+
+  /** Tag area threshold for "good" quality tier */
+  public double tagAreaGoodThreshold = 5.0;
+
   public CameraConfiguration(String name, Type type) {
     this.cameraName = name;
     this.cameraType = type;
@@ -272,6 +297,34 @@ public class CameraConfiguration {
     return this;
   }
 
+  /** Set the maximum age (seconds) for a vision estimate to be considered valid */
+  public CameraConfiguration withMaxEstimateAgeSeconds(double maxAgeSeconds) {
+    this.maxEstimateAgeSeconds = maxAgeSeconds;
+    return this;
+  }
+
+  /** Set the max rotation rate (rad/s) before rejecting single-tag estimates */
+  public CameraConfiguration withMaxOmegaForSingleTagRadians(double maxOmegaRadians) {
+    this.maxOmegaForSingleTagRadians = maxOmegaRadians;
+    return this;
+  }
+
+  /** Set the max rotation rate (rad/s) before rejecting all estimates */
+  public CameraConfiguration withMaxOmegaForAnyTagRadians(double maxOmegaRadians) {
+    this.maxOmegaForAnyTagRadians = maxOmegaRadians;
+    return this;
+  }
+
+  /** Set the tag area thresholds (percentage of image) for quality scoring */
+  public CameraConfiguration withTagAreaThresholds(
+      double rejectThreshold, double farThreshold, double mediumThreshold, double goodThreshold) {
+    this.tagAreaRejectThreshold = rejectThreshold;
+    this.tagAreaFarThreshold = farThreshold;
+    this.tagAreaMediumThreshold = mediumThreshold;
+    this.tagAreaGoodThreshold = goodThreshold;
+    return this;
+  }
+
   @Override
   public String toString() {
     return cameraName + "_" + cameraType.typeName;
@@ -284,6 +337,11 @@ public class CameraConfiguration {
         .withCameraFOV(FOV.LIMELIGHT4)
         .withBaslineStdDev(0.02, Double.MAX_VALUE) // Values yoinked from 2481
         .withDisabledThrottleValue(2) // TODO
-        .withEnabledThrottleValue(2);
+        .withEnabledThrottleValue(2)
+        // Vision filtering defaults
+        .withMaxEstimateAgeSeconds(0.5)
+        .withMaxOmegaForSingleTagRadians(Math.toRadians(150))
+        .withMaxOmegaForAnyTagRadians(Math.toRadians(360))
+        .withTagAreaThresholds(0.05, 0.1, 1.0, 5.0);
   }
 }

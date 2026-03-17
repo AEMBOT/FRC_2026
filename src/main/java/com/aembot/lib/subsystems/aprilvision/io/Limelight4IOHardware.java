@@ -10,6 +10,7 @@ import com.aembot.lib.subsystems.aprilvision.util.LimelightExtras;
 import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers;
 import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers.PoseEstimate;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -148,9 +149,11 @@ public class Limelight4IOHardware implements AprilCameraIO {
   private void setRobotYawNetworkTables() {
     double robotYaw = robotStateInstance.getLatestFieldRobotPose().getRotation().getDegrees();
 
-    // Add mechanism origin yaw (e.g., turret rotation) so the LL knows its actual field orientation
-    double mechanismYawDegrees =
-        Units.radiansToDegrees(cameraConfiguration.mechanismOrigin.get().getRotation().getZ());
+    // Add mechanism origin rotation (e.g., turret) so the LL knows its actual field orientation
+    Rotation3d mechanismRotation = cameraConfiguration.mechanismOrigin.get().getRotation();
+    double mechanismYawDegrees = Units.radiansToDegrees(mechanismRotation.getZ());
+    double mechanismPitchDegrees = Units.radiansToDegrees(mechanismRotation.getY());
+    double mechanismRollDegrees = Units.radiansToDegrees(mechanismRotation.getX());
 
     // For mechanism-mounted cameras, set yaw rate to 0 since we don't have mechanism velocity
     double yawRate =
@@ -161,7 +164,13 @@ public class Limelight4IOHardware implements AprilCameraIO {
             : 0;
 
     LimelightHelpers.SetRobotOrientation_NoFlush(
-        cameraName, robotYaw + mechanismYawDegrees, yawRate, 0, 0, 0, 0);
+        cameraName,
+        robotYaw + mechanismYawDegrees,
+        yawRate,
+        mechanismPitchDegrees,
+        0,
+        mechanismRollDegrees,
+        0);
   }
 
   @Override
