@@ -34,7 +34,7 @@ public class ProductionIntakeConfig {
   public final int LEFT_WHEEL_CAN_ID = 55;
   public final int RIGHT_WHEEL_CAN_ID = 56;
 
-  public final double UP_DEPLOY_ANGLE = 140;
+  public final double UP_DEPLOY_ANGLE = 117.788503;
 
   public final double DOWN_DEPLOY_ANGLE = 8.206357; // Less temporary
 
@@ -66,9 +66,9 @@ public class ProductionIntakeConfig {
 
   public final double RIGHT_WHEEL_GEAR_RATIO = 1;
 
-  public final double ROLLER_VOLTAGE = 9;
+  public final double ROLLER_VOLTAGE = -9;
 
-  public final double WHEEL_VOLTAGE = 2;
+  public final double WHEEL_VOLTAGE = -2;
 
   public final CurrentLimitsConfigs ROLLER_CURRENT_LIMITS =
       new CurrentLimitsConfigs().withSupplyCurrentLimit(30);
@@ -131,7 +131,7 @@ public class ProductionIntakeConfig {
               new TalonFXConfiguration()
                   .withMotorOutput(
                       new MotorOutputConfigs()
-                          .withInverted(InvertedValue.Clockwise_Positive)
+                          .withInverted(InvertedValue.CounterClockwise_Positive)
                           .withNeutralMode(ROLLER_NEUTRAL_MODE.toCTRENeutralMode()))
                   .withCurrentLimits(ROLLER_CURRENT_LIMITS))
           .withCANDevice(
@@ -150,7 +150,7 @@ public class ProductionIntakeConfig {
               new TalonFXConfiguration()
                   .withMotorOutput(
                       new MotorOutputConfigs()
-                          .withInverted(InvertedValue.Clockwise_Positive)
+                          .withInverted(InvertedValue.CounterClockwise_Positive)
                           .withNeutralMode(ROLLER_NEUTRAL_MODE.toCTRENeutralMode()))
                   .withCurrentLimits(ROLLER_CURRENT_LIMITS))
           .withCANDevice(
