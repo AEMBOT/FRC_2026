@@ -32,7 +32,7 @@ public class ProductionCameraConfig {
 
   private static final int DISABLED_IMU_MODE = 1;
 
-  private static final int ENABLED_IMU_MODE = 4;
+  private static final int ENABLED_IMU_MODE = 1;
 
   /* ---- TURRET CAM ---- */
   public final CameraConfiguration cameraConfigTurret =
@@ -128,7 +128,7 @@ public class ProductionCameraConfig {
                   new Translation3d(
                       Units.inchesToMeters(-13),
                       Units.inchesToMeters(0),
-                      Units.inchesToMeters(12.2)),
+                      Units.inchesToMeters(9.18)),
                   new Rotation3d(
                       Units.degreesToRadians(180),
                       Units.degreesToRadians(-27),
