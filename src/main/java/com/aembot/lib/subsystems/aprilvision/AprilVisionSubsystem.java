@@ -279,8 +279,8 @@ public class AprilVisionSubsystem extends AEMSubsystem {
 
   /**
    * Transform the raw coprocessor pose (at camera XY location) to robot center pose. This handles:
-   * - Subtracting the camera XY offset to get robot center position
-   * - Subtracting any mechanism yaw (e.g., turret rotation) to get true robot heading
+   *  - Subtracting the camera XY offset to get robot center position 
+   *  - Subtracting any mechanism yaw (e.g., turret rotation) to get true robot heading
    */
   private Pose2d transformCameraPoseToRobotCenter(Pose2d rawPose, CameraConfiguration config) {
     // Get mechanism yaw (e.g., turret rotation) - pitch/roll handled by LL via SetRobotOrientation
