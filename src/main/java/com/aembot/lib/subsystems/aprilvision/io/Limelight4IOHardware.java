@@ -14,6 +14,7 @@ import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -80,6 +81,8 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
   private double cachedRobotYaw = 0;
 
+  protected Transform2d horizontalCameraOffset;
+
   public Limelight4IOHardware(
       CameraConfiguration config,
       YearFieldConstantable fieldConstants,
@@ -98,10 +101,13 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
     Pose3d cameraPosition = cameraConfiguration.getCameraPosition();
 
+    horizontalCameraOffset =
+        new Transform2d(-cameraPosition.getX(), -cameraPosition.getY(), Rotation2d.kZero);
+
     LimelightHelpers.setCameraPose_RobotSpace(
         cameraName,
-        cameraPosition.getX(),
-        -cameraPosition.getY(),
+        0,
+        0,
         cameraPosition.getZ(),
         Units.radiansToDegrees(cameraPosition.getRotation().getX()),
         -Units.radiansToDegrees(cameraPosition.getRotation().getY()),
@@ -177,16 +183,21 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
     setRobotYawNetworkTables();
 
+    double robotYawRate =
+        Units.radiansToDegrees(
+            robotStateInstance.getLatestMeasuredFieldRelativeChassisSpeeds().omegaRadiansPerSecond);
+
     PoseEstimate estimate = megatag2Estimate.get();
     // Check that there actually is an estimate, and that we haven't processed it yet
     boolean garbageData = estimate.avgTagDist < 0.56; // TODO MAGIC NUMBER AAAAAA
     if (estimate.tagCount > 0
         && estimate.timestampSeconds != lastMegatag2Timestamp
-        && !garbageData) {
-      Pose2d latencyUncompensatedPose = estimate.pose;
+        && !garbageData
+        && robotYawRate < 50) { // TODO magic number
+      Pose2d latencyUncompensatedPose = estimate.pose.plus(horizontalCameraOffset);
       Pose2d latencyCompensatedPose =
           compensateForEstimateLatency(
-              estimate.pose,
+              latencyUncompensatedPose,
               robotStateInstance.getLatestFusedFieldRelativeChassisSpeed(),
               Timer.getFPGATimestamp() - (estimate.timestampSeconds));
 
