@@ -231,9 +231,12 @@ public class AprilVisionSubsystem extends AEMSubsystem {
   private VisionPoseEstimation processRawEstimate(
       AprilVisionInputs inputs, CameraConfiguration config, String cameraName) {
 
+    // Use angular velocity at the time of the vision measurement, not current velocity.
+    // This prevents incorrect filtering/penalties when rotation state has changed since measurement.
     double omegaRadPerSec =
         Math.abs(
-            robotStateInstance.getLatestMeasuredFieldRelativeChassisSpeeds().omegaRadiansPerSecond);
+            robotStateInstance.getYawAngularVelocityForTimestamp(
+                inputs.coprocessorEstimationTimestamp));
 
     // Apply filtering
     if (!passesFilters(inputs, config, cameraName, omegaRadPerSec)) {
@@ -328,7 +331,8 @@ public class AprilVisionSubsystem extends AEMSubsystem {
     double scaledStdDev = baseStdDev * qualityScaleFactor;
 
     // Apply motion penalties
-    double motionAdjustedStdDev = applyMotionPenalties(scaledStdDev, omegaRadPerSec);
+    double motionAdjustedStdDev =
+        applyMotionPenalties(scaledStdDev, omegaRadPerSec);
 
     // Log pre-odom adjustment
     Logger.recordOutput(logPrefixStandard + "/" + cameraName + "/avgTagArea", inputs.avgTagArea);
@@ -403,8 +407,16 @@ public class AprilVisionSubsystem extends AEMSubsystem {
    *
    * <p>Uses linear scaling to maintain vision contribution during motion for continuous drift
    * correction, while still reducing trust at higher speeds.
+   *
+   * @param stdDev Base standard deviation to penalize
+   * @param omegaRadPerSec Angular velocity at the time of the vision measurement
+   * @param timestampSeconds Timestamp of the vision measurement (for future translational velocity
+   *     lookup)
    */
-  private double applyMotionPenalties(double stdDev, double omegaRadPerSec) {
+  private double applyMotionPenalties(
+      double stdDev, double omegaRadPerSec) {
+    // Note: Using latest translational velocity since we don't have a time buffer for it.
+    // This is less critical than rotation since translational velocity changes more gradually.
     var chassisSpeeds = robotStateInstance.getLatestMeasuredFieldRelativeChassisSpeeds();
     double translationalVelocity =
         Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
