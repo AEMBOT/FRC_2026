@@ -4,6 +4,7 @@ import com.aembot.lib.config.encoders.AEMCANCoderConfiguration;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 
 public class TalonFXTurretConfiguration {
@@ -37,6 +38,8 @@ public class TalonFXTurretConfiguration {
 
   /** The origin pose of the turret for visualization in advantagescope. */
   public Pose3d kTurretOriginPose;
+
+  public double startingRotation;
 
   /** How far we can be off in units for auto aim to still shoot */
   public double kAutoAimLeniance;
@@ -102,6 +105,11 @@ public class TalonFXTurretConfiguration {
     return this;
   }
 
+  public TalonFXTurretConfiguration withStartingRotation(double offet) {
+    this.startingRotation = offet;
+    return this;
+  }
+
   /**
    * Set the amount of units that we can be off in order to still shoot
    *
@@ -136,9 +144,12 @@ public class TalonFXTurretConfiguration {
       double diff = Math.abs(encoderBTeeth - encoderBTestPos);
       double circularDiff = Math.min(diff, kCANcoderBGearTeeth - diff);
 
-      if (circularDiff < 0.1) {
-        return kRealMotorConfig.getMechanismRotationsToUnits(
-            testPos / kRealMotorConfig.getGearRatio());
+      if (circularDiff < 0.3) {
+        return MathUtil.inputModulus(
+            kRealMotorConfig.getMechanismRotationsToUnits(testPos / 100.0) // FIXME magic num
+                + this.startingRotation,
+            0.0,
+            360.0);
       }
     }
 

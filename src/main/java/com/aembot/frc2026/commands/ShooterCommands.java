@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public final class ShooterCommands {
 
@@ -156,13 +157,26 @@ public final class ShooterCommands {
   }
 
   /**
+   * Function to get an amount to artifically boost flywheel speed
+   *
+   * <p>NOTE: currently just a static number but in future we may want to scale with distance or
+   * something
+   *
+   * @return amount to boost flywheel speed in m/s
+   */
+  private double getFlywheelSpeedBoost() {
+    return (RobotRuntimeConstants.MODE == RuntimeMode.REAL) ? 4.5 : 0.4;
+  }
+
+  /**
    * @return the current optimal speed to shoot to the goal position
    */
   private double getCurrentSpeed() {
     return getCurrentVelocityTable()
-        .getFuelInitVelocityMagnitude(
-            robotPoseSupplier.get(),
-            RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds());
+            .getFuelInitVelocityMagnitude(
+                RobotStateYearly.get().getLatestFieldRobotPose(),
+                RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds())
+        + getFlywheelSpeedBoost();
   }
 
   /* ---- HOOD COMMANDS ---- */
@@ -266,7 +280,9 @@ public final class ShooterCommands {
    *     values
    */
   public boolean isShooterNearGoal() {
-    return isFlywheelNearGoal() && isHoodNearGoal() && isTurretNearGoal();
+    boolean yes = isFlywheelNearGoal() && isHoodNearGoal() && isTurretNearGoal();
+    Logger.recordOutput("IsShooterNearGoal", yes);
+    return yes;
   }
 
   /**

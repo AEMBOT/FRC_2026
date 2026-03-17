@@ -2,7 +2,6 @@ package com.aembot.lib.subsystems.drive.io;
 
 import com.aembot.lib.subsystems.aprilvision.util.AprilCameraOutput;
 import com.aembot.lib.subsystems.drive.DrivetrainInputs;
-import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Pose2d;
 
@@ -12,7 +11,7 @@ public class DrivetrainIOReplay implements DrivetrainIO {
   public void updateInputs(DrivetrainInputs inputs) {}
 
   @Override
-  public void logModules(SwerveDriveState state, String prefix) {}
+  public void logModules(DrivetrainInputs inputs, String prefix) {}
 
   @Override
   public void resetOdometry(Pose2d pose) {}

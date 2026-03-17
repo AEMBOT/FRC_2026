@@ -48,6 +48,8 @@ public class OverBumperIntakeDeploySubsystem
     this.config = config;
     this.state = new OverBumperIntakeDeployState();
     this.stateConsumer = stateConsumer;
+
+    this.setEncoderPosition(config.kInitialAngleDeg);
   }
 
   /**
@@ -55,15 +57,21 @@ public class OverBumperIntakeDeploySubsystem
    *     position
    */
   public Command getZeroUpwardCommand() {
-    return new InstantCommand(() -> setEncoderPosition(config.kRealMotorConfig.kMinPositionUnits))
+    Timer timer = new Timer();
+    return new InstantCommand(
+            () -> {
+              setEncoderPosition(config.kRealMotorConfig.kMinPositionUnits);
+              timer.restart();
+            })
         .andThen(
-            smartVelocitySetpointCommand(() -> config.kZeroingSpeedDegPerSec)
-                .until(() -> (MathUtil.isNear(0, getCurrentVelocity(), 0.1)))
+            voltageCommand(() -> config.kZeroingVoltage)
+                .until(
+                    () -> (MathUtil.isNear(0, getCurrentVelocity(), 0.5) && timer.hasElapsed(0.1)))
                 .finallyDo(
                     () -> {
                       setEncoderPosition(
                           config.kRealMotorConfig.getUnitsToRotorRotations(
-                              config.kRealMotorConfig.kMaxPositionUnits));
+                              config.kUpwardsZeroAngleDeg));
                     }));
   }
 
@@ -72,15 +80,21 @@ public class OverBumperIntakeDeploySubsystem
    *     encoder position
    */
   public Command getZeroDownwardCommand() {
-    return new InstantCommand(() -> setEncoderPosition(config.kRealMotorConfig.kMaxPositionUnits))
+    Timer timer = new Timer();
+    return new InstantCommand(
+            () -> {
+              setEncoderPosition(config.kRealMotorConfig.kMaxPositionUnits);
+              timer.restart();
+            })
         .andThen(
-            smartVelocitySetpointCommand(() -> -config.kZeroingSpeedDegPerSec)
-                .until(() -> (MathUtil.isNear(0, getCurrentVelocity(), 0.1)))
+            voltageCommand(() -> -config.kZeroingVoltage)
+                .until(
+                    () -> (MathUtil.isNear(0, getCurrentVelocity(), 0.5) && timer.hasElapsed(0.5)))
                 .finallyDo(
                     () -> {
                       setEncoderPosition(
                           config.kRealMotorConfig.getUnitsToRotorRotations(
-                              config.kRealMotorConfig.kMinPositionUnits));
+                              config.kDownwardsZeroAngleDeg));
                     }));
   }
 

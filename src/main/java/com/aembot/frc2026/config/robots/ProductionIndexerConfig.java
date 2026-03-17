@@ -7,10 +7,12 @@ import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.aembot.lib.config.sensors.timeOfFlight.CANRangeTimeOfFlightConfiguration;
+import com.aembot.lib.config.wrappers.ConfigureSlot0Gains;
 import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import com.aembot.lib.core.can.CANDeviceID;
 import com.aembot.lib.core.can.CANDeviceID.CANDeviceType;
 import com.aembot.lib.core.motors.interfaces.MotorIO.NeutralMode;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -39,8 +41,10 @@ public final class ProductionIndexerConfig {
 
     static final NeutralMode MOTOR_NEUTRAL_MODE = NeutralMode.BRAKE;
 
-    // constants copied from hood config
-    static final Slot0Configs MOTOR_GAINS = new Slot0Configs().withKP(.1).withKV(.12);
+    public static final ConfigureSlot0Gains SLOT_0_CONFIGS =
+        (RobotRuntimeConstants.MODE == RuntimeMode.REAL)
+            ? new ConfigureSlot0Gains(0.1, 0.0, 0.0, 0.0, 0.0, 0.12, 0.0)
+            : new ConfigureSlot0Gains(0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
     /** Target speed of the spindexer roller in RPM */
     static final double TARGET_SPEED_RPM = 200.0; // Copied from intake config
@@ -93,7 +97,7 @@ public final class ProductionIndexerConfig {
                           new MotionMagicConfigs()
                               .withMotionMagicCruiseVelocity((TARGET_SPEED_RPM / 60) * GEAR_RATIO)
                               .withMotionMagicAcceleration((ACCELERATION_RPM / 60) * GEAR_RATIO))
-                      .withSlot0(MOTOR_GAINS)
+                      .withSlot0(SLOT_0_CONFIGS)
                       .withMotorOutput(
                           new MotorOutputConfigs()
                               .withInverted(
@@ -181,11 +185,9 @@ public final class ProductionIndexerConfig {
                       .withSlot0(MOTOR_GAINS)
                       .withMotorOutput(
                           new MotorOutputConfigs()
-                              .withInverted(
-                                  MOTOR_INVERTED
-                                      ? InvertedValue.CounterClockwise_Positive
-                                      : InvertedValue.Clockwise_Positive)
-                              .withNeutralMode(MOTOR_NEUTRAL_MODE.toCTRENeutralMode())))
+                              .withInverted(InvertedValue.Clockwise_Positive)
+                              .withNeutralMode(MOTOR_NEUTRAL_MODE.toCTRENeutralMode()))
+                      .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(20)))
               .withMomentOfInertia(0.01)
               .withCANDevice(
                   new CANDeviceID(
@@ -220,7 +222,7 @@ public final class ProductionIndexerConfig {
           .withMotorConfig(motorConfig)
           .withSimMotorConfig(simMotorConfig)
           .withTimeOfFlightConfig(timeOfFlightConfig)
-          .withTargetSpeedRPM(TARGET_SPEED_RPM)
+          .withRunVoltage(TARGET_SPEED_RPM)
           .withGamePieceMoveTimeSeconds(SECONDS_THRU_SELECTOR)
           .withGamePieceCapacity(GAMEPIECE_CAPACITY)
           .withGamePiecePositions(GAMEPIECE_POSITIONS)
@@ -232,7 +234,7 @@ public final class ProductionIndexerConfig {
   private final class KickerConstants {
     static final String SUBSYSTEM_NAME = GeneralConstants.COMPOUND_NAME + "KickerSubsystem";
 
-    static final double GEAR_RATIO = 1.0 / 1.0;
+    static final double GEAR_RATIO = 3.0 / 1.0;
 
     static final int MOTOR_CAN_ID = 56;
 
@@ -241,10 +243,11 @@ public final class ProductionIndexerConfig {
     static final NeutralMode MOTOR_NEUTRAL_MODE = NeutralMode.BRAKE;
 
     // constants copied from hood config
-    static final Slot0Configs MOTOR_GAINS = new Slot0Configs().withKP(.1).withKV(.12);
+    // TODO: Not fully tuned
+    static final Slot0Configs MOTOR_GAINS = new Slot0Configs().withKP(0).withKV(.13).withKS(0.49);
 
     /** Target speed of the spindexer roller in RPM */
-    static final double TARGET_SPEED_RPM = 200.0; // Copied from intake config
+    static final double TARGET_SPEED_RPM = 1400.0; // Copied from intake config
 
     /**
      * Speed of the kicker to resist movement of game pieces into the shooter in RPM.
@@ -254,7 +257,7 @@ public final class ProductionIndexerConfig {
     static final double RESIST_SPEED_RPM = -20.0;
 
     /** Target acceleration of the spindexer roller in RPM^2. */
-    static final double ACCELERATION_RPM = 400.0; // Copied from intake config
+    static final double ACCELERATION_RPM = 60000.0; // Copied from intake config
 
     /**
      * The amount of time it takes to transport a game piece from the kicker to the shooter. Used in
@@ -285,7 +288,8 @@ public final class ProductionIndexerConfig {
                                   MOTOR_INVERTED
                                       ? InvertedValue.CounterClockwise_Positive
                                       : InvertedValue.Clockwise_Positive)
-                              .withNeutralMode(MOTOR_NEUTRAL_MODE.toCTRENeutralMode())))
+                              .withNeutralMode(MOTOR_NEUTRAL_MODE.toCTRENeutralMode()))
+                      .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(40)))
               .withMomentOfInertia(0.01)
               .withCANDevice(
                   new CANDeviceID(
@@ -296,7 +300,7 @@ public final class ProductionIndexerConfig {
                       busName))
               .withName(SUBSYSTEM_NAME + "Motor")
               .withUnitToMechanismRotationRatio(1) // Use RPM
-              .withUnitToRotorRotationRatio(1 / GEAR_RATIO);
+              .withUnitToRotorRotationRatio(GEAR_RATIO);
 
       SimulatedMotorConfiguration<TalonFXConfiguration> simMotorConfig =
           new SimulatedMotorConfiguration<TalonFXConfiguration>()
@@ -307,7 +311,7 @@ public final class ProductionIndexerConfig {
       return new IndexerKickerConfiguration(SUBSYSTEM_NAME)
           .withMotorConfig(motorConfig)
           .withSimMotorConfig(simMotorConfig)
-          .withTargetSpeedRPM(TARGET_SPEED_RPM)
+          .withTargetSpeedRPM(8)
           .withResistSpeedRPM(RESIST_SPEED_RPM)
           .withGamePieceMoveTimeSeconds(SECONDS_THRU_KICKER)
           .withGamePieceCapacity(GAMEPIECE_CAPACITY)

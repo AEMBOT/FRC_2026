@@ -2,7 +2,6 @@ package com.aembot.lib.subsystems.drive.io;
 
 import com.aembot.lib.subsystems.aprilvision.util.AprilCameraOutput;
 import com.aembot.lib.subsystems.drive.DrivetrainInputs;
-import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Pose2d;
 
@@ -13,9 +12,9 @@ public interface DrivetrainIO {
    * Log the states of the swerve drive modules in a more human-readable way, including their names
    * (ie. FL, BR)
    *
-   * @param state Current Swerve Drive state to be logged
+   * @param inputs Current Drivetrain inputs containing state to be logged
    */
-  public void logModules(SwerveDriveState state, String prefix);
+  public void logModules(DrivetrainInputs inputs, String prefix);
 
   /**
    * Resets the drive train odometry to the given pose. Ie. setting robot pose to auto starting

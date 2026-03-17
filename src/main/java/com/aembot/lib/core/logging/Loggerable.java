@@ -4,7 +4,6 @@ import static com.aembot.lib.constants.RuntimeConstants.*;
 
 import com.aembot.lib.constants.RuntimeConstants;
 import com.aembot.lib.constants.generated.BuildConstants;
-import edu.wpi.first.wpilibj.DriverStation;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -21,9 +20,9 @@ public interface Loggerable {
       case REAL:
         // Log to logs file & (if not on FMS) NetworkTables
         Logger.addDataReceiver(new WPILOGWriter("/U/logs"));
-        if (!DriverStation.isFMSAttached()) {
-          Logger.addDataReceiver(new NT4Publisher());
-        }
+        // if (!DriverStation.isFMSAttached()) {
+        Logger.addDataReceiver(new NT4Publisher());
+        // }
         break;
       case SIM:
         // Log to both file & NetworkTables

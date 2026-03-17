@@ -22,6 +22,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
@@ -65,6 +66,22 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
   private final StatusSignal<LinearAcceleration> accelerationX;
   private final StatusSignal<LinearAcceleration> accelerationY;
 
+  /* ----- CANCoder Absolute Position Signals ----- */
+  @SuppressWarnings("unchecked")
+  private final StatusSignal<Angle>[] absolutePositionSignals = new StatusSignal[4];
+
+  @SuppressWarnings("unchecked")
+  private final StatusSignal<Current>[] driveMotorSupplyCurrents = new StatusSignal[4];
+
+  @SuppressWarnings("unchecked")
+  private final StatusSignal<Current>[] driveMotorStatorCurrents = new StatusSignal[4];
+
+  @SuppressWarnings("unchecked")
+  private final StatusSignal<Current>[] steerMotorSupplyCurrents = new StatusSignal[4];
+
+  @SuppressWarnings("unchecked")
+  private final StatusSignal<Current>[] steerMotorStatorCurrents = new StatusSignal[4];
+
   /**
    * Construct the IO layer for a real drivetrain
    *
@@ -97,7 +114,16 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
 
     for (int i = 0; i < swerveModuleConfigurations.size(); i++) {
       moduleNames.add(i, swerveModuleConfigurations.get(i).moduleName);
+      absolutePositionSignals[i] = getModule(i).getEncoder().getAbsolutePosition();
+
+      driveMotorStatorCurrents[i] = getModule(i).getDriveMotor().getStatorCurrent();
+      driveMotorSupplyCurrents[i] = getModule(i).getDriveMotor().getSupplyCurrent();
+      steerMotorStatorCurrents[i] = getModule(i).getSteerMotor().getStatorCurrent();
+      steerMotorSupplyCurrents[i] = getModule(i).getSteerMotor().getSupplyCurrent();
     }
+
+    // Set CANCoder signals to update at 100hz
+    BaseStatusSignal.setUpdateFrequencyForAll(100, absolutePositionSignals);
 
     // Set yaw velocity to update at 250 hz; we care more about this value
     BaseStatusSignal.setUpdateFrequencyForAll(250, angularYawVelocity);
@@ -135,6 +161,17 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
         accelerationX,
         accelerationY);
 
+    // Refresh and store absolute encoder positions
+    BaseStatusSignal.refreshAll(absolutePositionSignals);
+
+    BaseStatusSignal.refreshAll(driveMotorStatorCurrents);
+    BaseStatusSignal.refreshAll(driveMotorSupplyCurrents);
+    BaseStatusSignal.refreshAll(steerMotorStatorCurrents);
+    BaseStatusSignal.refreshAll(steerMotorSupplyCurrents);
+    for (int i = 0; i < absolutePositionSignals.length; i++) {
+      inputs.absoluteEncoderPositions[i] = absolutePositionSignals[i].getValueAsDouble();
+    }
+
     inputs.kinematics = getKinematics();
     inputs.gyroYawAngle = inputs.Pose.getRotation().getDegrees();
     inputs.yawAngularVelocity = angularYawVelocity.getValueAsDouble();
@@ -152,24 +189,36 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
   }
 
   @Override
-  public void logModules(SwerveDriveState state, String prefix) {
-    if (state.ModuleStates == null) return;
+  public void logModules(DrivetrainInputs inputs, String prefix) {
+    if (inputs.ModuleStates == null) return;
     final String modulePrefix = prefix + "/Modules/";
     for (int i = 0; i < getModules().length; i++) {
       Logger.recordOutput(
           modulePrefix + moduleNames.get(i) + "/Absolute Encoder Angle",
-          getModule(i).getEncoder().getAbsolutePosition().getValueAsDouble() * 360);
+          inputs.absoluteEncoderPositions[i] * 360);
       Logger.recordOutput(
-          modulePrefix + moduleNames.get(i) + "/Steering Angle", state.ModuleStates[i].angle);
+          modulePrefix + moduleNames.get(i) + "/Steering Angle", inputs.ModuleStates[i].angle);
       Logger.recordOutput(
           modulePrefix + moduleNames.get(i) + "/Target Steering Angle",
-          state.ModuleTargets[i].angle);
+          inputs.ModuleTargets[i].angle);
       Logger.recordOutput(
           modulePrefix + moduleNames.get(i) + "/Drive Velocity",
-          state.ModuleStates[i].speedMetersPerSecond);
+          inputs.ModuleStates[i].speedMetersPerSecond);
       Logger.recordOutput(
           modulePrefix + moduleNames.get(i) + "/Target Drive Velocity",
-          state.ModuleTargets[i].speedMetersPerSecond);
+          inputs.ModuleTargets[i].speedMetersPerSecond);
+      Logger.recordOutput(
+          modulePrefix + moduleNames.get(i) + "/SteerMotorSupplyAmps",
+          steerMotorSupplyCurrents[i].getValueAsDouble());
+      Logger.recordOutput(
+          modulePrefix + moduleNames.get(i) + "/SteerMotorStatorAmps",
+          steerMotorStatorCurrents[i].getValueAsDouble());
+      Logger.recordOutput(
+          modulePrefix + moduleNames.get(i) + "/DriveMotorSupplyAmps",
+          driveMotorSupplyCurrents[i].getValueAsDouble());
+      Logger.recordOutput(
+          modulePrefix + moduleNames.get(i) + "/DriveMotorStatorAmps",
+          driveMotorStatorCurrents[i].getValueAsDouble());
     }
   }
 
@@ -194,9 +243,13 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
 
   @Override
   public void addVisionEstimation(AprilCameraOutput cameraOutput) {
-    addVisionMeasurement(
-        cameraOutput.estimatedPose().latencyCompensatedPose(),
-        Utils.fpgaToCurrentTime(cameraOutput.estimatedPose().timestampSeconds()),
-        cameraOutput.estimatedPose().stdDevs().toMatrix());
+    if (!Double.isNaN(cameraOutput.estimatedPose().stdDevs().xStdDev())
+        && !Double.isNaN(cameraOutput.estimatedPose().latencyCompensatedPose().getX())) {
+      var visPose = cameraOutput.estimatedPose().latencyCompensatedPose();
+      addVisionMeasurement(
+          new Pose2d(visPose.getX(), visPose.getY(), this.getRotation3d().toRotation2d()),
+          Utils.fpgaToCurrentTime(cameraOutput.estimatedPose().timestampSeconds()),
+          cameraOutput.estimatedPose().stdDevs().toMatrix());
+    }
   }
 }

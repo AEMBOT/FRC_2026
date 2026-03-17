@@ -5,6 +5,7 @@ import com.aembot.lib.core.can.CANDeviceID;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.pathplanner.lib.config.PIDConstants;
+import edu.wpi.first.math.controller.PIDController;
 
 public class DrivetrainConfiguration {
   public String configurationName;
@@ -48,6 +49,9 @@ public class DrivetrainConfiguration {
 
   /** PID constants to use for drive heading control */
   public PIDConstants headingPID;
+
+  public PIDController autoTranslationController;
+  public PIDController autoRotationController;
 
   public DrivetrainConfiguration() {}
 
@@ -136,6 +140,18 @@ public class DrivetrainConfiguration {
     return this;
   }
 
+  /*
+   * set the controller to use during auto for movement
+   *
+   * @param autoTranslationController PID controller to use for movement in auto
+   * @return self for chaining
+   */
+  public DrivetrainConfiguration withAutoTranslationController(
+      PIDController autoTranslationController) {
+    this.autoTranslationController = autoTranslationController;
+    return this;
+  }
+
   /**
    * Set the PID constants to use when using heading based swerve control
    *
@@ -144,6 +160,18 @@ public class DrivetrainConfiguration {
    */
   public DrivetrainConfiguration withHeadingPIDConstants(PIDConstants headingPIDConstants) {
     this.headingPID = headingPIDConstants;
+    return this;
+  }
+
+  /*
+   * set the controller to use during auto for rotation
+   *
+   * @param autoRotationController PID controller to use for rotation in auto
+   * @return self for chaining
+   */
+  public DrivetrainConfiguration withAutoRotationController(PIDController autoRotationController) {
+    this.autoRotationController = autoRotationController;
+    autoRotationController.enableContinuousInput(-Math.PI, Math.PI);
     return this;
   }
 }

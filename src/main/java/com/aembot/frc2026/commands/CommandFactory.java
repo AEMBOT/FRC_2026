@@ -15,13 +15,16 @@ import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSu
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.BooleanSupplier;
+import org.littletonrobotics.junction.Logger;
 
 public final class CommandFactory {
 
@@ -29,6 +32,10 @@ public final class CommandFactory {
   public final IntakeCommands intakeCommands;
   public final IndexerCommands indexerCommands;
   public final ShooterCommands shooterCommands;
+
+  private boolean shootFuel;
+  private final Trigger aimTrigger;
+  private final Trigger kickerTrigger;
 
   public CommandFactory(
       DriveSubsystem driveSubsystem,
@@ -46,11 +53,34 @@ public final class CommandFactory {
     this.indexerCommands =
         new IndexerCommands(spindexerSubsystem, indexerSelectorSubsystem, indexerKickerSubsystem);
     this.shooterCommands = new ShooterCommands(hoodSubsystem, turretSubsystem, flywheelSubsystem);
+
+    this.aimTrigger =
+        new Trigger(() -> shootFuel && DriverStation.isAutonomousEnabled())
+            .whileTrue(shooterCommands.createShootFuelCommand());
+    this.kickerTrigger =
+        new Trigger(
+                () ->
+                    (shootFuel
+                        && shooterCommands.isShooterNearGoal()
+                        && DriverStation.isAutonomousEnabled()))
+            .whileTrue(indexerCommands.createFeedIndexerCommand());
+  }
+
+  public void logCommands() {
+    Logger.recordOutput("Commands/shootFuel", shootFuel);
+    Logger.recordOutput("Commands/atSetpoint", shooterCommands.isShooterNearGoal());
   }
 
   public Command createShootFuelCommand() {
-    return new ParallelCommandGroup(
-        indexerCommands.createFeedIndexerCommand(), shooterCommands.createShootFuelCommand());
+    return new RunCommand(() -> shootFuel = true).finallyDo(() -> shootFuel = false);
+  }
+
+  public Command createStartShootingFuelCommand() {
+    return new InstantCommand(() -> shootFuel = true);
+  }
+
+  public Command createStopShootingFuelCommand() {
+    return new InstantCommand(() -> shootFuel = false);
   }
 
   public Command createShootFuelTowerPosCommand() {
@@ -67,13 +97,14 @@ public final class CommandFactory {
   }
 
   public Command resetOdometryHeading() {
-    Translation2d robotTranslation =
-        RobotStateYearly.get().getLatestFieldRobotPose().getTranslation();
-    Rotation2d robotRotation =
-        RobotRuntimeConstants.isBlueAlliance() ? Rotation2d.kZero : Rotation2d.k180deg;
-
     return new InstantCommand(
-        () -> driveSubsystem.resetPose(new Pose2d(robotTranslation, robotRotation)));
+        () -> {
+          Translation2d robotTranslation =
+              RobotStateYearly.get().getLatestFieldRobotPose().getTranslation();
+          Rotation2d robotRotation =
+              RobotRuntimeConstants.isBlueAlliance() ? Rotation2d.kZero : Rotation2d.k180deg;
+          driveSubsystem.resetPose(new Pose2d(robotTranslation, robotRotation));
+        });
   }
 
   public Command createSetDriveHeadingForUnderTrenchCommand(

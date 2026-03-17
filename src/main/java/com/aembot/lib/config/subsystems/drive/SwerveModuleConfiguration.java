@@ -466,7 +466,7 @@ public abstract class SwerveModuleConfiguration<
    */
   public double getMaxSpeedMetersPerSecond() {
     // Calc if unset
-    if (maxRobotSpeedMeterPerSecond == Double.NaN) {
+    if (Double.isNaN(maxRobotSpeedMeterPerSecond)) {
       maxRobotSpeedMeterPerSecond =
           (Units.radiansPerSecondToRotationsPerMinute(driveMotorType.freeSpeedRadPerSec) / 60.0)
               * Math.PI

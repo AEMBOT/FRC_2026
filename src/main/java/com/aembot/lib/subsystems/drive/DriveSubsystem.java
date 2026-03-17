@@ -1,5 +1,6 @@
 package com.aembot.lib.subsystems.drive;
 
+import choreo.trajectory.SwerveSample;
 import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
 import com.aembot.lib.state.RobotState;
@@ -8,6 +9,7 @@ import com.aembot.lib.subsystems.drive.io.DrivetrainIO;
 import com.aembot.lib.subsystems.drive.io.DrivetrainSimIO;
 import com.aembot.lib.subsystems.drive.simulation.MapleSimSwerveDrivetrain;
 import com.aembot.lib.subsystems.drive.visualizations.SwerveVisualizer;
+import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -199,5 +201,32 @@ public class DriveSubsystem extends AEMSubsystem {
     }
 
     return null;
+  }
+
+  /**
+   * Create a new swerve request from a robot relative chassis speeds variable
+   *
+   * @param speeds robot relative chassis speeds
+   */
+  public void setRequestFromChassisSpeeds(ChassisSpeeds speeds) {
+    setRequest(
+        new SwerveRequest.FieldCentric()
+            .withVelocityX(speeds.vxMetersPerSecond)
+            .withVelocityY(speeds.vyMetersPerSecond)
+            .withRotationalRate(speeds.omegaRadiansPerSecond)
+            .withDriveRequestType(SwerveModule.DriveRequestType.Velocity));
+  }
+
+  public void setRequestFromSwerveSample(SwerveSample sample) {
+
+    ChassisSpeeds speeds =
+        new ChassisSpeeds(
+            sample.vx + config.autoTranslationController.calculate(inputs.Pose.getX(), sample.x),
+            sample.vy + config.autoTranslationController.calculate(inputs.Pose.getY(), sample.y),
+            sample.omega
+                + config.autoRotationController.calculate(
+                    inputs.Pose.getRotation().getRadians(), sample.heading));
+
+    setRequestFromChassisSpeeds(speeds);
   }
 }
