@@ -59,7 +59,7 @@ public class TurretSubsystem
   private void setPositionFromEncoders() {
     double absolutePosition =
         config.getMechanismRotationsFromEncoders(
-            io.getCANcoderA().getRawAngle() - 0.683838, io.getCANcoderB().getRawAngle() - 0.654541);
+            io.getCANcoderA().getRawAngle(), io.getCANcoderB().getRawAngle());
 
     if (absolutePosition == -1) {
       CommandScheduler.getInstance()
@@ -101,8 +101,8 @@ public class TurretSubsystem
     Logger.recordOutput(
         "calculatedTurretRot",
         config.getMechanismRotationsFromEncoders(
-            encoderAInputs.absolutePositionRotations - 0.683838,
-            encoderBInputs.absolutePositionRotations - 0.654541));
+            encoderAInputs.absolutePositionRotations,
+            encoderBInputs.absolutePositionRotations));
 
     state.updateTurretYaw(Rotation2d.fromDegrees(inputs.positionUnits));
 
