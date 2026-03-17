@@ -243,6 +243,19 @@ public abstract class RobotState implements Loggable {
     return odometryState.gyroFusedChassisSpeeds.get();
   }
 
+  /**
+   * Get the yaw angular velocity at a specific timestamp (interpolated from buffer).
+   *
+   * @param timestampSeconds The timestamp to query
+   * @return The angular velocity in rad/s, or the latest value if timestamp not in buffer
+   */
+  public double getYawAngularVelocityForTimestamp(double timestampSeconds) {
+    return odometryState
+        .driveYawAngularVelocity
+        .getSample(timestampSeconds)
+        .orElse(odometryState.actualFieldRelativeChassisSpeeds.get().omegaRadiansPerSecond);
+  }
+
   // --- Loggable Implementation ---
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {

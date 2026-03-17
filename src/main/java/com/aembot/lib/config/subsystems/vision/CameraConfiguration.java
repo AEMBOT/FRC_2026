@@ -128,10 +128,10 @@ public class CameraConfiguration {
   public double maxEstimateAgeSeconds = 0.5;
 
   /** Max rotation rate (rad/s) before rejecting single-tag estimates */
-  public double maxOmegaForSingleTagRadians = Math.toRadians(150);
+  public double maxOmegaForSingleTagRadians = Math.toRadians(50);
 
   /** Max rotation rate (rad/s) before rejecting all estimates */
-  public double maxOmegaForAnyTagRadians = Math.toRadians(360);
+  public double maxOmegaForAnyTagRadians = Math.toRadians(150);
 
   // ===== TAG AREA THRESHOLDS (percentage of image) =====
 
@@ -146,6 +146,19 @@ public class CameraConfiguration {
 
   /** Tag area threshold for "good" quality tier */
   public double tagAreaGoodThreshold = 5.0;
+
+  /** Minimum tag distance (meters) - estimates closer than this are rejected as garbage data */
+  public double minTagDistanceMeters = 0.56;
+
+  /**
+   * Supplier for the mechanism's angular velocity in rad/s (e.g., turret rotation speed). Used to
+   * reject vision estimates when the mechanism is rotating too quickly. Returns 0 by default (no
+   * mechanism rotation).
+   */
+  public Supplier<Double> mechanismAngularVelocitySupplier = () -> 0.0;
+
+  /** Max mechanism rotation rate (rad/s) before rejecting all estimates from this camera */
+  public double maxMechanismOmegaRadians = Double.MAX_VALUE;
 
   public CameraConfiguration(String name, Type type) {
     this.cameraName = name;
@@ -325,6 +338,27 @@ public class CameraConfiguration {
     return this;
   }
 
+  /** Set the minimum tag distance (meters) - estimates closer than this are rejected */
+  public CameraConfiguration withMinTagDistanceMeters(double minDistanceMeters) {
+    this.minTagDistanceMeters = minDistanceMeters;
+    return this;
+  }
+
+  /**
+   * Set the supplier for the mechanism's angular velocity in rad/s (e.g., turret rotation speed).
+   * Used to reject vision estimates when the mechanism is rotating too quickly.
+   */
+  public CameraConfiguration withMechanismAngularVelocity(Supplier<Double> velocitySupplier) {
+    this.mechanismAngularVelocitySupplier = velocitySupplier;
+    return this;
+  }
+
+  /** Set the max mechanism rotation rate (rad/s) before rejecting all estimates from this camera */
+  public CameraConfiguration withMaxMechanismOmegaRadians(double maxOmegaRadians) {
+    this.maxMechanismOmegaRadians = maxOmegaRadians;
+    return this;
+  }
+
   @Override
   public String toString() {
     return cameraName + "_" + cameraType.typeName;
@@ -340,8 +374,9 @@ public class CameraConfiguration {
         .withEnabledThrottleValue(2)
         // Vision filtering defaults
         .withMaxEstimateAgeSeconds(0.5)
-        .withMaxOmegaForSingleTagRadians(Math.toRadians(150))
-        .withMaxOmegaForAnyTagRadians(Math.toRadians(360))
-        .withTagAreaThresholds(0.05, 0.1, 1.0, 5.0);
+        .withMaxOmegaForSingleTagRadians(Math.toRadians(50))
+        .withMaxOmegaForAnyTagRadians(Math.toRadians(150))
+        .withTagAreaThresholds(0.05, 0.1, 1.0, 5.0)
+        .withMinTagDistanceMeters(0.56);
   }
 }
