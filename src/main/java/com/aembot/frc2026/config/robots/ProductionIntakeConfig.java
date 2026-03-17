@@ -48,7 +48,7 @@ public class ProductionIntakeConfig {
 
   public final double ZEROING_VOLTAGE = 4.0;
 
-  public final String SUBSYSTEM_NAME = "TexasToastSubsystem";
+  public final String SUBSYSTEM_NAME = "IntexerSubsystem";
 
   public final double DEPLOY_GEAR_RATIO = 18400.0 / 243.0;
 
