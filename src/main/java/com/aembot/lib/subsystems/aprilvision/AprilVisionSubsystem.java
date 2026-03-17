@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,26 +21,10 @@ import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
 public class AprilVisionSubsystem extends AEMSubsystem {
-  /** Maximum age (seconds) for a vision estimate to be considered valid */
-  private static final double MAX_ESTIMATE_AGE_SECONDS = 0.5;
-
-  // ===== STD DEV COMPUTATION CONSTANTS (tunable in replay) =====
+  // ===== STD DEV COMPUTATION CONSTANTS (Limelight protocol, not configurable) =====
   private static final int MEGATAG2_X_STDDEV_INDEX = 6;
   private static final int MEGATAG2_Y_STDDEV_INDEX = 7;
   private static final int EXPECTED_STDDEV_ARRAY_LENGTH = 12;
-  private static final double FALLBACK_TRANSLATION_STDDEV = 0.5;
-
-  /** Max rotation rate (rad/s) before rejecting single-tag estimates */
-  private static final double MAX_OMEGA_FOR_SINGLE_TAG = Units.degreesToRadians(150);
-
-  /** Max rotation rate (rad/s) before rejecting all estimates */
-  private static final double MAX_OMEGA_FOR_ANY_TAG = Units.degreesToRadians(360);
-
-  // Tag area thresholds (percentage of image) for quality scoring
-  private static final double TAG_AREA_REJECT_THRESHOLD = 0.05;
-  private static final double TAG_AREA_FAR_THRESHOLD = 0.1;
-  private static final double TAG_AREA_MEDIUM_THRESHOLD = 1.0;
-  private static final double TAG_AREA_GOOD_THRESHOLD = 5.0;
 
   protected final RobotState robotStateInstance;
 
@@ -87,7 +70,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
       if (inputs.rawCoprocessorPose != null && inputs.tagCount > 0 && visionActive) {
         // Reject estimates that are too old
         double estimateAge = currentTime - inputs.coprocessorEstimationTimestamp;
-        if (estimateAge <= MAX_ESTIMATE_AGE_SECONDS) {
+        if (estimateAge <= config.maxEstimateAgeSeconds) {
           // === COMPUTE POSE AND STDDEVS (replayable) ===
           VisionPoseEstimation processed = processRawEstimate(inputs, config, config.cameraName);
 
@@ -252,11 +235,11 @@ public class AprilVisionSubsystem extends AEMSubsystem {
             robotStateInstance.getLatestMeasuredFieldRelativeChassisSpeeds().omegaRadiansPerSecond);
 
     // Apply filtering
-    if (!passesFilters(inputs, cameraName, omegaRadPerSec)) {
+    if (!passesFilters(inputs, config, cameraName, omegaRadPerSec)) {
       return null;
     }
 
-    // Transform pose for mechanism-mounted cameras
+    // Apply any mechanism relative offsets to this estimated pose
     Pose2d transformedPose = transformPoseForMechanism(inputs.rawCoprocessorPose, config);
 
     // Compute standard deviations
@@ -269,16 +252,19 @@ public class AprilVisionSubsystem extends AEMSubsystem {
 
   /** Check if the estimate passes all filtering criteria. */
   private boolean passesFilters(
-      AprilVisionInputs inputs, String cameraName, double omegaRadPerSec) {
+      AprilVisionInputs inputs,
+      CameraConfiguration config,
+      String cameraName,
+      double omegaRadPerSec) {
     // Reject if too close (garbage data from being inside tag)
     boolean tooClose = inputs.avgTagDist < 0.56;
 
     // Rotation rate filtering - stricter for single tag
     boolean rotatingTooFast;
     if (inputs.tagCount == 1) {
-      rotatingTooFast = omegaRadPerSec > MAX_OMEGA_FOR_SINGLE_TAG;
+      rotatingTooFast = omegaRadPerSec > config.maxOmegaForSingleTagRadians;
     } else {
-      rotatingTooFast = omegaRadPerSec > MAX_OMEGA_FOR_ANY_TAG;
+      rotatingTooFast = omegaRadPerSec > config.maxOmegaForAnyTagRadians;
     }
 
     // Log rejection reasons
@@ -290,9 +276,12 @@ public class AprilVisionSubsystem extends AEMSubsystem {
     return !tooClose && !rotatingTooFast;
   }
 
-  /** Transform the raw coprocessor pose to account for mechanism-mounted cameras (e.g., turret). */
+  /**
+   * Transform the raw coprocessor pose to account for mechanism-mounted cameras (e.g., turret).
+   * Only yaw is corrected here since pitch/roll don't affect the 2D heading.
+   */
   private Pose2d transformPoseForMechanism(Pose2d rawPose, CameraConfiguration config) {
-    // Get mechanism yaw (e.g., turret rotation)
+    // Get mechanism yaw (e.g., turret rotation) - pitch/roll handled by LL via SetRobotOrientation
     Rotation2d mechanismYaw =
         Rotation2d.fromRadians(config.mechanismOrigin.get().getRotation().getZ());
 
@@ -323,7 +312,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
     double baseStdDev = extractBaseStdDev(inputs, config);
 
     // Apply quality scaling based on tag area
-    double quality = computeQualityScore(inputs.avgTagArea, inputs.tagCount);
+    double quality = computeQualityScore(inputs.avgTagArea, inputs.tagCount, config);
     double qualityScaleFactor = 1.0 / quality;
     double scaledStdDev = baseStdDev * qualityScaleFactor;
 
@@ -364,25 +353,25 @@ public class AprilVisionSubsystem extends AEMSubsystem {
   }
 
   /** Compute quality score based on tag area (percentage of image). */
-  private double computeQualityScore(double avgTagArea, int tagCount) {
+  private double computeQualityScore(double avgTagArea, int tagCount, CameraConfiguration config) {
     double quality;
 
-    if (avgTagArea < TAG_AREA_REJECT_THRESHOLD) {
+    if (avgTagArea < config.tagAreaRejectThreshold) {
       quality = 0.05;
-    } else if (avgTagArea < TAG_AREA_FAR_THRESHOLD) {
+    } else if (avgTagArea < config.tagAreaFarThreshold) {
       double t =
-          (avgTagArea - TAG_AREA_REJECT_THRESHOLD)
-              / (TAG_AREA_FAR_THRESHOLD - TAG_AREA_REJECT_THRESHOLD);
+          (avgTagArea - config.tagAreaRejectThreshold)
+              / (config.tagAreaFarThreshold - config.tagAreaRejectThreshold);
       quality = 0.1 + (t * 0.2);
-    } else if (avgTagArea < TAG_AREA_MEDIUM_THRESHOLD) {
+    } else if (avgTagArea < config.tagAreaMediumThreshold) {
       double t =
-          (avgTagArea - TAG_AREA_FAR_THRESHOLD)
-              / (TAG_AREA_MEDIUM_THRESHOLD - TAG_AREA_FAR_THRESHOLD);
+          (avgTagArea - config.tagAreaFarThreshold)
+              / (config.tagAreaMediumThreshold - config.tagAreaFarThreshold);
       quality = 0.3 + (t * 0.3);
-    } else if (avgTagArea < TAG_AREA_GOOD_THRESHOLD) {
+    } else if (avgTagArea < config.tagAreaGoodThreshold) {
       double t =
-          (avgTagArea - TAG_AREA_MEDIUM_THRESHOLD)
-              / (TAG_AREA_GOOD_THRESHOLD - TAG_AREA_MEDIUM_THRESHOLD);
+          (avgTagArea - config.tagAreaMediumThreshold)
+              / (config.tagAreaGoodThreshold - config.tagAreaMediumThreshold);
       quality = 0.6 + (t * 0.3);
     } else {
       quality = 1.0;
@@ -397,25 +386,28 @@ public class AprilVisionSubsystem extends AEMSubsystem {
   }
 
   /**
-   * Apply translation velocity penalty to std dev. During fast translation, vision measurements are
-   * delayed by 100-240ms. At 1.5 m/s with 200ms latency, the robot moves 0.3m. Without sufficient
-   * stddev scaling, the pose estimator over-trusts stale vision data, causing the estimate to lag
-   * behind the actual robot position and "snap" when stopped.
+   * Apply motion penalties to std dev based on translation and rotation velocity. During motion,
+   * vision measurements are delayed by 100-240ms. Without some stddev scaling, the pose estimator
+   * may over-trust stale vision data.
    *
-   * <p>Uses exponential scaling so vision stddev grows faster than linear with speed, ensuring
-   * odometry dominates during fast motion while vision still provides drift correction at low
-   * speeds.
+   * <p>Uses linear scaling to maintain vision contribution during motion for continuous drift
+   * correction, while still reducing trust at higher speeds.
    */
   private double applyMotionPenalties(double stdDev, double omegaRadPerSec) {
-    // Get current translation velocity
     var chassisSpeeds = robotStateInstance.getLatestMeasuredFieldRelativeChassisSpeeds();
     double translationalVelocity =
         Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
 
-    // Exponential scaling: at 1 m/s -> 2x, at 1.5 m/s -> 2.8x, at 2 m/s -> 4x
-    // This reduces vision weight from ~40% to ~7% at 1.5 m/s (with odom stddev of 0.3)
-    double translationPenalty = Math.pow(2, translationalVelocity);
-    stdDev *= translationPenalty;
+    // Linear scaling: at 1 m/s -> 1.5x, at 2 m/s -> 2x, at 4 m/s -> 3x
+    // Gentler than exponential to allow vision to still contribute during motion
+    double translationPenalty = 1.0 + (translationalVelocity * 0.5);
+
+    // Rotation penalty: at 1 rad/s (57 deg/s) -> 1.5x, at 2 rad/s -> 2x
+    // Penalizes rotation since MegaTag2 is more sensitive to angular velocity errors
+    //double rotationPenalty = 1.0 + (omegaRadPerSec * 0.5);
+
+    double rotationPenalty = 1.0;
+    stdDev *= translationPenalty * rotationPenalty;
 
     return stdDev;
   }
