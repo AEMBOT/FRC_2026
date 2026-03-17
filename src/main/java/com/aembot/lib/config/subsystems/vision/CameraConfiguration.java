@@ -147,6 +147,9 @@ public class CameraConfiguration {
   /** Tag area threshold for "good" quality tier */
   public double tagAreaGoodThreshold = 5.0;
 
+  /** Minimum tag distance (meters) - estimates closer than this are rejected as garbage data */
+  public double minTagDistanceMeters = 0.56;
+
   public CameraConfiguration(String name, Type type) {
     this.cameraName = name;
     this.cameraType = type;
@@ -325,6 +328,12 @@ public class CameraConfiguration {
     return this;
   }
 
+  /** Set the minimum tag distance (meters) - estimates closer than this are rejected */
+  public CameraConfiguration withMinTagDistanceMeters(double minDistanceMeters) {
+    this.minTagDistanceMeters = minDistanceMeters;
+    return this;
+  }
+
   @Override
   public String toString() {
     return cameraName + "_" + cameraType.typeName;
@@ -342,6 +351,7 @@ public class CameraConfiguration {
         .withMaxEstimateAgeSeconds(0.5)
         .withMaxOmegaForSingleTagRadians(Math.toRadians(150))
         .withMaxOmegaForAnyTagRadians(Math.toRadians(360))
-        .withTagAreaThresholds(0.05, 0.1, 1.0, 5.0);
+        .withTagAreaThresholds(0.05, 0.1, 1.0, 5.0)
+        .withMinTagDistanceMeters(0.56);
   }
 }
