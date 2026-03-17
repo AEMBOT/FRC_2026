@@ -224,7 +224,7 @@ public class Limelight4IOSim extends Limelight4IOHardware {
         // PhotonPoseEstimator returns robot center pose, but hardware LL returns
         // pose at camera XY location (since we set X=0, Y=0 to LL in hardware).
         // Add camera XY offset to match hardware behavior so that
-        // transformPoseForMechanism() works correctly for both paths.
+        // transformCameraPoseToRobotCenter() works correctly for both paths.
         Pose3d cameraPosition = cameraConfiguration.getCameraPosition();
         double robotYaw = estimatedPose.getRotation().getZ();
         double cosYaw = Math.cos(robotYaw);
