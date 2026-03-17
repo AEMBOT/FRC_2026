@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -38,12 +39,16 @@ public final class ShooterCommands {
 
   private Supplier<Pose2d> robotPoseSupplier;
 
+  private double shooterBoost = 4.5;
+
   private final Pose2d TOWER_SHOT_POSE = new Pose2d(1.541, 3.709, Rotation2d.kZero);
 
   public ShooterCommands(HoodSubsystem hood, TurretSubsystem turret, FlywheelSubsystem flywheel) {
     this.hood = hood;
     this.turret = turret;
     this.flywheel = flywheel;
+
+    SmartDashboard.putNumber("ShooterBoost", shooterBoost);
 
     String velocityTableDirectory = Filesystem.getDeployDirectory() + "/initial-velocities/real/";
     if (RobotRuntimeConstants.MODE == RuntimeMode.SIM) {
@@ -165,7 +170,8 @@ public final class ShooterCommands {
    * @return amount to boost flywheel speed in m/s
    */
   private double getFlywheelSpeedBoost() {
-    return (RobotRuntimeConstants.MODE == RuntimeMode.REAL) ? 4.5 : 0.4;
+    this.shooterBoost = SmartDashboard.getNumber("ShooterBoost", shooterBoost);
+    return (RobotRuntimeConstants.MODE == RuntimeMode.REAL) ? shooterBoost : 0.4;
   }
 
   /**
