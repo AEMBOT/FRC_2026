@@ -427,5 +427,9 @@
  "events":[
    {"name":"DeployIntake", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
    {"name":"StartShooting", "from":{"target":1, "targetTimestamp":0.50893, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
-   {"name":"RunIntake", "from":{"target":2, "targetTimestamp":1.16329, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
+   {"name":"RunIntake", "from":{"target":2, "targetTimestamp":1.16329, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
+   {"name":"StopShooting", "from":{"target":7, "targetTimestamp":4.8334, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
+   {"name":"StartShooting", "from":{"target":9, "targetTimestamp":5.93059, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
+   {"name":"StopIntake", "from":{"target":7, "targetTimestamp":4.8334, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
+   {"name":"RunIntake", "from":{"target":9, "targetTimestamp":5.93059, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
 }
