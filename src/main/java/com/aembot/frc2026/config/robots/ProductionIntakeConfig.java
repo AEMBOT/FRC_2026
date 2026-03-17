@@ -26,7 +26,7 @@ import org.ironmaple.simulation.IntakeSimulation.IntakeSide;
 
 public class ProductionIntakeConfig {
 
-  public final int DEPLOY_CAN_ID = 51;
+  public final int DEPLOY_CAN_ID = 52;
 
   public final int ROLLER_LEAD_CAN_ID = 50;
   public final int ROLLER_FOLLOWER_CAN_ID = 28; // FIXME get real can id
