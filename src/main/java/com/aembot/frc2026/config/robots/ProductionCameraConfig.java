@@ -36,7 +36,7 @@ public class ProductionCameraConfig {
 
   /* ---- TURRET CAM ---- */
   public final CameraConfiguration cameraConfigTurret =
-      CameraConfiguration.makeLimelight4Config("turret_disabled_no_use") // FIXME
+      CameraConfiguration.makeLimelight4Config("turret")
           .withMechanismOrigin(
               () -> {
                 Rotation2d turretYaw = RobotStateYearly.get().turretState.turretYaw.get();
