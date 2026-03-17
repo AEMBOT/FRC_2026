@@ -404,9 +404,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
 
     // Rotation penalty: at 1 rad/s (57 deg/s) -> 1.5x, at 2 rad/s -> 2x
     // Penalizes rotation since MegaTag2 is more sensitive to angular velocity errors
-    // double rotationPenalty = 1.0 + (omegaRadPerSec * 0.5);
-
-    double rotationPenalty = 1.0;
+    double rotationPenalty = 1.0 + (omegaRadPerSec * 0.5);
     stdDev *= translationPenalty * rotationPenalty;
 
     return stdDev;
