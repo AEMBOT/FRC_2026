@@ -130,8 +130,8 @@ public class ProductionCameraConfig {
                       Units.inchesToMeters(0),
                       Units.inchesToMeters(9.18)),
                   new Rotation3d(
-                      Units.degreesToRadians(180),
-                      Units.degreesToRadians(-27),
+                      Units.degreesToRadians(0),
+                      Units.degreesToRadians(27),
                       Units.degreesToRadians(180))))
           .withDisabledThrottleValue(DISABLED_THROTTLE)
           .withEnabledThrottleValue(ENABLED_THROTTLE)
