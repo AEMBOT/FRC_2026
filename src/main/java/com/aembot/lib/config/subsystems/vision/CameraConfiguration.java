@@ -151,9 +151,9 @@ public class CameraConfiguration {
   public double minTagDistanceMeters = 0.56;
 
   /**
-   * Supplier for the mechanism's angular velocity in rad/s (e.g., turret rotation speed).
-   * Used to reject vision estimates when the mechanism is rotating too quickly.
-   * Returns 0 by default (no mechanism rotation).
+   * Supplier for the mechanism's angular velocity in rad/s (e.g., turret rotation speed). Used to
+   * reject vision estimates when the mechanism is rotating too quickly. Returns 0 by default (no
+   * mechanism rotation).
    */
   public Supplier<Double> mechanismAngularVelocitySupplier = () -> 0.0;
 
