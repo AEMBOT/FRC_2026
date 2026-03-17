@@ -150,6 +150,16 @@ public class CameraConfiguration {
   /** Minimum tag distance (meters) - estimates closer than this are rejected as garbage data */
   public double minTagDistanceMeters = 0.56;
 
+  /**
+   * Supplier for the mechanism's angular velocity in rad/s (e.g., turret rotation speed).
+   * Used to reject vision estimates when the mechanism is rotating too quickly.
+   * Returns 0 by default (no mechanism rotation).
+   */
+  public Supplier<Double> mechanismAngularVelocitySupplier = () -> 0.0;
+
+  /** Max mechanism rotation rate (rad/s) before rejecting all estimates from this camera */
+  public double maxMechanismOmegaRadians = Double.MAX_VALUE;
+
   public CameraConfiguration(String name, Type type) {
     this.cameraName = name;
     this.cameraType = type;
@@ -331,6 +341,21 @@ public class CameraConfiguration {
   /** Set the minimum tag distance (meters) - estimates closer than this are rejected */
   public CameraConfiguration withMinTagDistanceMeters(double minDistanceMeters) {
     this.minTagDistanceMeters = minDistanceMeters;
+    return this;
+  }
+
+  /**
+   * Set the supplier for the mechanism's angular velocity in rad/s (e.g., turret rotation speed).
+   * Used to reject vision estimates when the mechanism is rotating too quickly.
+   */
+  public CameraConfiguration withMechanismAngularVelocity(Supplier<Double> velocitySupplier) {
+    this.mechanismAngularVelocitySupplier = velocitySupplier;
+    return this;
+  }
+
+  /** Set the max mechanism rotation rate (rad/s) before rejecting all estimates from this camera */
+  public CameraConfiguration withMaxMechanismOmegaRadians(double maxOmegaRadians) {
+    this.maxMechanismOmegaRadians = maxOmegaRadians;
     return this;
   }
 

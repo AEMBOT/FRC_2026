@@ -268,13 +268,22 @@ public class AprilVisionSubsystem extends AEMSubsystem {
       rotatingTooFast = omegaRadPerSec > config.maxOmegaForAnyTagRadians;
     }
 
+    // Mechanism rotation filtering (e.g., turret rotating too fast)
+    double mechanismOmega = Math.abs(config.mechanismAngularVelocitySupplier.get());
+    boolean mechanismRotatingTooFast = mechanismOmega > config.maxMechanismOmegaRadians;
+
     // Log rejection reasons
     Logger.recordOutput(logPrefixStandard + "/" + cameraName + "/omegaRadPerSec", omegaRadPerSec);
     Logger.recordOutput(logPrefixStandard + "/" + cameraName + "/rejectedTooClose", tooClose);
     Logger.recordOutput(
         logPrefixStandard + "/" + cameraName + "/rejectedRotation", rotatingTooFast);
+    Logger.recordOutput(
+        logPrefixStandard + "/" + cameraName + "/mechanismOmegaRadPerSec", mechanismOmega);
+    Logger.recordOutput(
+        logPrefixStandard + "/" + cameraName + "/rejectedMechanismRotation",
+        mechanismRotatingTooFast);
 
-    return !tooClose && !rotatingTooFast;
+    return !tooClose && !rotatingTooFast && !mechanismRotatingTooFast;
   }
 
   /**
