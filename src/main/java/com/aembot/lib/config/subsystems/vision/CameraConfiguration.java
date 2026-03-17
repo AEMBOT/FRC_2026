@@ -128,10 +128,10 @@ public class CameraConfiguration {
   public double maxEstimateAgeSeconds = 0.5;
 
   /** Max rotation rate (rad/s) before rejecting single-tag estimates */
-  public double maxOmegaForSingleTagRadians = Math.toRadians(150);
+  public double maxOmegaForSingleTagRadians = Math.toRadians(50);
 
   /** Max rotation rate (rad/s) before rejecting all estimates */
-  public double maxOmegaForAnyTagRadians = Math.toRadians(360);
+  public double maxOmegaForAnyTagRadians = Math.toRadians(150);
 
   // ===== TAG AREA THRESHOLDS (percentage of image) =====
 
@@ -374,8 +374,8 @@ public class CameraConfiguration {
         .withEnabledThrottleValue(2)
         // Vision filtering defaults
         .withMaxEstimateAgeSeconds(0.5)
-        .withMaxOmegaForSingleTagRadians(Math.toRadians(150))
-        .withMaxOmegaForAnyTagRadians(Math.toRadians(360))
+        .withMaxOmegaForSingleTagRadians(Math.toRadians(50))
+        .withMaxOmegaForAnyTagRadians(Math.toRadians(150))
         .withTagAreaThresholds(0.05, 0.1, 1.0, 5.0)
         .withMinTagDistanceMeters(0.56);
   }
