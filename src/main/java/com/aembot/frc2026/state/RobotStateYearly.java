@@ -3,6 +3,7 @@ package com.aembot.frc2026.state;
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.state.subsystems.indexer.IndexerCompoundState;
 import com.aembot.frc2026.state.subsystems.turret.TurretState;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.math.PositionUtil;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.state.subsystems.flywheel.FlywheelState;
@@ -14,7 +15,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import java.util.concurrent.atomic.AtomicReference;
-import org.littletonrobotics.junction.Logger;
 
 public class RobotStateYearly extends RobotState {
   // Ppl on the interwebs say this is good & thread safe
@@ -95,7 +95,7 @@ public class RobotStateYearly extends RobotState {
                             0,
                             new Rotation3d(0, -hoodState.getHoodAngle().getRadians(), 0)))));
 
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         "SensorRobotState/MechanismPositions", new Pose3d[] {turretPose, intakePose, hoodPose});
 
     indexerCompoundState.updateLog("SensorRobotState/IndexerCompound", "");

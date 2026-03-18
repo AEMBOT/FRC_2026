@@ -6,6 +6,7 @@ import com.aembot.frc2026.subsystems.indexerKicker.IndexerKickerSubsystem;
 import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorSubsystem;
 import com.aembot.frc2026.subsystems.spindexer.SpindexerSubsystem;
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.drive.commands.JoystickDriveCommand;
 import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
@@ -23,7 +24,6 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.BooleanSupplier;
-import org.littletonrobotics.junction.Logger;
 
 public final class CommandFactory {
 
@@ -61,8 +61,8 @@ public final class CommandFactory {
   }
 
   public void logCommands() {
-    Logger.recordOutput("Commands/shootFuel", shootFuel);
-    Logger.recordOutput("Commands/atSetpoint", shooterCommands.isShooterNearGoal());
+    AEMLogger.recordOutput("Commands/shootFuel", shootFuel);
+    AEMLogger.recordOutput("Commands/atSetpoint", shooterCommands.isShooterNearGoal());
   }
 
   public Command createShootFuelCommand() {

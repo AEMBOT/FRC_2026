@@ -2,6 +2,7 @@ package com.aembot.lib.core.motors.io;
 
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.aembot.lib.core.can.CANDeviceID;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.motors.visualization.SimulatedTalonFXVisualization;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -19,7 +20,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import org.ironmaple.simulation.motorsims.SimulatedBattery;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
-import org.littletonrobotics.junction.Logger;
 
 /** IO implementation for a simulated TalonFX */
 public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorController {
@@ -205,14 +205,14 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorC
   }
 
   public void logSim(String standardPrefix, String inputPrefix) {
-    Logger.recordOutput(standardPrefix + "/Simulation/SupplyVoltage", inputs.SupplyVoltage);
-    Logger.recordOutput(standardPrefix + "/Simulation/Voltage", inputs.SimVoltage);
-    Logger.recordOutput(standardPrefix + "/Simulation/PositionUnits", inputs.SimPosUnits);
-    Logger.recordOutput(
+    AEMLogger.recordOutput(standardPrefix + "/Simulation/SupplyVoltage", inputs.SupplyVoltage);
+    AEMLogger.recordOutput(standardPrefix + "/Simulation/Voltage", inputs.SimVoltage);
+    AEMLogger.recordOutput(standardPrefix + "/Simulation/PositionUnits", inputs.SimPosUnits);
+    AEMLogger.recordOutput(
         standardPrefix + "/Simulation/VelocityUnitsPerSec", inputs.SimVelocityUnits);
-    Logger.recordOutput(standardPrefix + "/Simulation/RotorPosition", inputs.RotorPosition);
-    Logger.recordOutput(standardPrefix + "/Simulation/RotorVelocity", inputs.RotorVelocity);
-    Logger.recordOutput(standardPrefix + "/Simulation/Mechanism2d", visualization.getMech2d());
+    AEMLogger.recordOutput(standardPrefix + "/Simulation/RotorPosition", inputs.RotorPosition);
+    AEMLogger.recordOutput(standardPrefix + "/Simulation/RotorVelocity", inputs.RotorVelocity);
+    AEMLogger.recordOutput(standardPrefix + "/Simulation/Mechanism2d", visualization.getMech2d());
   }
 
   public TalonFXSimState getCTRESimState() {

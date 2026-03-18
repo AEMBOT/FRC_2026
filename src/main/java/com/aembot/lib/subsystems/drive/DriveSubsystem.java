@@ -3,6 +3,7 @@ package com.aembot.lib.subsystems.drive;
 import choreo.trajectory.SwerveSample;
 import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.base.AEMSubsystem;
 import com.aembot.lib.subsystems.drive.io.DrivetrainIO;
@@ -70,10 +71,10 @@ public class DriveSubsystem extends AEMSubsystem {
     }
 
     // Log latency with time between periodic being called and finishing
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
 
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         logPrefixStandard + "/CurrentCommand",
         (getCurrentCommand() == null) ? "Default" : getCurrentCommand().getName());
   }
@@ -129,7 +130,7 @@ public class DriveSubsystem extends AEMSubsystem {
   public void updateLog(String standardPrefix, String inputPrefix) {
     Logger.processInputs(inputPrefix, inputs);
 
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         standardPrefix + "/Odometry/SpeedMetersPerSecond",
         new Translation2d(inputs.Speeds.vxMetersPerSecond, inputs.Speeds.vyMetersPerSecond)
             .getNorm());

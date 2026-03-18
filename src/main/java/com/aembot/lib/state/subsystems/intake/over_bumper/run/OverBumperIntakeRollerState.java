@@ -1,7 +1,7 @@
 package com.aembot.lib.state.subsystems.intake.over_bumper.run;
 
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.logging.Loggable;
-import org.littletonrobotics.junction.Logger;
 
 public class OverBumperIntakeRollerState implements Loggable {
 
@@ -11,7 +11,8 @@ public class OverBumperIntakeRollerState implements Loggable {
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
-    Logger.recordOutput(standardPrefix + "/angularVelocityUnitsPerMin", angularVelocityUnitsPerMin);
-    Logger.recordOutput(standardPrefix + "/isActive", isActive);
+    AEMLogger.recordOutput(
+        standardPrefix + "/angularVelocityUnitsPerMin", angularVelocityUnitsPerMin);
+    AEMLogger.recordOutput(standardPrefix + "/isActive", isActive);
   }
 }

@@ -7,6 +7,7 @@ import choreo.auto.AutoTrajectory;
 import choreo.trajectory.SwerveSample;
 import com.aembot.frc2026.commands.CommandFactory;
 import com.aembot.frc2026.state.RobotStateYearly;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,7 +15,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import java.util.function.Consumer;
-import org.littletonrobotics.junction.Logger;
 
 public class AutoHelper {
 
@@ -40,7 +40,7 @@ public class AutoHelper {
             (SwerveSample sample) -> driveSubsystem.setRequestFromSwerveSample(sample),
             true,
             driveSubsystem,
-            (state, isStart) -> Logger.recordOutput("AUTO_TRAJ", state.getPoses()));
+            (state, isStart) -> AEMLogger.recordOutput("AUTO_TRAJ", state.getPoses()));
   }
 
   /**

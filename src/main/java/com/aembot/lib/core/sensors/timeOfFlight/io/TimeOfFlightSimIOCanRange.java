@@ -1,9 +1,9 @@
 package com.aembot.lib.core.sensors.timeOfFlight.io;
 
 import com.aembot.lib.config.sensors.timeOfFlight.TimeOfFlightConfiguration;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.sensors.timeOfFlight.interfaces.TimeOfFlightSimIO;
 import com.ctre.phoenix6.sim.CANrangeSimState;
-import org.littletonrobotics.junction.Logger;
 
 public class TimeOfFlightSimIOCanRange extends TimeOfFlightIOCANRange implements TimeOfFlightSimIO {
   private final CANrangeSimState kSimState;
@@ -24,6 +24,6 @@ public class TimeOfFlightSimIOCanRange extends TimeOfFlightIOCANRange implements
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
-    Logger.recordOutput(standardPrefix + "/Simulation/SimulatedDistance", simulatedDistance);
+    AEMLogger.recordOutput(standardPrefix + "/Simulation/SimulatedDistance", simulatedDistance);
   }
 }
