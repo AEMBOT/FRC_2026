@@ -39,7 +39,7 @@ public class ProductionFlywheelConfig {
           ? new ConfigureSlot0Gains(0.0, 0.0, 0.0, 0.0, 0.4, 0.132, 0.0)
           : new ConfigureSlot0Gains(5, 0, 0, 0, 0, 0.1, 0);
 
-  public static final int MOTOR_ID = 53;
+  public static final int MOTOR_ID = 54;
   public static final String MOTOR_NAME = "FlywheelMotor";
   public static final double MOTOR_CURRENT_LIMIT = 40.0;
 
