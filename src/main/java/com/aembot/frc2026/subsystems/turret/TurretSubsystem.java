@@ -101,8 +101,7 @@ public class TurretSubsystem
     Logger.recordOutput(
         "calculatedTurretRot",
         config.getMechanismRotationsFromEncoders(
-            encoderAInputs.absolutePositionRotations,
-            encoderBInputs.absolutePositionRotations));
+            encoderAInputs.absolutePositionRotations, encoderBInputs.absolutePositionRotations));
 
     state.updateTurretYaw(Rotation2d.fromDegrees(inputs.positionUnits));
 
