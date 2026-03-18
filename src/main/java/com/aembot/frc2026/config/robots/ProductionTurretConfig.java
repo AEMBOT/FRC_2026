@@ -101,8 +101,8 @@ public class ProductionTurretConfig {
                   MOTOR_ID, SUBSYSTEM_NAME + "Motor", SUBSYSTEM_NAME, CANDeviceType.TALON_FX))
           .withName(SUBSYSTEM_NAME + "Motor")
           .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / GEAR_RATIO))
-          .withMaxPositionUnits(270)
-          .withMinPositionUnits(90);
+          .withMaxPositionUnits(305)
+          .withMinPositionUnits(30);
 
   public final SimulatedMotorConfiguration<TalonFXConfiguration> SIM_MOTOR_CONFIG =
       new SimulatedMotorConfiguration<TalonFXConfiguration>()
