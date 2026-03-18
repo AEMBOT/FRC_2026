@@ -23,7 +23,6 @@ import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 
 /** IO implementation for a simulated TalonFX */
 public class MotorIOTalonFXSim extends MotorIOTalonFX implements SimulatedMotorController {
-
   /** Helper class for simulated talon fx data */
   public class SimulatedTalonFXState {
     public double SupplyVoltage;

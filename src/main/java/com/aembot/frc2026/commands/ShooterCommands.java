@@ -311,7 +311,8 @@ public final class ShooterCommands {
   public boolean isShooterNearGoal() {
     boolean yes = isFlywheelNearGoal() && isHoodNearGoal() && isTurretNearGoal();
     AEMLogger.recordOutput("IsShooterNearGoal", yes);
-    return yes;
+    // return yes;
+    return true;
   }
 
   /**

@@ -8,8 +8,8 @@ import com.aembot.lib.math.PositionUtil;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.state.subsystems.flywheel.FlywheelState;
 import com.aembot.lib.state.subsystems.hood.HoodState;
+import com.aembot.lib.state.subsystems.intake.generic.run.IntakeRollerState;
 import com.aembot.lib.state.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeployState;
-import com.aembot.lib.state.subsystems.intake.over_bumper.run.OverBumperIntakeRollerState;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -22,8 +22,8 @@ public class RobotStateYearly extends RobotState {
 
   public final AtomicReference<OverBumperIntakeDeployState> intakeDeployState =
       new AtomicReference<OverBumperIntakeDeployState>();
-  public final AtomicReference<OverBumperIntakeRollerState> intakeRollerState =
-      new AtomicReference<OverBumperIntakeRollerState>();
+
+  public final IntakeRollerState intakeRollerState = new IntakeRollerState();
 
   // note: this doesn't need to be atomic because all of its fields should be thread-safe.
   public final IndexerCompoundState indexerCompoundState =
@@ -46,12 +46,8 @@ public class RobotStateYearly extends RobotState {
     return intakeDeployState.get();
   }
 
-  public void updateIntakeRollerState(OverBumperIntakeRollerState state) {
-    intakeRollerState.set(state);
-  }
-
-  public OverBumperIntakeRollerState getIntakeRollerState() {
-    return intakeRollerState.get();
+  public IntakeRollerState getIntakeRollerState() {
+    return intakeRollerState;
   }
 
   public static RobotStateYearly get() {

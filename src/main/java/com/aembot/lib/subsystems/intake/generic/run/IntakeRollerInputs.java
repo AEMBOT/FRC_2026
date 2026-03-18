@@ -1,9 +1,9 @@
-package com.aembot.lib.subsystems.intake.over_bumper.run;
+package com.aembot.lib.subsystems.intake.generic.run;
 
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
-public class OverBumperIntakeRollerInputs implements LoggableInputs {
+public class IntakeRollerInputs implements LoggableInputs {
 
   @Override
   public void toLog(LogTable table) {}
