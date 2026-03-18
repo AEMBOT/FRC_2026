@@ -131,38 +131,54 @@ public class TalonFXTurretConfiguration {
   }
 
   /**
-   * Get the absolute position of the mechanism from the encoder positions
+   * Get the absolute position of the mechanism from the encoder positions.
    *
-   * @param rawCANcoderAPos position in rotations of CANcoder A
-   * @param rawCANcoderBPos position in rotations of CANcoder B
-   * @param CANcoderAteeth number of teeth on CANcoder A
-   * @param CANcoderBteeth number of teeth on CANcoder B
-   * @param mechanismTeeth number of teeth on the bigger mechanism
-   * @return The absolute position of the mechanism in rotations. If it fails, returns -1
+   * <p>Uses Chinese Remainder Theorem (CRT) to determine absolute position from two encoders with
+   * coprime gear ratios. Uses continuous interpolation for robustness to noise.
+   *
+   * @param encAPos position in rotations of CANcoder A [0, 1)
+   * @param encBPos position in rotations of CANcoder B [0, 1)
+   * @param teethA number of teeth on CANcoder A pinion
+   * @param teethB number of teeth on CANcoder B pinion
+   * @param teethMech number of teeth on the output mechanism gear
+   * @return The absolute position of the mechanism in rotations [0, 1). Returns -1 if no valid
+   *     match found.
    */
   public double getMechanismRotationsFromEncoders(
-      double rawCANcoderAPos,
-      double rawCANcoderBPos,
-      int CANcoderAteeth,
-      int CANcoderBteeth,
-      int mechanismTeeth) { // now returns rots instead of degrees
+      double encAPos, double encBPos, int teethA, int teethB, int teethMech) {
 
-    double currentEncoderATeeth =
-        rawCANcoderAPos * CANcoderAteeth; // the current position of the encoder in terms of teeth
-    double currentEncoderBTeeth = rawCANcoderBPos * CANcoderBteeth;
+    // Gear ratios: how many encoder rotations per output rotation
+    double ratioA = (double) teethMech / teethA; // e.g., 100/13 = 7.69
+    double ratioB = (double) teethMech / teethB; // e.g., 100/17 = 5.88
 
-    for (double testPos = currentEncoderATeeth;
-        testPos < CANcoderAteeth * CANcoderBteeth;
-        testPos += CANcoderAteeth) {
+    double bestTheta = -1;
+    double bestError = Double.MAX_VALUE;
 
-      double encoderBTestPos = testPos % CANcoderBteeth;
+    // Search over candidate output positions based on encoder A
+    // Encoder A wraps ratioA times per output rotation, so there are ceil(ratioA) candidates
+    int numCandidates = (int) Math.ceil(ratioA);
 
-      double diff = Math.abs(currentEncoderBTeeth - encoderBTestPos);
-      double circularDiff = Math.min(diff, CANcoderBteeth - diff);
+    for (int k = 0; k < numCandidates; k++) {
+      // Candidate output position (in rotations, can be > 1)
+      double theta = (encAPos + k) / ratioA;
 
-      if (circularDiff < 0.3) {
-        return (testPos / mechanismTeeth);
+      // What would encoder B read at this theta?
+      double expectedB = (theta * ratioB) % 1.0;
+
+      // Circular distance between expected and actual encoder B
+      double diff = Math.abs(expectedB - encBPos);
+      double circularDiff = Math.min(diff, 1.0 - diff);
+
+      if (circularDiff < bestError) {
+        bestError = circularDiff;
+        bestTheta = theta;
       }
+    }
+
+    // Only accept if error is small (0.03 rotations = ~11 degrees on encoder)
+    if (bestError < 0.03) {
+      // Return position within single output rotation
+      return bestTheta % 1.0;
     }
 
     return -1;

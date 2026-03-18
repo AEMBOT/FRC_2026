@@ -57,25 +57,62 @@ public class TurretSubsystem
     SmartDashboard.putBoolean("Turret Enabled", motorEnabled);
   }
 
-  private void setPositionFromEncoders() {
-    double absolutePosition =
+  /**
+   * Compute absolute turret position using CRT with calibrated offsets.
+   *
+   * Offsets are applied here rather than via Phoenix6 MagnetOffset because calibration found
+   * that encoder readings must be INVERTED (1.0 - raw) before the offset is added. Phoenix6's
+   * MagnetOffset only adds an offset and cannot perform the inversion step.
+   *
+   * Calibration process invloved an exhaustive search compared CRT
+   * output to motor encoder position (zeroed at startup). The search tested all combinations of
+   * invert A/B (true/false), offset A (0-1 in 1/26 steps), offset B (0-1 in 1/34 steps), and gear
+   * swap. The winning config (RMS error ~1.4 deg): invert both, offset A=21/26≈0.808, offset
+   * B=5/34≈0.147. The offsets represent magnet misalignment; search resolution uses gear teeth
+   * (13T/17T) as natural tick sizes.
+   *
+   * @return turret position in degrees, or -1 if CRT computation failed
+   */
+  private double getCalculatedTurretDeg() {
+    // Invert readings then add calibrated offset - Phoenix6 MagnetOffset can't do inversion
+    double adjustedA =
+        MathUtil.inputModulus(
+            (1.0 - encoderAInputs.absolutePositionRotations) + config.kCANcoderAOffset, 0, 1);
+    double adjustedB =
+        MathUtil.inputModulus(
+            (1.0 - encoderBInputs.absolutePositionRotations) + config.kCANcoderBOffset, 0, 1);
+
+    double crtRotations =
         config.getMechanismRotationsFromEncoders(
-            MathUtil.inputModulus(io.getCANcoderA().getRawAngle(), 0, 1),
-            MathUtil.inputModulus(io.getCANcoderB().getRawAngle(), 0, 1),
+            adjustedA,
+            adjustedB,
             config.kCANcoderAGearTeeth,
             config.kCANcoderBGearTeeth,
             config.kMechanismTeeth);
 
-    if (absolutePosition == -1) {
+    if (crtRotations < 0) {
+      return -1;
+    }
+
+    // CRT outputs absolute position directly - no starting rotation offset needed
+    double degrees = (crtRotations % 1.0) * 360.0;
+    return degrees < 0 ? degrees + 360.0 : degrees;
+  }
+
+  private void setPositionFromEncoders() {
+    double calculatedDeg = getCalculatedTurretDeg();
+
+    if (calculatedDeg < 0) {
       CommandScheduler.getInstance()
           .schedule(
               dutyCycleCommand(() -> 0)
                   .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
                   .withName("DisableMotorCommand"));
+      return;
     }
 
-    // Zero encoder position based on cancoders
-    setEncoderPosition(absolutePosition);
+    // Zero encoder position based on CRT computation
+    setEncoderPosition(calculatedDeg);
   }
 
   @Override
@@ -100,17 +137,7 @@ public class TurretSubsystem
 
     // setPositionFromEncoders();
 
-    Logger.recordOutput("encoderA", io.getCANcoderA().getRawAngle());
-    Logger.recordOutput("encoderB", io.getCANcoderB().getRawAngle());
-
-    Logger.recordOutput(
-        "calculatedTurretRot",
-        config.getMechanismRotationsFromEncoders(
-            encoderAInputs.absolutePositionRotations,
-            encoderBInputs.absolutePositionRotations,
-            config.kCANcoderAGearTeeth,
-            config.kCANcoderBGearTeeth,
-            config.kMechanismTeeth));
+    Logger.recordOutput("calculatedTurretDeg", getCalculatedTurretDeg());
 
     state.updateTurretYaw(Rotation2d.fromDegrees(inputs.positionUnits));
 
@@ -124,8 +151,9 @@ public class TurretSubsystem
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
     Logger.processInputs(inputPrefix, inputs);
-    Logger.processInputs(inputPrefix, encoderAInputs);
-    Logger.processInputs(inputPrefix, encoderBInputs);
+    // Use unique prefixes for each CANcoder to prevent overwriting
+    Logger.processInputs(inputPrefix + "/CANCoderA", encoderAInputs);
+    Logger.processInputs(inputPrefix + "/CANCoderB", encoderBInputs);
     io.updateLog(standardPrefix, inputPrefix);
     super.updateLog(standardPrefix, inputPrefix);
   }

@@ -35,10 +35,19 @@ public class ProductionTurretConfig {
 
   public final int CANCODER_B_ID = 42;
 
-  public final double CANCODER_A_MAGNET_OFFSET = 0;
+  /**
+   * Calibrated offset for CRT computation (applied after inverting encoder reading).
+   *
+   * When performing CRT calibration process found that encoder readings need to be: 1. Inverted: inverted =
+   * 1.0 - raw 2. Offset added: adjusted = (inverted + offset) % 1.0
+   *
+   * This offset is used in TurretSubsystem for CRT computation, NOT as Phoenix6 MagnetOffset.
+   */
+  public final double CANCODER_A_MAGNET_OFFSET = 0.807692;
 
   public final Pose3d TURRET_ORIGIN_POSE = new Pose3d(-0.134944, 0.0, 0.339133, new Rotation3d());
 
+  // Starting position for motor encoder initialization (not used by CRT)
   public final double TURRET_START_ROT = 180;
 
   public final double AUTO_AIM_LENCIANCY = 10;
@@ -60,12 +69,17 @@ public class ProductionTurretConfig {
               new CANcoderConfiguration()
                   .withMagnetSensor(
                       new MagnetSensorConfigs()
-                          .withMagnetOffset(CANCODER_A_MAGNET_OFFSET)
+                          .withMagnetOffset(0) // CRT offset applied in TurretSubsystem, not here
                           .withAbsoluteSensorDiscontinuityPoint(1)));
 
   public final int CANCODER_A_GEAR_TEETH = 13;
 
-  public final double CANCODER_B_MAGNET_OFFSET = 0;
+  /**
+   * Calibrated offset for CRT computation (applied after inverting encoder reading).
+   *
+   * @see #CANCODER_A_MAGNET_OFFSET for full documentation
+   */
+  public final double CANCODER_B_MAGNET_OFFSET = 0.147059;
 
   public final AEMCANCoderConfiguration CANCODER_B_CONFIG =
       new AEMCANCoderConfiguration()
@@ -79,7 +93,7 @@ public class ProductionTurretConfig {
               new CANcoderConfiguration()
                   .withMagnetSensor(
                       new MagnetSensorConfigs()
-                          .withMagnetOffset(CANCODER_B_MAGNET_OFFSET)
+                          .withMagnetOffset(0) // CRT offset applied in TurretSubsystem, not here
                           .withAbsoluteSensorDiscontinuityPoint(1)));
 
   public final int CANCODER_B_GEAR_TEETH = 17;
@@ -116,8 +130,10 @@ public class ProductionTurretConfig {
       new TalonFXTurretConfiguration(SUBSYSTEM_NAME)
           .withCANcoderAConfig(CANCODER_A_CONFIG)
           .withCANcoderAGearTeeth(CANCODER_A_GEAR_TEETH)
+          .withCANcoderAOffset(CANCODER_A_MAGNET_OFFSET)
           .withCANcoderBConfig(CANCODER_B_CONFIG)
           .withCANcoderBGearTeeth(CANCODER_B_GEAR_TEETH)
+          .withCANcoderBOffset(CANCODER_B_MAGNET_OFFSET)
           .withMechanismTeeth(MECHANISM_TEETH)
           .withRealMotorConfig(MOTOR_CONFIG)
           .withSimMotorConfig(SIM_MOTOR_CONFIG)
