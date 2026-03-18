@@ -244,10 +244,10 @@ public class ProductionIntakeConfig {
           .withCANDevice(
               new CANDeviceID(
                   RIGHT_WHEEL_CAN_ID,
-                  SUBSYSTEM_NAME + "LeftWheelMotor",
+                  SUBSYSTEM_NAME + "RightWheelMotor",
                   SUBSYSTEM_NAME + "Wheels",
                   CANDeviceID.CANDeviceType.TALON_FX))
-          .withName(SUBSYSTEM_NAME + "LeftWheelMotor")
+          .withName(SUBSYSTEM_NAME + "RightWheelMotor")
           .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / RIGHT_WHEEL_GEAR_RATIO))
           .withMomentOfInertia(0.00025);
 
