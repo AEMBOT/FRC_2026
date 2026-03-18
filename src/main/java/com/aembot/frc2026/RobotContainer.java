@@ -185,15 +185,15 @@ public class RobotContainer implements Loggerable {
 
     driverController
         .povUp()
-        .onTrue(commandFactory.shooterCommands.createSetPassingPoseCenterLeftCommand());
-
-    driverController
-        .povRight()
         .onTrue(commandFactory.shooterCommands.createSetPassingPoseCenterRightCommand());
 
     driverController
-        .povDown()
+        .povRight()
         .onTrue(commandFactory.shooterCommands.createSetPassingPoseCornerRightCommand());
+
+    driverController
+        .povDown()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseCornerLeftCommand());
 
     driverController.start().onTrue(commandFactory.resetOdometryHeading());
 
