@@ -140,11 +140,9 @@ public class RobotContainer implements Loggerable {
                 .alongWith(commandFactory.intakeCommands.createRunIntakeCommand()));
 
     driverController
-        .rightBumper()
-        .whileTrue(
-            commandFactory
-                .createShootFuelTowerPosCommand()
-                .alongWith(commandFactory.intakeCommands.createRunIntakeCommand()));
+        .leftTrigger()
+        .onTrue(commandFactory.intakeCommands.createZeroDownCommand())
+        .onFalse(commandFactory.intakeCommands.createUpCommand());
 
     // c on the controller
     driverController.leftStick().onTrue(commandFactory.intakeCommands.createZeroDownCommand());
@@ -152,12 +150,7 @@ public class RobotContainer implements Loggerable {
     // z on the controller
     driverController.rightStick().onTrue(commandFactory.intakeCommands.createUpCommand());
 
-    driverController
-        .b()
-        .whileTrue(
-            intakeRollerSubsystem
-                .reverseRollerCommand()
-                .alongWith(intakeWheelsSubsystem.reverseSystemCommand()));
+    // driverController.y() UNUSED
 
     driverController
         .x()
@@ -165,21 +158,23 @@ public class RobotContainer implements Loggerable {
             commandFactory.createSetDriveHeadingForUnderTrenchCommand(
                 driverController, driverController.leftBumper()));
 
+    // driverController.a() UNUSED
+
     driverController
         .povLeft()
-        .onTrue(commandFactory.shooterCommands.createSetPassingPoseLeftCommand());
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseCornerLeftCommand());
 
     driverController
         .povUp()
-        .onTrue(commandFactory.shooterCommands.createSetPassingPoseMiddleCommand());
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseCenterRightCommand());
 
     driverController
         .povRight()
-        .onTrue(commandFactory.shooterCommands.createSetPassingPoseRightCommand());
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseCornerRightCommand());
 
     driverController
         .povDown()
-        .onTrue(commandFactory.shooterCommands.createSetPassingPoseOutpostCommand());
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseCornerLeftCommand());
 
     driverController.start().onTrue(commandFactory.resetOdometryHeading());
 
