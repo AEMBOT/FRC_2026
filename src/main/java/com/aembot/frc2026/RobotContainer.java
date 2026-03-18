@@ -147,7 +147,10 @@ public class RobotContainer implements Loggerable {
 
     driverController.rightBumper().whileTrue(commandFactory.createShootFuelTowerPosCommand());
 
-    driverController.leftTrigger().onTrue(commandFactory.intakeCommands.createZeroDownCommand()).onFalse(commandFactory.intakeCommands.createUpCommand());
+    driverController
+        .leftTrigger()
+        .onTrue(commandFactory.intakeCommands.createZeroDownCommand())
+        .onFalse(commandFactory.intakeCommands.createUpCommand());
 
     // While we're pressing left trigger to intake and not right trigger or y to shoot, run indexer
     // load
