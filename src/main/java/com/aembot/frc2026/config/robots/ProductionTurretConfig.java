@@ -38,8 +38,7 @@ public class ProductionTurretConfig {
 
   public final double CANCODER_A_MAGNET_OFFSET = 0;
 
-  public final Pose3d TURRET_ORIGIN_POSE =
-      new Pose3d(-0.134944, -0.000127, 0.339133, new Rotation3d());
+  public final Pose3d TURRET_ORIGIN_POSE = new Pose3d(-0.134944, 0.0, 0.339133, new Rotation3d());
 
   public final double TURRET_START_ROT = 180;
 

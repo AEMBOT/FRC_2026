@@ -9,10 +9,9 @@ import com.aembot.lib.config.odometry.OdometryStandardDevs;
  *   <li>{@code cameraName()}: {@link String} Name of the camera that observed the tag. Should be
  *       {@link com.aembot.lib.config.subsystems.vision.CameraConfiguration#cameraName
  *       CameraConfiguration#cameraName}.
- *   <li>{@code tagID()}: {@code int} ID of the observed tag
  *   <li>{@code estimatedPose()}: {@link VisionPoseEstimation} The robot pose estimated from the
  *       observation
  *   <li>{@code stddevs()} {@link OdometryStandardDevs} The standard deviations of the pose
  *       estimation
  */
-public record AprilCameraOutput(String cameraName, int tagID, VisionPoseEstimation estimatedPose) {}
+public record AprilCameraOutput(String cameraName, VisionPoseEstimation estimatedPose) {}

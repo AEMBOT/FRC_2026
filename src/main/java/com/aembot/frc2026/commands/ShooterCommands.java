@@ -9,7 +9,9 @@ import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -76,6 +78,25 @@ public final class ShooterCommands {
                 : RobotStateYearly.get().getLatestFieldRobotPose().getX() > 12.512548;
 
     robotPoseSupplier = () -> RobotStateYearly.get().getLatestFieldRobotPose();
+  }
+
+  /**
+   * Computes the turret's field pose by applying the turret origin offset to the robot pose. This
+   * accounts for the turret not being at the robot center.
+   *
+   * @return The turret's pose on the field, or null if robot pose is unavailable
+   */
+  private Pose2d getTurretFieldPose() {
+    Pose2d robotPose = robotPoseSupplier.get();
+    if (robotPose == null) {
+      return null;
+    }
+
+    Pose3d turretOrigin = RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig().kTurretOriginPose;
+    Translation2d turretOffset = new Translation2d(turretOrigin.getX(), turretOrigin.getY());
+    Translation2d fieldOffset = turretOffset.rotateBy(robotPose.getRotation());
+
+    return new Pose2d(robotPose.getTranslation().plus(fieldOffset), robotPose.getRotation());
   }
 
   /* ---- VELOCITY TABLES ---- */
@@ -147,7 +168,7 @@ public final class ShooterCommands {
   private Rotation2d getCurrentYaw() {
     return getCurrentVelocityTable()
         .getFuelInitVelocityRotation3d(
-            robotPoseSupplier.get(),
+            getTurretFieldPose(),
             RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds())
         .toRotation2d();
   }
@@ -159,7 +180,7 @@ public final class ShooterCommands {
     return Units.radiansToDegrees(
         getCurrentVelocityTable()
             .getFuelInitVelocityRotation3d(
-                robotPoseSupplier.get(),
+                getTurretFieldPose(),
                 RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds())
             .getY());
   }
@@ -182,7 +203,7 @@ public final class ShooterCommands {
   private double getCurrentSpeed() {
     return getCurrentVelocityTable()
             .getFuelInitVelocityMagnitude(
-                RobotStateYearly.get().getLatestFieldRobotPose(),
+                getTurretFieldPose(),
                 RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds())
         + getFlywheelSpeedBoost();
   }
