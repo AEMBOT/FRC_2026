@@ -149,7 +149,8 @@ public class RobotContainer implements Loggerable {
 
     driverController
         .leftTrigger()
-        .whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
+        .onTrue(commandFactory.intakeCommands.createZeroDownCommand())
+        .onFalse(commandFactory.intakeCommands.createUpCommand());
 
     // While we're pressing left trigger to intake and not right trigger or y to shoot, run indexer
     // load
@@ -166,7 +167,7 @@ public class RobotContainer implements Loggerable {
     // z on the controller
     driverController.rightStick().onTrue(commandFactory.intakeCommands.createUpCommand());
 
-    driverController.y().whileTrue(commandFactory.createShootFuelCommand());
+    // driverController.y() UNUSED
 
     driverController
         .x()
@@ -176,7 +177,7 @@ public class RobotContainer implements Loggerable {
 
     driverController.b().whileTrue(commandFactory.indexerCommands.createRunIndexerBackCommand());
 
-    driverController.a().onTrue(commandFactory.intakeCommands.createFlickIntakeCommand());
+    // driverController.a() UNUSED
 
     driverController
         .povLeft()
@@ -184,15 +185,15 @@ public class RobotContainer implements Loggerable {
 
     driverController
         .povUp()
-        .onTrue(commandFactory.shooterCommands.createSetPassingPoseCenterLeftCommand());
-
-    driverController
-        .povRight()
         .onTrue(commandFactory.shooterCommands.createSetPassingPoseCenterRightCommand());
 
     driverController
-        .povDown()
+        .povRight()
         .onTrue(commandFactory.shooterCommands.createSetPassingPoseCornerRightCommand());
+
+    driverController
+        .povDown()
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseCornerLeftCommand());
 
     driverController.start().onTrue(commandFactory.resetOdometryHeading());
 
