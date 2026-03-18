@@ -4,7 +4,6 @@ import com.aembot.lib.config.encoders.AEMCANCoderConfiguration;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 
 public class TalonFXTurretConfiguration {
@@ -29,6 +28,9 @@ public class TalonFXTurretConfiguration {
 
   /** Number of teeth on the gear connecting the rotor to CANcoder B */
   public int kCANcoderBGearTeeth;
+
+  /** Number of teeth on the big mechanism gear next to both CANcoders */
+  public int kMechanismTeeth;
 
   /** Magnet offset for CANcoder A */
   public double kCANcoderAOffset;
@@ -85,6 +87,11 @@ public class TalonFXTurretConfiguration {
     return this;
   }
 
+  public TalonFXTurretConfiguration withMechanismTeeth(int MechanismTeeth) {
+    this.kMechanismTeeth = MechanismTeeth;
+    return this;
+  }
+
   public TalonFXTurretConfiguration withCANcoderAOffset(double CANcoderAOffset) {
     this.kCANcoderAOffset = CANcoderAOffset;
     return this;
@@ -128,28 +135,33 @@ public class TalonFXTurretConfiguration {
    *
    * @param rawCANcoderAPos position in rotations of CANcoder A
    * @param rawCANcoderBPos position in rotations of CANcoder B
-   * @return The absolute position of the mechanism in configured units. If it fails, returns -1
+   * @param CANcoderAteeth number of teeth on CANcoder A
+   * @param CANcoderBteeth number of teeth on CANcoder B
+   * @param mechanismTeeth number of teeth on the bigger mechanism
+   * @return The absolute position of the mechanism in rotations. If it fails, returns -1
    */
-  public double getMechanismRotationsFromEncoders(double rawCANcoderAPos, double rawCANcoderBPos) {
+  public double getMechanismRotationsFromEncoders(
+      double rawCANcoderAPos,
+      double rawCANcoderBPos,
+      int CANcoderAteeth,
+      int CANcoderBteeth,
+      int mechanismTeeth) { // now returns rots instead of degrees
 
-    double encoderATeeth = rawCANcoderAPos * kCANcoderAGearTeeth;
-    double encoderBTeeth = rawCANcoderBPos * kCANcoderBGearTeeth;
+    double currentEncoderATeeth =
+        rawCANcoderAPos * CANcoderAteeth; // the current position of the encoder in terms of teeth
+    double currentEncoderBTeeth = rawCANcoderBPos * CANcoderBteeth;
 
-    for (double testPos = encoderATeeth;
-        testPos < kCANcoderAGearTeeth * kCANcoderBGearTeeth;
-        testPos += kCANcoderAGearTeeth) {
+    for (double testPos = currentEncoderATeeth;
+        testPos < CANcoderAteeth * CANcoderBteeth;
+        testPos += CANcoderAteeth) {
 
-      double encoderBTestPos = testPos % kCANcoderBGearTeeth;
+      double encoderBTestPos = testPos % CANcoderBteeth;
 
-      double diff = Math.abs(encoderBTeeth - encoderBTestPos);
-      double circularDiff = Math.min(diff, kCANcoderBGearTeeth - diff);
+      double diff = Math.abs(currentEncoderBTeeth - encoderBTestPos);
+      double circularDiff = Math.min(diff, CANcoderBteeth - diff);
 
       if (circularDiff < 0.3) {
-        return MathUtil.inputModulus(
-            kRealMotorConfig.getMechanismRotationsToUnits(testPos / 100.0) // FIXME magic num
-                + this.startingRotation,
-            0.0,
-            360.0);
+        return (testPos / mechanismTeeth);
       }
     }
 
