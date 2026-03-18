@@ -34,7 +34,7 @@ public class ProductionIntakeConfig {
   public final int LEFT_WHEEL_CAN_ID = 55;
   public final int RIGHT_WHEEL_CAN_ID = 56;
 
-  public final double UP_DEPLOY_ANGLE = 117.788503;
+  public final double UP_DEPLOY_ANGLE = 117.788503 + 15;
 
   public final double DOWN_DEPLOY_ANGLE = 8.206357; // Less temporary
 
