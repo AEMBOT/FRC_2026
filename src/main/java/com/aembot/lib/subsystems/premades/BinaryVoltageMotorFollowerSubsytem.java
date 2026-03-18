@@ -51,6 +51,10 @@ public class BinaryVoltageMotorFollowerSubsytem
     return voltageCommand(() -> kConfig.kRunVoltage);
   }
 
+  public Command reverseSystemCommand() {
+    return voltageCommand(() -> -kConfig.kRunVoltage);
+  }
+
   public Command stopSystemCommand() {
     return voltageCommand(() -> 0);
   }

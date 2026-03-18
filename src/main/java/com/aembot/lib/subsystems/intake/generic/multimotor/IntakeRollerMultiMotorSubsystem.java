@@ -56,6 +56,10 @@ public class IntakeRollerMultiMotorSubsystem
     return voltageCommand(() -> kConfig.kRunVoltage);
   }
 
+  public Command reverseRollerCommand() {
+    return voltageCommand(() -> -kConfig.kRunVoltage);
+  }
+
   public Command stopRollerCommand() {
     return voltageCommand(() -> 0);
   }

@@ -167,6 +167,13 @@ public class RobotContainer implements Loggerable {
     // driverController.a() UNUSED
 
     driverController
+        .b()
+        .whileTrue(
+            intakeRollerSubsystem
+                .reverseRollerCommand()
+                .alongWith(intakeWheelsSubsystem.reverseSystemCommand()));
+
+    driverController
         .povLeft()
         .onTrue(commandFactory.shooterCommands.createSetPassingPoseCornerLeftCommand());
 

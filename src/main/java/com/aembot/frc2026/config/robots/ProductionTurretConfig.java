@@ -13,7 +13,6 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -46,7 +45,7 @@ public class ProductionTurretConfig {
 
   public final ConfigureSlot0Gains SLOT_0_CONFIGS =
       (RobotRuntimeConstants.MODE == RuntimeMode.REAL)
-          ? new ConfigureSlot0Gains(0.4, 0.0, 0.0, 0.0, 0.4, 0.123, 0.0)
+          ? new ConfigureSlot0Gains(2.5, 0.0, 0.0, 0.0, 0.3, 0.119, 0.0)
           : new ConfigureSlot0Gains(0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
   public final AEMCANCoderConfiguration CANCODER_A_CONFIG =
@@ -95,15 +94,15 @@ public class ProductionTurretConfig {
                               Units.degreesToRotations(CRUISE_VELOCITY_DEG_PER_SEC) * GEAR_RATIO)
                           .withMotionMagicAcceleration(
                               Units.degreesToRotations(ACCELERATION_DEG_PER_SEC) * GEAR_RATIO))
-                  .withSlot0(new Slot0Configs().withKP(0.4).withKS(.4).withKV(0.123))
+                  .withSlot0(SLOT_0_CONFIGS)
                   .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(20)))
           .withCANDevice(
               new CANDeviceID(
                   MOTOR_ID, SUBSYSTEM_NAME + "Motor", SUBSYSTEM_NAME, CANDeviceType.TALON_FX))
           .withName(SUBSYSTEM_NAME + "Motor")
           .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / GEAR_RATIO))
-          .withMaxPositionUnits(270)
-          .withMinPositionUnits(90);
+          .withMaxPositionUnits(305)
+          .withMinPositionUnits(30);
 
   public final int MECHANISM_TEETH = 100;
 

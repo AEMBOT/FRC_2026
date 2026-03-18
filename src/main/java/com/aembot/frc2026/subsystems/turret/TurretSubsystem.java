@@ -61,8 +61,8 @@ public class TurretSubsystem
   private void setPositionFromEncoders() {
     double absolutePosition =
         config.getMechanismRotationsFromEncoders(
-            MathUtil.inputModulus(io.getCANcoderA().getRawAngle() - 0.683838, 0, 1),
-            MathUtil.inputModulus(io.getCANcoderB().getRawAngle() - 0.654541, 0, 1),
+            MathUtil.inputModulus(io.getCANcoderA().getRawAngle(), 0, 1),
+            MathUtil.inputModulus(io.getCANcoderB().getRawAngle(), 0, 1),
             config.kCANcoderAGearTeeth,
             config.kCANcoderBGearTeeth,
             config.kMechanismTeeth);
@@ -107,8 +107,8 @@ public class TurretSubsystem
     AEMLogger.recordOutput(
         "calculatedTurretRot",
         config.getMechanismRotationsFromEncoders(
-            encoderAInputs.absolutePositionRotations - 0.683838,
-            encoderBInputs.absolutePositionRotations - 0.654541,
+            encoderAInputs.absolutePositionRotations,
+            encoderBInputs.absolutePositionRotations,
             config.kCANcoderAGearTeeth,
             config.kCANcoderBGearTeeth,
             config.kMechanismTeeth));
