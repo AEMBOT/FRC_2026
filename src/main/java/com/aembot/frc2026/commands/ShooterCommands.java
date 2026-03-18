@@ -14,12 +14,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import java.util.function.BooleanSupplier;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -41,7 +41,12 @@ public final class ShooterCommands {
 
   private Supplier<Pose2d> robotPoseSupplier;
 
-  private double shooterBoost = 4.5;
+  private Function<Double, Double> shooterBoost =
+      (distance) -> 0.917017 * distance + (1.13468 + 0.5);
+
+  private double PASSING_BOOST = 4.5;
+
+  private Translation2d HUB_TRANSLATION = new Translation2d(4.6101, 4.03479);
 
   private final Pose2d TOWER_SHOT_POSE = new Pose2d(1.541, 3.709, Rotation2d.kZero);
 
@@ -50,7 +55,7 @@ public final class ShooterCommands {
     this.turret = turret;
     this.flywheel = flywheel;
 
-    SmartDashboard.putNumber("ShooterBoost", shooterBoost);
+    // SmartDashboard.putNumber("ShooterBoost", shooterBoost);
 
     String velocityTableDirectory = Filesystem.getDeployDirectory() + "/initial-velocities/real/";
     if (RobotRuntimeConstants.MODE == RuntimeMode.SIM) {
@@ -191,8 +196,16 @@ public final class ShooterCommands {
    * @return amount to boost flywheel speed in m/s
    */
   private double getFlywheelSpeedBoost() {
-    this.shooterBoost = SmartDashboard.getNumber("ShooterBoost", shooterBoost);
-    return (RobotRuntimeConstants.MODE == RuntimeMode.REAL) ? shooterBoost : 0.4;
+    // this.shooterBoost = SmartDashboard.getNumber("ShooterBoost", shooterBoost);
+    double boost;
+    if (inShootingZone.getAsBoolean()) {
+      var pos = RobotStateYearly.get().getLatestFieldRobotPose().getTranslation();
+      var dist = pos.getDistance(HUB_TRANSLATION);
+      boost = shooterBoost.apply(dist);
+    } else {
+      boost = PASSING_BOOST;
+    }
+    return (RobotRuntimeConstants.MODE == RuntimeMode.REAL) ? boost : 0.4;
   }
 
   /**
