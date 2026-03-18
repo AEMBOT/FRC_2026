@@ -16,7 +16,7 @@ public class LogEntry<T> {
   /**
    * @see #kThrottle
    */
-  public static final int DEFAULT_THROTTLE = 2;
+  public static final int DEFAULT_THROTTLE = 5;
 
   /** The key to log this entry at. */
   public final String kKey;
