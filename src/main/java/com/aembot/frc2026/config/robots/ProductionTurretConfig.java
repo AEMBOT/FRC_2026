@@ -104,6 +104,8 @@ public class ProductionTurretConfig {
           .withMaxPositionUnits(305)
           .withMinPositionUnits(30);
 
+  public final int MECHANISM_TEETH = 100;
+
   public final SimulatedMotorConfiguration<TalonFXConfiguration> SIM_MOTOR_CONFIG =
       new SimulatedMotorConfiguration<TalonFXConfiguration>()
           .withRealConfiguration(MOTOR_CONFIG)
@@ -116,6 +118,7 @@ public class ProductionTurretConfig {
           .withCANcoderAGearTeeth(CANCODER_A_GEAR_TEETH)
           .withCANcoderBConfig(CANCODER_B_CONFIG)
           .withCANcoderBGearTeeth(CANCODER_B_GEAR_TEETH)
+          .withMechanismTeeth(MECHANISM_TEETH)
           .withRealMotorConfig(MOTOR_CONFIG)
           .withSimMotorConfig(SIM_MOTOR_CONFIG)
           .withTurretOriginPose(TURRET_ORIGIN_POSE)
