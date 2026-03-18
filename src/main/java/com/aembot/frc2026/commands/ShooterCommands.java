@@ -9,7 +9,9 @@ import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,10 +29,10 @@ public final class ShooterCommands {
   private final FlywheelSubsystem flywheel;
 
   private final OptimalVelocityTable shootingHubTable;
-  private final OptimalVelocityTable passingOutpostTable;
-  private final OptimalVelocityTable passingLeftTable;
-  private final OptimalVelocityTable passingMiddleTable;
-  private final OptimalVelocityTable passingRightTable;
+  private final OptimalVelocityTable passingCornerLeftTable;
+  private final OptimalVelocityTable passingCornerRightTable;
+  private final OptimalVelocityTable passingCenterLeftTable;
+  private final OptimalVelocityTable passingCenterRightTable;
 
   private Supplier<OptimalVelocityTable> passingTableSupplier;
 
@@ -54,15 +56,19 @@ public final class ShooterCommands {
     this.shootingHubTable =
         new OptimalVelocityTable(
             velocityTableDirectory + "../real/Shooting_Hub_Initial_Velocities.csv");
-    this.passingOutpostTable =
-        new OptimalVelocityTable(velocityTableDirectory + "Passing_Outpost_Initial_Velocities.csv");
-    this.passingLeftTable =
-        new OptimalVelocityTable(velocityTableDirectory + "Passing_Left_Initial_Velocities.csv");
-    this.passingMiddleTable =
-        new OptimalVelocityTable(velocityTableDirectory + "Passing_Middle_Initial_Velocities.csv");
-    this.passingRightTable =
-        new OptimalVelocityTable(velocityTableDirectory + "Passing_Right_Initial_Velocities.csv");
-    passingTableSupplier = () -> passingMiddleTable;
+    this.passingCornerLeftTable =
+        new OptimalVelocityTable(
+            velocityTableDirectory + "Passing_Left_Corner_Initial_Velocities.csv");
+    this.passingCornerRightTable =
+        new OptimalVelocityTable(
+            velocityTableDirectory + "Passing_Right_Corner_Initial_Velocities.csv");
+    this.passingCenterLeftTable =
+        new OptimalVelocityTable(
+            velocityTableDirectory + "Passing_Left_Center_Initial_Velocities.csv");
+    this.passingCenterRightTable =
+        new OptimalVelocityTable(
+            velocityTableDirectory + "Passing_Right_Center_Initial_Velocities.csv");
+    passingTableSupplier = () -> passingCornerRightTable;
 
     // Supplier so that our shooting zones are different whether we are blue or red
     inShootingZone =
@@ -72,6 +78,25 @@ public final class ShooterCommands {
                 : RobotStateYearly.get().getLatestFieldRobotPose().getX() > 12.512548;
 
     robotPoseSupplier = () -> RobotStateYearly.get().getLatestFieldRobotPose();
+  }
+
+  /**
+   * Computes the turret's field pose by applying the turret origin offset to the robot pose. This
+   * accounts for the turret not being at the robot center.
+   *
+   * @return The turret's pose on the field, or null if robot pose is unavailable
+   */
+  private Pose2d getTurretFieldPose() {
+    Pose2d robotPose = robotPoseSupplier.get();
+    if (robotPose == null) {
+      return null;
+    }
+
+    Pose3d turretOrigin = RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig().kTurretOriginPose;
+    Translation2d turretOffset = new Translation2d(turretOrigin.getX(), turretOrigin.getY());
+    Translation2d fieldOffset = turretOffset.rotateBy(robotPose.getRotation());
+
+    return new Pose2d(robotPose.getTranslation().plus(fieldOffset), robotPose.getRotation());
   }
 
   /* ---- VELOCITY TABLES ---- */
@@ -96,40 +121,44 @@ public final class ShooterCommands {
   /**
    * @return a command that sets the passing position to the outpost
    */
-  public Command createSetPassingPoseOutpostCommand() {
+  public Command createSetPassingPoseCenterRightCommand() {
     return new InstantCommand(
         () -> {
-          passingTableSupplier = () -> passingOutpostTable;
+          System.out.println("Setting passing table to center right");
+          passingTableSupplier = () -> passingCenterRightTable;
         });
   }
 
   /**
    * @return a command that sets the passing position to the left
    */
-  public Command createSetPassingPoseLeftCommand() {
+  public Command createSetPassingPoseCornerLeftCommand() {
     return new InstantCommand(
         () -> {
-          passingTableSupplier = () -> passingLeftTable;
+          System.out.println("Setting passing table to corner right");
+          passingTableSupplier = () -> passingCornerLeftTable;
         });
   }
 
   /**
    * @return a command that sets the passing position to the middle
    */
-  public Command createSetPassingPoseMiddleCommand() {
+  public Command createSetPassingPoseCornerRightCommand() {
     return new InstantCommand(
         () -> {
-          passingTableSupplier = () -> passingMiddleTable;
+          System.out.println("Setting passing table to corner right");
+          passingTableSupplier = () -> passingCornerRightTable;
         });
   }
 
   /**
    * @return a command that sets the passing position to the right
    */
-  public Command createSetPassingPoseRightCommand() {
+  public Command createSetPassingPoseCenterLeftCommand() {
     return new InstantCommand(
         () -> {
-          passingTableSupplier = () -> passingRightTable;
+          System.out.println("Setting passing table to center left");
+          passingTableSupplier = () -> passingCenterLeftTable;
         });
   }
 
@@ -139,7 +168,7 @@ public final class ShooterCommands {
   private Rotation2d getCurrentYaw() {
     return getCurrentVelocityTable()
         .getFuelInitVelocityRotation3d(
-            robotPoseSupplier.get(),
+            getTurretFieldPose(),
             RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds())
         .toRotation2d();
   }
@@ -151,7 +180,7 @@ public final class ShooterCommands {
     return Units.radiansToDegrees(
         getCurrentVelocityTable()
             .getFuelInitVelocityRotation3d(
-                robotPoseSupplier.get(),
+                getTurretFieldPose(),
                 RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds())
             .getY());
   }
@@ -174,7 +203,7 @@ public final class ShooterCommands {
   private double getCurrentSpeed() {
     return getCurrentVelocityTable()
             .getFuelInitVelocityMagnitude(
-                RobotStateYearly.get().getLatestFieldRobotPose(),
+                getTurretFieldPose(),
                 RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds())
         + getFlywheelSpeedBoost();
   }
