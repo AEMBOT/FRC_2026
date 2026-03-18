@@ -13,6 +13,7 @@ import com.aembot.frc2026.subsystems.spindexer.SpindexerSubsystem;
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.frc2026.util.AutoHelper;
 import com.aembot.lib.core.logging.Loggerable;
+import com.aembot.lib.core.logging.log_entries.LogEntry;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
@@ -31,7 +32,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.littletonrobotics.junction.LoggedRobot;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -98,6 +98,12 @@ public class RobotContainer implements Loggerable {
                   && DriverStation.getAlliance().get().equals(Alliance.Blue));
 
   private final Field2d field = new Field2d();
+
+  /* ---- LOG ENTRIES ---- */
+  private final LogEntry<Alliance> allianceLogEntry =
+      new LogEntry<>("Alliance", Alliance.class, 20);
+  private final LogEntry<Boolean> allianceSetLogEntry =
+      new LogEntry<>("AllianceSet", Boolean.class, 20);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer(LoggedRobot robot) {
@@ -235,8 +241,8 @@ public class RobotContainer implements Loggerable {
   public void logCommands() {
     commandFactory.logCommands();
     if (DriverStation.getAlliance().isPresent())
-      Logger.recordOutput("Alliance", DriverStation.getAlliance().get());
-    Logger.recordOutput("AllianceSet", DriverStation.getAlliance().isPresent());
+      allianceLogEntry.pushValue(DriverStation.getAlliance().get());
+    allianceSetLogEntry.pushValue(DriverStation.getAlliance().isPresent());
 
     field.setRobotPose(RobotStateYearly.get().getLatestFieldRobotPose());
     SmartDashboard.putData("FieldData/Field2d", field);
