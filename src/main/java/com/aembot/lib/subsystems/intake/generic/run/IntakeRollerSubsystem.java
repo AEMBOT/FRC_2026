@@ -1,8 +1,8 @@
 package com.aembot.lib.subsystems.intake.generic.run;
 
 import com.aembot.lib.config.motors.MotorConfiguration;
-import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.config.subsystems.intake.generic.run.TalonFXIntakeRollerConfiguration;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.state.subsystems.intake.generic.run.IntakeRollerState;
