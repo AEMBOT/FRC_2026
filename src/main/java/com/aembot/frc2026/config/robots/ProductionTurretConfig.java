@@ -30,7 +30,7 @@ public class ProductionTurretConfig {
 
   public final double GEAR_RATIO = 480.0 / 13.0;
 
-  public final int MOTOR_ID = 52;
+  public final int MOTOR_ID = 53;
 
   public final int CANCODER_A_ID = 43;
 
@@ -106,6 +106,8 @@ public class ProductionTurretConfig {
           .withMaxPositionUnits(270)
           .withMinPositionUnits(90);
 
+  public final int MECHANISM_TEETH = 100;
+
   public final SimulatedMotorConfiguration<TalonFXConfiguration> SIM_MOTOR_CONFIG =
       new SimulatedMotorConfiguration<TalonFXConfiguration>()
           .withRealConfiguration(MOTOR_CONFIG)
@@ -118,6 +120,7 @@ public class ProductionTurretConfig {
           .withCANcoderAGearTeeth(CANCODER_A_GEAR_TEETH)
           .withCANcoderBConfig(CANCODER_B_CONFIG)
           .withCANcoderBGearTeeth(CANCODER_B_GEAR_TEETH)
+          .withMechanismTeeth(MECHANISM_TEETH)
           .withRealMotorConfig(MOTOR_CONFIG)
           .withSimMotorConfig(SIM_MOTOR_CONFIG)
           .withTurretOriginPose(TURRET_ORIGIN_POSE)

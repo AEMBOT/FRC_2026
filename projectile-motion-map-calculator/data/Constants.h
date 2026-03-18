@@ -28,10 +28,10 @@ using namespace std;
 #define HUB_POSITION Vector3D{4.6101, 4.03479, 1.4732}
 
 // Positions to aim towards when passing
-#define PASS_POSITIONS_0 Vector3D{1.8, 5.5, 0}
-#define PASS_POSITIONS_1 Vector3D{1.8, 4, 0}
-#define PASS_POSITIONS_2 Vector3D{1.8, 2.5, 0}
-#define PASS_POSITIONS_3 Vector3D{0.5, 0.5, 0}
+#define PASS_POSITIONS_0 Vector3D{1, 7.069326, 0} // Corner Left 
+#define PASS_POSITIONS_1 Vector3D{1, 1, 0} // Corner Right
+#define PASS_POSITIONS_2 Vector3D{2.312797, 5.558536, 0} // Center Left
+#define PASS_POSITIONS_3 Vector3D{2.312797, 2.51079, 0} // Center Right
 
 // Radius of the funnel on the hub
 // Slightly smaller than real radius
