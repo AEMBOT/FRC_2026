@@ -254,11 +254,11 @@ public final class ShooterCommands {
 
     targetRotation = MathUtil.inputModulus(targetRotation, 0, 360);
 
-    double scaledValue = ((targetRotation - 180) * -0.06);
+    double scaledValue = ((targetRotation - 180) * 0.1);
 
     System.out.println(scaledValue);
 
-    return MathUtil.inputModulus(targetRotation, 0, 360);
+    return MathUtil.inputModulus(targetRotation + scaledValue, 0, 360);
   }
 
   /**
