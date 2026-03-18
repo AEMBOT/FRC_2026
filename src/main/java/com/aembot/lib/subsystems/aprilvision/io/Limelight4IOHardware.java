@@ -2,23 +2,26 @@ package com.aembot.lib.subsystems.aprilvision.io;
 
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
-import com.aembot.lib.math.PositionUtil;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionInputs;
 import com.aembot.lib.subsystems.aprilvision.interfaces.AprilCameraIO;
 import com.aembot.lib.subsystems.aprilvision.util.LimelightExtras;
 import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers;
 import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers.PoseEstimate;
+import com.aembot.lib.subsystems.aprilvision.util.LimelightHelpers.RawFiducial;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.PubSubOption;
+import edu.wpi.first.networktables.TimestampedDoubleArray;
 import java.util.EnumSet;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
@@ -36,12 +39,6 @@ public class Limelight4IOHardware implements AprilCameraIO {
 
   protected final NetworkTable networkTable;
 
-  /**
-   * double NT entry indicating the heartbeat of the limelight. "hb" on network table. Resets at
-   * two-billion
-   */
-  protected final NetworkTableEntry heartbeatEntry;
-
   protected final RobotState robotStateInstance;
 
   /**
@@ -50,19 +47,16 @@ public class Limelight4IOHardware implements AprilCameraIO {
    */
   private double lastMegatag2Timestamp = Double.NaN;
 
+  /* ---- NT SUBSCRIBER ---- */
+  private final DoubleArraySubscriber botposeSubscriber;
+
   /* ---- ASYNCHRONOUSLY UPDATED FIELDS ---- */
-  private AtomicReference<Double> latencyMs = new AtomicReference<>(0.0);
-
-  private AtomicBoolean hasTag = new AtomicBoolean(false);
-
-  private AtomicInteger tagID = new AtomicInteger(-1);
-
   private AtomicReference<PoseEstimate> megatag2Estimate =
       new AtomicReference<>(new PoseEstimate());
 
   private AtomicReference<double[]> limelightStdDevs = new AtomicReference<>(new double[0]);
 
-  protected final Consumer<NetworkTableEvent> heartbeatCallback = this::updateNtValuesCache;
+  protected final Consumer<NetworkTableEvent> poseUpdateCallback = this::updateNtValuesCache;
 
   public Limelight4IOHardware(
       CameraConfiguration config,
@@ -74,11 +68,16 @@ public class Limelight4IOHardware implements AprilCameraIO {
     this.robotStateInstance = robotStateInstance;
 
     this.networkTable = NetworkTableInstance.getDefault().getTable(cameraName);
-    this.heartbeatEntry = networkTable.getEntry("hb");
+
+    // Subscribe to MegaTag2 pose data - callback fires when new pose arrives
+    this.botposeSubscriber =
+        networkTable
+            .getDoubleArrayTopic("botpose_orb_wpiblue")
+            .subscribe(new double[] {}, PubSubOption.sendAll(true));
 
     NetworkTableInstance.getDefault()
         .addListener(
-            heartbeatEntry, EnumSet.of(NetworkTableEvent.Kind.kValueAll), heartbeatCallback);
+            botposeSubscriber, EnumSet.of(NetworkTableEvent.Kind.kValueAll), poseUpdateCallback);
 
     Pose3d cameraPosition = cameraConfiguration.getCameraPosition();
 
@@ -93,37 +92,72 @@ public class Limelight4IOHardware implements AprilCameraIO {
   }
 
   /**
-   * Updates the cached values from NetworkTables. Called asynchronously as {@link
-   * #heartbeatCallback} for every limelight heartbeat
+   * Updates the cached values from NetworkTables. Called asynchronously when new MegaTag2 pose data
+   * arrives on the botpose_orb_wpiblue topic.
    */
-  public void updateNtValuesCache(NetworkTableEvent event) {
-    latencyMs.set(
-        LimelightHelpers.getLatency_Capture(cameraName)
-            + LimelightHelpers.getLatency_Pipeline(cameraName));
+  private void updateNtValuesCache(NetworkTableEvent event) {
+    // Get data directly from subscriber - no additional NT read needed
+    TimestampedDoubleArray tsValue = botposeSubscriber.getAtomic();
+    double[] poseArray = tsValue.value;
+    long timestamp = tsValue.timestamp;
 
-    hasTag.set(LimelightHelpers.getTV(cameraName));
-    tagID.set((int) LimelightHelpers.getFiducialID(cameraName));
+    if (poseArray.length == 0) {
+      megatag2Estimate.set(new PoseEstimate());
+      return;
+    }
 
-    megatag2Estimate.set(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName));
+    // Parse pose data from array (same format as LimelightHelpers)
+    Pose2d pose = toPose2D(poseArray);
+    double latency = extractArrayEntry(poseArray, 6);
+    int tagCount = (int) extractArrayEntry(poseArray, 7);
+    double tagSpan = extractArrayEntry(poseArray, 8);
+    double tagDist = extractArrayEntry(poseArray, 9);
+    double tagArea = extractArrayEntry(poseArray, 10);
 
+    // Convert server timestamp from microseconds to seconds and adjust for latency
+    double adjustedTimestamp = (timestamp / 1000000.0) - (latency / 1000.0);
+
+    PoseEstimate poseEstimate =
+        new PoseEstimate(
+            pose,
+            adjustedTimestamp,
+            latency,
+            tagCount,
+            tagSpan,
+            tagDist,
+            tagArea,
+            new RawFiducial[0],
+            true);
+
+    megatag2Estimate.set(poseEstimate);
+    // Read stddevs synchronously here to ensure they match the pose frame
     limelightStdDevs.set(LimelightExtras.getStandardDeviations(cameraName));
+  }
+
+  private static Pose2d toPose2D(double[] inData) {
+    if (inData.length < 6) {
+      return new Pose2d();
+    }
+    return new Pose2d(
+        new Translation2d(inData[0], inData[1]), new Rotation2d(Units.degreesToRadians(inData[5])));
+  }
+
+  private static double extractArrayEntry(double[] inData, int position) {
+    if (inData.length < position + 1) {
+      return 0;
+    }
+    return inData[position];
   }
 
   @Override
   public void updateInputs(AprilVisionInputs inputs) {
     // Update robot orientation for MegaTag2
     setRobotYawNetworkTables();
+    PoseEstimate poseEstimate = megatag2Estimate.get();
 
-    inputs.latency = latencyMs.get();
+    inputs.latency = poseEstimate.latency;
 
-    inputs.hasTag = hasTag.get();
-    inputs.tagID = tagID.get();
-
-    if (inputs.hasTag && inputs.tagID >= 1 && inputs.tagID <= fieldConstants.getNumTags()) {
-      inputs.tagPosition = fieldConstants.getAprilTagPose3d(inputs.tagID);
-    } else {
-      inputs.tagPosition = PositionUtil.NaN.POSE3D;
-    }
+    inputs.hasTag = poseEstimate.tagCount > 0;
 
     // Populate RAW coprocessor data (no RIO-side processing)
     PoseEstimate estimate = megatag2Estimate.get();

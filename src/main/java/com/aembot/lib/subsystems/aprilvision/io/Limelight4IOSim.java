@@ -85,6 +85,9 @@ public class Limelight4IOSim extends Limelight4IOHardware {
    */
   protected final NetworkTableEntry stddevsEntry;
 
+  /** double NT entry for heartbeat. "hb" on network table */
+  protected final NetworkTableEntry heartbeatEntry;
+
   /* ---- END NETWORK TABLES ENTRIES ---- */
 
   private final VisionSystemSim visionSystemSim;
@@ -143,6 +146,7 @@ public class Limelight4IOSim extends Limelight4IOHardware {
     megatag2PoseEstimateEntry = networkTable.getEntry("botpose_orb_wpiblue");
     rawFiducialsEntry = networkTable.getEntry("rawfiducials");
     stddevsEntry = networkTable.getEntry("stddevs");
+    heartbeatEntry = networkTable.getEntry("hb");
   }
 
   @Override

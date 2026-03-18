@@ -76,7 +76,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
           VisionPoseEstimation processed = processRawEstimate(inputs, config, config.cameraName);
 
           if (processed != null && processed.latencyUncompensatedPose() != null) {
-            rawCameraOutputs.add(new AprilCameraOutput(config.cameraName, inputs.tagID, processed));
+            rawCameraOutputs.add(new AprilCameraOutput(config.cameraName, processed));
 
             // Log computed values as OUTPUTS
             Logger.recordOutput(
@@ -213,9 +213,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
     // Return single fused estimate at the latest timestamp
     return List.of(
         new AprilCameraOutput(
-            "fused",
-            -1, // No single tag ID for fused
-            new VisionPoseEstimation(fusedPose, fusedStdDevs, latestTimestamp)));
+            "fused", new VisionPoseEstimation(fusedPose, fusedStdDevs, latestTimestamp)));
   }
 
   public Command createKillVisionCommand() {
