@@ -1,9 +1,13 @@
 package com.aembot.lib.subsystems.base;
 
+import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.motors.MotorFollowersConfiguration;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.motors.interfaces.MotorIO.FollowDirection;
+import com.aembot.lib.core.motors.io.containers.CompoundMotorIO;
+import java.util.Arrays;
+import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -24,47 +28,41 @@ import org.littletonrobotics.junction.Logger;
  * @param <M> {@link MotorIO} IO interface for the motor.
  * @param <C> {@link MotorFollowerConfiguration} describing behaviour of the motor & its followersx
  */
-public class MotorFollowerSubsystem<
-        I extends MotorInputs, M extends MotorIO, C extends MotorFollowersConfiguration<?>>
-    extends MotorSubsystem<I, M, C> {
+public class MotorFollowerSubsystem<I extends MotorInputs, M extends MotorIO, C>
+    extends MotorSubsystem<I, M, MotorConfiguration<C>> {
   /** Configuration object defining leader and follower setup. */
-  protected C mainConfig;
+  protected MotorFollowersConfiguration<C> mainConfig;
 
   /** Input/state containers for each follower motor. */
   protected I[] followerMotorInputs;
 
   /** IO objects for each follower motor. */
-  protected M[] followerMotorIOs;
+  protected List<M> followerMotorIOs;
 
-  /**
-   * Constructs a new {@code MotorFollowerSubsystem}.
-   *
-   * @param leaderMotorInputs The inputs object representing the leader motor’s sensor readings.
-   * @param leaderMotor The {@link MotorIO} implementation controlling the leader motor.
-   * @param followerMotorInputs Array of inputs for each follower motor.
-   * @param followerMotors Array of {@link MotorIO} objects for each follower motor.
-   * @param config The configuration object defining follower relationships and parameters.
-   * @throws AssertionError if the number of follower inputs does not match the number of follower
-   *     motors.
-   */
+  /** Container of all motors. Mostly exists to make sure sim notifiers are set up. */
+  protected final CompoundMotorIO<M> motorIOContainer;
+
   public MotorFollowerSubsystem(
-      I leaderMotorInputs, M leaderMotor, I[] followerMotorInputs, M[] followerMotors, C config) {
-    super(leaderMotorInputs, leaderMotor, config);
+      I[] motorInputs, CompoundMotorIO<M> io, MotorFollowersConfiguration<C> config) {
+    super(motorInputs[0], io.getMotor(0), config.validate().leaderConfig);
 
     this.mainConfig = config;
+    this.motorIOContainer = io;
 
-    this.followerMotorInputs = followerMotorInputs;
-    this.followerMotorIOs = followerMotors;
+    this.followerMotorInputs = Arrays.copyOfRange(motorInputs, 1, motorInputs.length);
+
+    this.followerMotorIOs = io.kMotors.subList(1, io.kMotors.size());
 
     // Ensure all follower motor property collections are the same length
-    assert (this.followerMotorInputs.length == this.followerMotorIOs.length)
+    assert (this.followerMotorInputs.length == this.followerMotorIOs.size())
             && (this.followerMotorInputs.length == config.followerConfigurations.size())
         : "Length of follower inputs/io/configs not equal";
 
     // Configure each follower to follow the leader according to their configuration
     for (int i = 0; i < config.followerConfigurations.size(); i++) {
-      MotorIO motor = followerMotors[i];
-      motor.follow(mainConfig.kCANDevice, config.followerConfigurations.get(i).followDirection);
+      M motor = this.followerMotorIOs.get(i);
+      motor.follow(
+          mainConfig.leaderConfig.kCANDevice, config.followerConfigurations.get(i).followDirection);
     }
   }
 
@@ -72,9 +70,13 @@ public class MotorFollowerSubsystem<
   public void periodic() {
     super.periodic();
     for (int i = 0; i < mainConfig.followerConfigurations.size(); i++) {
-      MotorIO followerIO = followerMotorIOs[i];
+      MotorIO followerIO = followerMotorIOs.get(i);
       followerIO.updateInputs(followerMotorInputs[i]);
-      Logger.processInputs(logPrefixInput + "/Inputs", followerMotorInputs[i]);
+      Logger.processInputs(
+          logPrefixInput
+              + "/Followers/"
+              + mainConfig.followerConfigurations.get(i).config.kConfigurationName,
+          followerMotorInputs[i]);
     }
   }
 

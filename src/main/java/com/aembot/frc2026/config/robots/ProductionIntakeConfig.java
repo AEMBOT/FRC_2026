@@ -2,12 +2,14 @@ package com.aembot.frc2026.config.robots;
 
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.lib.config.motors.MotorConfiguration;
+import com.aembot.lib.config.motors.MotorFollowersConfiguration;
 import com.aembot.lib.config.motors.SimulatedMotorConfiguration;
+import com.aembot.lib.config.subsystems.intake.generic.run.BinaryVoltageMotorFollowerConfig;
 import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
-import com.aembot.lib.config.subsystems.intake.overBumper.run.TalonFXOverBumperIntakeRollerConfiguration;
 import com.aembot.lib.config.wrappers.ConfigureSlot0Gains;
 import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import com.aembot.lib.core.can.CANDeviceID;
+import com.aembot.lib.core.motors.interfaces.MotorIO.FollowDirection;
 import com.aembot.lib.core.motors.interfaces.MotorIO.NeutralMode;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -19,15 +21,20 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import java.util.List;
 import org.ironmaple.simulation.IntakeSimulation.IntakeSide;
 
 public class ProductionIntakeConfig {
 
   public final int DEPLOY_CAN_ID = 52;
 
-  public final int ROLLER_CAN_ID = 50;
+  public final int ROLLER_LEAD_CAN_ID = 50;
+  public final int ROLLER_FOLLOWER_CAN_ID = 51;
 
-  public final double UP_DEPLOY_ANGLE = 140;
+  public final int LEFT_WHEEL_CAN_ID = 55;
+  public final int RIGHT_WHEEL_CAN_ID = 56;
+
+  public final double UP_DEPLOY_ANGLE = 117.788503;
 
   public final double DOWN_DEPLOY_ANGLE = 8.206357; // Less temporary
 
@@ -41,7 +48,7 @@ public class ProductionIntakeConfig {
 
   public final double ZEROING_VOLTAGE = 4.0;
 
-  public final String SUBSYSTEM_NAME = "IntakeSubsystem";
+  public final String SUBSYSTEM_NAME = "IntexerSubsystem";
 
   public final double DEPLOY_GEAR_RATIO = 18400.0 / 243.0;
 
@@ -55,7 +62,19 @@ public class ProductionIntakeConfig {
 
   public final double ROLLER_GEAR_RATIO = 1;
 
-  public final double ROLLER_VOLTAGE = 12;
+  public final double LEFT_WHEEL_GEAR_RATIO = 1;
+
+  public final double RIGHT_WHEEL_GEAR_RATIO = 1;
+
+  public final double ROLLER_VOLTAGE = -9;
+
+  public final double WHEEL_VOLTAGE = -2;
+
+  public final CurrentLimitsConfigs ROLLER_CURRENT_LIMITS =
+      new CurrentLimitsConfigs().withSupplyCurrentLimit(30);
+
+  public final CurrentLimitsConfigs WHEEL_CURRENT_LIMITS =
+      new CurrentLimitsConfigs().withSupplyCurrentLimit(30);
 
   public final NeutralMode ROLLER_NEUTRAL_MODE = NeutralMode.BRAKE;
 
@@ -106,23 +125,43 @@ public class ProductionIntakeConfig {
           .withMaxPositionUnits(UP_DEPLOY_ANGLE)
           .withMinPositionUnits(DOWN_DEPLOY_ANGLE);
 
-  public final MotorConfiguration<TalonFXConfiguration> ROLLER_MOTOR_CONFIG =
+  public final MotorConfiguration<TalonFXConfiguration> ROLLER_LEAD_MOTOR_CONFIG =
       new MotorConfiguration<TalonFXConfiguration>()
           .withMotorConfig(
               new TalonFXConfiguration()
                   .withMotorOutput(
                       new MotorOutputConfigs()
-                          .withInverted(InvertedValue.Clockwise_Positive)
+                          .withInverted(InvertedValue.CounterClockwise_Positive)
                           .withNeutralMode(ROLLER_NEUTRAL_MODE.toCTRENeutralMode()))
-                  .withCurrentLimits(new CurrentLimitsConfigs().withSupplyCurrentLimit(30)))
+                  .withCurrentLimits(ROLLER_CURRENT_LIMITS))
           .withCANDevice(
               new CANDeviceID(
-                  ROLLER_CAN_ID,
-                  SUBSYSTEM_NAME + "RollerMotor",
+                  ROLLER_LEAD_CAN_ID,
+                  SUBSYSTEM_NAME + "RollerMotorLead",
                   SUBSYSTEM_NAME + "Roller",
                   CANDeviceID.CANDeviceType.TALON_FX))
-          .withName(SUBSYSTEM_NAME + "RollerMotor")
-          .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / ROLLER_GEAR_RATIO));
+          .withName(SUBSYSTEM_NAME + "RollerMotorLead")
+          .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / ROLLER_GEAR_RATIO))
+          .withMomentOfInertia(0.00025);
+
+  public final MotorConfiguration<TalonFXConfiguration> ROLLER_FOLLOW_MOTOR_CONFIG =
+      new MotorConfiguration<TalonFXConfiguration>()
+          .withMotorConfig(
+              new TalonFXConfiguration()
+                  .withMotorOutput(
+                      new MotorOutputConfigs()
+                          .withInverted(InvertedValue.CounterClockwise_Positive)
+                          .withNeutralMode(ROLLER_NEUTRAL_MODE.toCTRENeutralMode()))
+                  .withCurrentLimits(ROLLER_CURRENT_LIMITS))
+          .withCANDevice(
+              new CANDeviceID(
+                  ROLLER_FOLLOWER_CAN_ID,
+                  SUBSYSTEM_NAME + "RollerMotorFollower",
+                  SUBSYSTEM_NAME + "Roller",
+                  CANDeviceID.CANDeviceType.TALON_FX))
+          .withName(SUBSYSTEM_NAME + "RollerMotorFollower")
+          .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / ROLLER_GEAR_RATIO))
+          .withMomentOfInertia(0.00025);
 
   public final SimulatedMotorConfiguration<TalonFXConfiguration> DEPLOY_SIM_MOTOR_CONFIG =
       new SimulatedMotorConfiguration<TalonFXConfiguration>()
@@ -130,9 +169,15 @@ public class ProductionIntakeConfig {
           .withStartingRotation(STARTING_ANGLE_DEG)
           .withSimMotorConstants(DCMotor.getKrakenX60(1));
 
-  public final SimulatedMotorConfiguration<TalonFXConfiguration> ROLLER_SIM_MOTOR_CONFIG =
+  public final SimulatedMotorConfiguration<TalonFXConfiguration> ROLLER_LEAD_SIM_MOTOR_CONFIG =
       new SimulatedMotorConfiguration<TalonFXConfiguration>()
-          .withRealConfiguration(ROLLER_MOTOR_CONFIG)
+          .withRealConfiguration(ROLLER_LEAD_MOTOR_CONFIG)
+          .withStartingRotation(0)
+          .withSimMotorConstants(DCMotor.getKrakenX60(1));
+
+  public final SimulatedMotorConfiguration<TalonFXConfiguration> ROLLER_FOLLOW_SIM_MOTOR_CONFIG =
+      new SimulatedMotorConfiguration<TalonFXConfiguration>()
+          .withRealConfiguration(ROLLER_FOLLOW_MOTOR_CONFIG)
           .withStartingRotation(0)
           .withSimMotorConstants(DCMotor.getKrakenX60(1));
 
@@ -148,9 +193,88 @@ public class ProductionIntakeConfig {
           .withInitialAngleDeg(STARTING_ANGLE_DEG)
           .withDownwardsZeroAngleDeg(ZERO_ANGLE_DEG);
 
-  public final TalonFXOverBumperIntakeRollerConfiguration ROLLER_CONFIG =
-      new TalonFXOverBumperIntakeRollerConfiguration(SUBSYSTEM_NAME + "Roller")
-          .withRealMotorConfiguration(ROLLER_MOTOR_CONFIG)
-          .withSimMotorConfiguration(ROLLER_SIM_MOTOR_CONFIG)
-          .withIntakeVoltage(ROLLER_VOLTAGE);
+  //   public final TalonFXIntakeRollerConfiguration ROLLER_CONFIG =
+  //       new TalonFXIntakeRollerConfiguration(SUBSYSTEM_NAME + "Roller")
+  //           .withRealMotorConfiguration(ROLLER_LEAD_MOTOR_CONFIG)
+  //           .withSimMotorConfiguration(ROLLER_LEAD_SIM_MOTOR_CONFIG)
+  //           .withIntakeVoltage(ROLLER_VOLTAGE);
+  public final BinaryVoltageMotorFollowerConfig ROLLER_CONFIG =
+      new BinaryVoltageMotorFollowerConfig(SUBSYSTEM_NAME + "Roller")
+          .withMotorConfigs(
+              new MotorFollowersConfiguration<TalonFXConfiguration>()
+                  .withLeaderConfig(ROLLER_LEAD_MOTOR_CONFIG)
+                  .withLeaderSimConfig(ROLLER_LEAD_SIM_MOTOR_CONFIG)
+                  .withFollowerConfigs(
+                      List.of(
+                          new MotorFollowersConfiguration.FollowerConfiguration<>(
+                                  ROLLER_FOLLOW_MOTOR_CONFIG)
+                              .withSimConfig(ROLLER_FOLLOW_SIM_MOTOR_CONFIG)
+                              .withFollowDirection(FollowDirection.INVERT))))
+          .withIntakeVoltage(ROLLER_VOLTAGE)
+          .validate();
+
+  public final MotorConfiguration<TalonFXConfiguration> LEFT_WHEEL_MOTOR_CONFIG =
+      new MotorConfiguration<TalonFXConfiguration>()
+          .withMotorConfig(
+              new TalonFXConfiguration()
+                  .withMotorOutput(
+                      new MotorOutputConfigs()
+                          .withInverted(InvertedValue.Clockwise_Positive)
+                          .withNeutralMode(ROLLER_NEUTRAL_MODE.toCTRENeutralMode()))
+                  .withCurrentLimits(WHEEL_CURRENT_LIMITS))
+          .withCANDevice(
+              new CANDeviceID(
+                  LEFT_WHEEL_CAN_ID,
+                  SUBSYSTEM_NAME + "LeftWheelMotor",
+                  SUBSYSTEM_NAME + "Wheels",
+                  CANDeviceID.CANDeviceType.TALON_FX))
+          .withName(SUBSYSTEM_NAME + "LeftWheelMotor")
+          .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / LEFT_WHEEL_GEAR_RATIO))
+          .withMomentOfInertia(0.00025);
+
+  public final MotorConfiguration<TalonFXConfiguration> RIGHT_WHEEL_MOTOR_CONFIG =
+      new MotorConfiguration<TalonFXConfiguration>()
+          .withMotorConfig(
+              new TalonFXConfiguration()
+                  .withMotorOutput(
+                      new MotorOutputConfigs()
+                          .withInverted(InvertedValue.Clockwise_Positive)
+                          .withNeutralMode(ROLLER_NEUTRAL_MODE.toCTRENeutralMode()))
+                  .withCurrentLimits(WHEEL_CURRENT_LIMITS))
+          .withCANDevice(
+              new CANDeviceID(
+                  RIGHT_WHEEL_CAN_ID,
+                  SUBSYSTEM_NAME + "RightWheelMotor",
+                  SUBSYSTEM_NAME + "Wheels",
+                  CANDeviceID.CANDeviceType.TALON_FX))
+          .withName(SUBSYSTEM_NAME + "RightWheelMotor")
+          .withUnitToRotorRotationRatio(Units.rotationsToDegrees(1 / RIGHT_WHEEL_GEAR_RATIO))
+          .withMomentOfInertia(0.00025);
+
+  public final SimulatedMotorConfiguration<TalonFXConfiguration> LEFT_WHEEL_SIM_MOTOR_CONFIG =
+      new SimulatedMotorConfiguration<TalonFXConfiguration>()
+          .withRealConfiguration(LEFT_WHEEL_MOTOR_CONFIG)
+          .withStartingRotation(0)
+          .withSimMotorConstants(DCMotor.getKrakenX60(1));
+
+  public final SimulatedMotorConfiguration<TalonFXConfiguration> RIGHT_WHEEL_SIM_MOTOR_CONFIG =
+      new SimulatedMotorConfiguration<TalonFXConfiguration>()
+          .withRealConfiguration(RIGHT_WHEEL_MOTOR_CONFIG)
+          .withStartingRotation(0)
+          .withSimMotorConstants(DCMotor.getKrakenX60(1));
+
+  public final BinaryVoltageMotorFollowerConfig WHEEL_CONFIG =
+      new BinaryVoltageMotorFollowerConfig(SUBSYSTEM_NAME + "Wheels")
+          .withMotorConfigs(
+              new MotorFollowersConfiguration<TalonFXConfiguration>()
+                  .withLeaderConfig(LEFT_WHEEL_MOTOR_CONFIG)
+                  .withLeaderSimConfig(LEFT_WHEEL_SIM_MOTOR_CONFIG)
+                  .withFollowerConfigs(
+                      List.of(
+                          new MotorFollowersConfiguration.FollowerConfiguration<>(
+                                  RIGHT_WHEEL_MOTOR_CONFIG)
+                              .withSimConfig(RIGHT_WHEEL_SIM_MOTOR_CONFIG)
+                              .withFollowDirection(FollowDirection.INVERT))))
+          .withIntakeVoltage(WHEEL_VOLTAGE)
+          .validate();
 }

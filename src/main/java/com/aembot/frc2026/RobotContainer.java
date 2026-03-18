@@ -7,9 +7,6 @@ package com.aembot.frc2026;
 import com.aembot.frc2026.commands.CommandFactory;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.subsystems.SubsystemFactory;
-import com.aembot.frc2026.subsystems.indexerKicker.IndexerKickerSubsystem;
-import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorSubsystem;
-import com.aembot.frc2026.subsystems.spindexer.SpindexerSubsystem;
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.frc2026.util.AutoHelper;
 import com.aembot.lib.core.logging.Loggerable;
@@ -17,8 +14,9 @@ import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
+import com.aembot.lib.subsystems.intake.generic.multimotor.IntakeRollerMultiMotorSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
-import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
+import com.aembot.lib.subsystems.premades.BinaryVoltageMotorFollowerSubsytem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -53,23 +51,16 @@ public class RobotContainer implements Loggerable {
   /* ---- DRIVETRAIN ---- */
   private final DriveSubsystem driveSubsystem = SubsystemFactory.createDriveSubsystem();
 
-  /* ---- INDEXER ---- */
-  private final SpindexerSubsystem spindexerSubsystem = SubsystemFactory.createSpindexerSubsystem();
-
-  private final IndexerSelectorSubsystem indexerSelectorSubsystem =
-      SubsystemFactory.createIndexerSelectorSubsystem();
-
-  private final IndexerKickerSubsystem indexerKickerSubsystem =
-      SubsystemFactory.createIndexerKickerSubsystem();
-
   /* ---- SHOOTER ---- */
   private final HoodSubsystem hoodSubsystem = SubsystemFactory.createHoodSubsystem();
 
   /* ---- INTAKE ---- */
   private final OverBumperIntakeDeploySubsystem intakeDeploySubsystem =
       SubsystemFactory.createIntakeDeploySubsystem();
-  private final OverBumperIntakeRollerSubsystem intakeRollerSubsystem =
+  private final IntakeRollerMultiMotorSubsystem intakeRollerSubsystem =
       SubsystemFactory.createIntakeRollerSubsystem();
+  private final BinaryVoltageMotorFollowerSubsytem intakeWheelsSubsystem =
+      SubsystemFactory.createIntakeWheelsSubsystem();
 
   /* ---- TURRET ---- */
   private final TurretSubsystem turretSubsystem = SubsystemFactory.createTurretSubsystem();
@@ -109,9 +100,7 @@ public class RobotContainer implements Loggerable {
             hoodSubsystem,
             intakeDeploySubsystem,
             intakeRollerSubsystem,
-            spindexerSubsystem,
-            indexerSelectorSubsystem,
-            indexerKickerSubsystem,
+            intakeWheelsSubsystem,
             flywheelSubsystem,
             turretSubsystem);
 
@@ -143,23 +132,17 @@ public class RobotContainer implements Loggerable {
 
     /* ---- PRIMARY DRIVER COMMANDS ---- */
 
-    driverController.rightTrigger().whileTrue(commandFactory.createShootFuelCommand());
-
-    driverController.rightBumper().whileTrue(commandFactory.createShootFuelTowerPosCommand());
+    driverController
+        .rightTrigger()
+        .whileTrue(
+            commandFactory
+                .createShootFuelCommand()
+                .alongWith(commandFactory.intakeCommands.createRunIntakeCommand()));
 
     driverController
         .leftTrigger()
         .onTrue(commandFactory.intakeCommands.createZeroDownCommand())
         .onFalse(commandFactory.intakeCommands.createUpCommand());
-
-    // While we're pressing left trigger to intake and not right trigger or y to shoot, run indexer
-    // load
-    driverController
-        .leftTrigger()
-        .and(driverController.rightTrigger().negate())
-        .and(driverController.y().negate())
-        .and(driverController.rightBumper().negate())
-        .whileTrue(commandFactory.indexerCommands.createLoadIndexerCommand());
 
     // c on the controller
     driverController.leftStick().onTrue(commandFactory.intakeCommands.createZeroDownCommand());
@@ -174,8 +157,6 @@ public class RobotContainer implements Loggerable {
         .whileTrue(
             commandFactory.createSetDriveHeadingForUnderTrenchCommand(
                 driverController, driverController.leftBumper()));
-
-    driverController.b().whileTrue(commandFactory.indexerCommands.createRunIndexerBackCommand());
 
     // driverController.a() UNUSED
 
