@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import java.util.function.BooleanSupplier;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -40,12 +41,21 @@ public final class ShooterCommands {
 
   private Supplier<Pose2d> robotPoseSupplier;
 
+  private Function<Double, Double> shooterBoost =
+      (distance) -> 0.917017 * distance + (1.13468 + 0.5);
+
+  private double PASSING_BOOST = 4.5;
+
+  private Translation2d HUB_TRANSLATION = new Translation2d(4.6101, 4.03479);
+
   private final Pose2d TOWER_SHOT_POSE = new Pose2d(1.541, 3.709, Rotation2d.kZero);
 
   public ShooterCommands(HoodSubsystem hood, TurretSubsystem turret, FlywheelSubsystem flywheel) {
     this.hood = hood;
     this.turret = turret;
     this.flywheel = flywheel;
+
+    // SmartDashboard.putNumber("ShooterBoost", shooterBoost);
 
     String velocityTableDirectory = Filesystem.getDeployDirectory() + "/initial-velocities/real/";
     if (RobotRuntimeConstants.MODE == RuntimeMode.SIM) {
@@ -194,7 +204,16 @@ public final class ShooterCommands {
    * @return amount to boost flywheel speed in m/s
    */
   private double getFlywheelSpeedBoost() {
-    return (RobotRuntimeConstants.MODE == RuntimeMode.REAL) ? 4.5 : 0.4;
+    // this.shooterBoost = SmartDashboard.getNumber("ShooterBoost", shooterBoost);
+    double boost;
+    if (inShootingZone.getAsBoolean()) {
+      var pos = RobotStateYearly.get().getLatestFieldRobotPose().getTranslation();
+      var dist = pos.getDistance(HUB_TRANSLATION);
+      boost = shooterBoost.apply(dist);
+    } else {
+      boost = PASSING_BOOST;
+    }
+    return (RobotRuntimeConstants.MODE == RuntimeMode.REAL) ? boost : 0.4;
   }
 
   /**
@@ -252,7 +271,15 @@ public final class ShooterCommands {
       targetRotation += 180;
     }
 
-    return MathUtil.inputModulus(targetRotation, 0, 360);
+    // targetRotation = MathUtil.inputModulus(targetRotation - 180, 0, 360) * 0.95 + 180;
+
+    targetRotation = MathUtil.inputModulus(targetRotation, 0, 360);
+
+    double scaledValue = ((targetRotation - 180) * 0.1);
+
+    System.out.println(scaledValue);
+
+    return MathUtil.inputModulus(targetRotation + scaledValue, 0, 360);
   }
 
   /**
