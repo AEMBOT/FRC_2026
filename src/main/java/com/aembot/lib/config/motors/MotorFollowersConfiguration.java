@@ -161,13 +161,12 @@ public class MotorFollowersConfiguration<C> {
 
     if (missing.size() != 0 || !followerErrors.isEmpty()) {
       throw new VerifyError(
-          "Config for " + leaderConfig != null
-              ? leaderConfig.kConfigurationName
-              : "UNNAMED"
-                  + " does not have a set "
-                  + String.join(",", missing)
-                  + "\n"
-                  + followerErrors);
+          "Config for "
+              + (leaderConfig != null ? leaderConfig.kConfigurationName : "UNNAMED")
+              + " does not have a set "
+              + String.join(",", missing)
+              + "\n"
+              + followerErrors);
     }
 
     return this;
