@@ -2,6 +2,7 @@ package com.aembot.frc2026.state;
 
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.constants.field.Field2026;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.state.SimulatedRobotState;
 import com.aembot.lib.state.subsystems.flywheel.SimulatedShooterFlywheelState;
 import com.aembot.lib.state.subsystems.intake.over_bumper.SimulatedOverBumperIntakeState;
@@ -11,7 +12,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import java.util.ArrayList;
 import java.util.Arrays;
 import org.ironmaple.simulation.SimulatedArena;
-import org.littletonrobotics.junction.Logger;
 
 public class SimulatedRobotStateYearly extends SimulatedRobotState {
   private SimulatedRobotStateYearly() {
@@ -69,7 +69,7 @@ public class SimulatedRobotStateYearly extends SimulatedRobotState {
             Arrays.asList(SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel")));
 
     // Publish to telemetry using AdvantageKit
-    Logger.recordOutput("SimulatedRobotState/FuelPositions", fuelPoses.toArray(new Pose3d[0]));
+    AEMLogger.recordOutput("SimulatedRobotState/FuelPositions", fuelPoses.toArray(new Pose3d[0]));
 
     simulatedIntakeState.updateLog("SimulatedRobotState/Intake", "");
     simulatedShooterFlywheelState.updateLog("SimulatedRobotState/ShooterFlywheel", "");

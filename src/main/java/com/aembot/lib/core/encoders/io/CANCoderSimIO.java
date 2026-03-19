@@ -6,10 +6,10 @@ import com.aembot.lib.core.can.interfaces.CANable;
 import com.aembot.lib.core.encoders.CANCoderInputs;
 import com.aembot.lib.core.encoders.factories.CANCoderFactory;
 import com.aembot.lib.core.encoders.interfaces.CANCoderIO;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.sim.CANcoderSimState;
 import edu.wpi.first.math.MathUtil;
-import org.littletonrobotics.junction.Logger;
 
 public class CANCoderSimIO implements CANCoderIO, CANable {
 
@@ -54,12 +54,12 @@ public class CANCoderSimIO implements CANCoderIO, CANable {
   }
 
   public void logSim(String standardPrefix, String inputPrefix) {
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         standardPrefix + "/Simulation/" + getName() + "/PositionRotations", inputs.encoderPosition);
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         standardPrefix + "/Simulation/" + getName() + "/VelocityRotationsPerSec",
         inputs.encoderVelocity);
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         standardPrefix + "/Simulation/" + getName() + "/AccelerationRotationsPerSecSq",
         inputs.encoderAcceleration);
   }

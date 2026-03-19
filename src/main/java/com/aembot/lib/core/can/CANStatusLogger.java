@@ -1,6 +1,7 @@
 package com.aembot.lib.core.can;
 
 import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.logging.Loggable;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
@@ -16,7 +17,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * Manages logging for a can bus and its attached devices. <br>
@@ -157,8 +157,8 @@ public class CANStatusLogger implements Loggable {
   /** Log the data on this instance's canBus */
   private void logBusStatus() {
     CANBusStatus status = canBus.getStatus();
-    Logger.recordOutput(logLocationPrefix + "BusStatus", status.Status);
-    Logger.recordOutput(logLocationPrefix + "BusUtilization", status.BusUtilization);
+    AEMLogger.recordOutput(logLocationPrefix + "BusStatus", status.Status);
+    AEMLogger.recordOutput(logLocationPrefix + "BusUtilization", status.BusUtilization);
   }
 
   /**
@@ -179,7 +179,7 @@ public class CANStatusLogger implements Loggable {
       String subsystemName = device.getSubsystemName();
       boolean isConnected = device.isConnected();
 
-      Logger.recordOutput(
+      AEMLogger.recordOutput(
           logLocationPrefix
               + subsystemName
               + "/"
@@ -189,7 +189,7 @@ public class CANStatusLogger implements Loggable {
           isConnected);
 
       if (device.getMasterDevice() != null) {
-        Logger.recordOutput(
+        AEMLogger.recordOutput(
             logLocationPrefix
                 + subsystemName
                 + "/"

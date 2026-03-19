@@ -7,6 +7,7 @@ package com.aembot.frc2026;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.state.SimulatedRobotStateYearly;
 import com.aembot.lib.core.can.CANStatusLogger;
+import com.aembot.lib.core.logging.AEMLogger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -45,6 +46,7 @@ public class Robot extends LoggedRobot {
     // Update the robot state
     RobotStateYearly.get().updateLog();
     m_robotContainer.logCommands();
+    AEMLogger.tick();
   }
 
   @Override

@@ -2,6 +2,7 @@ package com.aembot.lib.subsystems.intake.generic.run;
 
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.subsystems.intake.generic.run.TalonFXIntakeRollerConfiguration;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.state.subsystems.intake.generic.run.IntakeRollerState;
@@ -75,7 +76,7 @@ public class IntakeRollerSubsystem
     updateState();
 
     // Log latency with time between periodic being called and finishing
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
   }
 

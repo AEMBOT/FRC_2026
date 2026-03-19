@@ -2,6 +2,7 @@ package com.aembot.lib.subsystems.aprilvision.io;
 
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.constants.fields.YearFieldConstantable;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionInputs;
 import com.aembot.lib.subsystems.aprilvision.interfaces.AprilCameraIO;
@@ -24,7 +25,6 @@ import edu.wpi.first.networktables.TimestampedDoubleArray;
 import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import org.littletonrobotics.junction.Logger;
 
 public class Limelight4IOHardware implements AprilCameraIO {
   protected final CameraConfiguration cameraConfiguration;
@@ -176,7 +176,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
       inputs.tagCount = 0;
     }
 
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         cameraName + "/tempCelsius", LimelightExtras.getCameraTemperature(cameraName));
   }
 

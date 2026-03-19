@@ -5,6 +5,7 @@ import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.frc2026.util.OptimalVelocityTable;
 import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import edu.wpi.first.math.MathUtil;
@@ -21,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 
 public final class ShooterCommands {
 
@@ -337,7 +337,7 @@ public final class ShooterCommands {
    */
   public boolean isShooterNearGoal() {
     boolean yes = isFlywheelNearGoal() && isHoodNearGoal() && isTurretNearGoal();
-    Logger.recordOutput("IsShooterNearGoal", yes);
+    AEMLogger.recordOutput("IsShooterNearGoal", yes);
     // return yes;
     return true;
   }

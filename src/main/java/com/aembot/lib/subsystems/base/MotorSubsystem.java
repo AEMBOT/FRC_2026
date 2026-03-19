@@ -1,6 +1,7 @@
 package com.aembot.lib.subsystems.base;
 
 import com.aembot.lib.config.motors.MotorConfiguration;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -96,7 +97,7 @@ public abstract class MotorSubsystem<
   public void updateLog(String standardPrefix, String inputPrefix) {
     Logger.processInputs(inputPrefix + "/Inputs", inputs);
 
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         standardPrefix + "/CurrentCommand",
         (getCurrentCommand() == null) ? "NONE" : getCurrentCommand().getName());
   }
@@ -142,7 +143,7 @@ public abstract class MotorSubsystem<
   }
 
   protected void setNeutralModeImpl(MotorIO.NeutralMode mode) {
-    Logger.recordOutput(logPrefixStandard + "/SetNeutralMode", mode.toString());
+    AEMLogger.recordOutput(logPrefixStandard + "/SetNeutralMode", mode.toString());
     io.setNeutralMode(mode);
   }
 
@@ -160,7 +161,7 @@ public abstract class MotorSubsystem<
   // ---  CONTROL: Duty Cycle
 
   protected void setOpenLoopDutyCycleImpl(double dutyCycle) {
-    Logger.recordOutput(logPrefixStandard + "/SetOpenLoopDutyCycle", dutyCycle);
+    AEMLogger.recordOutput(logPrefixStandard + "/SetOpenLoopDutyCycle", dutyCycle);
     if (motorEnabled) {
       io.setOpenLoopDutyCycle(dutyCycle);
     } else {
@@ -171,7 +172,7 @@ public abstract class MotorSubsystem<
   // ---  CONTROL: Voltage
 
   protected void setVoltageImpl(double voltage) {
-    Logger.recordOutput(logPrefixStandard + "/SetVoltage", voltage);
+    AEMLogger.recordOutput(logPrefixStandard + "/SetVoltage", voltage);
     if (motorEnabled) {
       io.setVoltageOutput(voltage);
     } else {
@@ -182,7 +183,7 @@ public abstract class MotorSubsystem<
   // --- CONTROL: Torque
 
   protected void setTorqueCurrentImpl(double current) {
-    Logger.recordOutput(logPrefixStandard + "/SetTorqueCurrent", current);
+    AEMLogger.recordOutput(logPrefixStandard + "/SetTorqueCurrent", current);
     if (motorEnabled) {
       io.setTorqueCurrent(current);
     } else {
@@ -194,7 +195,7 @@ public abstract class MotorSubsystem<
 
   protected void setPIDVelocitySetpointImpl(double velocity, int slot) {
     currentVelocitySetpoint = velocity;
-    Logger.recordOutput(logPrefixStandard + "/SetPIDVelocitySetpoint", velocity);
+    AEMLogger.recordOutput(logPrefixStandard + "/SetPIDVelocitySetpoint", velocity);
     if (motorEnabled) {
       io.setPIDVelocitySetpoint(velocity, slot);
     } else {
@@ -210,7 +211,7 @@ public abstract class MotorSubsystem<
 
   protected void setPIDPositionSetpointImpl(double position, int slot) {
     currentPositionSetpoint = position;
-    Logger.recordOutput(logPrefixStandard + "/SetPIDPositionSetpoint", position);
+    AEMLogger.recordOutput(logPrefixStandard + "/SetPIDPositionSetpoint", position);
     if (motorEnabled) {
       io.setPIDPositionSetpoint(position, slot);
     } else {
@@ -230,8 +231,8 @@ public abstract class MotorSubsystem<
 
   protected void setSmartPositionSetpointImpl(double position, int slot) {
     currentPositionSetpoint = position;
-    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Position", position);
-    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Slot", slot);
+    AEMLogger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Position", position);
+    AEMLogger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Slot", slot);
     if (motorEnabled) {
       io.setSmartPositionSetpoint(position, slot);
     } else {
@@ -271,13 +272,15 @@ public abstract class MotorSubsystem<
       double feedforward,
       int slot) {
     currentPositionSetpoint = position;
-    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Position", position);
-    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Velocity", velocity);
-    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Acceleration", acceleration);
+    AEMLogger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Position", position);
+    AEMLogger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Velocity", velocity);
+    AEMLogger.recordOutput(
+        logPrefixStandard + "/SetSmartPositionSetpoint/Acceleration", acceleration);
 
-    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Jerk", jerk);
-    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Feedforward", feedforward);
-    Logger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Slot", slot);
+    AEMLogger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Jerk", jerk);
+    AEMLogger.recordOutput(
+        logPrefixStandard + "/SetSmartPositionSetpoint/Feedforward", feedforward);
+    AEMLogger.recordOutput(logPrefixStandard + "/SetSmartPositionSetpoint/Slot", slot);
     if (motorEnabled) {
       io.setDynamicSmartPositionSetpoint(position, velocity, acceleration, jerk, feedforward, slot);
     } else {
@@ -289,8 +292,8 @@ public abstract class MotorSubsystem<
 
   protected void setSmartVelocitySetpointImpl(double velocity, int slot) {
     currentVelocitySetpoint = velocity;
-    Logger.recordOutput(logPrefixStandard + "/SetSmartVelocitySetpoint/Velocity", velocity);
-    Logger.recordOutput(logPrefixStandard + "/SetSmartVelocitySetpoint/Slot", slot);
+    AEMLogger.recordOutput(logPrefixStandard + "/SetSmartVelocitySetpoint/Velocity", velocity);
+    AEMLogger.recordOutput(logPrefixStandard + "/SetSmartVelocitySetpoint/Slot", slot);
     if (motorEnabled) {
       io.setSmartVelocitySetpoint(velocity, slot);
     } else {

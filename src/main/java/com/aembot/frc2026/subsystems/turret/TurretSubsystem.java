@@ -5,6 +5,7 @@ import com.aembot.frc2026.state.subsystems.turret.TurretState;
 import com.aembot.frc2026.subsystems.turret.io.TurretIO;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.core.encoders.CANCoderInputs;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
@@ -100,10 +101,10 @@ public class TurretSubsystem
 
     // setPositionFromEncoders();
 
-    Logger.recordOutput("encoderA", io.getCANcoderA().getRawAngle());
-    Logger.recordOutput("encoderB", io.getCANcoderB().getRawAngle());
+    AEMLogger.recordOutput("encoderA", io.getCANcoderA().getRawAngle());
+    AEMLogger.recordOutput("encoderB", io.getCANcoderB().getRawAngle());
 
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         "calculatedTurretRot",
         config.getMechanismRotationsFromEncoders(
             encoderAInputs.absolutePositionRotations,
@@ -115,7 +116,7 @@ public class TurretSubsystem
     state.updateTurretYaw(Rotation2d.fromDegrees(inputs.positionUnits));
 
     // Log latency with time between periodic being called and finishing
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
 
     motorEnabled = SmartDashboard.getBoolean("Turret Enabled", motorEnabled);

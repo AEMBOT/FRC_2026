@@ -1,10 +1,10 @@
 package com.aembot.lib.subsystems.drive.visualizations;
 
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.logging.Loggable;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 
@@ -83,7 +83,7 @@ public class SwerveVisualizer implements Loggable {
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
     for (LoggedMechanism2d mechanism : moduleMechanisms) {
-      Logger.recordOutput(standardPrefix + "/DriveViz", mechanism);
+      AEMLogger.recordOutput(standardPrefix + "/DriveViz", mechanism);
     }
   }
 }

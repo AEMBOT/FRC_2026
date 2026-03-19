@@ -3,6 +3,7 @@ package com.aembot.lib.subsystems.drive.io;
 import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
 import com.aembot.lib.config.subsystems.drive.SwerveModuleConfiguration;
 import com.aembot.lib.core.can.CANStatusLogger;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.phoenix6.AEMSwerveDriveState;
 import com.aembot.lib.subsystems.aprilvision.util.AprilCameraOutput;
 import com.aembot.lib.subsystems.drive.DrivetrainInputs;
@@ -29,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import org.littletonrobotics.junction.Logger;
 
 /** Hardware IO implementation of the drivetrain using the CTRE swerve API */
 public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
@@ -193,30 +193,30 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
     if (inputs.ModuleStates == null) return;
     final String modulePrefix = prefix + "/Modules/";
     for (int i = 0; i < getModules().length; i++) {
-      Logger.recordOutput(
+      AEMLogger.recordOutput(
           modulePrefix + moduleNames.get(i) + "/Absolute Encoder Angle",
           inputs.absoluteEncoderPositions[i] * 360);
-      Logger.recordOutput(
+      AEMLogger.recordOutput(
           modulePrefix + moduleNames.get(i) + "/Steering Angle", inputs.ModuleStates[i].angle);
-      Logger.recordOutput(
+      AEMLogger.recordOutput(
           modulePrefix + moduleNames.get(i) + "/Target Steering Angle",
           inputs.ModuleTargets[i].angle);
-      Logger.recordOutput(
+      AEMLogger.recordOutput(
           modulePrefix + moduleNames.get(i) + "/Drive Velocity",
           inputs.ModuleStates[i].speedMetersPerSecond);
-      Logger.recordOutput(
+      AEMLogger.recordOutput(
           modulePrefix + moduleNames.get(i) + "/Target Drive Velocity",
           inputs.ModuleTargets[i].speedMetersPerSecond);
-      Logger.recordOutput(
+      AEMLogger.recordOutput(
           modulePrefix + moduleNames.get(i) + "/SteerMotorSupplyAmps",
           steerMotorSupplyCurrents[i].getValueAsDouble());
-      Logger.recordOutput(
+      AEMLogger.recordOutput(
           modulePrefix + moduleNames.get(i) + "/SteerMotorStatorAmps",
           steerMotorStatorCurrents[i].getValueAsDouble());
-      Logger.recordOutput(
+      AEMLogger.recordOutput(
           modulePrefix + moduleNames.get(i) + "/DriveMotorSupplyAmps",
           driveMotorSupplyCurrents[i].getValueAsDouble());
-      Logger.recordOutput(
+      AEMLogger.recordOutput(
           modulePrefix + moduleNames.get(i) + "/DriveMotorStatorAmps",
           driveMotorStatorCurrents[i].getValueAsDouble());
     }

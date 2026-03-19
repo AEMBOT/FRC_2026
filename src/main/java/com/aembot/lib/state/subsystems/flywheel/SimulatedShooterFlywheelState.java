@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.logging.Loggable;
 import com.aembot.lib.state.RobotState;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -16,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
-import org.littletonrobotics.junction.Logger;
 
 public class SimulatedShooterFlywheelState implements Loggable {
   private final RobotState robotStateInstance;
@@ -70,7 +70,7 @@ public class SimulatedShooterFlywheelState implements Loggable {
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         standardPrefix + "/SimulatedShotTrajectory", loggedTrajectory.toArray(new Pose3d[0]));
   }
 }

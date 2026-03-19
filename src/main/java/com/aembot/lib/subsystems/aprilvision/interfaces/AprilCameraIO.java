@@ -2,9 +2,9 @@ package com.aembot.lib.subsystems.aprilvision.interfaces;
 
 import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionInputs;
 import edu.wpi.first.math.geometry.Pose2d;
-import org.littletonrobotics.junction.Logger;
 
 public interface AprilCameraIO {
   public CameraConfiguration getConfiguration();
@@ -33,7 +33,7 @@ public interface AprilCameraIO {
     //     || Double.isNaN(cameraEstimatedRobotPose.getX())
     //     || Double.isNaN(cameraEstimatedRobotPose.getY())) {
 
-    //   Logger.recordOutput(getConfiguration() + "/stdDevs", unadjustedStandardDevs);
+    //   AEMLogger.recordOutput(getConfiguration() + "/stdDevs", unadjustedStandardDevs);
     //   return unadjustedStandardDevs;
     // }
 
@@ -41,7 +41,7 @@ public interface AprilCameraIO {
         wholeEstimatedRobotPose.minus(cameraEstimatedRobotPose).getTranslation().getNorm();
     double factor = 1 + (Math.pow(distMeters, 2) * 2); // Prolly very subject to change
 
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         getConfiguration() + "/stdDevs",
         new OdometryStandardDevs(
             unadjustedStandardDevs.xStdDev() * factor,

@@ -2,6 +2,7 @@ package com.aembot.lib.subsystems.aprilvision;
 
 import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.math.PositionUtil;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.aprilvision.interfaces.AprilCameraIO;
@@ -60,7 +61,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
       AprilVisionInputs inputs = cameraWithInput.getSecond();
       CameraConfiguration config = io.getConfiguration();
 
-      Logger.recordOutput(
+      AEMLogger.recordOutput(
           logPrefixStandard + "/" + config.cameraName + "/CameraPosition",
           new Pose3d(robotStateInstance.getLatestFieldRobotPose())
               .plus(PositionUtil.toTransform3d(config.getCameraPosition())));
@@ -79,13 +80,13 @@ public class AprilVisionSubsystem extends AEMSubsystem {
             rawCameraOutputs.add(new AprilCameraOutput(config.cameraName, processed));
 
             // Log computed values as OUTPUTS
-            Logger.recordOutput(
+            AEMLogger.recordOutput(
                 logPrefixStandard + "/" + config.cameraName + "/ComputedPose",
                 processed.latencyUncompensatedPose());
-            Logger.recordOutput(
+            AEMLogger.recordOutput(
                 logPrefixStandard + "/" + config.cameraName + "/ComputedXStdDev",
                 processed.stdDevs().xStdDev());
-            Logger.recordOutput(
+            AEMLogger.recordOutput(
                 logPrefixStandard + "/" + config.cameraName + "/ComputedYStdDev",
                 processed.stdDevs().yStdDev());
           }
@@ -98,18 +99,18 @@ public class AprilVisionSubsystem extends AEMSubsystem {
     // Fuse multiple camera estimates using inverse-variance weighting
     List<AprilCameraOutput> fusedObservations = fuseMultiCameraEstimates(rawCameraOutputs);
 
-    Logger.recordOutput(logPrefixStandard + "/RawCameraCount", rawCameraOutputs.size());
-    Logger.recordOutput(logPrefixStandard + "/FusedObservationCount", fusedObservations.size());
+    AEMLogger.recordOutput(logPrefixStandard + "/RawCameraCount", rawCameraOutputs.size());
+    AEMLogger.recordOutput(logPrefixStandard + "/FusedObservationCount", fusedObservations.size());
 
     robotStateInstance.setApriltagObservations(fusedObservations);
 
     updateLog();
     for (AprilCameraOutput observation : robotStateInstance.getAprilTagObservations()) {
-      Logger.recordOutput(
+      AEMLogger.recordOutput(
           logPrefixStandard + "/VisionEstimatedRobotPose", observation.estimatedPose());
     }
 
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - currentTime) * 1000);
   }
 
@@ -140,7 +141,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
     Pose2d odomAtLatest = robotStateInstance.getFieldRobotPoseForTimestamp(latestTimestamp);
     if (odomAtLatest == null) {
       // Can't preview without odometry, fall back to simple fusion
-      Logger.recordOutput(logPrefixStandard + "/FusePreviewFailed", true);
+      AEMLogger.recordOutput(logPrefixStandard + "/FusePreviewFailed", true);
       return rawOutputs;
     }
 
@@ -205,10 +206,10 @@ public class AprilVisionSubsystem extends AEMSubsystem {
     OdometryStandardDevs fusedStdDevs =
         new OdometryStandardDevs(fusedXStdDev, fusedYStdDev, Double.MAX_VALUE);
 
-    Logger.recordOutput(logPrefixStandard + "/FusedPose", fusedPose);
-    Logger.recordOutput(logPrefixStandard + "/FusedXStdDev", fusedXStdDev);
-    Logger.recordOutput(logPrefixStandard + "/FusedYStdDev", fusedYStdDev);
-    Logger.recordOutput(logPrefixStandard + "/FusePreviewFailed", false);
+    AEMLogger.recordOutput(logPrefixStandard + "/FusedPose", fusedPose);
+    AEMLogger.recordOutput(logPrefixStandard + "/FusedXStdDev", fusedXStdDev);
+    AEMLogger.recordOutput(logPrefixStandard + "/FusedYStdDev", fusedYStdDev);
+    AEMLogger.recordOutput(logPrefixStandard + "/FusePreviewFailed", false);
 
     // Return single fused estimate at the latest timestamp
     return List.of(
@@ -275,13 +276,14 @@ public class AprilVisionSubsystem extends AEMSubsystem {
     boolean mechanismRotatingTooFast = mechanismOmega > config.maxMechanismOmegaRadians;
 
     // Log rejection reasons
-    Logger.recordOutput(logPrefixStandard + "/" + cameraName + "/omegaRadPerSec", omegaRadPerSec);
-    Logger.recordOutput(logPrefixStandard + "/" + cameraName + "/rejectedTooClose", tooClose);
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
+        logPrefixStandard + "/" + cameraName + "/omegaRadPerSec", omegaRadPerSec);
+    AEMLogger.recordOutput(logPrefixStandard + "/" + cameraName + "/rejectedTooClose", tooClose);
+    AEMLogger.recordOutput(
         logPrefixStandard + "/" + cameraName + "/rejectedRotation", rotatingTooFast);
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         logPrefixStandard + "/" + cameraName + "/mechanismOmegaRadPerSec", mechanismOmega);
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         logPrefixStandard + "/" + cameraName + "/rejectedMechanismRotation",
         mechanismRotatingTooFast);
 
@@ -333,11 +335,11 @@ public class AprilVisionSubsystem extends AEMSubsystem {
     double motionAdjustedStdDev = applyMotionPenalties(scaledStdDev, omegaRadPerSec);
 
     // Log pre-odom adjustment
-    Logger.recordOutput(logPrefixStandard + "/" + cameraName + "/avgTagArea", inputs.avgTagArea);
-    Logger.recordOutput(logPrefixStandard + "/" + cameraName + "/quality", quality);
-    Logger.recordOutput(
+    AEMLogger.recordOutput(logPrefixStandard + "/" + cameraName + "/avgTagArea", inputs.avgTagArea);
+    AEMLogger.recordOutput(logPrefixStandard + "/" + cameraName + "/quality", quality);
+    AEMLogger.recordOutput(
         logPrefixStandard + "/" + cameraName + "/qualityScaleFactor", qualityScaleFactor);
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         logPrefixStandard + "/" + cameraName + "/xyStdDevPreOdomAdjust", motionAdjustedStdDev);
 
     // Apply odometry divergence adjustment
@@ -456,7 +458,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
 
-    Logger.recordOutput(standardPrefix + "/VisionActive", visionActive);
+    AEMLogger.recordOutput(standardPrefix + "/VisionActive", visionActive);
 
     for (Pair<AprilCameraIO, AprilVisionInputs> cameraWithInput : camerasWithInputs) {
       AprilCameraIO io = cameraWithInput.getFirst();

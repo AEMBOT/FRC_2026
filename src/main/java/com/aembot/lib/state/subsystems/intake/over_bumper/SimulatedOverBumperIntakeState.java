@@ -3,6 +3,7 @@ package com.aembot.lib.state.subsystems.intake.over_bumper;
 import static edu.wpi.first.units.Units.Meters;
 
 import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.logging.Loggable;
 import com.aembot.lib.state.subsystems.intake.generic.run.IntakeRollerState;
 import com.aembot.lib.state.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeployState;
@@ -10,7 +11,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
-import org.littletonrobotics.junction.Logger;
 
 public class SimulatedOverBumperIntakeState implements Loggable {
   private final Supplier<OverBumperIntakeDeployState> kDeployStateSupplier;
@@ -94,8 +94,8 @@ public class SimulatedOverBumperIntakeState implements Loggable {
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
-    Logger.recordOutput(standardPrefix + "/Initialized", intakeSim.get() != null);
-    Logger.recordOutput(
+    AEMLogger.recordOutput(standardPrefix + "/Initialized", intakeSim.get() != null);
+    AEMLogger.recordOutput(
         standardPrefix + "/HeldGamePieces",
         intakeSim.get() != null ? intakeSim.get().getGamePiecesAmount() : -1);
   }

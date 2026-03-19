@@ -1,9 +1,9 @@
 package com.aembot.frc2026.state.subsystems.indexer;
 
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.logging.Loggable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * Represents the high-level state of the indexer compound subsystem. All fields and methods should
@@ -105,15 +105,15 @@ public class IndexerCompoundState implements Loggable {
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
-    Logger.recordOutput(standardPrefix + "/State", getCommandedState());
-    Logger.recordOutput(
+    AEMLogger.recordOutput(standardPrefix + "/State", getCommandedState());
+    AEMLogger.recordOutput(
         standardPrefix + "/" + kSpindexerName + "/CommandedState", getSpindexerCommandedState());
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         standardPrefix + "/" + kSelectorName + "/CommandedState", getSelectorCommandedState());
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         standardPrefix + "/" + kKickerName + "/CommandedState", getKickerCommandedState());
 
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         standardPrefix + "/" + kSelectorName + "/GamePieceDetected", getGamePieceInSelector());
   }
 }
