@@ -42,7 +42,7 @@ public final class ShooterCommands {
   private Supplier<Pose2d> robotPoseSupplier;
 
   private Function<Double, Double> shooterBoost =
-      (distance) -> 0.917017 * distance + (1.13468 + 0.7);
+      (distance) -> 0.917017 * distance + (1.13468 + 0.6);
 
   private double PASSING_BOOST = 4.5;
 
