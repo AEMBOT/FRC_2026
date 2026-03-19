@@ -47,7 +47,12 @@ public final class CommandFactory {
     this.shooterCommands = new ShooterCommands(hoodSubsystem, turretSubsystem, flywheelSubsystem);
 
     this.aimTrigger =
-        new Trigger(() -> shootFuel).whileTrue(shooterCommands.createShootFuelCommand());
+        new Trigger(() -> shootFuel)
+            .whileTrue(
+                shooterCommands
+                    .createShootFuelCommand()
+                    .alongWith(intakeRollerSubsystem.runRollerCommand())
+                    .alongWith(intakeWheelsSubsystem.runSystemCommand()));
   }
 
   public void logCommands() {

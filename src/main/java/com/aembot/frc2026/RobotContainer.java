@@ -138,12 +138,7 @@ public class RobotContainer implements Loggerable {
 
     /* ---- PRIMARY DRIVER COMMANDS ---- */
 
-    driverController
-        .rightTrigger()
-        .whileTrue(
-            commandFactory
-                .createShootFuelCommand()
-                .alongWith(commandFactory.intakeCommands.createRunIntakeCommand()));
+    driverController.rightTrigger().whileTrue(commandFactory.createShootFuelCommand());
 
     driverController
         .leftTrigger()
