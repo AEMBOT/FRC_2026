@@ -37,6 +37,8 @@ public final class ShooterCommands {
 
   private Supplier<OptimalVelocityTable> passingTableSupplier;
 
+  private Supplier<Translation2d> shotPositionSupplier;
+
   private final BooleanSupplier inShootingZone;
 
   private Supplier<Pose2d> robotPoseSupplier;
@@ -48,6 +50,10 @@ public final class ShooterCommands {
   // private double PASSING_BOOST = 4.5;
 
   private Translation2d HUB_TRANSLATION = new Translation2d(4.6101, 4.03479);
+  private Translation2d PASSING_CORNER_LEFT_POS = new Translation2d(1, 7.069326);
+  private Translation2d PASSING_CORNER_RIGHT_POS = new Translation2d(1, 1);
+  private Translation2d PASSING_CENTER_LEFT_POS = new Translation2d(2.312797, 5.558536);
+  private Translation2d PASSING_CENTER_RIGHT_POS = new Translation2d(2.312797, 2.51079);
 
   private final Pose2d TOWER_SHOT_POSE = new Pose2d(1.541, 3.709, Rotation2d.kZero);
 
@@ -80,6 +86,8 @@ public final class ShooterCommands {
         new OptimalVelocityTable(
             velocityTableDirectory + "Passing_Right_Center_Initial_Velocities.csv");
     passingTableSupplier = () -> passingCornerRightTable;
+
+    shotPositionSupplier = () -> PASSING_CORNER_RIGHT_POS;
 
     // Supplier so that our shooting zones are different whether we are blue or red
     inShootingZone =
@@ -137,6 +145,7 @@ public final class ShooterCommands {
         () -> {
           System.out.println("Setting passing table to center right");
           passingTableSupplier = () -> passingCenterRightTable;
+          shotPositionSupplier = () -> PASSING_CENTER_RIGHT_POS;
         });
   }
 
@@ -148,6 +157,7 @@ public final class ShooterCommands {
         () -> {
           System.out.println("Setting passing table to corner right");
           passingTableSupplier = () -> passingCornerLeftTable;
+          shotPositionSupplier = () -> PASSING_CORNER_LEFT_POS;
         });
   }
 
@@ -159,6 +169,7 @@ public final class ShooterCommands {
         () -> {
           System.out.println("Setting passing table to corner right");
           passingTableSupplier = () -> passingCornerRightTable;
+          shotPositionSupplier = () -> PASSING_CORNER_RIGHT_POS;
         });
   }
 
@@ -170,6 +181,7 @@ public final class ShooterCommands {
         () -> {
           System.out.println("Setting passing table to center left");
           passingTableSupplier = () -> passingCenterLeftTable;
+          shotPositionSupplier = () -> PASSING_CENTER_LEFT_POS;
         });
   }
 
@@ -208,7 +220,7 @@ public final class ShooterCommands {
     // this.tempShooterBoost = SmartDashboard.getNumber("ShooterBoost", tempShooterBoost);
     double boost;
     var pos = RobotStateYearly.get().getLatestFieldRobotPose().getTranslation();
-    var dist = pos.getDistance(HUB_TRANSLATION);
+    var dist = pos.getDistance(shotPositionSupplier.get());
     boost = shooterBoost.apply(dist);
 
     return (RobotRuntimeConstants.MODE == RuntimeMode.REAL) ? boost : 0.4;
