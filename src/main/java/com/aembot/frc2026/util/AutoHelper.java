@@ -102,7 +102,7 @@ public class AutoHelper {
   public static void registerAutoCommands(CommandFactory commandFactory) {
 
     autoFactory
-        .bind("DeployIntake", commandFactory.intakeCommands.createDownCommand())
+        .bind("DeployIntake", commandFactory.intakeCommands.createZeroDownCommand())
         .bind("RaiseIntake", commandFactory.intakeCommands.createUpCommand())
         .bind("RunIntake", commandFactory.intakeCommands.createRunIntakeCommand())
         .bind("StopIntake", commandFactory.intakeCommands.createStopIntakeCommand())
