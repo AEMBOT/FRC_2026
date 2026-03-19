@@ -46,7 +46,7 @@ public class ProductionIntakeConfig {
 
   public final NeutralMode DEPLOY_NEUTRAL_MODE = NeutralMode.BRAKE;
 
-  public final double ZEROING_VOLTAGE = 4.0;
+  public final double ZEROING_VOLTAGE = 6.0;
 
   public final String SUBSYSTEM_NAME = "IntexerSubsystem";
 
