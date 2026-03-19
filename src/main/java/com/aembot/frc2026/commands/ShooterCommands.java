@@ -45,7 +45,7 @@ public final class ShooterCommands {
 
   // private double tempShooterBoost = 3.5;
 
-  private double PASSING_BOOST = 4.5;
+  // private double PASSING_BOOST = 4.5;
 
   private Translation2d HUB_TRANSLATION = new Translation2d(4.6101, 4.03479);
 
@@ -207,13 +207,10 @@ public final class ShooterCommands {
   private double getFlywheelSpeedBoost() {
     // this.tempShooterBoost = SmartDashboard.getNumber("ShooterBoost", tempShooterBoost);
     double boost;
-    if (inShootingZone.getAsBoolean()) {
-      var pos = RobotStateYearly.get().getLatestFieldRobotPose().getTranslation();
-      var dist = pos.getDistance(HUB_TRANSLATION);
-      boost = shooterBoost.apply(dist);
-    } else {
-      boost = PASSING_BOOST;
-    }
+    var pos = RobotStateYearly.get().getLatestFieldRobotPose().getTranslation();
+    var dist = pos.getDistance(HUB_TRANSLATION);
+    boost = shooterBoost.apply(dist);
+
     return (RobotRuntimeConstants.MODE == RuntimeMode.REAL) ? boost : 0.4;
     // return tempShooterBoost;
   }
