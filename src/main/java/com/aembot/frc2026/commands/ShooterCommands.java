@@ -41,8 +41,9 @@ public final class ShooterCommands {
 
   private Supplier<Pose2d> robotPoseSupplier;
 
-  private Function<Double, Double> shooterBoost =
-      (distance) -> 0.917017 * distance + (1.13468 + 0.6);
+  private Function<Double, Double> shooterBoost = (distance) -> 0.624737 * distance + (2.60562);
+
+  // private double tempShooterBoost = 3.5;
 
   private double PASSING_BOOST = 4.5;
 
@@ -55,7 +56,7 @@ public final class ShooterCommands {
     this.turret = turret;
     this.flywheel = flywheel;
 
-    // SmartDashboard.putNumber("ShooterBoost", shooterBoost);
+    // SmartDashboard.putNumber("ShooterBoost", tempShooterBoost);
 
     String velocityTableDirectory = Filesystem.getDeployDirectory() + "/initial-velocities/real/";
     if (RobotRuntimeConstants.MODE == RuntimeMode.SIM) {
@@ -204,7 +205,7 @@ public final class ShooterCommands {
    * @return amount to boost flywheel speed in m/s
    */
   private double getFlywheelSpeedBoost() {
-    // this.shooterBoost = SmartDashboard.getNumber("ShooterBoost", shooterBoost);
+    // this.tempShooterBoost = SmartDashboard.getNumber("ShooterBoost", tempShooterBoost);
     double boost;
     if (inShootingZone.getAsBoolean()) {
       var pos = RobotStateYearly.get().getLatestFieldRobotPose().getTranslation();
@@ -214,6 +215,7 @@ public final class ShooterCommands {
       boost = PASSING_BOOST;
     }
     return (RobotRuntimeConstants.MODE == RuntimeMode.REAL) ? boost : 0.4;
+    // return tempShooterBoost;
   }
 
   /**
