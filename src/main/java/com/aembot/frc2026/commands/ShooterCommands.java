@@ -6,6 +6,7 @@ import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.frc2026.util.OptimalVelocityTable;
 import com.aembot.lib.constants.RuntimeConstants.RuntimeMode;
 import com.aembot.lib.core.logging.AEMLogger;
+import com.aembot.lib.math.PositionUtil;
 import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import edu.wpi.first.math.MathUtil;
@@ -220,7 +221,12 @@ public final class ShooterCommands {
     // this.tempShooterBoost = SmartDashboard.getNumber("ShooterBoost", tempShooterBoost);
     double boost;
     var pos = RobotStateYearly.get().getLatestFieldRobotPose().getTranslation();
-    var dist = pos.getDistance(shotPositionSupplier.get());
+    double dist;
+    if (inShootingZone.getAsBoolean()) {
+      dist = pos.getDistance(PositionUtil.flipForAlliance(HUB_TRANSLATION));
+    } else {
+      dist = pos.getDistance(PositionUtil.flipForAlliance(shotPositionSupplier.get()));
+    }
     boost = shooterBoost.apply(dist);
 
     return (RobotRuntimeConstants.MODE == RuntimeMode.REAL) ? boost : 0.4;
