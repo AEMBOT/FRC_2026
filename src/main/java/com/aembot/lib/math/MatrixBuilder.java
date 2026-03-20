@@ -84,7 +84,7 @@ public class MatrixBuilder<R extends Num, C extends Num> {
 
     for (int i = 0; i < matrix.getNumRows(); i++) {
       if (i < values.length) {
-        System.out.println(matrix);
+        // System.out.println(matrix);
         matrix.set(i, column, values[i]);
       } else {
         matrix.set(i, column, 0);
