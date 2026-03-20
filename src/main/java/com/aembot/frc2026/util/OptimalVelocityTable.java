@@ -113,10 +113,17 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
 
     Translation3d velocity = getPoint(compensatedX, compensatedY).orElse(Translation3d.kZero);
 
+    // Chassis speeds need to be flipped to blue-alliance frame when on red alliance,
+    // since the velocity from the table is in blue-alliance coordinates
+    double chassisVx = fieldRelativeChassisSpeeds.vxMetersPerSecond;
+    double chassisVy = fieldRelativeChassisSpeeds.vyMetersPerSecond;
+    if (RobotRuntimeConstants.isRedAlliance()) {
+      chassisVx = -chassisVx;
+      chassisVy = -chassisVy;
+    }
+
     return new Translation3d(
-        velocity.getX() - fieldRelativeChassisSpeeds.vxMetersPerSecond,
-        velocity.getY() - fieldRelativeChassisSpeeds.vyMetersPerSecond,
-        velocity.getZ());
+        velocity.getX() - chassisVx, velocity.getY() - chassisVy, velocity.getZ());
   }
 
   /**
