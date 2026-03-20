@@ -51,9 +51,10 @@ public class AutoHelper {
   public static void setupAutoChooser() {
 
     addAuto("MiddleDepot");
-    addAuto("LeftNeutralDepot");
-    addAuto("RightNeutralOutpost");
     addAuto("CenterPreload");
+    addAuto("RightDaisy");
+    addAuto("LeftDaisy");
+
 
     // TODO make clean
     AutoRoutine doNothingRoutine = autoFactory.newRoutine("DoNothing");
