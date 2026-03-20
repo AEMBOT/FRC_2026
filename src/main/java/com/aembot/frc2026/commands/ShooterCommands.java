@@ -58,6 +58,9 @@ public final class ShooterCommands {
 
   private final Pose2d TOWER_SHOT_POSE = new Pose2d(1.541, 3.709, Rotation2d.kZero);
 
+  // Offset for the turret in case it gets off for whatever reason
+  private double turretOffset = 0.0;
+
   public ShooterCommands(HoodSubsystem hood, TurretSubsystem turret, FlywheelSubsystem flywheel) {
     this.hood = hood;
     this.turret = turret;
@@ -296,7 +299,7 @@ public final class ShooterCommands {
 
     // System.out.println(scaledValue);
 
-    return MathUtil.inputModulus(targetRotation + scaledValue, 0, 360);
+    return MathUtil.inputModulus(targetRotation + scaledValue + turretOffset, 0, 360);
   }
 
   /**
@@ -315,6 +318,20 @@ public final class ShooterCommands {
     double tolerance = RobotRuntimeConstants.ROBOT_CONFIG.getTurretConfig().kAutoAimLeniance;
     return MathUtil.isNear(
         turret.getCurrentPosition(), getTurretTowardsGoalFromRobotPose(), tolerance);
+  }
+
+  /**
+   * @return A command to increase the turret offset
+   */
+  public Command createTurretOffsetIncreaseCommand() {
+    return new RunCommand(() -> turretOffset += 0.1);
+  }
+
+  /**
+   * @return A command to increase the turret offset
+   */
+  public Command createTurretOffsetDecreaseCommand() {
+    return new RunCommand(() -> turretOffset -= 0.1);
   }
 
   /* ---- FLYWHEEL COMMANDS ---- */

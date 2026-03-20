@@ -29,6 +29,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+
+import javax.print.attribute.SetOfIntegerSyntax;
+
 import org.littletonrobotics.junction.LoggedRobot;
 
 /**
@@ -189,6 +192,9 @@ public class RobotContainer implements Loggerable {
     /* ---- SECONDARY CONTROLLER BINDINGS ---- */
 
     secondaryController.leftBumper().onTrue(visionSubsystem.createKillVisionCommand());
+
+    secondaryController.x().whileTrue(commandFactory.shooterCommands.createTurretOffsetIncreaseCommand());
+    secondaryController.b().whileTrue(commandFactory.shooterCommands.createTurretOffsetDecreaseCommand());
 
     // rest is unused
 
