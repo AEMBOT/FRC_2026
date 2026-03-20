@@ -585,10 +585,7 @@
  "events":[
    {"name":"DeployIntake", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
    {"name":"StartShooting", "from":{"target":2, "targetTimestamp":1.1859, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
-   {"name":"RunIntake", "from":{"target":3, "targetTimestamp":1.7893, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
    {"name":"StopShooting", "from":{"target":8, "targetTimestamp":5.58897, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
    {"name":"StartShooting", "from":{"target":10, "targetTimestamp":6.78764, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
-   {"name":"StopIntake", "from":{"target":8, "targetTimestamp":5.58897, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
-   {"name":"RunIntake", "from":{"target":10, "targetTimestamp":6.78764, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
    {"name":"SetPassingPoseRightCorner", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
 }
