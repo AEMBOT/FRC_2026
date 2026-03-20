@@ -110,9 +110,9 @@ public class AutoHelper {
         .bind("StopShooting", commandFactory.createStopShootingFuelCommand())
         .bind(
             "SetPassingPoseLeftCorner",
-            commandFactory.shooterCommands.createSetPassingPoseCenterLeftCommand())
+            commandFactory.shooterCommands.createSetPassingPoseCornerLeftCommand())
         .bind(
             "SetPassingPoseRightCorner",
-            commandFactory.shooterCommands.createSetPassingPoseCenterRightCommand());
+            commandFactory.shooterCommands.createSetPassingPoseCornerRightCommand());
   }
 }
