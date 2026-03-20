@@ -55,7 +55,6 @@ public class AutoHelper {
     addAuto("RightDaisy");
     addAuto("LeftDaisy");
 
-
     // TODO make clean
     AutoRoutine doNothingRoutine = autoFactory.newRoutine("DoNothing");
 
