@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import java.util.function.Consumer;
 
 public class AutoHelper {
@@ -52,7 +53,7 @@ public class AutoHelper {
    *
    * <p>DOES NOT add auto chooser to dashboard
    */
-  public static void setupAutoChooser() {
+  public static void setupAutoChooser(CommandFactory commandFactory) {
 
     addAuto("MiddleDepot");
     addAuto("CenterPreload");
@@ -76,6 +77,28 @@ public class AutoHelper {
                                 : Rotation2d.kZero))));
 
     autoChooser.addRoutine("DoNothing", () -> doNothingRoutine);
+
+    String centerPreloadName = "CenterPreload";
+
+    AutoRoutine preloadRoutine = autoFactory.newRoutine(centerPreloadName);
+
+    AutoTrajectory preloadTraj = preloadRoutine.trajectory(centerPreloadName);
+
+    preloadRoutine
+        .active()
+        .onTrue(
+            new InstantCommand(
+                    () -> setOdometryFunc.accept(preloadTraj.getInitialPose().orElseThrow()))
+                .andThen(preloadTraj.cmd()))
+        .whileTrue(
+            commandFactory
+                .shooterCommands
+                .createFlywheelGoalSpeedCommand()
+                .alongWith(
+                    new WaitCommand(1.5)
+                        .andThen(commandFactory.intakeCommands.createRunIntakeCommand())));
+
+    autoChooser.addRoutine(centerPreloadName, () -> preloadRoutine);
 
     SmartDashboard.putData("set odom for auto", setOdomForAuto());
   }
