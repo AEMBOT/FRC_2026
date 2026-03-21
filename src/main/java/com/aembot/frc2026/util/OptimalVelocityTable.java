@@ -1,8 +1,8 @@
 package com.aembot.frc2026.util;
 
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
+import com.aembot.frc2026.constants.field.Field2026;
 import com.aembot.lib.math.ConcurrentInterpolatable2DMap;
-import com.aembot.lib.math.PositionUtil;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvToBeanBuilder;
 import edu.wpi.first.math.MathUtil;
@@ -15,6 +15,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+
+import org.opencv.core.Mat;
 
 /** Class that parses a csv file to an interpolatable 2D Map */
 public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translation3d> {
@@ -92,9 +94,7 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
    * @return value of the optimal velocity at the sampled point
    */
   public Translation3d getFuelInitVelocity(
-      Pose2d pose, ChassisSpeeds fieldRelativeChassisSpeeds) {
-
-    var robotPose = PositionUtil.clampToField(pose);
+      Pose2d robotPose, ChassisSpeeds fieldRelativeChassisSpeeds) {
 
     double compensatedX =
         robotPose.getX()
@@ -107,6 +107,10 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
             + fieldRelativeChassisSpeeds.vyMetersPerSecond
                 * Units.millisecondsToSeconds(
                     RobotRuntimeConstants.AUTO_AIM_LATENCY_COMPENSATION_MS);
+
+    var layout = Field2026.get().getFieldLayout();
+    compensatedX = MathUtil.clamp(compensatedX, 0, layout.getFieldLength());
+    compensatedY = MathUtil.clamp(compensatedY, 0, layout.getFieldWidth());
 
     if (RobotRuntimeConstants.isRedAlliance()) {
       // Field is 16.540988 x 8.069326 meters
@@ -131,9 +135,8 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
    * @return direction of the shooter at the sampled point
    */
   public Rotation3d getFuelInitVelocityRotation3d(
-      Pose2d pose, ChassisSpeeds fieldRelativeChassisSpeeds) {
+      Pose2d robotPose, ChassisSpeeds fieldRelativeChassisSpeeds) {
 
-    var robotPose = PositionUtil.clampToField(pose);
     Translation3d velocity = getFuelInitVelocity(robotPose, fieldRelativeChassisSpeeds);
 
     double yaw = Math.atan2(velocity.getY(), velocity.getX());
