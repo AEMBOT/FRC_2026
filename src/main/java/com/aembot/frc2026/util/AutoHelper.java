@@ -13,6 +13,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import java.util.function.Consumer;
 
@@ -41,6 +43,8 @@ public class AutoHelper {
             true,
             driveSubsystem,
             (state, isStart) -> AEMLogger.recordOutput("AUTO_TRAJ", state.getPoses()));
+
+    // Elastic.
   }
 
   /**
@@ -72,7 +76,25 @@ public class AutoHelper {
                                 : Rotation2d.kZero))));
 
     autoChooser.addRoutine("DoNothing", () -> doNothingRoutine);
+
+    SmartDashboard.putData("set odom for auto", setOdomForAuto());
   }
+
+  private static Command setOdomForAuto() {
+    return new InstantCommand(
+            () -> {
+              String autoName = autoChooser.selectedCommand().getName();
+              AutoTrajectory traj = autoFactory.newRoutine(autoName).trajectory(autoName);
+              setOdometryFunc.accept(traj.getInitialPose().orElse(new Pose2d()));
+            })
+        .withName("Set auto pos")
+        .ignoringDisable(true);
+  }
+
+  // public static void setOdomForRightDaisy() {
+  //   AutoTrajectory traj = autoFactory.newRoutine("RightDaisy").trajectory("RightDaisy");
+  //   setOdometryFunc.accept(traj.getInitialPose().orElseThrow());
+  // }
 
   /**
    * Add an auto to the auto chooser
