@@ -2,6 +2,7 @@ package com.aembot.frc2026.util;
 
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.lib.math.ConcurrentInterpolatable2DMap;
+import com.aembot.lib.math.PositionUtil;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvToBeanBuilder;
 import edu.wpi.first.math.MathUtil;
@@ -91,7 +92,9 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
    * @return value of the optimal velocity at the sampled point
    */
   public Translation3d getFuelInitVelocity(
-      Pose2d robotPose, ChassisSpeeds fieldRelativeChassisSpeeds) {
+      Pose2d pose, ChassisSpeeds fieldRelativeChassisSpeeds) {
+
+    var robotPose = PositionUtil.clampToField(pose);
 
     double compensatedX =
         robotPose.getX()
@@ -128,8 +131,9 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
    * @return direction of the shooter at the sampled point
    */
   public Rotation3d getFuelInitVelocityRotation3d(
-      Pose2d robotPose, ChassisSpeeds fieldRelativeChassisSpeeds) {
+      Pose2d pose, ChassisSpeeds fieldRelativeChassisSpeeds) {
 
+    var robotPose = PositionUtil.clampToField(pose);
     Translation3d velocity = getFuelInitVelocity(robotPose, fieldRelativeChassisSpeeds);
 
     double yaw = Math.atan2(velocity.getY(), velocity.getX());
