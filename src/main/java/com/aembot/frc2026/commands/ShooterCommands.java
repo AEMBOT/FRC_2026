@@ -382,7 +382,8 @@ public final class ShooterCommands {
   public Command createShootFuelCommand() {
 
     return new ParallelCommandGroup(
-        createFlywheelGoalSpeedCommand(), createHoodTowardsGoalCommand());
+        flywheel.smartVelocitySetpointCommand(() -> 3e10),
+        hood.smartPositionSetpointCommand(() -> hood.config.kMotorConfig.kMinPositionUnits));
   }
 
   /* ---- SUPPLIER FUNCTIONS ---- */

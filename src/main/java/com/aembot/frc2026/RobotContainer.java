@@ -20,6 +20,7 @@ import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeplo
 import com.aembot.lib.subsystems.premades.BinaryVoltageMotorFollowerSubsytem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -90,6 +91,8 @@ public class RobotContainer implements Loggerable {
 
   private final Field2d field = new Field2d();
 
+  double turretTarget = 180;
+
   /* ---- LOG ENTRIES ---- */
   private final LogEntry<Alliance> allianceLogEntry =
       new LogEntry<>("Alliance", Alliance.class, 20);
@@ -126,6 +129,29 @@ public class RobotContainer implements Loggerable {
         commandFactory.createDriveJoystickCmd(driverController, driverController.leftBumper()));
 
     hoodSubsystem.setDefaultCommand(commandFactory.shooterCommands.createHoodDownCommand());
+
+    turretSubsystem.setDefaultCommand(
+        turretSubsystem.smartPositionSetpointCommand(
+            () -> {
+              double joystickMag =
+                  Math.hypot(secondaryController.getRightX(), secondaryController.getRightY());
+
+              double fieldCentricAngle;
+              if (joystickMag > 0.1) {
+                fieldCentricAngle =
+                    Math.atan2(secondaryController.getRightX(), secondaryController.getRightY());
+
+                turretTarget =
+                    Units.radiansToDegrees(
+                        fieldCentricAngle
+                            - RobotStateYearly.get()
+                                .getLatestFieldRobotPose()
+                                .getRotation()
+                                .getRadians());
+              }
+
+              return turretTarget;
+            }));
 
     // turretSubsystem.setDefaultCommand(
     //     commandFactory.shooterCommands.createTurretTowardsGoalCommand());

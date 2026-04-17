@@ -24,7 +24,7 @@ public class HoodSubsystem
 
   /** Configuration to use for this subsystem */
   @SuppressWarnings("unused") // Currently unused but that may change in the future
-  private final TalonFXHoodConfiguration config;
+  public final TalonFXHoodConfiguration config;
 
   /** The HoodState instance to update */
   private final HoodState state;

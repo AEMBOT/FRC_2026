@@ -117,7 +117,10 @@ public class SubsystemFactory {
             new HoodIOReplay(),
             RobotStateYearly.get().hoodState);
       case REAL:
-
+        return new HoodSubsystem(
+            RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig(),
+            new HoodIOReplay(),
+            RobotStateYearly.get().hoodState);
       default:
         return new HoodSubsystem(
             RobotRuntimeConstants.ROBOT_CONFIG.getHoodConfig(),

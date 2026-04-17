@@ -89,7 +89,8 @@ public class AutoHelper {
         .onTrue(
             new InstantCommand(
                     () -> setOdometryFunc.accept(preloadTraj.getInitialPose().orElseThrow()))
-                .andThen(new WaitCommand(1)).andThen(preloadTraj.cmd()))
+                .andThen(new WaitCommand(1))
+                .andThen(preloadTraj.cmd()))
         .whileTrue(
             commandFactory
                 .shooterCommands
@@ -134,7 +135,8 @@ public class AutoHelper {
         .active()
         .onTrue(
             new InstantCommand(() -> setOdometryFunc.accept(traj.getInitialPose().orElseThrow()))
-                .andThen(new WaitCommand(1)).andThen(traj.cmd()));
+                .andThen(new WaitCommand(1))
+                .andThen(traj.cmd()));
 
     autoChooser.addRoutine(autoName, () -> routine);
   }
