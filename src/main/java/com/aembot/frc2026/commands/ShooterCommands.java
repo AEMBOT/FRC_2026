@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -307,6 +308,39 @@ public final class ShooterCommands {
    */
   public Command createTurretTowardsGoalCommand() {
     return turret.smartPositionSetpointCommand(() -> getTurretTowardsGoalFromRobotPose());
+  }
+
+  /**
+   * Creates a command that aims the turret field-centrically based on joystick input. The operator
+   * pushes the stick in the field-relative direction they want the turret to face; the robot
+   * heading from the gyro is subtracted to produce a robot-relative turret setpoint. When the stick
+   * is inside the deadband the turret holds its last commanded angle.
+   *
+   * @param stickX supplier for the joystick X axis (left-right)
+   * @param stickY supplier for the joystick Y axis (forward-back)
+   * @return a command that drives turret yaw field-centrically
+   */
+  public Command createFieldCentricTurretCommand(DoubleSupplier stickX, DoubleSupplier stickY) {
+    double[] lastTarget = {180.0};
+    return turret.smartPositionSetpointCommand(
+        () -> {
+          double x = stickX.getAsDouble();
+          double y = stickY.getAsDouble();
+          double mag = Math.hypot(x, y);
+
+          if (mag > 0.1) {
+            double fieldAngle = Math.atan2(x, y);
+            double robotHeading =
+                RobotStateYearly.get().getLatestFieldRobotPose().getRotation().getRadians();
+            // Turret forward is 180, so add 180 so that "stick up" maps to turret=180.
+            // Wrap to [0, 360] so we never hand the controller a negative or >360 angle
+            // (which would cause the turret to swing the long way around at the wraparound).
+            double target = Units.radiansToDegrees(fieldAngle - robotHeading) + 180.0;
+            lastTarget[0] = MathUtil.inputModulus(target, 0, 360);
+          }
+
+          return lastTarget[0];
+        });
   }
 
   /**
