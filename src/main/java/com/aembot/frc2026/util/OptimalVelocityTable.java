@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import org.opencv.core.Mat;
-
 /** Class that parses a csv file to an interpolatable 2D Map */
 public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translation3d> {
 

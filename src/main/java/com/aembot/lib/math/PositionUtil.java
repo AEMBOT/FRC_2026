@@ -1,7 +1,6 @@
 package com.aembot.lib.math;
 
 import com.aembot.frc2026.constants.field.Field2026;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -107,6 +106,9 @@ public final class PositionUtil {
   public static Pose2d clampToField(Pose2d pose) {
     var layout = Field2026.get().getFieldLayout();
     // return new Pose2d(Math.min(Math.max(0,pose.getX()), layout.getFieldLength()))
-    return new Pose2d(MathUtil.clamp(pose.getX(), 0, layout.getFieldLength()), MathUtil.clamp(pose.getY(), 0, layout.getFieldWidth()), pose.getRotation());
+    return new Pose2d(
+        MathUtil.clamp(pose.getX(), 0, layout.getFieldLength()),
+        MathUtil.clamp(pose.getY(), 0, layout.getFieldWidth()),
+        pose.getRotation());
   }
 }
