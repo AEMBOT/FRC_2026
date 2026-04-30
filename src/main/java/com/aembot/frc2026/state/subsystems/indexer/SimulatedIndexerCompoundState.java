@@ -3,6 +3,7 @@ package com.aembot.frc2026.state.subsystems.indexer;
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
 import com.aembot.frc2026.state.subsystems.indexer.IndexerCompoundState.IndexerStageRunState;
 import com.aembot.lib.config.sensors.timeOfFlight.TimeOfFlightConfiguration;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.logging.Loggable;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.Timer;
@@ -12,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * Class for simulating the indexer compound subsystem. The simulation is very simple and rather
@@ -245,7 +245,7 @@ public class SimulatedIndexerCompoundState implements Loggable {
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
     for (IndexerStage stage : IndexerStage.values()) {
-      Logger.recordOutput(
+      AEMLogger.recordOutput(
           standardPrefix + "/" + stage.toString() + "/SimulatedGamePieces",
           getGamePiecesFor(stage).size());
     }

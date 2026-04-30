@@ -1,6 +1,7 @@
 package com.aembot.lib.core.sensors.timeOfFlight;
 
 import com.aembot.lib.config.sensors.timeOfFlight.TimeOfFlightConfiguration;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.logging.Loggable;
 import com.aembot.lib.core.sensors.timeOfFlight.interfaces.TimeOfFlightIO;
 import com.aembot.lib.core.sensors.timeOfFlight.interfaces.TimeOfFlightSimIO;
@@ -59,7 +60,7 @@ public class TimeOfFlightSensor implements Loggable {
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
-    Logger.recordOutput(standardPrefix + "/ObjectDetected", detectedState);
+    AEMLogger.recordOutput(standardPrefix + "/ObjectDetected", detectedState);
   }
 
   /** The distance measured by the TOF sensor in meters */

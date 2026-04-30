@@ -7,14 +7,17 @@ import choreo.auto.AutoTrajectory;
 import choreo.trajectory.SwerveSample;
 import com.aembot.frc2026.commands.CommandFactory;
 import com.aembot.frc2026.state.RobotStateYearly;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import java.util.function.Consumer;
-import org.littletonrobotics.junction.Logger;
 
 public class AutoHelper {
 
@@ -40,7 +43,9 @@ public class AutoHelper {
             (SwerveSample sample) -> driveSubsystem.setRequestFromSwerveSample(sample),
             true,
             driveSubsystem,
-            (state, isStart) -> Logger.recordOutput("AUTO_TRAJ", state.getPoses()));
+            (state, isStart) -> AEMLogger.recordOutput("AUTO_TRAJ", state.getPoses()));
+
+    // Elastic.
   }
 
   /**
@@ -48,12 +53,12 @@ public class AutoHelper {
    *
    * <p>DOES NOT add auto chooser to dashboard
    */
-  public static void setupAutoChooser() {
+  public static void setupAutoChooser(CommandFactory commandFactory) {
 
     addAuto("MiddleDepot");
-    addAuto("LeftNeutralDepot");
-    addAuto("RightNeutralOutpost");
     addAuto("CenterPreload");
+    addAuto("RightDaisy");
+    addAuto("LeftDaisy");
 
     // TODO make clean
     AutoRoutine doNothingRoutine = autoFactory.newRoutine("DoNothing");
@@ -72,7 +77,48 @@ public class AutoHelper {
                                 : Rotation2d.kZero))));
 
     autoChooser.addRoutine("DoNothing", () -> doNothingRoutine);
+
+    String centerPreloadName = "CenterPreload";
+
+    AutoRoutine preloadRoutine = autoFactory.newRoutine(centerPreloadName);
+
+    AutoTrajectory preloadTraj = preloadRoutine.trajectory(centerPreloadName);
+
+    preloadRoutine
+        .active()
+        .onTrue(
+            new InstantCommand(
+                    () -> setOdometryFunc.accept(preloadTraj.getInitialPose().orElseThrow()))
+                .andThen(new WaitCommand(1))
+                .andThen(preloadTraj.cmd()))
+        .whileTrue(
+            commandFactory
+                .shooterCommands
+                .createFlywheelGoalSpeedCommand()
+                .alongWith(
+                    new WaitCommand(2.5)
+                        .andThen(commandFactory.intakeCommands.createRunIntakeCommand())));
+
+    autoChooser.addRoutine(centerPreloadName, () -> preloadRoutine);
+
+    SmartDashboard.putData("set odom for auto", setOdomForAuto());
   }
+
+  private static Command setOdomForAuto() {
+    return new InstantCommand(
+            () -> {
+              String autoName = autoChooser.selectedCommand().getName();
+              AutoTrajectory traj = autoFactory.newRoutine(autoName).trajectory(autoName);
+              setOdometryFunc.accept(traj.getInitialPose().orElse(new Pose2d()));
+            })
+        .withName("Set auto pos")
+        .ignoringDisable(true);
+  }
+
+  // public static void setOdomForRightDaisy() {
+  //   AutoTrajectory traj = autoFactory.newRoutine("RightDaisy").trajectory("RightDaisy");
+  //   setOdometryFunc.accept(traj.getInitialPose().orElseThrow());
+  // }
 
   /**
    * Add an auto to the auto chooser
@@ -89,9 +135,26 @@ public class AutoHelper {
         .active()
         .onTrue(
             new InstantCommand(() -> setOdometryFunc.accept(traj.getInitialPose().orElseThrow()))
+                .andThen(new WaitCommand(1))
                 .andThen(traj.cmd()));
 
     autoChooser.addRoutine(autoName, () -> routine);
+  }
+
+  private static AutoRoutine createRightSundomeElimsRoutine(CommandFactory cmdFactory) {
+    AutoRoutine routine = autoFactory.newRoutine("RightSundomeElims");
+    AutoTrajectory traj = routine.trajectory("RightSundomeElims");
+
+    traj.atTime("ShooterActive").onTrue(cmdFactory.shooterCommands.createShootFuelCommand());
+    traj.atTime("IntakeActive").onTrue(cmdFactory.createShootFuelCommand());
+
+    routine
+        .active()
+        .onTrue(
+            new InstantCommand(() -> setOdometryFunc.accept(traj.getInitialPose().orElseThrow()))
+                .andThen(traj.cmd()));
+
+    return routine;
   }
 
   /**
@@ -101,16 +164,22 @@ public class AutoHelper {
    */
   public static void registerAutoCommands(CommandFactory commandFactory) {
 
+    // TODO move this somewhere that makes more sense
+    autoChooser.addRoutine(
+        "rightSundomeElims", () -> createRightSundomeElimsRoutine(commandFactory));
+
     autoFactory
-        .bind("DeployIntake", commandFactory.intakeCommands.createDownCommand())
+        .bind("DeployIntake", commandFactory.intakeCommands.createZeroDownCommand())
         .bind("RaiseIntake", commandFactory.intakeCommands.createUpCommand())
         .bind("RunIntake", commandFactory.intakeCommands.createRunIntakeCommand())
         .bind("StopIntake", commandFactory.intakeCommands.createStopIntakeCommand())
         .bind("StartShooting", commandFactory.createStartShootingFuelCommand())
         .bind("StopShooting", commandFactory.createStopShootingFuelCommand())
         .bind(
-            "StartFlickingIntake",
-            commandFactory.intakeCommands.createContinuousFlickIntakeCommand())
-        .bind("StopFlickingIntake", commandFactory.intakeCommands.createDownCommand());
+            "SetPassingPoseLeftCorner",
+            commandFactory.shooterCommands.createSetPassingPoseCornerLeftCommand())
+        .bind(
+            "SetPassingPoseRightCorner",
+            commandFactory.shooterCommands.createSetPassingPoseCornerRightCommand());
   }
 }

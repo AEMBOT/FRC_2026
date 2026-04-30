@@ -1,5 +1,7 @@
 package com.aembot.lib.math;
 
+import com.aembot.frc2026.constants.field.Field2026;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -8,6 +10,8 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /** Convert poses to transforms and vice versa */
 public final class PositionUtil {
@@ -27,6 +31,10 @@ public final class PositionUtil {
     public static final Transform3d TRANSFORM3D = new Transform3d(TRANSLATION3D, ROTATION3D);
   }
 
+  public final class RotationConstants {
+    public static final Rotation3d ROT_3D_180_DEG = new Rotation3d(Rotation2d.k180deg);
+  }
+
   public static Pose3d toPose3d(Transform3d transform3d) {
     return new Pose3d(transform3d.getTranslation(), transform3d.getRotation());
   }
@@ -41,5 +49,66 @@ public final class PositionUtil {
 
   public static Transform2d toTransform2d(Pose2d pose2d) {
     return new Transform2d(pose2d.getTranslation(), pose2d.getRotation());
+  }
+
+  public static Translation3d flipForAlliance(Translation3d bluePos) {
+    switch (DriverStation.getAlliance().orElseGet(() -> Alliance.Blue)) {
+      case Red:
+        return new Translation3d(
+            Field2026.get().getFieldLayout().getFieldLength() - bluePos.getX(),
+            Field2026.get().getFieldLayout().getFieldWidth() - bluePos.getY(),
+            bluePos.getZ());
+      case Blue:
+      default:
+        return bluePos;
+    }
+  }
+
+  public static Translation2d flipForAlliance(Translation2d bluePos) {
+    switch (DriverStation.getAlliance().orElseGet(() -> Alliance.Blue)) {
+      case Red:
+        return new Translation2d(
+            Field2026.get().getFieldLayout().getFieldLength() - bluePos.getX(),
+            Field2026.get().getFieldLayout().getFieldWidth() - bluePos.getY());
+      case Blue:
+      default:
+        return bluePos;
+    }
+  }
+
+  public static Pose3d flipForAlliance(Pose3d bluePos) {
+    switch (DriverStation.getAlliance().orElseGet(() -> Alliance.Blue)) {
+      case Red:
+        return new Pose3d(
+            Field2026.get().getFieldLayout().getFieldLength() - bluePos.getX(),
+            Field2026.get().getFieldLayout().getFieldWidth() - bluePos.getY(),
+            bluePos.getZ(),
+            bluePos.getRotation().plus(RotationConstants.ROT_3D_180_DEG));
+      case Blue:
+      default:
+        return bluePos;
+    }
+  }
+
+  public static Pose2d flipForAlliance(Pose2d bluePos) {
+    switch (DriverStation.getAlliance().orElseGet(() -> Alliance.Blue)) {
+      case Red:
+        return new Pose2d(
+            Field2026.get().getFieldLayout().getFieldLength() - bluePos.getX(),
+            Field2026.get().getFieldLayout().getFieldWidth() - bluePos.getY(),
+            bluePos.getRotation().plus(Rotation2d.k180deg));
+      case Blue:
+      default:
+        return bluePos;
+    }
+  }
+
+  public static Pose2d clampToField(Pose2d pose) {
+    var layout = Field2026.get().getFieldLayout();
+    // return new Pose2d(Math.min(Math.max(0,pose.getX()), layout.getFieldLength()))
+    return new Pose2d(
+        MathUtil.clamp(pose.getX(), 0, layout.getFieldLength()),
+        MathUtil.clamp(pose.getY(), 0, layout.getFieldWidth()),
+        pose.getRotation());
   }
 }

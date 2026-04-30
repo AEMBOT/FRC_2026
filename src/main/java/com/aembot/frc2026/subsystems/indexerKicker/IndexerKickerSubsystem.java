@@ -4,6 +4,7 @@ import com.aembot.frc2026.config.subsystems.indexerKicker.IndexerKickerConfigura
 import com.aembot.frc2026.state.subsystems.indexer.IndexerCompoundState.IndexerStageRunState;
 import com.aembot.frc2026.subsystems.indexerKicker.io.IndexerKickerMechanismIO;
 import com.aembot.lib.config.motors.MotorConfiguration;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
@@ -50,7 +51,7 @@ public class IndexerKickerSubsystem
     kMechanismIO.updateInputs(kMechanismInputs);
 
     // Log latency with time between periodic being called and finishing
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
   }
 

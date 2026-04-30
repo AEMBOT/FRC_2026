@@ -31,6 +31,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import org.littletonrobotics.junction.Logger;
 
 public class MotorIOTalonFX implements MotorIO, CANable {
   protected final TalonFX talon;
@@ -212,6 +213,8 @@ public class MotorIOTalonFX implements MotorIO, CANable {
     inputs.currentStatorAmps = currentStatorSignal.getValueAsDouble();
     inputs.currentSupplyAmps = currentSupplySignal.getValueAsDouble();
     inputs.rawRotorPosition = rotorPositionSignal.getValueAsDouble();
+
+    Logger.recordOutput(getName() + "_control", talon.getControlMode().getValue());
 
     return refreshStatus == StatusCode.OK;
   }

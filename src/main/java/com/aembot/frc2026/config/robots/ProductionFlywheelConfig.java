@@ -19,7 +19,7 @@ import edu.wpi.first.math.util.Units;
 public class ProductionFlywheelConfig {
   //  TODO Placeholder values, values need to be changed cuz they don't make sense
   public static final double CRUISE_VELOCITY_METERS_PER_SEC = 16.0;
-  public static final double ACCELERATION_METERS_PER_SEC = 32.0;
+  public static final double ACCELERATION_METERS_PER_SEC = 2048.0;
   public static final double JERK = 0.0;
 
   public static final double VELOCITY_TOLERANCE_METERS_PER_SEC = 0.2;
@@ -39,9 +39,9 @@ public class ProductionFlywheelConfig {
           ? new ConfigureSlot0Gains(0.0, 0.0, 0.0, 0.0, 0.4, 0.132, 0.0)
           : new ConfigureSlot0Gains(5, 0, 0, 0, 0, 0.1, 0);
 
-  public static final int MOTOR_ID = 53;
+  public static final int MOTOR_ID = 54;
   public static final String MOTOR_NAME = "FlywheelMotor";
-  public static final double MOTOR_CURRENT_LIMIT = 40.0;
+  public static final double MOTOR_CURRENT_LIMIT = 60.0;
 
   public static final String FLYWHEEL_SUBSYTEM_NAME = "FlywheelSubsystem";
 

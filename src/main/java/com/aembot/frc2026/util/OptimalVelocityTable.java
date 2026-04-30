@@ -1,6 +1,7 @@
 package com.aembot.frc2026.util;
 
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
+import com.aembot.frc2026.constants.field.Field2026;
 import com.aembot.lib.math.ConcurrentInterpolatable2DMap;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -104,6 +105,10 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
             + fieldRelativeChassisSpeeds.vyMetersPerSecond
                 * Units.millisecondsToSeconds(
                     RobotRuntimeConstants.AUTO_AIM_LATENCY_COMPENSATION_MS);
+
+    var layout = Field2026.get().getFieldLayout();
+    compensatedX = MathUtil.clamp(compensatedX, 0, layout.getFieldLength());
+    compensatedY = MathUtil.clamp(compensatedY, 0, layout.getFieldWidth());
 
     if (RobotRuntimeConstants.isRedAlliance()) {
       // Field is 16.540988 x 8.069326 meters

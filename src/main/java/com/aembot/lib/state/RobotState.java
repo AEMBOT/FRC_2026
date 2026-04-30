@@ -1,6 +1,7 @@
 package com.aembot.lib.state;
 
 import com.aembot.lib.constants.RobotStateConstants;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.logging.Loggable;
 import com.aembot.lib.math.ConcurrentTimeInterpolatableBuffer;
 import com.aembot.lib.subsystems.aprilvision.util.AprilCameraOutput;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * Robot state class that retains all information that is used to determine the robots current
@@ -94,7 +94,7 @@ public abstract class RobotState implements Loggable {
         String key, ConcurrentTimeInterpolatableBuffer<Pose2d> buffer) {
       Entry<Double, Pose2d> latest = buffer.getLatest();
       if (latest != null) {
-        Logger.recordOutput(key, latest.getValue());
+        AEMLogger.recordOutput(key, latest.getValue());
       }
     }
   }
@@ -241,6 +241,19 @@ public abstract class RobotState implements Loggable {
 
   public ChassisSpeeds getLatestFusedFieldRelativeChassisSpeed() {
     return odometryState.gyroFusedChassisSpeeds.get();
+  }
+
+  /**
+   * Get the yaw angular velocity at a specific timestamp (interpolated from buffer).
+   *
+   * @param timestampSeconds The timestamp to query
+   * @return The angular velocity in rad/s, or the latest value if timestamp not in buffer
+   */
+  public double getYawAngularVelocityForTimestamp(double timestampSeconds) {
+    return odometryState
+        .driveYawAngularVelocity
+        .getSample(timestampSeconds)
+        .orElse(odometryState.actualFieldRelativeChassisSpeeds.get().omegaRadiansPerSecond);
   }
 
   // --- Loggable Implementation ---

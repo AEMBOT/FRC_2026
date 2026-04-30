@@ -1,9 +1,9 @@
 package com.aembot.lib.state.subsystems.hood;
 
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.logging.Loggable;
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.concurrent.atomic.AtomicReference;
-import org.littletonrobotics.junction.Logger;
 
 public class HoodState implements Loggable {
   public AtomicReference<Rotation2d> hoodAngle = new AtomicReference<>();
@@ -18,6 +18,6 @@ public class HoodState implements Loggable {
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
-    Logger.recordOutput(standardPrefix + "/Angle", hoodAngle.get());
+    AEMLogger.recordOutput(standardPrefix + "/Angle", hoodAngle.get());
   }
 }

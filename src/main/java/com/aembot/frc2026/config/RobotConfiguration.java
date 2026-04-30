@@ -11,12 +11,13 @@ import com.aembot.lib.config.subsystems.drive.simulation.DrivetrainSimConfigurat
 import com.aembot.lib.config.subsystems.flywheel.TalonFXFlywheelConfiguration;
 import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
 import com.aembot.lib.config.subsystems.hood.simulation.SimulatedHoodConfiguration;
+import com.aembot.lib.config.subsystems.intake.generic.run.BinaryVoltageMotorFollowerConfig;
 import com.aembot.lib.config.subsystems.intake.overBumper.deploy.TalonFXOverBumperIntakeDeployConfiguration;
-import com.aembot.lib.config.subsystems.intake.overBumper.run.TalonFXOverBumperIntakeRollerConfiguration;
 import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
 import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.pathplanner.lib.config.RobotConfig;
 import java.util.List;
 
 /**
@@ -83,7 +84,14 @@ public abstract class RobotConfiguration {
    *
    * @return intake roller configuration
    */
-  public abstract TalonFXOverBumperIntakeRollerConfiguration getIntakeRollerConfig();
+  public abstract BinaryVoltageMotorFollowerConfig getIntakeRollerConfig();
+
+  /**
+   * Get the configuration of the intake wheels subsystem
+   *
+   * @return intake wheels configuration
+   */
+  public abstract BinaryVoltageMotorFollowerConfig getIntakeWheelsConfig();
 
   /**
    * Get configuration details about the drive train sim for this robot

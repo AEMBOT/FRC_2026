@@ -7,18 +7,17 @@ package com.aembot.frc2026;
 import com.aembot.frc2026.commands.CommandFactory;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.subsystems.SubsystemFactory;
-import com.aembot.frc2026.subsystems.indexerKicker.IndexerKickerSubsystem;
-import com.aembot.frc2026.subsystems.indexerSelector.IndexerSelectorSubsystem;
-import com.aembot.frc2026.subsystems.spindexer.SpindexerSubsystem;
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.frc2026.util.AutoHelper;
 import com.aembot.lib.core.logging.Loggerable;
+import com.aembot.lib.core.logging.log_entries.LogEntry;
 import com.aembot.lib.subsystems.aprilvision.AprilVisionSubsystem;
 import com.aembot.lib.subsystems.drive.DriveSubsystem;
 import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
+import com.aembot.lib.subsystems.intake.generic.multimotor.IntakeRollerMultiMotorSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
-import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerSubsystem;
+import com.aembot.lib.subsystems.premades.BinaryVoltageMotorFollowerSubsytem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -31,7 +30,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.littletonrobotics.junction.LoggedRobot;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -53,23 +51,16 @@ public class RobotContainer implements Loggerable {
   /* ---- DRIVETRAIN ---- */
   private final DriveSubsystem driveSubsystem = SubsystemFactory.createDriveSubsystem();
 
-  /* ---- INDEXER ---- */
-  private final SpindexerSubsystem spindexerSubsystem = SubsystemFactory.createSpindexerSubsystem();
-
-  private final IndexerSelectorSubsystem indexerSelectorSubsystem =
-      SubsystemFactory.createIndexerSelectorSubsystem();
-
-  private final IndexerKickerSubsystem indexerKickerSubsystem =
-      SubsystemFactory.createIndexerKickerSubsystem();
-
   /* ---- SHOOTER ---- */
   private final HoodSubsystem hoodSubsystem = SubsystemFactory.createHoodSubsystem();
 
   /* ---- INTAKE ---- */
   private final OverBumperIntakeDeploySubsystem intakeDeploySubsystem =
       SubsystemFactory.createIntakeDeploySubsystem();
-  private final OverBumperIntakeRollerSubsystem intakeRollerSubsystem =
+  private final IntakeRollerMultiMotorSubsystem intakeRollerSubsystem =
       SubsystemFactory.createIntakeRollerSubsystem();
+  private final BinaryVoltageMotorFollowerSubsytem intakeWheelsSubsystem =
+      SubsystemFactory.createIntakeWheelsSubsystem();
 
   /* ---- TURRET ---- */
   private final TurretSubsystem turretSubsystem = SubsystemFactory.createTurretSubsystem();
@@ -99,6 +90,12 @@ public class RobotContainer implements Loggerable {
 
   private final Field2d field = new Field2d();
 
+  /* ---- LOG ENTRIES ---- */
+  private final LogEntry<Alliance> allianceLogEntry =
+      new LogEntry<>("Alliance", Alliance.class, 20);
+  private final LogEntry<Boolean> allianceSetLogEntry =
+      new LogEntry<>("AllianceSet", Boolean.class, 20);
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer(LoggedRobot robot) {
     setupLogger(robot);
@@ -109,9 +106,7 @@ public class RobotContainer implements Loggerable {
             hoodSubsystem,
             intakeDeploySubsystem,
             intakeRollerSubsystem,
-            spindexerSubsystem,
-            indexerSelectorSubsystem,
-            indexerKickerSubsystem,
+            intakeWheelsSubsystem,
             flywheelSubsystem,
             turretSubsystem);
 
@@ -145,20 +140,10 @@ public class RobotContainer implements Loggerable {
 
     driverController.rightTrigger().whileTrue(commandFactory.createShootFuelCommand());
 
-    driverController.rightBumper().whileTrue(commandFactory.createShootFuelTowerPosCommand());
-
     driverController
         .leftTrigger()
-        .whileTrue(commandFactory.intakeCommands.createRunIntakeCommand());
-
-    // While we're pressing left trigger to intake and not right trigger or y to shoot, run indexer
-    // load
-    driverController
-        .leftTrigger()
-        .and(driverController.rightTrigger().negate())
-        .and(driverController.y().negate())
-        .and(driverController.rightBumper().negate())
-        .whileTrue(commandFactory.indexerCommands.createLoadIndexerCommand());
+        .onTrue(commandFactory.intakeCommands.createZeroDownCommand())
+        .onFalse(commandFactory.intakeCommands.createUpCommand());
 
     // c on the controller
     driverController.leftStick().onTrue(commandFactory.intakeCommands.createZeroDownCommand());
@@ -166,7 +151,7 @@ public class RobotContainer implements Loggerable {
     // z on the controller
     driverController.rightStick().onTrue(commandFactory.intakeCommands.createUpCommand());
 
-    driverController.y().whileTrue(commandFactory.createShootFuelCommand());
+    // driverController.y() UNUSED
 
     driverController
         .x()
@@ -174,31 +159,43 @@ public class RobotContainer implements Loggerable {
             commandFactory.createSetDriveHeadingForUnderTrenchCommand(
                 driverController, driverController.leftBumper()));
 
-    driverController.b().whileTrue(commandFactory.indexerCommands.createRunIndexerBackCommand());
+    // driverController.a() UNUSED
 
-    driverController.a().onTrue(commandFactory.intakeCommands.createFlickIntakeCommand());
+    driverController
+        .b()
+        .whileTrue(
+            intakeRollerSubsystem
+                .reverseRollerCommand()
+                .alongWith(intakeWheelsSubsystem.reverseSystemCommand()));
 
     driverController
         .povLeft()
-        .onTrue(commandFactory.shooterCommands.createSetPassingPoseLeftCommand());
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseCornerLeftCommand());
 
     driverController
         .povUp()
-        .onTrue(commandFactory.shooterCommands.createSetPassingPoseMiddleCommand());
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseCenterRightCommand());
 
     driverController
         .povRight()
-        .onTrue(commandFactory.shooterCommands.createSetPassingPoseRightCommand());
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseCornerRightCommand());
 
     driverController
         .povDown()
-        .onTrue(commandFactory.shooterCommands.createSetPassingPoseOutpostCommand());
+        .onTrue(commandFactory.shooterCommands.createSetPassingPoseCornerLeftCommand());
 
     driverController.start().onTrue(commandFactory.resetOdometryHeading());
 
     /* ---- SECONDARY CONTROLLER BINDINGS ---- */
 
     secondaryController.leftBumper().onTrue(visionSubsystem.createKillVisionCommand());
+
+    secondaryController
+        .x()
+        .whileTrue(commandFactory.shooterCommands.createTurretOffsetIncreaseCommand());
+    secondaryController
+        .b()
+        .whileTrue(commandFactory.shooterCommands.createTurretOffsetDecreaseCommand());
 
     // rest is unused
 
@@ -235,8 +232,8 @@ public class RobotContainer implements Loggerable {
   public void logCommands() {
     commandFactory.logCommands();
     if (DriverStation.getAlliance().isPresent())
-      Logger.recordOutput("Alliance", DriverStation.getAlliance().get());
-    Logger.recordOutput("AllianceSet", DriverStation.getAlliance().isPresent());
+      allianceLogEntry.pushValue(DriverStation.getAlliance().get());
+    allianceSetLogEntry.pushValue(DriverStation.getAlliance().isPresent());
 
     field.setRobotPose(RobotStateYearly.get().getLatestFieldRobotPose());
     SmartDashboard.putData("FieldData/Field2d", field);
@@ -249,7 +246,7 @@ public class RobotContainer implements Loggerable {
 
               AutoHelper.registerAutoCommands(commandFactory);
 
-              AutoHelper.setupAutoChooser();
+              AutoHelper.setupAutoChooser(commandFactory);
 
               SmartDashboard.putData("Choose Auto Routine", AutoHelper.autoChooser);
 

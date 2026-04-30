@@ -4,6 +4,7 @@ import com.aembot.frc2026.config.subsystems.indexerSelector.IndexerSelectorConfi
 import com.aembot.frc2026.state.subsystems.indexer.IndexerCompoundState.IndexerStageRunState;
 import com.aembot.frc2026.subsystems.indexerSelector.io.IndexerSelectorMechanismIO;
 import com.aembot.lib.config.motors.MotorConfiguration;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.core.sensors.timeOfFlight.TimeOfFlightSensor;
@@ -65,7 +66,7 @@ public class IndexerSelectorSubsystem
     kGamePieceDetectedConsumer.accept(kTimeOfFlightSensor.getObjectDetected());
 
     // Log latency with time between periodic being called and finishing
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
   }
 

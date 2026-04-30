@@ -61,7 +61,7 @@ public class SimulatedTalonFXVisualization {
   }
 
   /**
-   * Supply this to Logger.recordOutput in order to add visualization to advantage scope
+   * Supply this to AEMLogger.recordOutput in order to add visualization to advantage scope
    *
    * @return The internal mechanism 2d used in this visualization
    */

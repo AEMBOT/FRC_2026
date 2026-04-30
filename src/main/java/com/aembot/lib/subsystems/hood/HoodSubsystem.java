@@ -2,6 +2,7 @@ package com.aembot.lib.subsystems.hood;
 
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.config.subsystems.hood.TalonFXHoodConfiguration;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.state.subsystems.hood.HoodState;
@@ -53,7 +54,7 @@ public class HoodSubsystem
     state.updateHoodAngle(new Rotation2d(Units.degreesToRadians(inputs.positionUnits)));
 
     // Log latency with time between periodic being called and finishing
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
 
     motorEnabled = SmartDashboard.getBoolean("Hood Enabled", true);

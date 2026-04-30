@@ -1,12 +1,19 @@
 package com.aembot.lib.subsystems.aprilvision;
 
+import com.aembot.lib.config.odometry.OdometryStandardDevs;
+import com.aembot.lib.config.subsystems.vision.CameraConfiguration;
+import com.aembot.lib.core.logging.AEMLogger;
+import com.aembot.lib.math.PositionUtil;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.aprilvision.interfaces.AprilCameraIO;
 import com.aembot.lib.subsystems.aprilvision.util.AprilCameraOutput;
 import com.aembot.lib.subsystems.aprilvision.util.VisionPoseEstimation;
 import com.aembot.lib.subsystems.base.AEMSubsystem;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,6 +23,11 @@ import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
 public class AprilVisionSubsystem extends AEMSubsystem {
+  // ===== STD DEV COMPUTATION CONSTANTS (Limelight protocol, not configurable) =====
+  private static final int MEGATAG2_X_STDDEV_INDEX = 6;
+  private static final int MEGATAG2_Y_STDDEV_INDEX = 7;
+  private static final int EXPECTED_STDDEV_ARRAY_LENGTH = 12;
+
   protected final RobotState robotStateInstance;
 
   protected final List<Pair<AprilCameraIO, AprilVisionInputs>> camerasWithInputs =
@@ -39,62 +51,414 @@ public class AprilVisionSubsystem extends AEMSubsystem {
 
   @Override
   public void periodic() {
-    double timestamp = Timer.getFPGATimestamp();
+    double currentTime = Timer.getFPGATimestamp();
 
-    List<AprilCameraOutput> aprilTagObservations = new ArrayList<>();
+    List<AprilCameraOutput> rawCameraOutputs = new ArrayList<>();
 
+    // Collect all valid camera estimates
     for (Pair<AprilCameraIO, AprilVisionInputs> cameraWithInput : camerasWithInputs) {
       AprilCameraIO io = cameraWithInput.getFirst();
       AprilVisionInputs inputs = cameraWithInput.getSecond();
+      CameraConfiguration config = io.getConfiguration();
 
-      if (io.getConfiguration().cameraName == "turret") continue;
-
-      Logger.recordOutput(
-          logPrefixStandard + "/" + io.getConfiguration().cameraName + "/CameraPosition",
+      AEMLogger.recordOutput(
+          logPrefixStandard + "/" + config.cameraName + "/CameraPosition",
           new Pose3d(robotStateInstance.getLatestFieldRobotPose())
-              // This is so jank. why is there no method to add two poses :sob:
-              // Convert the cam pos pose2d to a transform2d with #minus, because
-              // that returns a Transform2d for some unfathomable reason
-              .plus(io.getConfiguration().getCameraPosition().minus(Pose3d.kZero)));
+              .plus(PositionUtil.toTransform3d(config.getCameraPosition())));
 
       io.updateInputs(inputs);
 
-      if (inputs.coprocessorEstimationLatencyCompensated != null && visionActive) {
-        aprilTagObservations.add(
-            new AprilCameraOutput(
-                io.getConfiguration().cameraName,
-                inputs.tagID,
-                new VisionPoseEstimation(
-                    inputs.coprocessorEstimationLatencyUncompensated,
-                    inputs.coprocessorEstimationLatencyCompensated,
-                    inputs.coprocessorEstimationStdDevs,
-                    inputs.coprocessorEstimationTimestamp)));
+      // Check for valid raw estimate
+      if (inputs.rawCoprocessorPose != null && inputs.tagCount > 0 && visionActive) {
+        // Reject estimates that are too old
+        double estimateAge = currentTime - inputs.coprocessorEstimationTimestamp;
+        if (estimateAge <= config.maxEstimateAgeSeconds) {
+          // === COMPUTE POSE AND STDDEVS (replayable) ===
+          VisionPoseEstimation processed = processRawEstimate(inputs, config, config.cameraName);
+
+          if (processed != null && processed.latencyUncompensatedPose() != null) {
+            rawCameraOutputs.add(new AprilCameraOutput(config.cameraName, processed));
+
+            // Log computed values as OUTPUTS
+            AEMLogger.recordOutput(
+                logPrefixStandard + "/" + config.cameraName + "/ComputedPose",
+                processed.latencyUncompensatedPose());
+            AEMLogger.recordOutput(
+                logPrefixStandard + "/" + config.cameraName + "/ComputedXStdDev",
+                processed.stdDevs().xStdDev());
+            AEMLogger.recordOutput(
+                logPrefixStandard + "/" + config.cameraName + "/ComputedYStdDev",
+                processed.stdDevs().yStdDev());
+          }
+        }
       }
 
       visionActive = SmartDashboard.getBoolean("Vision Enabled", true);
     }
 
-    robotStateInstance.setApriltagObservations(aprilTagObservations);
+    // Fuse multiple camera estimates using inverse-variance weighting
+    List<AprilCameraOutput> fusedObservations = fuseMultiCameraEstimates(rawCameraOutputs);
+
+    AEMLogger.recordOutput(logPrefixStandard + "/RawCameraCount", rawCameraOutputs.size());
+    AEMLogger.recordOutput(logPrefixStandard + "/FusedObservationCount", fusedObservations.size());
+
+    robotStateInstance.setApriltagObservations(fusedObservations);
 
     updateLog();
     for (AprilCameraOutput observation : robotStateInstance.getAprilTagObservations()) {
-      Logger.recordOutput(
+      AEMLogger.recordOutput(
           logPrefixStandard + "/VisionEstimatedRobotPose", observation.estimatedPose());
     }
 
-    // Log latency with time between periodic being called and finishing
-    Logger.recordOutput(
-        logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
+    AEMLogger.recordOutput(
+        logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - currentTime) * 1000);
+  }
+
+  /**
+   * Fuse multiple camera estimates into a single estimate using inverse-variance weighting. This
+   * prevents camera "fighting" where multiple cameras with different estimates cause pose
+   * oscillation.
+   *
+   * <p>Before fusing, older estimates are "previewed" forward to the latest timestamp using
+   * odometry, so all estimates are effectively at the same point in time (254's approach).
+   */
+  private List<AprilCameraOutput> fuseMultiCameraEstimates(List<AprilCameraOutput> rawOutputs) {
+    if (rawOutputs.isEmpty()) {
+      return rawOutputs;
+    }
+
+    if (rawOutputs.size() == 1) {
+      return rawOutputs; // No fusion needed
+    }
+
+    // Find the latest timestamp among all estimates
+    double latestTimestamp = 0;
+    for (AprilCameraOutput output : rawOutputs) {
+      latestTimestamp = Math.max(latestTimestamp, output.estimatedPose().timestampSeconds());
+    }
+
+    // Get odometry pose at the latest timestamp (target time for all estimates)
+    Pose2d odomAtLatest = robotStateInstance.getFieldRobotPoseForTimestamp(latestTimestamp);
+    if (odomAtLatest == null) {
+      // Can't preview without odometry, fall back to simple fusion
+      AEMLogger.recordOutput(logPrefixStandard + "/FusePreviewFailed", true);
+      return rawOutputs;
+    }
+
+    double weightedX = 0;
+    double weightedY = 0;
+    double totalWeightX = 0;
+    double totalWeightY = 0;
+
+    for (AprilCameraOutput output : rawOutputs) {
+      Pose2d pose = output.estimatedPose().latencyUncompensatedPose();
+      OdometryStandardDevs stdDevs = output.estimatedPose().stdDevs();
+      double timestamp = output.estimatedPose().timestampSeconds();
+
+      if (pose == null || stdDevs == null) continue;
+
+      // Preview this estimate forward to the latest timestamp using odometry
+      Pose2d previewedPose = pose;
+      if (timestamp < latestTimestamp) {
+        Pose2d odomAtThis = robotStateInstance.getFieldRobotPoseForTimestamp(timestamp);
+        if (odomAtThis != null) {
+          // Compute transform from this timestamp to latest: how did the robot move?
+          Transform2d odomDelta = odomAtLatest.minus(odomAtThis);
+          // Apply that motion to the vision estimate
+          previewedPose = pose.transformBy(odomDelta);
+        }
+      }
+
+      // Inverse variance weighting: weight = 1 / variance = 1 / stddev^2
+      double xVariance = stdDevs.xStdDev() * stdDevs.xStdDev();
+      double yVariance = stdDevs.yStdDev() * stdDevs.yStdDev();
+
+      // Prevent division by zero
+      if (xVariance < 1e-6) xVariance = 1e-6;
+      if (yVariance < 1e-6) yVariance = 1e-6;
+
+      double weightX = 1.0 / xVariance;
+      double weightY = 1.0 / yVariance;
+
+      weightedX += previewedPose.getX() * weightX;
+      weightedY += previewedPose.getY() * weightY;
+      totalWeightX += weightX;
+      totalWeightY += weightY;
+    }
+
+    if (totalWeightX < 1e-6 || totalWeightY < 1e-6) {
+      return rawOutputs; // Fallback if weighting failed
+    }
+
+    // Calculate fused position
+    double fusedX = weightedX / totalWeightX;
+    double fusedY = weightedY / totalWeightY;
+
+    // Use first camera's rotation (they should all be using gyro anyway)
+    Pose2d firstPose = rawOutputs.get(0).estimatedPose().latencyUncompensatedPose();
+    Pose2d fusedPose = new Pose2d(fusedX, fusedY, firstPose.getRotation());
+
+    // Fused stddev is lower than any individual (benefit of multiple measurements)
+    // stddev_fused = 1 / sqrt(sum of 1/variance)
+    double fusedXStdDev = 1.0 / Math.sqrt(totalWeightX);
+    double fusedYStdDev = 1.0 / Math.sqrt(totalWeightY);
+
+    OdometryStandardDevs fusedStdDevs =
+        new OdometryStandardDevs(fusedXStdDev, fusedYStdDev, Double.MAX_VALUE);
+
+    AEMLogger.recordOutput(logPrefixStandard + "/FusedPose", fusedPose);
+    AEMLogger.recordOutput(logPrefixStandard + "/FusedXStdDev", fusedXStdDev);
+    AEMLogger.recordOutput(logPrefixStandard + "/FusedYStdDev", fusedYStdDev);
+    AEMLogger.recordOutput(logPrefixStandard + "/FusePreviewFailed", false);
+
+    // Return single fused estimate at the latest timestamp
+    return List.of(
+        new AprilCameraOutput(
+            "fused", new VisionPoseEstimation(fusedPose, fusedStdDevs, latestTimestamp)));
   }
 
   public Command createKillVisionCommand() {
     return new InstantCommand(() -> visionActive = false);
   }
 
+  // ===== VISION PROCESSING METHODS (all computations replayable) =====
+
+  /**
+   * Process raw coprocessor data into a usable pose estimate. This method performs all RIO-side
+   * computations (filtering, pose transformation, std dev calculation) so they can be replayed.
+   */
+  private VisionPoseEstimation processRawEstimate(
+      AprilVisionInputs inputs, CameraConfiguration config, String cameraName) {
+
+    // Use angular velocity at the time of the vision measurement, not current velocity.
+    // This prevents incorrect filtering/penalties when rotation state has changed since
+    // measurement.
+    double omegaRadPerSec =
+        Math.abs(
+            robotStateInstance.getYawAngularVelocityForTimestamp(
+                inputs.coprocessorEstimationTimestamp));
+
+    // Apply filtering
+    if (!passesFilters(inputs, config, cameraName, omegaRadPerSec)) {
+      return null;
+    }
+
+    // Apply any mechanism relative offsets to this estimated pose
+    Pose2d transformedPose = transformCameraPoseToRobotCenter(inputs.rawCoprocessorPose, config);
+
+    // Compute standard deviations
+    OdometryStandardDevs stdDevs =
+        computeStdDevs(inputs, config, cameraName, omegaRadPerSec, transformedPose);
+
+    return new VisionPoseEstimation(
+        transformedPose, stdDevs, inputs.coprocessorEstimationTimestamp);
+  }
+
+  /** Check if the estimate passes all filtering criteria. */
+  private boolean passesFilters(
+      AprilVisionInputs inputs,
+      CameraConfiguration config,
+      String cameraName,
+      double omegaRadPerSec) {
+    // Reject if too close (garbage data from being inside tag)
+    boolean tooClose = inputs.avgTagDist < config.minTagDistanceMeters;
+
+    // Rotation rate filtering - stricter for single tag
+    boolean rotatingTooFast;
+    if (inputs.tagCount == 1) {
+      rotatingTooFast = omegaRadPerSec > config.maxOmegaForSingleTagRadians;
+    } else {
+      rotatingTooFast = omegaRadPerSec > config.maxOmegaForAnyTagRadians;
+    }
+
+    // Mechanism rotation filtering (e.g., turret rotating too fast)
+    double mechanismOmega = Math.abs(config.mechanismAngularVelocitySupplier.get());
+    boolean mechanismRotatingTooFast = mechanismOmega > config.maxMechanismOmegaRadians;
+
+    // Log rejection reasons
+    AEMLogger.recordOutput(
+        logPrefixStandard + "/" + cameraName + "/omegaRadPerSec", omegaRadPerSec);
+    AEMLogger.recordOutput(logPrefixStandard + "/" + cameraName + "/rejectedTooClose", tooClose);
+    AEMLogger.recordOutput(
+        logPrefixStandard + "/" + cameraName + "/rejectedRotation", rotatingTooFast);
+    AEMLogger.recordOutput(
+        logPrefixStandard + "/" + cameraName + "/mechanismOmegaRadPerSec", mechanismOmega);
+    AEMLogger.recordOutput(
+        logPrefixStandard + "/" + cameraName + "/rejectedMechanismRotation",
+        mechanismRotatingTooFast);
+
+    return !tooClose && !rotatingTooFast && !mechanismRotatingTooFast;
+  }
+
+  /**
+   * Transform the raw coprocessor pose (at camera XY location) to robot center pose. This handles:
+   * - Subtracting the camera XY offset to get robot center position - Subtracting any mechanism yaw
+   * (e.g., turret rotation) to get true robot heading
+   */
+  private Pose2d transformCameraPoseToRobotCenter(Pose2d rawPose, CameraConfiguration config) {
+    // Get mechanism yaw (e.g., turret rotation) - pitch/roll handled by LL via SetRobotOrientation
+    Rotation2d mechanismYaw =
+        Rotation2d.fromRadians(config.mechanismOrigin.get().getRotation().getZ());
+
+    // LL returned pose has rotation = robotYaw + mechanismYaw, so subtract to get robot yaw
+    Rotation2d robotYaw = rawPose.getRotation().minus(mechanismYaw);
+
+    // Camera offset in robot frame - transform to field frame using robot yaw
+    Pose3d cameraPosition = config.getCameraPosition();
+    double offsetX = cameraPosition.getX();
+    double offsetY = cameraPosition.getY();
+    double cosYaw = robotYaw.getCos();
+    double sinYaw = robotYaw.getSin();
+    double fieldOffsetX = offsetX * cosYaw - offsetY * sinYaw;
+    double fieldOffsetY = offsetX * sinYaw + offsetY * cosYaw;
+
+    return new Pose2d(rawPose.getX() - fieldOffsetX, rawPose.getY() - fieldOffsetY, robotYaw);
+  }
+
+  /** Compute standard deviations for a vision estimate. */
+  private OdometryStandardDevs computeStdDevs(
+      AprilVisionInputs inputs,
+      CameraConfiguration config,
+      String cameraName,
+      double omegaRadPerSec,
+      Pose2d transformedPose) {
+
+    // Get base std devs from coprocessor or fallback
+    double baseStdDev = extractBaseStdDev(inputs, config);
+
+    // Apply quality scaling based on tag area
+    double quality = computeQualityScore(inputs.avgTagArea, inputs.tagCount, config);
+    double qualityScaleFactor = 1.0 / quality;
+    double scaledStdDev = baseStdDev * qualityScaleFactor;
+
+    // Apply motion penalties
+    double motionAdjustedStdDev = applyMotionPenalties(scaledStdDev, omegaRadPerSec);
+
+    // Log pre-odom adjustment
+    AEMLogger.recordOutput(logPrefixStandard + "/" + cameraName + "/avgTagArea", inputs.avgTagArea);
+    AEMLogger.recordOutput(logPrefixStandard + "/" + cameraName + "/quality", quality);
+    AEMLogger.recordOutput(
+        logPrefixStandard + "/" + cameraName + "/qualityScaleFactor", qualityScaleFactor);
+    AEMLogger.recordOutput(
+        logPrefixStandard + "/" + cameraName + "/xyStdDevPreOdomAdjust", motionAdjustedStdDev);
+
+    // Apply odometry divergence adjustment
+    OdometryStandardDevs preAdjust =
+        new OdometryStandardDevs(motionAdjustedStdDev, motionAdjustedStdDev, Double.MAX_VALUE);
+    return adjustStdDevsWithOdomPose(
+        preAdjust, inputs.coprocessorEstimationTimestamp, transformedPose);
+  }
+
+  /** Extract base standard deviation from Limelight array or use fallback calculation. */
+  private double extractBaseStdDev(AprilVisionInputs inputs, CameraConfiguration config) {
+    double[] stdDevArray = inputs.rawStdDevsArray;
+
+    if (stdDevArray.length >= EXPECTED_STDDEV_ARRAY_LENGTH) {
+      double xStdDev = stdDevArray[MEGATAG2_X_STDDEV_INDEX];
+      double yStdDev = stdDevArray[MEGATAG2_Y_STDDEV_INDEX];
+
+      if (xStdDev > 0 && yStdDev > 0) {
+        return Math.max(xStdDev, yStdDev);
+      }
+    }
+
+    // Fallback: calculate using distance and tag count
+    double stdDevFactor = Math.pow(inputs.avgTagDist, 2) / Math.max(1, inputs.tagCount);
+    return config.baselineTranslationalStdDev * stdDevFactor;
+  }
+
+  /** Compute quality score based on tag area (percentage of image). */
+  private double computeQualityScore(double avgTagArea, int tagCount, CameraConfiguration config) {
+    double quality;
+
+    if (avgTagArea < config.tagAreaRejectThreshold) {
+      quality = 0.05;
+    } else if (avgTagArea < config.tagAreaFarThreshold) {
+      double t =
+          (avgTagArea - config.tagAreaRejectThreshold)
+              / (config.tagAreaFarThreshold - config.tagAreaRejectThreshold);
+      quality = 0.1 + (t * 0.2);
+    } else if (avgTagArea < config.tagAreaMediumThreshold) {
+      double t =
+          (avgTagArea - config.tagAreaFarThreshold)
+              / (config.tagAreaMediumThreshold - config.tagAreaFarThreshold);
+      quality = 0.3 + (t * 0.3);
+    } else if (avgTagArea < config.tagAreaGoodThreshold) {
+      double t =
+          (avgTagArea - config.tagAreaMediumThreshold)
+              / (config.tagAreaGoodThreshold - config.tagAreaMediumThreshold);
+      quality = 0.6 + (t * 0.3);
+    } else {
+      quality = 1.0;
+    }
+
+    // Multi-tag bonus
+    if (tagCount > 1) {
+      quality = Math.min(1.0, quality * 1.5);
+    }
+
+    return quality;
+  }
+
+  /**
+   * Apply motion penalties to std dev based on translation and rotation velocity. During motion,
+   * vision measurements are delayed by 100-240ms. Without some stddev scaling, the pose estimator
+   * may over-trust stale vision data.
+   *
+   * <p>Uses linear scaling to maintain vision contribution during motion for continuous drift
+   * correction, while still reducing trust at higher speeds.
+   *
+   * @param stdDev Base standard deviation to penalize
+   * @param omegaRadPerSec Angular velocity at the time of the vision measurement
+   * @param timestampSeconds Timestamp of the vision measurement (for future translational velocity
+   *     lookup)
+   */
+  private double applyMotionPenalties(double stdDev, double omegaRadPerSec) {
+    // Note: Using latest translational velocity since we don't have a time buffer for it.
+    // This is less critical than rotation since translational velocity changes more gradually.
+    var chassisSpeeds = robotStateInstance.getLatestMeasuredFieldRelativeChassisSpeeds();
+    double translationalVelocity =
+        Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+
+    // Linear scaling: at 1 m/s -> 1.5x, at 2 m/s -> 2x, at 4 m/s -> 3x
+    // Gentler than exponential to allow vision to still contribute during motion
+    double translationPenalty = 1.0 + (translationalVelocity * 0.5);
+
+    // Rotation penalty: at 1 rad/s (57 deg/s) -> 1.5x, at 2 rad/s -> 2x
+    // Penalizes rotation since MegaTag2 is more sensitive to angular velocity errors
+    double rotationPenalty = 1.0 + (omegaRadPerSec * 0.5);
+    stdDev *= translationPenalty * rotationPenalty;
+
+    return stdDev;
+  }
+
+  /**
+   * Adjust std devs based on divergence between vision and odometry estimates. Currently disabled -
+   * the penalty could be preveting correcting from wrong initial positions and 254 doesn't use this
+   * approach. Limelight's stddev + rotation rejection provide sufficient protection.
+   */
+  private OdometryStandardDevs adjustStdDevsWithOdomPose(
+      OdometryStandardDevs unadjustedStdDevs, double timestampSeconds, Pose2d visionPose) {
+    //    Pose2d odomPose = robotStateInstance.getFieldRobotPoseForTimestamp(timestampSeconds);
+
+    //    if (odomPose == null || visionPose == null) {
+    //      return unadjustedStdDevs;
+    //    }
+
+    //    double distMeters = odomPose.minus(visionPose).getTranslation().getNorm();
+    //    double factor = 1 + (Math.pow(distMeters, 2) * 2);
+
+    //    return new OdometryStandardDevs(
+    //        unadjustedStdDevs.xStdDev() * factor,
+    //        unadjustedStdDevs.yStdDev() * factor,
+    //        unadjustedStdDevs.rotStdDev() * factor);
+    return unadjustedStdDevs;
+  }
+
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
 
-    Logger.recordOutput(standardPrefix + "/VisionActive", visionActive);
+    AEMLogger.recordOutput(standardPrefix + "/VisionActive", visionActive);
 
     for (Pair<AprilCameraIO, AprilVisionInputs> cameraWithInput : camerasWithInputs) {
       AprilCameraIO io = cameraWithInput.getFirst();
@@ -124,7 +488,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
    * @return A command that update network tables with values to use while disabled
    */
   public Command updateNTDisabledCommand() {
-    return new InstantCommand(this::updateNTDisabled);
+    return new InstantCommand(this::updateNTDisabled).ignoringDisable(true);
   }
 
   /**
@@ -133,6 +497,6 @@ public class AprilVisionSubsystem extends AEMSubsystem {
    * @return A command that update network tables with values to use while enabled
    */
   public Command updateNTEnabledCommand() {
-    return new InstantCommand(this::updateNTEnabled);
+    return new InstantCommand(this::updateNTEnabled).ignoringDisable(true);
   }
 }

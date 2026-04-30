@@ -5,10 +5,12 @@ import com.aembot.frc2026.state.subsystems.turret.TurretState;
 import com.aembot.frc2026.subsystems.turret.io.TurretIO;
 import com.aembot.lib.config.motors.MotorConfiguration;
 import com.aembot.lib.core.encoders.CANCoderInputs;
+import com.aembot.lib.core.logging.AEMLogger;
 import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -59,7 +61,11 @@ public class TurretSubsystem
   private void setPositionFromEncoders() {
     double absolutePosition =
         config.getMechanismRotationsFromEncoders(
-            io.getCANcoderA().getRawAngle() - 0.683838, io.getCANcoderB().getRawAngle() - 0.654541);
+            MathUtil.inputModulus(io.getCANcoderA().getRawAngle(), 0, 1),
+            MathUtil.inputModulus(io.getCANcoderB().getRawAngle(), 0, 1),
+            config.kCANcoderAGearTeeth,
+            config.kCANcoderBGearTeeth,
+            config.kMechanismTeeth);
 
     if (absolutePosition == -1) {
       CommandScheduler.getInstance()
@@ -95,19 +101,22 @@ public class TurretSubsystem
 
     // setPositionFromEncoders();
 
-    Logger.recordOutput("encoderA", io.getCANcoderA().getRawAngle());
-    Logger.recordOutput("encoderB", io.getCANcoderB().getRawAngle());
+    AEMLogger.recordOutput("encoderA", io.getCANcoderA().getRawAngle());
+    AEMLogger.recordOutput("encoderB", io.getCANcoderB().getRawAngle());
 
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         "calculatedTurretRot",
         config.getMechanismRotationsFromEncoders(
-            encoderAInputs.absolutePositionRotations - 0.683838,
-            encoderBInputs.absolutePositionRotations - 0.654541));
+            encoderAInputs.absolutePositionRotations,
+            encoderBInputs.absolutePositionRotations,
+            config.kCANcoderAGearTeeth,
+            config.kCANcoderBGearTeeth,
+            config.kMechanismTeeth));
 
     state.updateTurretYaw(Rotation2d.fromDegrees(inputs.positionUnits));
 
     // Log latency with time between periodic being called and finishing
-    Logger.recordOutput(
+    AEMLogger.recordOutput(
         logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - timestamp) * 1000);
 
     motorEnabled = SmartDashboard.getBoolean("Turret Enabled", motorEnabled);

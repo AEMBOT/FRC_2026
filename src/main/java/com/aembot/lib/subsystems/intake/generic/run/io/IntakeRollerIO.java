@@ -1,11 +1,11 @@
-package com.aembot.lib.subsystems.intake.over_bumper.run.io;
+package com.aembot.lib.subsystems.intake.generic.run.io;
 
 import com.aembot.lib.core.logging.Loggable;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
-import com.aembot.lib.subsystems.intake.over_bumper.run.OverBumperIntakeRollerInputs;
+import com.aembot.lib.subsystems.intake.generic.run.IntakeRollerInputs;
 
 /** Base IO layer for an over the bumper intake roller subsystem */
-public interface OverBumperIntakeRollerIO extends Loggable {
+public interface IntakeRollerIO extends Loggable {
 
   /**
    * @return The underlying motor that the io uses
@@ -17,5 +17,5 @@ public interface OverBumperIntakeRollerIO extends Loggable {
    *
    * @param inputs New set of inputs
    */
-  public void updateInputs(OverBumperIntakeRollerInputs inputs);
+  public void updateInputs(IntakeRollerInputs inputs);
 }
