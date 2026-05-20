@@ -44,7 +44,8 @@ public final class ShooterCommands {
 
   private Supplier<Pose2d> robotPoseSupplier;
 
-  private Function<Double, Double> shooterBoost = (distance) -> 0.624737 * distance + (2.60562);
+  private Function<Double, Double> shooterBoost =
+      (distance) -> 0.624737 * distance + (2.60562 - 0.6);
 
   // private double tempShooterBoost = 3.5;
 
