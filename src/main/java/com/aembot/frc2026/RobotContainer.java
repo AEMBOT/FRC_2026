@@ -40,6 +40,7 @@ import org.littletonrobotics.junction.LoggedRobot;
  */
 public class RobotContainer implements Loggerable {
 
+  private final SerialPort LEDS = new SerialPort(115200, SerialPort.Port.kMXP);
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverController = new CommandXboxController(0);
 
@@ -118,11 +119,8 @@ public class RobotContainer implements Loggerable {
 
   /** Use this method to define your controller button -> command mappings */
   private void configureBindings() {
-    SerialPort LEDS = new SerialPort(115200, SerialPort.Port.kMXP);
 
     LEDS.writeString("b");
-
-    LEDS.close();
 
     setupAutos().schedule();
 
@@ -160,11 +158,16 @@ public class RobotContainer implements Loggerable {
 
     // driverController.y() UNUSED
 
+    // driverController
+    //     .x()
+    //     .whileTrue(
+    //         commandFactory.createSetDriveHeadingForUnderTrenchCommand(
+    //             driverController, driverController.leftBumper()));
+
     driverController
         .x()
-        .whileTrue(
-            commandFactory.createSetDriveHeadingForUnderTrenchCommand(
-                driverController, driverController.leftBumper()));
+        .onTrue(new InstantCommand(() -> LEDS.writeString("s")).ignoringDisable(true));
+    // .onFalse(new InstantCommand(() -> LEDS.writeString("b")).ignoringDisable(true));
 
     // driverController.a() UNUSED
 
