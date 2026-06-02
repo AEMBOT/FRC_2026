@@ -19,6 +19,8 @@ import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.SerialPort.Port;
 import java.util.List;
 
 // TODO pretty much everything here is a placeholder
@@ -38,6 +40,8 @@ public class ProductionConfig extends RobotConfiguration {
           .withBumperLengthM(Units.inchesToMeters(35.625))
           .withBumperWidthM(Units.inchesToMeters(35.625))
           .withWheelCoefficientOfFriction(1.2);
+
+  public static final SerialPort.Port LED_STRIP_PORT = SerialPort.Port.kMXP;
 
   private static final ProductionDrivetrainConfig DRIVETRAIN_CONFIG =
       new ProductionDrivetrainConfig(PHYSICAL_CONFIGURATION, DRIVETRAIN_BUS_NAME);
@@ -140,5 +144,10 @@ public class ProductionConfig extends RobotConfiguration {
   @Override
   public TalonFXTurretConfiguration getTurretConfig() {
     return TURRET_CONFIG.TURRET_CONFIG;
+  }
+
+  @Override
+  public Port getLEDStripPort() {
+    return LED_STRIP_PORT;
   }
 }

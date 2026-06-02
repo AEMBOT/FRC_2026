@@ -140,8 +140,6 @@ public class LogEntry<T> {
           break;
         }
 
-        // Otherwise, match first assignable type
-        var paramType = method.getParameterTypes()[1];
         if (method.getParameterTypes()[1].isAssignableFrom(type)) {
           candidates.add(method);
         }

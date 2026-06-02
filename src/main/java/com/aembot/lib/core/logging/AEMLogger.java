@@ -24,6 +24,7 @@ public final class AEMLogger {
     i++;
 
     for (LogEntry<?> entry : keysToLogEntries.values()) {
+      entry.tickSupplier();
       if ((RobotRuntimeConstants.MODE == RuntimeMode.REPLAY
               || (i + entry.kStagger) % entry.kThrottle == 0)
           && entry.hasBeenPushed()) {

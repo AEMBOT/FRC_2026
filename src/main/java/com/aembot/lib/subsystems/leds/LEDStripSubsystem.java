@@ -3,6 +3,7 @@ package com.aembot.lib.subsystems.leds;
 import com.aembot.lib.core.logging.log_entries.LogEntry;
 import com.aembot.lib.subsystems.base.AEMSubsystem;
 import com.aembot.lib.subsystems.leds.interfaces.LEDStripIO;
+import edu.wpi.first.wpilibj2.command.Command;
 
 public class LEDStripSubsystem extends AEMSubsystem {
   public enum LEDPattern {
@@ -51,6 +52,9 @@ public class LEDStripSubsystem extends AEMSubsystem {
   /** Character to send over serial for a mementary sped-up flash of {@link LEDPattern#GAY_FADE} */
   private static final char HUE_FLASH_CODE = 's';
 
+  /** The amount of time the hue flash takes. This is dependent on the arduino-side firmware. */
+  private static final double HUE_FLASH_SECONDS = 0.3;
+
   // I think it's best to declare LogEntries like this for the sake of visibility
   @SuppressWarnings("unused")
   private final LogEntry<LEDPattern> kPatternLog;
@@ -89,20 +93,41 @@ public class LEDStripSubsystem extends AEMSubsystem {
   }
 
   public void setPattern(LEDPattern pattern) {
-    kIO.sendCode(pattern.kCode);
-    kSerialOutLog.pushValue(pattern.kCode);
-    this.currentPattern = pattern;
+    if (getCurrentPattern() != pattern) {
+      kIO.sendCode(pattern.kCode);
+      kSerialOutLog.pushValue(pattern.kCode);
+      this.currentPattern = pattern;
+    }
   }
 
   public void setSpeed(LEDSpeed speed) {
-    kIO.sendCode(speed.kCode);
-    kSerialOutLog.pushValue(speed.kCode);
-    this.currentSpeed = speed;
+    if (getCurrentSpeed() != speed) {
+      kIO.sendCode(speed.kCode);
+      kSerialOutLog.pushValue(speed.kCode);
+      this.currentSpeed = speed;
+    }
   }
 
   public void hueFlash() {
     kIO.sendCode(HUE_FLASH_CODE);
     kSerialOutLog.pushValue(HUE_FLASH_CODE);
+  }
+
+  public Command patternAndSpeedCommand(LEDPattern pattern, LEDSpeed speed) {
+    return runOnce(
+            () -> {
+              this.setPattern(pattern);
+              this.setSpeed(speed);
+            })
+        .withName(pattern.name() + ":" + speed.name())
+        .ignoringDisable(true);
+  }
+
+  public Command hueFlashCommand() {
+    return runOnce(this::hueFlash)
+        .withTimeout(HUE_FLASH_SECONDS)
+        .withName("hueFlashCommand")
+        .ignoringDisable(true);
   }
 
   @Override
