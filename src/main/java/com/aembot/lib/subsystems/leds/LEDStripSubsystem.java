@@ -114,11 +114,8 @@ public class LEDStripSubsystem extends AEMSubsystem {
   }
 
   public Command patternAndSpeedCommand(LEDPattern pattern, LEDSpeed speed) {
-    return runOnce(
-            () -> {
-              this.setPattern(pattern);
-              this.setSpeed(speed);
-            })
+    return runOnce(() -> this.setPattern(pattern))
+        .andThen(runOnce(() -> this.setSpeed(speed)))
         .withName(pattern.name() + ":" + speed.name())
         .ignoringDisable(true);
   }
