@@ -74,12 +74,12 @@ public class LEDStripSubsystem extends AEMSubsystem {
 
     kPatternLog =
         new LogEntry<>(
-            this.logPrefixStandard + "/State", LEDPattern.class, 10, this::getCurrentPattern);
+            this.logPrefixStandard + "/State", LEDPattern.class, 1, this::getCurrentPattern);
     kSpeedLog =
         new LogEntry<>(
-            this.logPrefixStandard + "/Speed", LEDSpeed.class, 10, this::getCurrentSpeed);
+            this.logPrefixStandard + "/Speed", LEDSpeed.class, 1, this::getCurrentSpeed);
 
-    kSerialOutLog = new LogEntry<>(this.logPrefixStandard + "/SerialOut", Character.class, 10);
+    kSerialOutLog = new LogEntry<>(this.logPrefixStandard + "/SerialOut", Character.class, 1);
 
     kIO = io;
   }
@@ -98,6 +98,7 @@ public class LEDStripSubsystem extends AEMSubsystem {
       kSerialOutLog.pushValue(pattern.kCode);
       this.currentPattern = pattern;
     }
+    kPatternLog.pushValue(pattern);
   }
 
   public void setSpeed(LEDSpeed speed) {
@@ -106,6 +107,7 @@ public class LEDStripSubsystem extends AEMSubsystem {
       kSerialOutLog.pushValue(speed.kCode);
       this.currentSpeed = speed;
     }
+    kSpeedLog.pushValue(speed);
   }
 
   public void hueFlash() {
