@@ -76,8 +76,7 @@ public class LEDStripSubsystem extends AEMSubsystem {
         new LogEntry<>(
             this.logPrefixStandard + "/State", LEDPattern.class, 1, this::getCurrentPattern);
     kSpeedLog =
-        new LogEntry<>(
-            this.logPrefixStandard + "/Speed", LEDSpeed.class, 1, this::getCurrentSpeed);
+        new LogEntry<>(this.logPrefixStandard + "/Speed", LEDSpeed.class, 1, this::getCurrentSpeed);
 
     kSerialOutLog = new LogEntry<>(this.logPrefixStandard + "/SerialOut", Character.class, 1);
 
