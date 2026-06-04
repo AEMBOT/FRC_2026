@@ -130,8 +130,6 @@ public final class CommandFactory {
                     Set.of(ledStripSubsystem)))
             .ignoringDisable(true));
 
-    this.aimTrigger.whileTrue(
-        new RepeatCommand(
-            ledStripSubsystem.patternAndSpeedCommand(LEDPattern.RAINBOW, LEDSpeed.FAST)));
+    this.aimTrigger.whileTrue(ledStripSubsystem.hueFlashCommand());
   }
 }
