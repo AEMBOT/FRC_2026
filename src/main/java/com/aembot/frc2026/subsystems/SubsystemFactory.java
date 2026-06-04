@@ -55,6 +55,9 @@ import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeplo
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.io.OverBumperIntakeDeployReplayIO;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.io.OverBumperIntakeDeploySimIO;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.io.TalonFXOverBumperIntakeDeployHardwareIO;
+import com.aembot.lib.subsystems.leds.LEDStripSubsystem;
+import com.aembot.lib.subsystems.leds.io.LEDStripIOReal;
+import com.aembot.lib.subsystems.leds.io.LEDStripIOReplay;
 import com.aembot.lib.subsystems.premades.BinaryVoltageMotorFollowerSubsytem;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -101,6 +104,21 @@ public class SubsystemFactory {
             RobotStateYearly.get());
     }
   }
+
+  public static LEDStripSubsystem createLEDStripSubsystem() {
+    final String SUBSYSTEM_NAME = "LEDStrip";
+
+    switch (RobotRuntimeConstants.MODE) {
+      case REAL:
+        return new LEDStripSubsystem(
+            SUBSYSTEM_NAME,
+            new LEDStripIOReal(RobotRuntimeConstants.ROBOT_CONFIG.getLEDStripPort()));
+      default:
+        return new LEDStripSubsystem(SUBSYSTEM_NAME, new LEDStripIOReplay());
+    }
+  }
+
+  /* ---- ROBOT SPECIFIC ---- */
 
   public static HoodSubsystem createHoodSubsystem() {
 

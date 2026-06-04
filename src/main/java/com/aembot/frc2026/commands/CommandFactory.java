@@ -10,17 +10,23 @@ import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import com.aembot.lib.subsystems.intake.generic.multimotor.IntakeRollerMultiMotorSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
+import com.aembot.lib.subsystems.leds.LEDStripSubsystem;
+import com.aembot.lib.subsystems.leds.LEDStripSubsystem.LEDPattern;
+import com.aembot.lib.subsystems.leds.LEDStripSubsystem.LEDSpeed;
 import com.aembot.lib.subsystems.premades.BinaryVoltageMotorFollowerSubsytem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 public final class CommandFactory {
@@ -109,5 +115,21 @@ public final class CommandFactory {
         DriveCommands.createDriveWithBackwardHeadingCommand(
             driveSubsystem, driverController.getHID(), () -> slowModeButton.getAsBoolean()),
         inAllianceZone);
+  }
+
+  public void configureLEDStripTriggers(LEDStripSubsystem ledStripSubsystem) {
+    ledStripSubsystem.setDefaultCommand(
+        new RepeatCommand(
+                new DeferredCommand(
+                    () ->
+                        ledStripSubsystem.patternAndSpeedCommand(
+                            RobotRuntimeConstants.isRedAlliance()
+                                ? LEDPattern.RED
+                                : LEDPattern.BLUE,
+                            LEDSpeed.NORMAL),
+                    Set.of(ledStripSubsystem)))
+            .ignoringDisable(true));
+
+    this.aimTrigger.whileTrue(ledStripSubsystem.hueFlashCommand());
   }
 }

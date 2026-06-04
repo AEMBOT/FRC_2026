@@ -18,6 +18,7 @@ import com.aembot.lib.config.subsystems.vision.SimulatedCameraConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.pathplanner.lib.config.RobotConfig;
+import edu.wpi.first.wpilibj.SerialPort;
 import java.util.List;
 
 /**
@@ -40,6 +41,11 @@ public abstract class RobotConfiguration {
    * @return Current list of CAN buses used on this robot
    */
   public abstract List<String> getCANBusNames();
+
+  /**
+   * @return The serial port used to communicate with the LED controller
+   */
+  public abstract SerialPort.Port getLEDStripPort();
 
   /**
    * Configuration that will be passed into the drivetrain configuration

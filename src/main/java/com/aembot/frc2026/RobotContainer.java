@@ -17,6 +17,7 @@ import com.aembot.lib.subsystems.flywheel.FlywheelSubsystem;
 import com.aembot.lib.subsystems.hood.HoodSubsystem;
 import com.aembot.lib.subsystems.intake.generic.multimotor.IntakeRollerMultiMotorSubsystem;
 import com.aembot.lib.subsystems.intake.over_bumper.deploy.OverBumperIntakeDeploySubsystem;
+import com.aembot.lib.subsystems.leds.LEDStripSubsystem;
 import com.aembot.lib.subsystems.premades.BinaryVoltageMotorFollowerSubsytem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -44,6 +45,9 @@ public class RobotContainer implements Loggerable {
 
   @SuppressWarnings("unused")
   private final CommandXboxController secondaryController = new CommandXboxController(1);
+
+  /* ---- LEDS ---- */
+  private final LEDStripSubsystem ledStripSubsystem = SubsystemFactory.createLEDStripSubsystem();
 
   /* ---- FLYWHEEL ---- */
   private final FlywheelSubsystem flywheelSubsystem = SubsystemFactory.createFlywheelSubsystem();
@@ -200,6 +204,8 @@ public class RobotContainer implements Loggerable {
     // rest is unused
 
     /* ---- ADDITIONAL TRIGGER BINDINGS ---- */
+
+    commandFactory.configureLEDStripTriggers(ledStripSubsystem);
 
     robotEnabled
         .onTrue(visionSubsystem.updateNTEnabledCommand())
