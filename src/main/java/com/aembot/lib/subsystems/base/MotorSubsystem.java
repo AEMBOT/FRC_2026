@@ -6,11 +6,8 @@ import com.aembot.lib.core.motors.MotorInputs;
 import com.aembot.lib.core.motors.interfaces.MotorIO;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -322,51 +319,6 @@ public abstract class MotorSubsystem<
     */
     return new InstantCommand(() -> setSmartMotionConfigImpl(config))
         .withName("SetSmartMotionConfig");
-  }
-
-  // --- COMMANDS: Control Modifiers
-
-  /**
-   * Disable software limits while this command is run, restoring them as they were before after it
-   * terminates.
-   */
-  public Command withoutSoftwareLimitsTemporailyCommand() {
-    // Needs to be final or else Java will throw a fit. Can't be a pair bcuz its fields are final.
-    // bleh
-    final var prevLimits =
-        new Object() {
-          boolean forwardLimitsEnabled = false;
-          boolean reverseLimitsEnabled = false;
-
-          void fromPair(Pair<Boolean, Boolean> limits) {
-            this.forwardLimitsEnabled = limits.getFirst();
-            this.reverseLimitsEnabled = limits.getSecond();
-          }
-        };
-
-    // This doesn't have any requirements because it shouldn't require the subsystem
-    return Commands.startEnd(
-            () -> {
-              prevLimits.fromPair(io.getEnableSoftwareLimits());
-              io.setEnableSoftwareLimits(false, false);
-            },
-            () -> {
-              io.setEnableSoftwareLimits(
-                  prevLimits.forwardLimitsEnabled, prevLimits.reverseLimitsEnabled);
-            })
-        .withName("WithoutSoftwareLimitsTemp");
-  }
-
-  /**
-   * Run the command passed in with the software limits disabled, renabling them once the command is
-   * complete
-   *
-   * @param commandToRun The command we wish to run with the software limits enabled
-   * @return The command to be run
-   */
-  public Command runWithoutSoftwareLimitsCommand(Command commandToRun) {
-    return new ParallelDeadlineGroup(commandToRun, withoutSoftwareLimitsTemporailyCommand())
-        .withName("Running_" + commandToRun.getName() + "_WithoutSoftwareLimitsTemp");
   }
 
   // --- COMMANDS: Neutral Mode
