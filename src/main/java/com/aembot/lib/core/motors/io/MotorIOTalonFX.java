@@ -278,25 +278,6 @@ public class MotorIOTalonFX implements MotorIO, CANable {
     return CTREUtil.Configuration.Motors.applyConfiguration(talon, config) == StatusCode.OK;
   }
 
-  // FIXME Get rid of these bcuz these should be config things
-  @Override
-  public boolean setEnableSoftwareLimits(boolean forwardLimitEnabled, boolean reverseLimitEnabled) {
-    checkServoMotorConfig();
-
-    this.config.getMotorConfig().SoftwareLimitSwitch.ForwardSoftLimitEnable = forwardLimitEnabled;
-    this.config.getMotorConfig().SoftwareLimitSwitch.ReverseSoftLimitEnable = reverseLimitEnabled;
-    return CTREUtil.Configuration.Motors.applyConfiguration(talon, config) == StatusCode.OK;
-  }
-
-  @Override
-  public Pair<Boolean, Boolean> getEnableSoftwareLimits() {
-    checkServoMotorConfig();
-
-    return new Pair<Boolean, Boolean>(
-        this.config.getMotorConfig().SoftwareLimitSwitch.ForwardSoftLimitEnable,
-        this.config.getMotorConfig().SoftwareLimitSwitch.ReverseSoftLimitEnable);
-  }
-
   @Override
   public boolean setEnableHardwareLimits(boolean forwardLimitEnabled, boolean reverseLimitEnabled) {
     checkServoMotorConfig();
