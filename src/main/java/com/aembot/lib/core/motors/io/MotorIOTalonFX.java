@@ -140,13 +140,20 @@ public class MotorIOTalonFX implements MotorIO, CANable {
    *     context of just the motor
    */
   public MotorIOTalonFX(MotorConfiguration<TalonFXConfiguration> config) {
-    this(TalonFXFactory.createRawWithConfig(config.kCANDevice, config.getMotorConfig().withSoftwareLimitSwitch(
-      new SoftwareLimitSwitchConfigs()
-      .withForwardSoftLimitEnable(Double.isFinite(config.kMaxPositionUnits))
-      .withForwardSoftLimitThreshold(config.getUnitsToRotorRotations(config.kMaxPositionUnits))
-      .withReverseSoftLimitEnable(Double.isFinite(config.kMinPositionUnits))
-      .withReverseSoftLimitThreshold(config.getUnitsToRotorRotations(config.kMinPositionUnits))
-    )), config);
+    this(
+        TalonFXFactory.createRawWithConfig(
+            config.kCANDevice,
+            config
+                .getMotorConfig()
+                .withSoftwareLimitSwitch(
+                    new SoftwareLimitSwitchConfigs()
+                        .withForwardSoftLimitEnable(Double.isFinite(config.kMaxPositionUnits))
+                        .withForwardSoftLimitThreshold(
+                            config.getUnitsToRotorRotations(config.kMaxPositionUnits))
+                        .withReverseSoftLimitEnable(Double.isFinite(config.kMinPositionUnits))
+                        .withReverseSoftLimitThreshold(
+                            config.getUnitsToRotorRotations(config.kMinPositionUnits)))),
+        config);
   }
 
   /**
