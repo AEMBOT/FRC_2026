@@ -52,6 +52,7 @@ public class AprilVisionSubsystem extends AEMSubsystem {
   @Override
   public void periodic() {
     double currentTime = Timer.getFPGATimestamp();
+    visionActive = SmartDashboard.getBoolean("Vision Enabled", true);
 
     List<AprilCameraOutput> rawCameraOutputs = new ArrayList<>();
 
@@ -92,8 +93,6 @@ public class AprilVisionSubsystem extends AEMSubsystem {
           }
         }
       }
-
-      visionActive = SmartDashboard.getBoolean("Vision Enabled", true);
     }
 
     // Fuse multiple camera estimates using inverse-variance weighting
@@ -217,8 +216,17 @@ public class AprilVisionSubsystem extends AEMSubsystem {
             "fused", new VisionPoseEstimation(fusedPose, fusedStdDevs, latestTimestamp)));
   }
 
+  /** Update both the fusion gate and its dashboard control on the main robot thread. */
+  public void setVisionEnabled(boolean enabled) {
+    visionActive = enabled;
+    SmartDashboard.putBoolean("Vision Enabled", enabled);
+    if (!enabled) {
+      robotStateInstance.setApriltagObservations(List.of());
+    }
+  }
+
   public Command createKillVisionCommand() {
-    return new InstantCommand(() -> visionActive = false);
+    return new InstantCommand(() -> setVisionEnabled(false));
   }
 
   // ===== VISION PROCESSING METHODS (all computations replayable) =====

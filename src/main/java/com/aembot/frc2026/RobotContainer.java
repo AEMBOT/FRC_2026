@@ -5,6 +5,7 @@
 package com.aembot.frc2026;
 
 import com.aembot.frc2026.commands.CommandFactory;
+import com.aembot.frc2026.commands.DriveCommands;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.subsystems.SubsystemFactory;
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
@@ -111,6 +112,10 @@ public class RobotContainer implements Loggerable {
             turretSubsystem);
 
     configureBindings();
+    SmartDashboard.putData(
+        "Reset Hub Strafe Test Pose (Vision Off)",
+        DriveCommands.createResetHubStrafeTestPoseCommand(driveSubsystem, visionSubsystem));
+    SmartDashboard.putString("Hub Strafe Test Status", "Not reset this boot");
 
     driveSubsystem.resetPose(new Pose2d(2, 4, Rotation2d.fromDegrees(-180)));
   }

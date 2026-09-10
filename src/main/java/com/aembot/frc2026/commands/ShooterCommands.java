@@ -1,6 +1,7 @@
 package com.aembot.frc2026.commands;
 
 import com.aembot.frc2026.constants.RobotRuntimeConstants;
+import com.aembot.frc2026.constants.field.Field2026;
 import com.aembot.frc2026.state.RobotStateYearly;
 import com.aembot.frc2026.subsystems.turret.TurretSubsystem;
 import com.aembot.frc2026.util.OptimalVelocityTable;
@@ -50,7 +51,7 @@ public final class ShooterCommands {
 
   // private double PASSING_BOOST = 4.5;
 
-  private Translation2d HUB_TRANSLATION = new Translation2d(4.6101, 4.03479);
+  private final Translation2d HUB_TRANSLATION = Field2026.BLUE_HUB_CENTER;
   private Translation2d PASSING_CORNER_LEFT_POS = new Translation2d(1, 7.069326);
   private Translation2d PASSING_CORNER_RIGHT_POS = new Translation2d(1, 1);
   private Translation2d PASSING_CENTER_LEFT_POS = new Translation2d(2.312797, 5.558536);
