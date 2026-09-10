@@ -19,7 +19,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.littletonrobotics.junction.Logger;
 
 public class AprilVisionSubsystem extends AEMSubsystem {
@@ -35,6 +37,13 @@ public class AprilVisionSubsystem extends AEMSubsystem {
 
   private boolean visionActive = true;
 
+  /**
+   * Log key per unordered camera pair, keyed by {@link #pairKey}. Used to report how far apart two
+   * cameras place the robot at the same instant -- the regression metric for camera calibration,
+   * since a correct field map and correct extrinsics make every camera agree.
+   */
+  private final Map<String, String> cameraPairKeys = new HashMap<>();
+
   public AprilVisionSubsystem(RobotState robotStateInstance, AprilCameraIO... cameras) {
     super("VisionSubsystem");
 
@@ -42,6 +51,17 @@ public class AprilVisionSubsystem extends AEMSubsystem {
 
     for (AprilCameraIO camera : cameras) {
       camerasWithInputs.add(Pair.of(camera, new AprilVisionInputs()));
+    }
+
+    // Precompute a log key per camera pair. AEMLogger binds a key to a type permanently on first
+    // use, so the set of keys has to be fixed at construction rather than built from whichever
+    // cameras happen to have an estimate on a given loop.
+    for (int i = 0; i < cameras.length; i++) {
+      for (int j = i + 1; j < cameras.length; j++) {
+        String a = cameras[i].getConfiguration().cameraName;
+        String b = cameras[j].getConfiguration().cameraName;
+        cameraPairKeys.put(pairKey(a, b), logPrefixStandard + "/Disagreement/" + a + "_vs_" + b);
+      }
     }
 
     updateNTDisabled();
@@ -99,6 +119,8 @@ public class AprilVisionSubsystem extends AEMSubsystem {
     // Fuse multiple camera estimates using inverse-variance weighting
     List<AprilCameraOutput> fusedObservations = fuseMultiCameraEstimates(rawCameraOutputs);
 
+    logInterCameraDisagreement(rawCameraOutputs);
+
     AEMLogger.recordOutput(logPrefixStandard + "/RawCameraCount", rawCameraOutputs.size());
     AEMLogger.recordOutput(logPrefixStandard + "/FusedObservationCount", fusedObservations.size());
 
@@ -112,6 +134,43 @@ public class AprilVisionSubsystem extends AEMSubsystem {
 
     AEMLogger.recordOutput(
         logPrefixStandard + "/LatencyPeriodicMS", (Timer.getFPGATimestamp() - currentTime) * 1000);
+  }
+
+  /** Stable, order-independent key for a camera pair. */
+  private static String pairKey(String cameraA, String cameraB) {
+    return cameraA.compareTo(cameraB) <= 0 ? cameraA + "|" + cameraB : cameraB + "|" + cameraA;
+  }
+
+  /**
+   * Log how far apart each pair of cameras places the robot on this loop, plus the worst pair.
+   *
+   * <p>With a correct field map and correct camera extrinsics every camera should agree, so this is
+   * the number to watch when calibrating: large disagreement points at the mounts or the map rather
+   * than at anything the estimator is doing. Only pairs that both produced an estimate this loop
+   * are written.
+   */
+  private void logInterCameraDisagreement(List<AprilCameraOutput> rawOutputs) {
+    double worst = 0;
+
+    for (int i = 0; i < rawOutputs.size(); i++) {
+      for (int j = i + 1; j < rawOutputs.size(); j++) {
+        AprilCameraOutput a = rawOutputs.get(i);
+        AprilCameraOutput b = rawOutputs.get(j);
+
+        Pose2d poseA = a.estimatedPose().latencyUncompensatedPose();
+        Pose2d poseB = b.estimatedPose().latencyUncompensatedPose();
+        if (poseA == null || poseB == null) continue;
+
+        String key = cameraPairKeys.get(pairKey(a.cameraName(), b.cameraName()));
+        if (key == null) continue;
+
+        double disagreement = poseA.getTranslation().getDistance(poseB.getTranslation());
+        AEMLogger.recordOutput(key, disagreement);
+        worst = Math.max(worst, disagreement);
+      }
+    }
+
+    AEMLogger.recordOutput(logPrefixStandard + "/Disagreement/WorstPairMeters", worst);
   }
 
   /**

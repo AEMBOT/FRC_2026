@@ -22,6 +22,7 @@ import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
+import edu.wpi.first.wpilibj.Timer;
 import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -50,9 +51,31 @@ public class Limelight4IOHardware implements AprilCameraIO {
   /* ---- NT SUBSCRIBER ---- */
   private final DoubleArraySubscriber botposeSubscriber;
 
+  /**
+   * A parsed botpose frame plus the timing and validity data that goes with it. Bundled into a
+   * single immutable object so the main thread cannot read a pose from one frame alongside the
+   * timing of another.
+   *
+   * @param estimate the parsed MegaTag2 estimate, with per-tag data in {@code rawFiducials}
+   * @param ntTimestampMicros raw NetworkTables timestamp of the frame, before latency subtraction
+   * @param receivedFpgaTimestamp FPGA time at which the frame was received by the RIO
+   * @param arrayLengthValid whether the array was long enough to contain per-tag data
+   */
+  private record CachedFrame(
+      PoseEstimate estimate,
+      long ntTimestampMicros,
+      double receivedFpgaTimestamp,
+      boolean arrayLengthValid) {}
+
+  private static final CachedFrame EMPTY_FRAME = new CachedFrame(new PoseEstimate(), 0, 0, true);
+
+  /** Number of values the Limelight appends per detected tag after the 11 header values. */
+  private static final int VALS_PER_FIDUCIAL = 7;
+
+  private static final int BOTPOSE_HEADER_VALS = 11;
+
   /* ---- ASYNCHRONOUSLY UPDATED FIELDS ---- */
-  private AtomicReference<PoseEstimate> megatag2Estimate =
-      new AtomicReference<>(new PoseEstimate());
+  private AtomicReference<CachedFrame> megatag2Estimate = new AtomicReference<>(EMPTY_FRAME);
 
   private AtomicReference<double[]> limelightStdDevs = new AtomicReference<>(new double[0]);
 
@@ -102,7 +125,7 @@ public class Limelight4IOHardware implements AprilCameraIO {
     long timestamp = tsValue.timestamp;
 
     if (poseArray.length == 0) {
-      megatag2Estimate.set(new PoseEstimate());
+      megatag2Estimate.set(EMPTY_FRAME);
       return;
     }
 
@@ -117,6 +140,18 @@ public class Limelight4IOHardware implements AprilCameraIO {
     // Convert server timestamp from microseconds to seconds and adjust for latency
     double adjustedTimestamp = (timestamp / 1000000.0) - (latency / 1000.0);
 
+    // Per-tag data is already in this array; parse it rather than paying for another NT read.
+    // A short array means the frame is malformed or truncated, so the per-tag values cannot be
+    // trusted -- fall back to no fiducials and flag it, but keep using the header values so pose
+    // behaviour is unchanged.
+    // Exact match, not >=: a longer-than-expected array means the protocol has drifted (e.g. extra
+    // header values), and the 11 + 7i indexing below would then read misaligned data rather than
+    // failing. Upstream LimelightHelpers checks the same way.
+    boolean arrayLengthValid =
+        poseArray.length == BOTPOSE_HEADER_VALS + (VALS_PER_FIDUCIAL * tagCount);
+    RawFiducial[] rawFiducials =
+        arrayLengthValid ? extractFiducials(poseArray, tagCount) : new RawFiducial[0];
+
     PoseEstimate poseEstimate =
         new PoseEstimate(
             pose,
@@ -126,10 +161,11 @@ public class Limelight4IOHardware implements AprilCameraIO {
             tagSpan,
             tagDist,
             tagArea,
-            new RawFiducial[0],
+            rawFiducials,
             true);
 
-    megatag2Estimate.set(poseEstimate);
+    megatag2Estimate.set(
+        new CachedFrame(poseEstimate, timestamp, Timer.getFPGATimestamp(), arrayLengthValid));
     // Read stddevs synchronously here to ensure they match the pose frame
     limelightStdDevs.set(LimelightExtras.getStandardDeviations(cameraName));
   }
@@ -140,6 +176,29 @@ public class Limelight4IOHardware implements AprilCameraIO {
     }
     return new Pose2d(
         new Translation2d(inData[0], inData[1]), new Rotation2d(Units.degreesToRadians(inData[5])));
+  }
+
+  /**
+   * Pull the per-tag block out of a botpose array. The caller must have already checked that the
+   * array is long enough.
+   */
+  private static RawFiducial[] extractFiducials(double[] inData, int tagCount) {
+    RawFiducial[] fiducials = new RawFiducial[tagCount];
+
+    for (int i = 0; i < tagCount; i++) {
+      int baseIndex = BOTPOSE_HEADER_VALS + (i * VALS_PER_FIDUCIAL);
+      fiducials[i] =
+          new RawFiducial(
+              (int) inData[baseIndex],
+              inData[baseIndex + 1],
+              inData[baseIndex + 2],
+              inData[baseIndex + 3],
+              inData[baseIndex + 4],
+              inData[baseIndex + 5],
+              inData[baseIndex + 6]);
+    }
+
+    return fiducials;
   }
 
   private static double extractArrayEntry(double[] inData, int position) {
@@ -153,14 +212,15 @@ public class Limelight4IOHardware implements AprilCameraIO {
   public void updateInputs(AprilVisionInputs inputs) {
     // Update robot orientation for MegaTag2
     setRobotYawNetworkTables();
-    PoseEstimate poseEstimate = megatag2Estimate.get();
 
-    inputs.latency = poseEstimate.latency;
+    // Read the cached frame once: two separate reads could straddle a callback and mix data from
+    // different frames.
+    CachedFrame frame = megatag2Estimate.get();
+    PoseEstimate estimate = frame.estimate();
 
-    inputs.hasTag = poseEstimate.tagCount > 0;
+    inputs.latency = estimate.latency;
 
-    // Populate RAW coprocessor data (no RIO-side processing)
-    PoseEstimate estimate = megatag2Estimate.get();
+    inputs.hasTag = estimate.tagCount > 0;
 
     if (estimate.tagCount > 0 && estimate.timestampSeconds != lastMegatag2Timestamp) {
       inputs.rawCoprocessorPose = estimate.pose;
@@ -170,14 +230,48 @@ public class Limelight4IOHardware implements AprilCameraIO {
       inputs.coprocessorEstimationTimestamp = estimate.timestampSeconds;
       inputs.rawStdDevsArray = limelightStdDevs.get();
 
+      inputs.rawNtTimestampMicros = frame.ntTimestampMicros();
+      inputs.frameReceivedFpgaTimestamp = frame.receivedFpgaTimestamp();
+      inputs.rawArrayLengthValid = frame.arrayLengthValid();
+      copyFiducialsToInputs(estimate.rawFiducials, inputs);
+
       lastMegatag2Timestamp = estimate.timestampSeconds;
     } else {
       inputs.rawCoprocessorPose = null;
       inputs.tagCount = 0;
+
+      // Clear per-tag data too, so a camera that has stopped seeing tags does not keep reporting
+      // the tags from its last good frame.
+      clearFiducialInputs(inputs);
     }
 
     AEMLogger.recordOutput(
         cameraName + "/tempCelsius", LimelightExtras.getCameraTemperature(cameraName));
+  }
+
+  private static void copyFiducialsToInputs(RawFiducial[] fiducials, AprilVisionInputs inputs) {
+    if (inputs.tagIDs.length != fiducials.length) {
+      inputs.tagIDs = new int[fiducials.length];
+      inputs.tagDistancesToCamera = new double[fiducials.length];
+      inputs.tagAmbiguities = new double[fiducials.length];
+      inputs.tagAreas = new double[fiducials.length];
+    }
+
+    for (int i = 0; i < fiducials.length; i++) {
+      inputs.tagIDs[i] = fiducials[i].id;
+      inputs.tagDistancesToCamera[i] = fiducials[i].distToCamera;
+      inputs.tagAmbiguities[i] = fiducials[i].ambiguity;
+      inputs.tagAreas[i] = fiducials[i].ta;
+    }
+  }
+
+  private static void clearFiducialInputs(AprilVisionInputs inputs) {
+    if (inputs.tagIDs.length != 0) {
+      inputs.tagIDs = new int[0];
+      inputs.tagDistancesToCamera = new double[0];
+      inputs.tagAmbiguities = new double[0];
+      inputs.tagAreas = new double[0];
+    }
   }
 
   private void setRobotYawNetworkTables() {
