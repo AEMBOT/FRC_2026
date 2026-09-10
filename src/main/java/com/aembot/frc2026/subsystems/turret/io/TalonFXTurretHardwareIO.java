@@ -10,6 +10,8 @@ import com.aembot.lib.core.motors.io.MotorIOTalonFX;
 /** Hardware implementation for turret io */
 public class TalonFXTurretHardwareIO implements TurretIO {
 
+  private final TurretTalonFXDiagnostics kDiagnostics;
+
   /** Internal motor used */
   private final MotorIOTalonFX motor;
 
@@ -30,6 +32,7 @@ public class TalonFXTurretHardwareIO implements TurretIO {
    */
   public TalonFXTurretHardwareIO(TalonFXTurretConfiguration config) {
     this.motor = new MotorIOTalonFX(config.kRealMotorConfig);
+    kDiagnostics = new TurretTalonFXDiagnostics(motor.getTalon(), config.kRealMotorConfig);
     this.CANcoderA = new CANCoderIOHardware(config.kCANcoderAConfig);
     this.CANcoderB = new CANCoderIOHardware(config.kCANcoderBConfig);
     this.config = config;
@@ -51,7 +54,9 @@ public class TalonFXTurretHardwareIO implements TurretIO {
   }
 
   @Override
-  public void updateInputs(TurretInputs inputs) {}
+  public void updateInputs(TurretInputs inputs) {
+    kDiagnostics.updateInputs(inputs);
+  }
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {}

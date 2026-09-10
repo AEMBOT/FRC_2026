@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.Notifier;
 /** Simulated IO implementation for the turret */
 public class TurretSimIO implements TurretIO {
 
+  private final TurretTalonFXDiagnostics kDiagnostics;
+
   /** Simulated motor */
   private final MotorIOTalonFXSim simMotor;
 
@@ -34,6 +36,9 @@ public class TurretSimIO implements TurretIO {
   public TurretSimIO(TalonFXTurretConfiguration config) {
     this.config = config;
     this.simMotor = new MotorIOTalonFXSim(config.kSimMotorConfig);
+    kDiagnostics =
+        new TurretTalonFXDiagnostics(
+            simMotor.getTalon(), config.kSimMotorConfig.kRealConfiguration);
     this.simCANcoderA = new CANCoderSimIO(config.kCANcoderAConfig);
     this.simCANcoderB = new CANCoderSimIO(config.kCANcoderBConfig);
     this.simNotifier = new Notifier(() -> updateSim());
@@ -72,7 +77,9 @@ public class TurretSimIO implements TurretIO {
   }
 
   @Override
-  public void updateInputs(TurretInputs inputs) {}
+  public void updateInputs(TurretInputs inputs) {
+    kDiagnostics.updateInputs(inputs);
+  }
 
   @Override
   public void updateLog(String standardPrefix, String inputPrefix) {

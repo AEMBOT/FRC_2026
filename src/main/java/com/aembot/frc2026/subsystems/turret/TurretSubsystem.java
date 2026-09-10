@@ -12,6 +12,7 @@ import com.aembot.lib.subsystems.base.MotorSubsystem;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
@@ -33,6 +34,32 @@ public class TurretSubsystem
 
   private final CANCoderInputs encoderAInputs = new CANCoderInputs();
   private final CANCoderInputs encoderBInputs = new CANCoderInputs();
+
+  private final TurretInputs kTrackingInputs = new TurretInputs();
+  private final String kTrackingInputsKey = logPrefixInput + "/Tracking";
+  private double lastRequestTimestampSeconds = Double.NaN;
+  private double lastLegalTargetDegrees = Double.NaN;
+  private double lastReadTimestampSeconds = Double.NaN;
+  private final String kRawTargetDegreesKey = logPrefixStandard + "/Tracking/RawTargetDegrees";
+  private final String kLegalTargetDegreesKey = logPrefixStandard + "/Tracking/LegalTargetDegrees";
+  private final String kRequestTimestampSecondsKey =
+      logPrefixStandard + "/Tracking/RequestTimestampSeconds";
+  private final String kRequestIntervalSecondsKey =
+      logPrefixStandard + "/Tracking/RequestIntervalSeconds";
+  private final String kRequestMotorEnabledKey =
+      logPrefixStandard + "/Tracking/RequestMotorEnabled";
+  private final String kRequestSlotKey = logPrefixStandard + "/Tracking/RequestSlot";
+  private final String kSnapshotLegalTargetDegreesKey =
+      logPrefixStandard + "/Tracking/SnapshotLegalTargetDegrees";
+  private final String kSnapshotRequestTimestampSecondsKey =
+      logPrefixStandard + "/Tracking/SnapshotRequestTimestampSeconds";
+  private final String kSnapshotRequestAgeSecondsKey =
+      logPrefixStandard + "/Tracking/SnapshotRequestAgeSeconds";
+  private final String kLoopIntervalSecondsKey =
+      logPrefixStandard + "/Tracking/LoopIntervalSeconds";
+  private final String kDriverStationEnabledKey =
+      logPrefixStandard + "/Tracking/DriverStationEnabled";
+  private final String kMotorEnabledKey = logPrefixStandard + "/Tracking/MotorEnabled";
 
   /**
    * Create a new turret subsystem
@@ -123,7 +150,36 @@ public class TurretSubsystem
   }
 
   @Override
+  protected void setSmartPositionSetpointImpl(double position, int slot) {
+    double now = Timer.getFPGATimestamp();
+    double legal =
+        MathUtil.clamp(position, motorConfig.kMinPositionUnits, motorConfig.kMaxPositionUnits);
+    Logger.recordOutput(kRawTargetDegreesKey, position);
+    Logger.recordOutput(kLegalTargetDegreesKey, legal);
+    Logger.recordOutput(kRequestTimestampSecondsKey, now);
+    Logger.recordOutput(kRequestIntervalSecondsKey, now - lastRequestTimestampSeconds);
+    Logger.recordOutput(kRequestMotorEnabledKey, motorEnabled);
+    Logger.recordOutput(kRequestSlotKey, (double) slot);
+    lastRequestTimestampSeconds = now;
+    lastLegalTargetDegrees = legal;
+    super.setSmartPositionSetpointImpl(position, slot);
+  }
+
+  @Override
   public void updateLog(String standardPrefix, String inputPrefix) {
+    // MotorSubsystem has just read motor feedback. Read the additional profile signals
+    // before commands execute, and identify the previously issued request beside this snapshot.
+    io.updateInputs(kTrackingInputs);
+    Logger.processInputs(kTrackingInputsKey, kTrackingInputs);
+    double now = Timer.getFPGATimestamp();
+    Logger.recordOutput(kSnapshotLegalTargetDegreesKey, lastLegalTargetDegrees);
+    Logger.recordOutput(kSnapshotRequestTimestampSecondsKey, lastRequestTimestampSeconds);
+    Logger.recordOutput(kSnapshotRequestAgeSecondsKey, now - lastRequestTimestampSeconds);
+    Logger.recordOutput(kLoopIntervalSecondsKey, now - lastReadTimestampSeconds);
+    Logger.recordOutput(kDriverStationEnabledKey, DriverStation.isEnabled());
+    Logger.recordOutput(kMotorEnabledKey, motorEnabled);
+    lastReadTimestampSeconds = now;
+
     Logger.processInputs(inputPrefix, inputs);
     Logger.processInputs(inputPrefix, encoderAInputs);
     Logger.processInputs(inputPrefix, encoderBInputs);
