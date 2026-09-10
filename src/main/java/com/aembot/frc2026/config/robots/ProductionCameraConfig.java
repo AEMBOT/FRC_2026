@@ -35,8 +35,12 @@ public class ProductionCameraConfig {
   private static final int ENABLED_IMU_MODE = 1;
 
   /* ---- TURRET CAM ---- */
+  // Not physically attached yet — disabled so it's skipped entirely at construction (no NT
+  // traffic, no per-loop polling). Re-enable with .withEnabled(true) once the camera is mounted
+  // (verify the "turret" NT hostname matches the physical Limelight).
   public final CameraConfiguration cameraConfigTurret =
-      CameraConfiguration.makeLimelight4Config("turret_disabled_no_use") // FIXME
+      CameraConfiguration.makeLimelight4Config("turret")
+          .withEnabled(false)
           .withMechanismOrigin(
               () -> {
                 Rotation2d turretYaw = RobotStateYearly.get().turretState.turretYaw.get();

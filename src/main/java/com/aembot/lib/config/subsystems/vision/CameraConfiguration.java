@@ -160,6 +160,16 @@ public class CameraConfiguration {
   /** Max mechanism rotation rate (rad/s) before rejecting all estimates from this camera */
   public double maxMechanismOmegaRadians = Double.MAX_VALUE;
 
+  /**
+   * Whether this camera is wired up and should be polled. When {@code false} the camera is skipped
+   * entirely at subsystem construction — no IO is created, so it does zero NetworkTables work and
+   * produces no log entries. Use this for a camera that isn't physically attached instead of
+   * pointing it at a bogus NT name (which still gets polled every loop). Default {@code true}.
+   *
+   * @see #withEnabled(boolean)
+   */
+  public boolean enabled = true;
+
   public CameraConfiguration(String name, Type type) {
     this.cameraName = name;
     this.cameraType = type;
@@ -201,6 +211,17 @@ public class CameraConfiguration {
    */
   public CameraConfiguration withMechanismOrigin(Supplier<Pose3d> origin) {
     this.mechanismOrigin = origin;
+    return this;
+  }
+
+  /**
+   * Enable or disable this camera. A disabled camera is skipped entirely at subsystem construction
+   * (no IO, no NetworkTables traffic, no logs).
+   *
+   * @see #enabled
+   */
+  public CameraConfiguration withEnabled(boolean enabled) {
+    this.enabled = enabled;
     return this;
   }
 

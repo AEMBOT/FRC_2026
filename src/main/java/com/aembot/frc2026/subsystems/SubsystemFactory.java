@@ -376,27 +376,35 @@ public class SubsystemFactory {
 
     YearFieldConstantable fieldConstants = new Field2026();
 
-    AprilCameraIO[] cameraIOs = new AprilCameraIO[configs.size()];
+    // Only build IO for cameras that are enabled. A disabled camera (e.g. one not physically
+    // attached) is skipped entirely here, so it never opens a NetworkTables table, never runs
+    // updateInputs, and never logs — instead of being "disabled" by pointing it at a bogus NT name
+    // and still polling it every loop.
+    List<AprilCameraIO> cameraIOs = new ArrayList<>();
 
-    for (int i = 0; i < cameraIOs.length; i++) {
+    for (int i = 0; i < configs.size(); i++) {
+      if (!configs.get(i).enabled) {
+        continue;
+      }
       switch (RobotRuntimeConstants.MODE) {
         case SIM:
-          cameraIOs[i] =
+          cameraIOs.add(
               new Limelight4IOSim(
-                  simConfigs.get(i), fieldConstants, RobotStateYearly.get(), simCameraRegistrar);
+                  simConfigs.get(i), fieldConstants, RobotStateYearly.get(), simCameraRegistrar));
           break;
         case REPLAY:
-          cameraIOs[i] = new AprilCameraReplayIO(configs.get(i));
+          cameraIOs.add(new AprilCameraReplayIO(configs.get(i)));
           break;
         default:
         case REAL:
-          cameraIOs[i] =
-              new Limelight4IOHardware(configs.get(i), fieldConstants, RobotStateYearly.get());
+          cameraIOs.add(
+              new Limelight4IOHardware(configs.get(i), fieldConstants, RobotStateYearly.get()));
           break;
       }
     }
 
-    return new AprilVisionSubsystem(RobotStateYearly.get(), cameraIOs);
+    return new AprilVisionSubsystem(
+        RobotStateYearly.get(), cameraIOs.toArray(new AprilCameraIO[0]));
   }
 
   public static FlywheelSubsystem createFlywheelSubsystem() {
