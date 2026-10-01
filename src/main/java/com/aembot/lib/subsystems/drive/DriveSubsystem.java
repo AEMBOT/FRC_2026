@@ -4,6 +4,7 @@ import choreo.trajectory.SwerveSample;
 import com.aembot.lib.config.odometry.OdometryStandardDevs;
 import com.aembot.lib.config.subsystems.drive.DrivetrainConfiguration;
 import com.aembot.lib.core.logging.AEMLogger;
+import com.aembot.lib.core.phoenix6.AEMSwerveDriveState;
 import com.aembot.lib.state.RobotState;
 import com.aembot.lib.subsystems.base.AEMSubsystem;
 import com.aembot.lib.subsystems.drive.io.DrivetrainIO;
@@ -20,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -145,6 +147,16 @@ public class DriveSubsystem extends AEMSubsystem {
    */
   public void resetPose(Pose2d pose) {
     io.resetOdometry(pose);
+  }
+
+  /**
+   * Register a listener that receives every drivetrain state as soon as odometry produces it. Wraps
+   * {@link DrivetrainIO#registerFastStateListener}; the same threading rules apply.
+   *
+   * @param listener Consumer of the latest drivetrain state, called on the odometry thread
+   */
+  public void registerFastStateListener(Consumer<AEMSwerveDriveState> listener) {
+    io.registerFastStateListener(listener);
   }
 
   /**

@@ -25,7 +25,7 @@ public class ProductionTurretConfig {
 
   public final double CRUISE_VELOCITY_DEG_PER_SEC = 720;
 
-  public final double ACCELERATION_DEG_PER_SEC = 720 * 2;
+  public final double ACCELERATION_DEG_PER_SEC_SQUARED = 2500;
 
   public final double GEAR_RATIO = 480.0 / 13.0;
 
@@ -93,9 +93,10 @@ public class ProductionTurretConfig {
                           .withMotionMagicCruiseVelocity(
                               Units.degreesToRotations(CRUISE_VELOCITY_DEG_PER_SEC) * GEAR_RATIO)
                           .withMotionMagicAcceleration(
-                              Units.degreesToRotations(ACCELERATION_DEG_PER_SEC) * GEAR_RATIO))
+                              Units.degreesToRotations(ACCELERATION_DEG_PER_SEC_SQUARED)
+                                  * GEAR_RATIO))
                   .withSlot0(SLOT_0_CONFIGS)
-                  .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(20)))
+                  .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(40)))
           .withCANDevice(
               new CANDeviceID(
                   MOTOR_ID, SUBSYSTEM_NAME + "Motor", SUBSYSTEM_NAME, CANDeviceType.TALON_FX))

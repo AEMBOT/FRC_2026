@@ -93,6 +93,21 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
    */
   public Translation3d getFuelInitVelocity(
       Pose2d robotPose, ChassisSpeeds fieldRelativeChassisSpeeds) {
+    return getFuelInitVelocity(
+        robotPose, fieldRelativeChassisSpeeds, RobotRuntimeConstants.isRedAlliance());
+  }
+
+  /**
+   * Get the optimal velocity for a given pose and velocity, with the alliance supplied by the
+   * caller so it can be called off the main thread without querying the DriverStation
+   *
+   * @param robotPose current pose of the robot, only uses x and y parts
+   * @param fieldRelativeChassisSpeeds speed of the robot relative to the field
+   * @param redAlliance true if the table should be sampled from the red side of the field
+   * @return value of the optimal velocity at the sampled point
+   */
+  public Translation3d getFuelInitVelocity(
+      Pose2d robotPose, ChassisSpeeds fieldRelativeChassisSpeeds, boolean redAlliance) {
 
     double compensatedX =
         robotPose.getX()
@@ -110,7 +125,7 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
     compensatedX = MathUtil.clamp(compensatedX, 0, layout.getFieldLength());
     compensatedY = MathUtil.clamp(compensatedY, 0, layout.getFieldWidth());
 
-    if (RobotRuntimeConstants.isRedAlliance()) {
+    if (redAlliance) {
       // Field is 16.540988 x 8.069326 meters
       compensatedX = 16.540988 - compensatedX;
       compensatedY = 8.069326 - compensatedY;
@@ -134,8 +149,25 @@ public class OptimalVelocityTable extends ConcurrentInterpolatable2DMap<Translat
    */
   public Rotation3d getFuelInitVelocityRotation3d(
       Pose2d robotPose, ChassisSpeeds fieldRelativeChassisSpeeds) {
+    return getFuelInitVelocityRotation3d(
+        robotPose, fieldRelativeChassisSpeeds, RobotRuntimeConstants.isRedAlliance());
+  }
 
-    Translation3d velocity = getFuelInitVelocity(robotPose, fieldRelativeChassisSpeeds);
+  /**
+   * Get a rotation representing the direction of the optimal velocity of fuel at a given pose and
+   * velocity, with the alliance supplied by the caller so it can be called off the main thread
+   * without querying the DriverStation
+   *
+   * @param robotPose current pose of the robot, only uses x and y parts
+   * @param fieldRelativeChassisSpeeds speed of the robot relative to the field
+   * @param redAlliance true if the table should be sampled from the red side of the field
+   * @return direction of the shooter at the sampled point
+   */
+  public Rotation3d getFuelInitVelocityRotation3d(
+      Pose2d robotPose, ChassisSpeeds fieldRelativeChassisSpeeds, boolean redAlliance) {
+
+    Translation3d velocity =
+        getFuelInitVelocity(robotPose, fieldRelativeChassisSpeeds, redAlliance);
 
     double yaw = Math.atan2(velocity.getY(), velocity.getX());
 

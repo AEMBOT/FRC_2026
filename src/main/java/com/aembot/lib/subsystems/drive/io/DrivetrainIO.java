@@ -1,9 +1,11 @@
 package com.aembot.lib.subsystems.drive.io;
 
+import com.aembot.lib.core.phoenix6.AEMSwerveDriveState;
 import com.aembot.lib.subsystems.aprilvision.util.AprilCameraOutput;
 import com.aembot.lib.subsystems.drive.DrivetrainInputs;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Pose2d;
+import java.util.function.Consumer;
 
 public interface DrivetrainIO {
   public void updateInputs(DrivetrainInputs inputs);
@@ -42,4 +44,16 @@ public interface DrivetrainIO {
   void setOdometryStdDevs(double xStd, double yStd, double rotStd);
 
   void addVisionEstimation(AprilCameraOutput cameraOutput);
+
+  /**
+   * Register a listener that receives every swerve drive state as soon as it is produced, rather
+   * than once per robot loop.
+   *
+   * <p>On hardware the listener runs on the drivetrain odometry thread at 250 Hz. It must not log
+   * (AEMLogger is not thread safe), must not block, and must finish in microseconds or it will
+   * delay odometry. Implementations with no odometry thread ignore the listener.
+   *
+   * @param listener Consumer of the latest drivetrain state
+   */
+  default void registerFastStateListener(Consumer<AEMSwerveDriveState> listener) {}
 }

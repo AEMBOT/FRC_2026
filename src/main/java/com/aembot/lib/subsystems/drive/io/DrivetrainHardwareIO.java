@@ -28,6 +28,8 @@ import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -36,6 +38,16 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
     implements DrivetrainIO {
   /** Create a thread safe cached version of the telemetry that we can use to produce logs */
   private AtomicReference<AEMSwerveDriveState> swerveTelemetryCache = new AtomicReference<>();
+
+  /** Listeners called on the odometry thread with every new state */
+  private final List<Consumer<AEMSwerveDriveState>> fastStateListeners =
+      new CopyOnWriteArrayList<>();
+
+  /**
+   * Count of exceptions thrown by fast state listeners. They are caught so a bad listener cannot
+   * kill the odometry thread, and counted so the failure still shows up in the log.
+   */
+  private final AtomicInteger fastStateListenerFailures = new AtomicInteger();
 
   /**
    * Updates the odometry information from the drive train within our overall robot state as well as
@@ -49,6 +61,14 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
             (Timer.getFPGATimestamp() - Utils.getCurrentTimeSeconds()) + aemState.Timestamp;
 
         swerveTelemetryCache.set(aemState);
+
+        for (Consumer<AEMSwerveDriveState> listener : fastStateListeners) {
+          try {
+            listener.accept(aemState);
+          } catch (RuntimeException e) {
+            fastStateListenerFailures.incrementAndGet();
+          }
+        }
       };
 
   private Matrix<N3, N1> stateStdDevs = null;
@@ -190,6 +210,9 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
 
   @Override
   public void logModules(DrivetrainInputs inputs, String prefix) {
+    // Logged here because this is the only per-loop output hook the IO has
+    AEMLogger.recordOutput(prefix + "/FastStateListenerFailures", fastStateListenerFailures.get());
+
     if (inputs.ModuleStates == null) return;
     final String modulePrefix = prefix + "/Modules/";
     for (int i = 0; i < getModules().length; i++) {
@@ -253,5 +276,10 @@ public class DrivetrainHardwareIO extends SwerveDrivetrain<TalonFX, TalonFX, CAN
           Utils.fpgaToCurrentTime(cameraOutput.estimatedPose().timestampSeconds()),
           cameraOutput.estimatedPose().stdDevs().toMatrix());
     }
+  }
+
+  @Override
+  public void registerFastStateListener(Consumer<AEMSwerveDriveState> listener) {
+    fastStateListeners.add(listener);
   }
 }

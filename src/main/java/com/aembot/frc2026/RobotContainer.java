@@ -110,6 +110,13 @@ public class RobotContainer implements Loggerable {
             flywheelSubsystem,
             turretSubsystem);
 
+    // Aim the turret from every drivetrain state instead of once per loop
+    driveSubsystem.registerFastStateListener(
+        state ->
+            turretSubsystem.acceptFastAim(
+                commandFactory.shooterCommands.computeTurretTarget(state),
+                state.timestampRIOSynchronized));
+
     configureBindings();
 
     driveSubsystem.resetPose(new Pose2d(2, 4, Rotation2d.fromDegrees(-180)));
@@ -127,8 +134,7 @@ public class RobotContainer implements Loggerable {
 
     hoodSubsystem.setDefaultCommand(commandFactory.shooterCommands.createHoodDownCommand());
 
-    turretSubsystem.setDefaultCommand(
-        commandFactory.shooterCommands.createTurretTowardsGoalCommand());
+    turretSubsystem.setDefaultCommand(commandFactory.shooterCommands.createTurretFastAimCommand());
 
     intakeRollerSubsystem.setDefaultCommand(
         commandFactory.intakeCommands.createStopIntakeCommand());
