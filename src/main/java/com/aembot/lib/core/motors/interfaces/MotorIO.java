@@ -73,23 +73,6 @@ public interface MotorIO {
   public boolean updateInputs(MotorInputs inputs);
 
   /**
-   * Enable or disabled forward and backwards software limits
-   *
-   * @param forwardLimitEnabled Enable (true) or disable (false) the forward software limits
-   * @param reversLimitEnabled Enable (true) or disable (false) the reverse software limits
-   * @return true on success false on failure
-   */
-  public boolean setEnableSoftwareLimits(boolean forwardLimitEnabled, boolean reverseLimitEnabled);
-
-  /**
-   * Get the current enabled state of both forward and reverse software limits
-   *
-   * @return A pair of booleans, this first is the forwardLimitEnabled state and the second is the
-   *     reverseLimitEnabled state
-   */
-  public Pair<Boolean, Boolean> getEnableSoftwareLimits();
-
-  /**
    * Enable or disabled forward and backwards hardware limits
    *
    * @param forwardLimitEnabled Enable (true) or disable (false) the forward hardware limits from

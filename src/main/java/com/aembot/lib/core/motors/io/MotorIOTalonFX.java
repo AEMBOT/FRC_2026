@@ -11,6 +11,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -139,7 +140,20 @@ public class MotorIOTalonFX implements MotorIO, CANable {
    *     context of just the motor
    */
   public MotorIOTalonFX(MotorConfiguration<TalonFXConfiguration> config) {
-    this(TalonFXFactory.createRawWithConfig(config.kCANDevice, config.getMotorConfig()), config);
+    this(
+        TalonFXFactory.createRawWithConfig(
+            config.kCANDevice,
+            config
+                .getMotorConfig()
+                .withSoftwareLimitSwitch(
+                    new SoftwareLimitSwitchConfigs()
+                        .withForwardSoftLimitEnable(Double.isFinite(config.kMaxPositionUnits))
+                        .withForwardSoftLimitThreshold(
+                            config.getUnitsToRotorRotations(config.kMaxPositionUnits))
+                        .withReverseSoftLimitEnable(Double.isFinite(config.kMinPositionUnits))
+                        .withReverseSoftLimitThreshold(
+                            config.getUnitsToRotorRotations(config.kMinPositionUnits)))),
+        config);
   }
 
   /**
@@ -269,24 +283,6 @@ public class MotorIOTalonFX implements MotorIO, CANable {
     }
 
     return CTREUtil.Configuration.Motors.applyConfiguration(talon, config) == StatusCode.OK;
-  }
-
-  @Override
-  public boolean setEnableSoftwareLimits(boolean forwardLimitEnabled, boolean reverseLimitEnabled) {
-    checkServoMotorConfig();
-
-    this.config.getMotorConfig().SoftwareLimitSwitch.ForwardSoftLimitEnable = forwardLimitEnabled;
-    this.config.getMotorConfig().SoftwareLimitSwitch.ReverseSoftLimitEnable = reverseLimitEnabled;
-    return CTREUtil.Configuration.Motors.applyConfiguration(talon, config) == StatusCode.OK;
-  }
-
-  @Override
-  public Pair<Boolean, Boolean> getEnableSoftwareLimits() {
-    checkServoMotorConfig();
-
-    return new Pair<Boolean, Boolean>(
-        this.config.getMotorConfig().SoftwareLimitSwitch.ForwardSoftLimitEnable,
-        this.config.getMotorConfig().SoftwareLimitSwitch.ReverseSoftLimitEnable);
   }
 
   @Override
