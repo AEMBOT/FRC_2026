@@ -109,8 +109,7 @@ public class RobotContainer implements Loggerable {
             intakeWheelsSubsystem,
             flywheelSubsystem,
             turretSubsystem,
-            secondaryController::getRightY
-            );
+            secondaryController::getRightY);
 
     // Aim the turret from every drivetrain state instead of once per loop
     driveSubsystem.registerFastStateListener(
