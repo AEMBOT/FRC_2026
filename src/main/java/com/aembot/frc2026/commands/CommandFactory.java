@@ -58,6 +58,7 @@ public final class CommandFactory {
   public void logCommands() {
     AEMLogger.recordOutput("Commands/shootFuel", shootFuel);
     AEMLogger.recordOutput("Commands/atSetpoint", shooterCommands.isShooterNearGoal());
+    shooterCommands.logCommands();
   }
 
   public Command createShootFuelCommand() {

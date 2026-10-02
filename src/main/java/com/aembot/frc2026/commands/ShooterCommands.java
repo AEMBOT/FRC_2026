@@ -100,6 +100,10 @@ public final class ShooterCommands {
     shotPositionSupplier = () -> PASSING_CORNER_RIGHT_POS;
   }
 
+  public void logCommands() {
+    AEMLogger.recordOutput("Commands/ShooterCommands/turretOffset", turretOffset);
+  }
+
   /**
    * Computes the turret's field pose by applying the turret origin offset to the robot pose. This
    * accounts for the turret not being at the robot center.
