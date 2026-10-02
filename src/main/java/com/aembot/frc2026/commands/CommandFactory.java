@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 public final class CommandFactory {
 
@@ -39,12 +40,13 @@ public final class CommandFactory {
       IntakeRollerMultiMotorSubsystem intakeRollerSubsystem,
       BinaryVoltageMotorFollowerSubsytem intakeWheelsSubsystem,
       FlywheelSubsystem flywheelSubsystem,
-      TurretSubsystem turretSubsystem) {
+      TurretSubsystem turretSubsystem,
+      DoubleSupplier hoodOffsetAxisSupplier) {
 
     this.driveSubsystem = driveSubsystem;
     this.intakeCommands =
         new IntakeCommands(intakeDeploySubsystem, intakeRollerSubsystem, intakeWheelsSubsystem);
-    this.shooterCommands = new ShooterCommands(hoodSubsystem, turretSubsystem, flywheelSubsystem);
+    this.shooterCommands = new ShooterCommands(hoodSubsystem, turretSubsystem, flywheelSubsystem, hoodOffsetAxisSupplier);
 
     this.aimTrigger =
         new Trigger(() -> shootFuel)

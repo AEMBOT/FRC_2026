@@ -22,6 +22,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+
+import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -67,10 +69,14 @@ public final class ShooterCommands {
   // Offset for the turret in case it gets off for whatever reason
   private volatile double turretOffset = 0.0;
 
-  public ShooterCommands(HoodSubsystem hood, TurretSubsystem turret, FlywheelSubsystem flywheel) {
+  /** Manually applied offset to target hood angle for human adjustment ranging from -1.0 to 1.0 */
+  private final DoubleSupplier hoodOffsetAxisSupplier;
+
+  public ShooterCommands(HoodSubsystem hood, TurretSubsystem turret, FlywheelSubsystem flywheel, DoubleSupplier hoodOffsetSupplier) {
     this.hood = hood;
     this.turret = turret;
     this.flywheel = flywheel;
+    this.hoodOffsetAxisSupplier = hoodOffsetSupplier;
 
     // SmartDashboard.putNumber("ShooterBoost", tempShooterBoost);
 
@@ -216,12 +222,13 @@ public final class ShooterCommands {
    */
   private double getCurrentPitch() {
     Pose2d robotPose = RobotStateYearly.get().getLatestFieldRobotPose();
+    double hoodOffsetDegrees = hoodOffsetAxisSupplier.getAsDouble() * 30;
     return Units.radiansToDegrees(
         getCurrentVelocityTable(robotPose, RobotRuntimeConstants.isBlueAlliance())
             .getFuelInitVelocityRotation3d(
                 getTurretFieldPose(getAimPose(robotPose)),
                 RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds())
-            .getY());
+            .getY()) + hoodOffsetDegrees;
   }
 
   /**
