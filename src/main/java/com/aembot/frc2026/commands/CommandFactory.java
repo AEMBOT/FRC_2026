@@ -46,7 +46,9 @@ public final class CommandFactory {
     this.driveSubsystem = driveSubsystem;
     this.intakeCommands =
         new IntakeCommands(intakeDeploySubsystem, intakeRollerSubsystem, intakeWheelsSubsystem);
-    this.shooterCommands = new ShooterCommands(hoodSubsystem, turretSubsystem, flywheelSubsystem, hoodOffsetAxisSupplier);
+    this.shooterCommands =
+        new ShooterCommands(
+            hoodSubsystem, turretSubsystem, flywheelSubsystem, hoodOffsetAxisSupplier);
 
     this.aimTrigger =
         new Trigger(() -> shootFuel)

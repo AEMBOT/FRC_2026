@@ -18,13 +18,12 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-
 import java.util.function.DoubleSupplier;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 public final class ShooterCommands {
@@ -52,7 +51,11 @@ public final class ShooterCommands {
   private volatile boolean redAlliance = false;
   private volatile boolean blueAlliance = false;
 
-  private Function<Double, Double> shooterBoost = (distance) -> 0.624737 * distance + (2.60562);
+  // Flywheel boost in m/s as a linear function of distance to target, tunable from SmartDashboard
+  private static final String BOOST_SLOPE_KEY = "ShooterBoost/Slope";
+  private static final String BOOST_INTERCEPT_KEY = "ShooterBoost/Intercept";
+  private double shooterBoostSlope = 0.624737;
+  private double shooterBoostIntercept = 2.60562;
 
   // private double tempShooterBoost = 3.5;
 
@@ -72,13 +75,18 @@ public final class ShooterCommands {
   /** Manually applied offset to target hood angle for human adjustment ranging from -1.0 to 1.0 */
   private final DoubleSupplier hoodOffsetAxisSupplier;
 
-  public ShooterCommands(HoodSubsystem hood, TurretSubsystem turret, FlywheelSubsystem flywheel, DoubleSupplier hoodOffsetSupplier) {
+  public ShooterCommands(
+      HoodSubsystem hood,
+      TurretSubsystem turret,
+      FlywheelSubsystem flywheel,
+      DoubleSupplier hoodOffsetSupplier) {
     this.hood = hood;
     this.turret = turret;
     this.flywheel = flywheel;
     this.hoodOffsetAxisSupplier = hoodOffsetSupplier;
 
-    // SmartDashboard.putNumber("ShooterBoost", tempShooterBoost);
+    SmartDashboard.putNumber(BOOST_SLOPE_KEY, shooterBoostSlope);
+    SmartDashboard.putNumber(BOOST_INTERCEPT_KEY, shooterBoostIntercept);
 
     String velocityTableDirectory = Filesystem.getDeployDirectory() + "/initial-velocities/real/";
     if (RobotRuntimeConstants.MODE == RuntimeMode.SIM) {
@@ -108,6 +116,9 @@ public final class ShooterCommands {
 
   public void logCommands() {
     AEMLogger.recordOutput("Commands/ShooterCommands/turretOffset", turretOffset);
+
+    shooterBoostSlope = SmartDashboard.getNumber(BOOST_SLOPE_KEY, shooterBoostSlope);
+    shooterBoostIntercept = SmartDashboard.getNumber(BOOST_INTERCEPT_KEY, shooterBoostIntercept);
   }
 
   /**
@@ -224,11 +235,12 @@ public final class ShooterCommands {
     Pose2d robotPose = RobotStateYearly.get().getLatestFieldRobotPose();
     double hoodOffsetDegrees = hoodOffsetAxisSupplier.getAsDouble() * 30;
     return Units.radiansToDegrees(
-        getCurrentVelocityTable(robotPose, RobotRuntimeConstants.isBlueAlliance())
-            .getFuelInitVelocityRotation3d(
-                getTurretFieldPose(getAimPose(robotPose)),
-                RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds())
-            .getY()) + hoodOffsetDegrees;
+            getCurrentVelocityTable(robotPose, RobotRuntimeConstants.isBlueAlliance())
+                .getFuelInitVelocityRotation3d(
+                    getTurretFieldPose(getAimPose(robotPose)),
+                    RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds())
+                .getY())
+        + hoodOffsetDegrees;
   }
 
   /**
@@ -250,7 +262,9 @@ public final class ShooterCommands {
     } else {
       dist = pos.getDistance(PositionUtil.flipForAlliance(shotPositionSupplier.get()));
     }
-    boost = shooterBoost.apply(dist);
+    boost = shooterBoostSlope * dist + shooterBoostIntercept;
+    AEMLogger.recordOutput("Commands/ShooterCommands/BoostDistance", dist);
+    AEMLogger.recordOutput("Commands/ShooterCommands/Boost", boost);
 
     return (RobotRuntimeConstants.MODE == RuntimeMode.REAL) ? boost : 0.4;
     // return tempShooterBoost;
@@ -261,11 +275,13 @@ public final class ShooterCommands {
    */
   private double getCurrentSpeed() {
     Pose2d robotPose = RobotStateYearly.get().getLatestFieldRobotPose();
-    return getCurrentVelocityTable(robotPose, RobotRuntimeConstants.isBlueAlliance())
+    double tableSpeed =
+        getCurrentVelocityTable(robotPose, RobotRuntimeConstants.isBlueAlliance())
             .getFuelInitVelocityMagnitude(
                 getTurretFieldPose(getAimPose(robotPose)),
-                RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds())
-        + getFlywheelSpeedBoost();
+                RobotStateYearly.get().getLatestMeasuredFieldRelativeChassisSpeeds());
+    AEMLogger.recordOutput("Commands/ShooterCommands/TableSpeed", tableSpeed);
+    return tableSpeed + getFlywheelSpeedBoost();
   }
 
   /* ---- HOOD COMMANDS ---- */
