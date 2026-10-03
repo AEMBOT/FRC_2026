@@ -55,7 +55,7 @@ public final class ShooterCommands {
   private static final String BOOST_SLOPE_KEY = "ShooterBoost/Slope";
   private static final String BOOST_INTERCEPT_KEY = "ShooterBoost/Intercept";
   private double shooterBoostSlope = 0.624737;
-  private double shooterBoostIntercept = 2.1;
+  private double shooterBoostIntercept = 2.60562;
 
   // private double tempShooterBoost = 3.5;
 
