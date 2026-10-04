@@ -74,7 +74,7 @@ public class ProductionIntakeConfig {
       new CurrentLimitsConfigs().withSupplyCurrentLimit(30);
 
   public final CurrentLimitsConfigs WHEEL_CURRENT_LIMITS =
-      new CurrentLimitsConfigs().withSupplyCurrentLimit(30);
+      new CurrentLimitsConfigs().withSupplyCurrentLimit(30).withStatorCurrentLimit(40);
 
   public final NeutralMode ROLLER_NEUTRAL_MODE = NeutralMode.BRAKE;
 
