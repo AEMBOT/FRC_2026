@@ -30,7 +30,7 @@ class ShooterCommandsAimTest {
     DriverStationSim.notifyNewData();
 
     // The aim math never touches the subsystems
-    shooterCommands = new ShooterCommands(null, null, null);
+    shooterCommands = new ShooterCommands(null, null, null, null, () -> 0.0, () -> 0.0);
     shooterCommands.refreshAlliance();
   }
 

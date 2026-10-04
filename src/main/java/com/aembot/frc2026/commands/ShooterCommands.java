@@ -70,20 +70,29 @@ public final class ShooterCommands {
   private final Pose2d TOWER_SHOT_POSE = new Pose2d(1.541, 3.709, Rotation2d.kZero);
 
   // Offset for the turret in case it gets off for whatever reason
-  private volatile double turretOffset = 0.0;
+  // private volatile double turretOffset = 0.0;
+
+  private boolean turretManual = false;
 
   /** Manually applied offset to target hood angle for human adjustment ranging from -1.0 to 1.0 */
   private final DoubleSupplier hoodOffsetAxisSupplier;
+
+  private final DoubleSupplier turretManualXAxisSupplier;
+  private final DoubleSupplier turretManualYAxisSupplier;
 
   public ShooterCommands(
       HoodSubsystem hood,
       TurretSubsystem turret,
       FlywheelSubsystem flywheel,
-      DoubleSupplier hoodOffsetSupplier) {
+      DoubleSupplier hoodOffsetSupplier,
+      DoubleSupplier turretXAxisSupplier,
+      DoubleSupplier turretYAxisSupplier) {
     this.hood = hood;
     this.turret = turret;
     this.flywheel = flywheel;
     this.hoodOffsetAxisSupplier = hoodOffsetSupplier;
+    this.turretManualXAxisSupplier = turretXAxisSupplier;
+    this.turretManualYAxisSupplier = turretYAxisSupplier;
 
     SmartDashboard.putNumber(BOOST_SLOPE_KEY, shooterBoostSlope);
     SmartDashboard.putNumber(BOOST_INTERCEPT_KEY, shooterBoostIntercept);
@@ -115,7 +124,8 @@ public final class ShooterCommands {
   }
 
   public void logCommands() {
-    AEMLogger.recordOutput("Commands/ShooterCommands/turretOffset", turretOffset);
+    AEMLogger.recordOutput(
+        "Commands/ShooterCommands/turretOffset", turretManualXAxisSupplier.getAsDouble());
 
     shooterBoostSlope = SmartDashboard.getNumber(BOOST_SLOPE_KEY, shooterBoostSlope);
     shooterBoostIntercept = SmartDashboard.getNumber(BOOST_INTERCEPT_KEY, shooterBoostIntercept);
@@ -321,13 +331,24 @@ public final class ShooterCommands {
     // Read the cached alliance once so the whole calculation agrees on it
     boolean red = redAlliance;
 
-    double targetRotation =
-        getCurrentVelocityTable(robotPose, blueAlliance)
-            .getFuelInitVelocityRotation3d(
-                getTurretFieldPose(getAimPose(robotPose)), fieldSpeeds, red)
-            .toRotation2d()
-            .minus(robotPose.getRotation())
-            .getDegrees();
+    double targetRotation = 0.0;
+
+    if (!turretManual) {
+      targetRotation =
+          getCurrentVelocityTable(robotPose, blueAlliance)
+                  .getFuelInitVelocityRotation3d(
+                      getTurretFieldPose(getAimPose(robotPose)), fieldSpeeds, red)
+                  .toRotation2d()
+                  .minus(robotPose.getRotation())
+                  .getDegrees()
+              + (turretManualXAxisSupplier.getAsDouble() * 90);
+    } else {
+      targetRotation =
+          Math.atan2(
+                  turretManualYAxisSupplier.getAsDouble(), turretManualXAxisSupplier.getAsDouble())
+              - robotPose.getRotation().getRadians();
+      targetRotation = -Units.radiansToDegrees(targetRotation);
+    }
 
     // Because of the way the the auto aim tables are set up, need to rotate turret 180 when on red
     // alliance
@@ -339,7 +360,7 @@ public final class ShooterCommands {
 
     double scaledValue = ((targetRotation - 180) * 0.1);
 
-    return MathUtil.inputModulus(targetRotation + scaledValue + turretOffset, 0, 360);
+    return MathUtil.inputModulus(targetRotation + scaledValue, 0, 360);
   }
 
   /**
@@ -403,14 +424,29 @@ public final class ShooterCommands {
    * @return A command to increase the turret offset
    */
   public Command createTurretOffsetIncreaseCommand() {
-    return new RunCommand(() -> turretOffset += 0.1);
+    // return new RunCommand(() -> turretOffset += 0.1);
+    return new InstantCommand();
   }
 
   /**
    * @return A command to increase the turret offset
    */
   public Command createTurretOffsetDecreaseCommand() {
-    return new RunCommand(() -> turretOffset -= 0.1);
+    return new InstantCommand();
+  }
+
+  public Command createTurretGoManualCommand() {
+    return new InstantCommand(
+        () -> {
+          this.turretManual = true;
+        });
+  }
+
+  public Command createTurretGoAutoCommand() {
+    return new InstantCommand(
+        () -> {
+          this.turretManual = false;
+        });
   }
 
   /* ---- FLYWHEEL COMMANDS ---- */

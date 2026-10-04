@@ -41,14 +41,21 @@ public final class CommandFactory {
       BinaryVoltageMotorFollowerSubsytem intakeWheelsSubsystem,
       FlywheelSubsystem flywheelSubsystem,
       TurretSubsystem turretSubsystem,
-      DoubleSupplier hoodOffsetAxisSupplier) {
+      DoubleSupplier hoodOffsetAxisSupplier,
+      DoubleSupplier turretOffsetAxisXSupplier,
+      DoubleSupplier turretOffsetAxisYSupplier) {
 
     this.driveSubsystem = driveSubsystem;
     this.intakeCommands =
         new IntakeCommands(intakeDeploySubsystem, intakeRollerSubsystem, intakeWheelsSubsystem);
     this.shooterCommands =
         new ShooterCommands(
-            hoodSubsystem, turretSubsystem, flywheelSubsystem, hoodOffsetAxisSupplier);
+            hoodSubsystem,
+            turretSubsystem,
+            flywheelSubsystem,
+            hoodOffsetAxisSupplier,
+            turretOffsetAxisXSupplier,
+            turretOffsetAxisYSupplier);
 
     this.aimTrigger =
         new Trigger(() -> shootFuel)

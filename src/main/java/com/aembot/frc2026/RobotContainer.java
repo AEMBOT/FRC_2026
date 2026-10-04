@@ -109,7 +109,9 @@ public class RobotContainer implements Loggerable {
             intakeWheelsSubsystem,
             flywheelSubsystem,
             turretSubsystem,
-            secondaryController::getRightY);
+            secondaryController::getRightY,
+            secondaryController::getLeftX,
+            secondaryController::getLeftY);
 
     // Aim the turret from every drivetrain state instead of once per loop
     driveSubsystem.registerFastStateListener(
@@ -196,6 +198,11 @@ public class RobotContainer implements Loggerable {
     /* ---- SECONDARY CONTROLLER BINDINGS ---- */
 
     secondaryController.leftBumper().onTrue(visionSubsystem.createKillVisionCommand());
+
+    secondaryController
+        .rightBumper()
+        .onTrue(commandFactory.shooterCommands.createTurretGoManualCommand())
+        .onFalse(commandFactory.shooterCommands.createTurretGoAutoCommand());
 
     secondaryController
         .x()
