@@ -67,7 +67,8 @@ public class TimothyTunerConstants {
                   // stator current limit to help avoid brownouts without impacting performance.
                   .withSupplyCurrentLimit(Amps.of(25))
                   .withStatorCurrentLimit(Amps.of(80))
-                  .withStatorCurrentLimitEnable(true));
+                  .withStatorCurrentLimitEnable(true)
+                  .withSupplyCurrentLimitEnable(true));
   private static final TalonFXConfiguration steerInitialConfigs =
       new TalonFXConfiguration()
           .withCurrentLimits(
